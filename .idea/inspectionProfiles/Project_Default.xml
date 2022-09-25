@@ -1,0 +1,30 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <value>
+          <list size="17">
+            <item index="0" class="java.lang.String" itemvalue="Flask-Reuploaded" />
+            <item index="1" class="java.lang.String" itemvalue="kaleido" />
+            <item index="2" class="java.lang.String" itemvalue="Flask-Uploads" />
+            <item index="3" class="java.lang.String" itemvalue="sklearn" />
+            <item index="4" class="java.lang.String" itemvalue="spikeextractors" />
+            <item index="5" class="java.lang.String" itemvalue="tzdata" />
+            <item index="6" class="java.lang.String" itemvalue="probeinterface" />
+            <item index="7" class="java.lang.String" itemvalue="Werkzeug-Raw" />
+            <item index="8" class="java.lang.String" itemvalue="plotly-express" />
+            <item index="9" class="java.lang.String" itemvalue="mountainsort4" />
+            <item index="10" class="java.lang.String" itemvalue="redis" />
+            <item index="11" class="java.lang.String" itemvalue="selenium" />
+            <item index="12" class="java.lang.String" itemvalue="Flask-Mail" />
+            <item index="13" class="java.lang.String" itemvalue="pySmartDL" />
+            <item index="14" class="java.lang.String" itemvalue="PyPrind" />
+            <item index="15" class="java.lang.String" itemvalue="jp-proxy-widget" />
+            <item index="16" class="java.lang.String" itemvalue="pipwin" />
+          </list>
+        </value>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>
