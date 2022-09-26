@@ -123,10 +123,13 @@ def get_df_behav(path=None,
     ferrData = allData.loc[allData.ferretname == ferret]
     # if ferret == 'F1702_Zola':
     #     ferrData = ferrData.loc[(ferrData.dates != '2021-10-04 10:25:00')]
-    allData = allData[allData['catchTrial'].isin([0])]
-    #allData = allData[allData['response'].isin(['0', '1'])]
-    pitchshiftmat = allData['PitchShiftMat']
-    precursorlist = allData['distractors']
+    # newdata = allData[allData['catchTrial'].isin([0])]
+    # newdata[newdata['response'].isin([0,1])]
+    # allData=newdata
+    newdata=allData[(allData.response == 0) | (allData.response == 1)]
+
+    pitchshiftmat = newdata['PitchShiftMat']
+    precursorlist = newdata['distractors']
     pitchoftarg = np.empty(len(pitchshiftmat))
     pitchofprecur = np.empty(len(pitchshiftmat))
 
@@ -155,10 +158,10 @@ def get_df_behav(path=None,
         #         pitchoftarg[i] = 0
         #         pitchofprecur[i] = 0
 
-    allData['pitchoftarg'] = pitchoftarg.tolist()
-    allData['pitchofprecur'] = pitchofprecur.tolist()
+    newdata['pitchoftarg'] = pitchoftarg.tolist()
+    newdata['pitchofprecur'] = pitchofprecur.tolist()
 
-    return allData
+    return newdata
 
     # ferretFigs = reactionTimeAnalysis(ferrData)
     # dataSet._save(figs=ferretFigs, file_name='reaction_times_{}_{}_{}.pdf'.format(ferret, startdate, finishdate))
