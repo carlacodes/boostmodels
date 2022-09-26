@@ -119,6 +119,7 @@ def get_df_behav(path=None,
     pitchshiftmat = allData['PitchShiftMat']
     precursorlist = allData['distractors']
     pitchoftarg = np.empty(len(pitchshiftmat))
+    pitchofprecur=np.empty(len(pitchshiftmat))
     for i in range(0, len(pitchshiftmat)):
         chosentrial = pitchshiftmat[i]
         chosendisttrial = precursorlist[i]
@@ -138,10 +139,13 @@ def get_df_behav(path=None,
         else:
             try:
                 pitchoftarg[i] = chosentrial[targpos]
+                pitchofprecur[i]=chosentrial[targpos-1]
             except:
                 pitchoftarg[i] = 0
+                pitchofprecur[i] = 0
 
     allData['pitchoftarg'] = pitchoftarg.tolist()
+    allData['pitchofprecur']=pitchofprecur.tolist()
 
     return allData
 
