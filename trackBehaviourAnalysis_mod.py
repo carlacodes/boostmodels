@@ -6,6 +6,10 @@ from instruments.behaviouralAnalysis import createWeekBehaviourFigs, reactionTim
 import math
 import numpy as np
 
+import pandas as pd
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+from statsmodels.tools.sm_exceptions import ConvergenceWarning
 
 # jules' extract behvioural data analysis
 # @click.group()
@@ -80,8 +84,8 @@ def cli_reaction_time(path=None,
     # for ferret in ferrets:
     ferret = ferrets
     ferrData = allData.loc[allData.ferretname == ferret]
-    if ferret == 'F1702_Zola':
-        ferrData = ferrData.loc[(ferrData.dates != '2021-10-04 10:25:00')]
+    # if ferret == 'F1702_Zola':
+    #     ferrData = ferrData.loc[(ferrData.dates != '2021-10-04 10:25:00')]
 
     ferretFigs = reactionTimeAnalysis(ferrData)
     dataSet._save(figs=ferretFigs, file_name='reaction_times_{}_{}_{}.pdf'.format(ferret, startdate, finishdate))
@@ -112,10 +116,10 @@ def get_df_behav(path=None,
     allData = dataSet._load()
 
     # for ferret in ferrets:
-    ferret = ferrets
-    ferrData = allData.loc[allData.ferretname == ferret]
-    if ferret == 'F1702_Zola':
-        ferrData = ferrData.loc[(ferrData.dates != '2021-10-04 10:25:00')]
+
+    #ferrData = allData.loc[allData.ferretname == ferret]
+    # if ferret == 'F1702_Zola':
+    #     ferrData = ferrData.loc[(ferrData.dates != '2021-10-04 10:25:00')]
     pitchshiftmat = allData['PitchShiftMat']
     precursorlist = allData['distractors']
     pitchoftarg = np.empty(len(pitchshiftmat))
@@ -157,5 +161,17 @@ def get_df_behav(path=None,
 # cli.add_command(cli_reaction_time)
 
 if __name__ == '__main__':
-    df = get_df_behav(ferrets='F1702_Zola', startdate='04-01-2020', finishdate='04-01-2022')
-    cli_reaction_time(ferrets='F1702_Zola', startdate='04-01-2020', finishdate='04-01-2022')
+    ferrets = "F1702_Zola", "F1815_Cruella"
+    for i, currFerr in enumerate(ferrets):
+        print(i, currFerr)
+    df = get_df_behav(ferrets=ferrets, startdate='04-01-2020', finishdate='04-01-2022')
+    #cli_reaction_time(ferrets='F1702_Zola', startdate='04-01-2020', finishdate='04-01-2022')
+    data = sm.datasets.get_rdataset("Sitka", "MASS").data
+    endog = data["size"]
+    endog = df['response']
+    data["Intercept"] = 1
+    exog = df[["pitchoftarg", "pitchofprecur"]]
+    exog["Intercept"]=1
+    md = sm.MixedLM(endog, exog, groups=df["ferret"], exog_re=exog["Intercept"])
+    mdf = md.fit()
+    print(mdf.summary())
