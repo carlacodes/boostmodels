@@ -133,9 +133,9 @@ def get_df_behav(path=None,
     pitchoftarg = np.empty(len(pitchshiftmat))
     pitchofprecur = np.empty(len(pitchshiftmat))
 
-    for i in range(0, len(pitchshiftmat)):
-        chosentrial = pitchshiftmat[i]
-        chosendisttrial = precursorlist[i]
+    for i in range(-1, len(pitchshiftmat)):
+        chosentrial = pitchshiftmat.values[i]
+        chosendisttrial = precursorlist.values[i]
 
         targpos = np.where(chosendisttrial == 1)
         pitchoftarg[i] = chosentrial[targpos[0] - 1]
