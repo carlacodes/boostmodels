@@ -126,7 +126,7 @@ def get_df_behav(path=None,
     # newdata = allData[allData['catchTrial'].isin([0])]
     # newdata[newdata['response'].isin([0,1])]
     # allData=newdata
-    newdata=allData[(allData.response == 0) | (allData.response == 1) | (allData.response == 7)]
+    newdata = allData[(allData.response == 0) | (allData.response == 1) | (allData.response == 7)]
 
     pitchshiftmat = newdata['PitchShiftMat']
     precursorlist = newdata['distractors']
@@ -176,6 +176,7 @@ if __name__ == '__main__':
     #     print(i, currFerr)
     df = get_df_behav(ferrets=ferrets, startdate='04-01-2020', finishdate='04-01-2022')
     # cli_reaction_time(ferrets='F1702_Zola', startdate='04-01-2020', finishdate='04-01-2022')
+    # TODO add relative lick release time as a column
     data = sm.datasets.get_rdataset("Sitka", "MASS").data
     endog = df['response']
     data["Intercept"] = 1
