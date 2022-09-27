@@ -147,7 +147,11 @@ def get_df_behav(path=None,
         chosendisttrial = precursorlist.values[i]
 
         targpos = np.where(chosendisttrial == 1)
-        pitchoftarg[i] = chosentrial[targpos[0] - 1]
+        try:
+            pitchoftarg[i] = chosentrial[targpos[0] - 1]
+        except:
+            newdata.drop(i)
+            continue
         if chosentrial[targpos[0] - 1] == 0:
             pitchoftarg[i] = talkerlist.values[i]
         pitchofprecur[i] = chosentrial[targpos[0] - 2]
@@ -184,10 +188,10 @@ def get_df_behav(path=None,
 # cli.add_command(cli_reaction_time)
 
 if __name__ == '__main__':
-    ferrets = ['F1702_Zola', 'F1815_Cruella']
+    ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
     # for i, currFerr in enumerate(ferrets):
     #     print(i, currFerr)
-    df = get_df_behav(ferrets=ferrets, startdate='04-01-2020', finishdate='04-01-2022')
+    df = get_df_behav(ferrets=ferrets, startdate='04-01-2020', finishdate='27-01-2022')
     # cli_reaction_time(ferrets='F1702_Zola', startdate='04-01-2020', finishdate='04-01-2022')
     # TODO add relative lick release time as a column
     data = sm.datasets.get_rdataset("Sitka", "MASS").data
