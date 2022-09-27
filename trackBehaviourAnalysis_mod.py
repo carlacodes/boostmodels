@@ -113,19 +113,19 @@ def get_df_behav(path=None,
                                finishDate=finishdate,
                                ferrets=ferrets,
                                outDir=output)
-    # allData, ferrets = extractAllFerretData(ferrets, path, startDate=startdate,
-    # finishDate=finishdate)
+    allData, ferrets = extractAllFerretData(ferrets, path, startDate=startdate,
+    finishDate=finishdate)
 
-    allData = dataSet._load()
+    # allData = dataSet._load()
 
     # for ferret in ferrets:
     ferret = ferrets
-    ferrData = allData.loc[allData.ferretname == ferret]
+    #ferrData = allData.loc[allData.ferretname == ferret]
     # if ferret == 'F1702_Zola':
     #     ferrData = ferrData.loc[(ferrData.dates != '2021-10-04 10:25:00')]
     # newdata = allData[allData['catchTrial'].isin([0])]
     # newdata[newdata['response'].isin([0,1])]
-    # allData=newdata
+    # allData = newdata
     newdata = allData[(allData.response == 0) | (allData.response == 1) | (allData.response == 7)]
 
     pitchshiftmat = newdata['PitchShiftMat']
@@ -171,7 +171,7 @@ def get_df_behav(path=None,
 # cli.add_command(cli_reaction_time)
 
 if __name__ == '__main__':
-    ferrets = 'F1702_Zola'
+    ferrets = ['F1702_Zola', 'F1815_Cruella']
     # for i, currFerr in enumerate(ferrets):
     #     print(i, currFerr)
     df = get_df_behav(ferrets=ferrets, startdate='04-01-2020', finishdate='04-01-2022')
