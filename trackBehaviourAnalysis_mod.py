@@ -200,5 +200,8 @@ if __name__ == '__main__':
     exog = df[["pitchoftarg", "pitchofprecur", "talker"]]
     exog["Intercept"] = 1
     md = sm.MixedLM(endog, exog, groups=df["ferret"], exog_re=exog["Intercept"])
-    mdf = md.fit()
+    mdf = md.fit(reml=False)
     print(mdf.summary())
+    print(mdf.aic)
+    print(mdf.bic)
+
