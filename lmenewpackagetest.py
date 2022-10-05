@@ -75,6 +75,7 @@ best_model = selector.best_estimator_
 
 maybe_beta = best_model.coef_["beta"]
 maybe_gamma = best_model.coef_["gamma"]
+#returning a binary array of 0 1 true false to get the actually relevant values??
 ftn, ffp, ffn, ftp = confusion_matrix(true_parameters["beta"], abs(maybe_beta) > 1e-2).ravel()
 rtn, rfp, rfn, rtp = confusion_matrix(true_parameters["gamma"], abs(maybe_gamma) > 1e-2).ravel()
 
