@@ -278,9 +278,9 @@ if __name__ == '__main__':
 
     data["Intercept"] = 1
     exog = df[["pitchoftarg", "pitchofprecur", "talker"]]
-    exog2 = df[["ferret", "pitchoftarg", "pitchofprecur", "talker", "side"]].to_numpy()
+    exog2 = df[["ferret", "pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitchprecur", "gradinpitch"]].to_numpy()
     varianceofarray = np.var(exog2, axis=1)
-    exog2 = np.insert(exog2, 1, varianceofarray, axis=1)
+    exog2 = np.insert(exog2, 7, varianceofarray, axis=1)
     exog["Intercept"] = 1
     md = sm.MixedLM(endog, exog, groups=df["ferret"], exog_re=exog["Intercept"])
     mdf = md.fit(reml=False)
@@ -300,7 +300,7 @@ if __name__ == '__main__':
         "lam": loguniform(1e-3, 1e3)
     }
     # We use standard functionality of sklearn to perform grid-search.
-    column_labels = ['group'] * 1 + ["fixed+random"] * 3 + ['variance'] * 1
+    column_labels = ['group'] * 1 + ["fixed+random"] * 6 + ['variance'] * 1
     selector = RandomizedSearchCV(estimator=model,
                                   param_distributions=params,
                                   n_iter=10,  # number of points from parameters space to sample
@@ -309,12 +309,12 @@ if __name__ == '__main__':
                                                                random_state=seed, columns_labels=column_labels),
                                   # The function below will evaluate the information criterion
                                   # on the test-sets during cross-validation.
-                                  # We use IC from Muller2018, but other options (AIC, BIC) are also available
+                                  # use the function below to evaluate the information criterion
                                   scoring=lambda clf, exog2, endog2: -clf.get_information_criterion(exog2, endog2,
                                                                                                     columns_labels=column_labels,
-                                                                                                    ic="muller_ic"),
+                                                                                                    ic="AIC"),
                                   random_state=seed,
-                                  n_jobs=20
+                                  n_jobs=2
                                   )
     selector.fit(exog2, endog2, columns_labels=column_labels)
     best_model = selector.best_estimator_
