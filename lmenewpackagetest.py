@@ -78,7 +78,6 @@ maybe_gamma = best_model.coef_["gamma"]
 #returning a binary array of 0 1 true false to get the actually relevant values?? -- yes as in the sk learn function y_true is the first argument and y_pred is the second argument
 ftn, ffp, ffn, ftp = confusion_matrix(true_parameters["beta"], abs(maybe_beta) > 1e-2).ravel()
 rtn, rfp, rfn, rtp = confusion_matrix(true_parameters["gamma"], abs(maybe_gamma) > 1e-2).ravel()
-#TODO: does this package have the AIC and BIC
 print(
     f"The model_name found {ftp} out of {ftp + ffn} correct fixed features, and also chose {ffp} out of {ftn + ffn} extra irrelevant fixed features. \n"
     f"It also identified {rtp} out of {rtp + rfn} random effects correctly, and got {rfp} out of {rtn + rfn} non-present random effects. \n"
