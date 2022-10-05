@@ -20,7 +20,7 @@ true_x = np.random.choice(2, size=num_features, p=np.array([0.9, 0.1]))
 # create sample data
 a = 10 * np.random.randn(num_objects, num_features)
 b = a.dot(true_x) + np.random.randn(num_objects)
-
+#just assign obs variance to be the variance of relative lick release times??
 print(f"The dataset has {a.shape[0]} objects and {a.shape[1]} features; \n"
       f"The vector of true parameters contains {sum(true_x != 0)} non-zero elements out of {num_features}.")
 problem, true_parameters = LMEProblem.generate(
