@@ -195,45 +195,46 @@ def get_df_behav(path=None,
                 pitchoftarg[i] = 109
 
             gradinpitch[i] = origF0 - pitchoftarg[i]
+
+            if chosentrial[targpos[0] - 1] == 0:
+                pitchoftarg[i] = origF0  # talkerlist.values[i]
+
+            pitchofprecur[i] = chosentrial[targpos[0] - 2]
+            if chosentrial[targpos[0] - 2] == 1:
+                pitchofprecur[i] = 191
+            if chosentrial[targpos[0] - 2] == 2:
+                pitchofprecur[i] = 124
+            if chosentrial[targpos[0] - 2] == 3:
+                pitchofprecur[i] = 144
+            if chosentrial[targpos[0] - 2] == 4:
+                pitchofprecur[i] = 191
+
+            if chosentrial[targpos[0] - 2] == 5:
+                pitchofprecur[i] = 251
+            if chosentrial[targpos[0] - 2] == 6:
+                pitchofprecur[i] = 332
+            if chosentrial[targpos[0] - 2] == 7:
+                pitchofprecur[i] = 367
+            if chosentrial[targpos[0] - 2] == 8:
+                pitchofprecur[i] = 144
+            if chosentrial[targpos[0] - 2] == 9:
+                pitchofprecur[i] = 191
+            if chosentrial[targpos[0] - 2] == 10:
+                pitchofprecur[i] = 251
+            if chosentrial[targpos[0] - 2] == 11:
+                pitchofprecur[i] = 332
+            if chosentrial[targpos[0] - 2] == 12:
+                pitchofprecur[i] = 367
+            if chosentrial[targpos[0] - 2] == 13:
+                pitchofprecur[i] = 109
+            if chosentrial[targpos[0] - 2] == 14:
+                pitchofprecur[i] = 109
+            if chosentrial[targpos[0] - 2] == 0:
+                pitchofprecur[i] = origF0  # talkerlist.values[i]
+            gradinpitchprecur[i] = origF0 - pitchofprecur[i]
         except:
             newdata.drop(i)
             continue
-        if chosentrial[targpos[0] - 1] == 0:
-            pitchoftarg[i] = origF0  # talkerlist.values[i]
-
-        pitchofprecur[i] = chosentrial[targpos[0] - 2]
-        if chosentrial[targpos[0] - 2] == 1:
-            pitchofprecur[i] = 191
-        if chosentrial[targpos[0] - 2] == 2:
-            pitchofprecur[i] = 124
-        if chosentrial[targpos[0] - 2] == 3:
-            pitchofprecur[i] = 144
-        if chosentrial[targpos[0] - 2] == 4:
-            pitchofprecur[i] = 191
-
-        if chosentrial[targpos[0] - 2] == 5:
-            pitchofprecur[i] = 251
-        if chosentrial[targpos[0] - 2] == 6:
-            pitchofprecur[i] = 332
-        if chosentrial[targpos[0] - 2] == 7:
-            pitchofprecur[i] = 367
-        if chosentrial[targpos[0] - 2] == 8:
-            pitchofprecur[i] = 144
-        if chosentrial[targpos[0] - 2] == 9:
-            pitchofprecur[i] = 191
-        if chosentrial[targpos[0] - 2] == 10:
-            pitchofprecur[i] = 251
-        if chosentrial[targpos[0] - 2] == 11:
-            pitchofprecur[i] = 332
-        if chosentrial[targpos[0] - 2] == 12:
-            pitchofprecur[i] = 367
-        if chosentrial[targpos[0] - 2] == 13:
-            pitchofprecur[i] = 109
-        if chosentrial[targpos[0] - 2] == 14:
-            pitchofprecur[i] = 109
-        if chosentrial[targpos[0] - 2] == 0:
-            pitchofprecur[i] = origF0  # talkerlist.values[i]
-        gradinpitchprecur[i] = origF0 - pitchofprecur[i]
         # if not isinstance(chosentrial, (np.ndarray, np.generic)):
         #     if math.isnan(chosentrial):
         #         chosentrial = np.zeros(5)
@@ -272,15 +273,15 @@ if __name__ == '__main__':
     #     print(i, currFerr)
     df = get_df_behav(ferrets=ferrets, startdate='04-01-2020', finishdate='27-01-2022')
     # cli_reaction_time(ferrets='F1702_Zola', startdate='04-01-2020', finishdate='04-01-2022')
-    data = sm.datasets.get_rdataset("Sitka", "MASS").data
+    #data = sm.datasets.get_rdataset("Sitka", "MASS").data
     endog = df['realRelReleaseTimes']
     endog2 = df['realRelReleaseTimes'].to_numpy()
 
-    data["Intercept"] = 1
-    exog = df[["pitchoftarg", "pitchofprecur", "talker"]]
-    exog2 = df[["ferret", "pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitchprecur", "gradinpitch"]].to_numpy()
+
+    exog = df[["pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitchprecur", "gradinpitch", "timeToTarget"]]
+    exog2 = df[["ferret", "pitchoftarg", "pitchofprecur", "talker", "side",  "gradinpitch", "gradinpitchprecur", "timeToTarget"]].to_numpy()
     varianceofarray = np.var(exog2, axis=1)
-    exog2 = np.insert(exog2, 7, varianceofarray, axis=1)
+    exog2 = np.insert(exog2, 8, varianceofarray, axis=1)
     exog["Intercept"] = 1
     md = sm.MixedLM(endog, exog, groups=df["ferret"], exog_re=exog["Intercept"])
     mdf = md.fit(reml=False)
@@ -300,7 +301,7 @@ if __name__ == '__main__':
         "lam": loguniform(1e-3, 1e3)
     }
     # We use standard functionality of sklearn to perform grid-search.
-    column_labels = ['group'] * 1 + ["fixed+random"] * 6 + ['variance'] * 1
+    column_labels = ['group'] * 1 + ["fixed+random"] * 7 + ['variance'] * 1
     selector = RandomizedSearchCV(estimator=model,
                                   param_distributions=params,
                                   n_iter=10,  # number of points from parameters space to sample
