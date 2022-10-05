@@ -280,7 +280,8 @@ if __name__ == '__main__':
 
     exog = df[["pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitchprecur", "gradinpitch", "timeToTarget"]]
     exog2 = df[["ferret", "pitchoftarg", "pitchofprecur", "talker", "side",  "gradinpitch", "gradinpitchprecur", "timeToTarget"]].to_numpy()
-    varianceofarray = np.var(exog2, axis=1)
+    varianceofarray = np.var(exog2, axis=0)
+    varianceofarray = np.ones((len(exog2)))*0.1
     exog2 = np.insert(exog2, 8, varianceofarray, axis=1)
     exog["Intercept"] = 1
     md = sm.MixedLM(endog, exog, groups=df["ferret"], exog_re=exog["Intercept"])
