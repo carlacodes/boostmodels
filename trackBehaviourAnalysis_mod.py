@@ -313,7 +313,7 @@ if __name__ == '__main__':
                                   # use the function below to evaluate the information criterion
                                   scoring=lambda clf, exog2, endog2: -clf.get_information_criterion(exog2, endog2,
                                                                                                     columns_labels=column_labels,
-                                                                                                    ic="AIC"),
+                                                                                                    ic="vaida_aic"),
                                   random_state=seed,
                                   n_jobs=20
                                   )
