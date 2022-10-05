@@ -43,6 +43,8 @@ x, y, columns_labels = problem.to_x_y()
 # We use SR3-empowered LASSO model_name, but many other popular models are also available.
 # See the glossary of models for more details.
 model = L1LmeModelSR3()
+# x is  a long array of dependent VARS
+# y is the independent VAR for your prediction
 
 # We're going to select features by varying the strength of the prior
 # and choosing the model_name that yields the best information criterion
