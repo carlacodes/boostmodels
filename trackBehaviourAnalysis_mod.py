@@ -304,7 +304,7 @@ if __name__ == '__main__':
     column_labels = ['group'] * 1 + ["fixed+random"] * 7 + ['variance'] * 1
     selector = RandomizedSearchCV(estimator=model,
                                   param_distributions=params,
-                                  n_iter=10,  # number of points from parameters space to sample
+                                  n_iter=2,  # number of points from parameters space to sample
                                   # the class below implements CV-splits for LME models
                                   cv=LMEStratifiedShuffleSplit(n_splits=2, test_size=0.5,
                                                                random_state=seed, columns_labels=column_labels),
@@ -315,7 +315,7 @@ if __name__ == '__main__':
                                                                                                     columns_labels=column_labels,
                                                                                                     ic="AIC"),
                                   random_state=seed,
-                                  n_jobs=2
+                                  n_jobs=20
                                   )
     selector.fit(exog2, endog2, columns_labels=column_labels)
     best_model = selector.best_estimator_
