@@ -193,7 +193,6 @@ if __name__ == '__main__':
     #     print(i, currFerr)
     df = get_df_behav(ferrets=ferrets, startdate='04-01-2020', finishdate='27-01-2022')
     # cli_reaction_time(ferrets='F1702_Zola', startdate='04-01-2020', finishdate='04-01-2022')
-    # TODO add relative lick release time as a column
     data = sm.datasets.get_rdataset("Sitka", "MASS").data
     endog = df['realRelReleaseTimes']
     data["Intercept"] = 1
