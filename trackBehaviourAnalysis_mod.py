@@ -302,23 +302,41 @@ if __name__ == '__main__':
         "lam": loguniform(1e-3, 1e3)
     }
     # We use standard functionality of sklearn to perform grid-search.
-    column_labels = ['group'] * 1 + ["fixed+random"] * 7 + ['variance'] * 1
+    # column_labels = ['group'] * 1 + ["fixed+random"] * 7 + ['variance'] * 1
+    # row_labels = ['ferret'] + ['pitchoftarg', 'pitchofprecur', 'talker', 'side', 'gradinpitchprecur', 'gradinpitch', 'timeToTarget'] + ['variance']
+    df['variances'] = varianceofarray
+    problem = LMEProblem.from_dataframe(
+        data=df,
+        fixed_effects=['pitchoftarg', 'pitchofprecur', 'talker', 'side', 'gradinpitchprecur', 'gradinpitch'],
+        random_effects=['timeToTarget'],
+        groups='ferret',
+        variance='variances',
+        target='realRelReleaseTimes',
+        must_include_fe=['pitchoftarg'],
+        must_include_re=['timeToTarget'],
+    )
+
+    # LMEProblem provides a very convenient representation
+    # of the problem. See the documentation for more details.
+
+    # It also can be converted to a more familiar representation
+    x, y, columns_labels = problem.to_x_y()
     selector = RandomizedSearchCV(estimator=model,
                                   param_distributions=params,
                                   n_iter=2,  # number of points from parameters space to sample
                                   # the class below implements CV-splits for LME models
                                   cv=LMEStratifiedShuffleSplit(n_splits=2, test_size=0.5,
-                                                               random_state=seed, columns_labels=column_labels),
+                                                               random_state=seed, columns_labels=columns_labels),
                                   # The function below will evaluate the information criterion
                                   # on the test-sets during cross-validation.
                                   # use the function below to evaluate the information criterion
-                                  scoring=lambda clf, exog2, endog2: -clf.get_information_criterion(exog2, endog2,
-                                                                                                    columns_labels=column_labels,
+                                  scoring=lambda clf, x, y: -clf.get_information_criterion(exog2, endog2,
+                                                                                                    columns_labels=columns_labels,
                                                                                                     ic="vaida_aic"),
                                   random_state=seed,
                                   n_jobs=20
                                   )
-    selector.fit(exog2, endog2, columns_labels=column_labels)
+    selector.fit(x, y, columns_labels=columns_labels)
     best_model = selector.best_estimator_
 
     maybe_beta = best_model.coef_["beta"]
