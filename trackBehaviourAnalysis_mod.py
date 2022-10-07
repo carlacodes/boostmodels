@@ -295,7 +295,7 @@ if __name__ == '__main__':
          "realRelReleaseTimes"]]
     exog2 = df[["ferret", "pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
                 "timeToTarget"]].to_numpy()
-
+    #TODO: CLEAN CODE
     import matplotlib.pyplot as plt
     import numpy as np
     from sklearn.linear_model import RidgeCV
