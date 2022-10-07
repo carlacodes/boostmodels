@@ -4,6 +4,9 @@ from instruments.io.BehaviourIO import BehaviourDataSet, WeekBehaviourDataSet
 from instruments.config import behaviouralDataPath, behaviourOutput
 from instruments.behaviouralAnalysis import createWeekBehaviourFigs, reactionTimeAnalysis, outputbehaviordf
 import math
+from time import time
+
+from scipy.stats import sem
 import os
 import numpy as np
 from instruments.helpers.extract_helpers import extractAllFerretData
@@ -137,6 +140,8 @@ def get_df_behav(path=None,
     # allData = newdata
     fs = 24414.062500
     newdata = allData[(allData.response == 0) | (allData.response == 1)]  # | (allData.response == 7)
+    newdata = newdata[(newdata.correctionTrial == 0)]  # | (allData.response == 7)
+
     # newdata = allData['absentTime'][0]
     newdata['targTimes'] = newdata['timeToTarget'] / fs
 
@@ -151,8 +156,10 @@ def get_df_behav(path=None,
     pitchofprecur = np.empty(len(pitchshiftmat))
     gradinpitch = np.empty(len(pitchshiftmat))
     gradinpitchprecur = np.empty(len(pitchshiftmat))
+    timetotarglist = np.empty(len(pitchshiftmat))
 
     for i in range(0, len(pitchshiftmat)):
+
         chosentrial = pitchshiftmat.values[i]
         chosendisttrial = precursorlist.values[i]
         chosentalker = talkerlist.values[i]
@@ -257,6 +264,7 @@ def get_df_behav(path=None,
     newdata['pitchofprecur'] = pitchofprecur.tolist()
     newdata['gradinpitch'] = gradinpitch.tolist()
     newdata['gradinpitchprecur'] = gradinpitchprecur.tolist()
+    newdata['timeToTarget'] = newdata['timeToTarget'] / 24414.0625
 
     return newdata
 
@@ -273,22 +281,80 @@ if __name__ == '__main__':
     #     print(i, currFerr)
     df = get_df_behav(ferrets=ferrets, startdate='04-01-2020', finishdate='27-01-2022')
     # cli_reaction_time(ferrets='F1702_Zola', startdate='04-01-2020', finishdate='04-01-2022')
-    #data = sm.datasets.get_rdataset("Sitka", "MASS").data
+    # data = sm.datasets.get_rdataset("Sitka", "MASS").data
     endog = df['realRelReleaseTimes']
     endog2 = df['realRelReleaseTimes'].to_numpy()
 
+    exog = df[["ferret", "pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
+                "timeToTarget"]]
+    #testing AIC with different exog vars
+    exog_reduced = df[[ 'talker', 'gradinpitchprecur', 'timeToTarget', 'side', 'pitchofprecur']]
 
-    exog = df[["pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitchprecur", "gradinpitch", "timeToTarget"]]
-    exog2 = df[["ferret", "pitchoftarg", "pitchofprecur", "talker", "side",  "gradinpitch", "gradinpitchprecur", "timeToTarget"]].to_numpy()
-    varianceofarray = np.var(exog2, axis=0)
-    varianceofarray = np.ones((len(exog2)))*0.01
+
+    df = df[["ferret", "pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitchprecur", "gradinpitch", "timeToTarget",
+         "realRelReleaseTimes"]]
+    exog2 = df[["ferret", "pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
+                "timeToTarget"]].to_numpy()
+
+    import matplotlib.pyplot as plt
+    import numpy as np
+    from sklearn.linear_model import RidgeCV
+    X=df[[ "pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
+                "timeToTarget"]].to_numpy()
+
+    y=endog2
+    ridge = RidgeCV(alphas=np.logspace(-6, 6, num=5)).fit(X, y)
+    importance = np.abs(ridge.coef_)
+    feature_names = np.array(df[[ "pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
+                "timeToTarget"]].columns)
+    plt.bar(height=importance, x=feature_names)
+    plt.title("Feature importances via coefficients")
+    plt.show()
+
+    from sklearn.feature_selection import SequentialFeatureSelector
+
+    tic_fwd = time()
+    sfs_forward = SequentialFeatureSelector(
+        ridge, n_features_to_select=3, direction="forward"
+    ).fit(X, y)
+    toc_fwd = time()
+
+    tic_bwd = time()
+    sfs_backward = SequentialFeatureSelector(
+        ridge, n_features_to_select=3, direction="backward"
+    ).fit(X, y)
+    toc_bwd = time()
+
+    print(
+        "Features selected by forward sequential selection: "
+        f"{feature_names[sfs_forward.get_support()]}"
+    )
+    print(f"Done in {toc_fwd - tic_fwd:.3f}s")
+    print(
+        "Features selected by backward sequential selection: "
+        f"{feature_names[sfs_backward.get_support()]}"
+    )
+    print(f"Done in {toc_bwd - tic_bwd:.3f}s")
+
+    # varianceofarray = np.var(exog2, axis=1)
+    from scipy.stats import sem
+    stderrorofrealrelreleasetime = sem(df["realRelReleaseTimes"])
+    varianceofarray =np.ones((len(exog2))) *(stderrorofrealrelreleasetime*stderrorofrealrelreleasetime) #np.ones((len(exog2)))*1e-8 #taken as the
+    #varofvar=varianceofarray.var()
     exog2 = np.insert(exog2, 8, varianceofarray, axis=1)
-    exog["Intercept"] = 1
-    md = sm.MixedLM(endog, exog, groups=df["ferret"], exog_re=exog["Intercept"])
+    md = sm.MixedLM(endog, exog, groups=df["ferret"], exog_re=None)
+
     mdf = md.fit(reml=False)
+    print(mdf.params)
     print(mdf.summary())
     print(mdf.aic)
     print(mdf.bic)
+
+    md_reduced = sm.MixedLM(endog, exog_reduced, groups=df["ferret"], exog_re=None)
+    mdf_reduced = md_reduced.fit(reml=False)
+    print(mdf_reduced.summary())
+    print(mdf_reduced.aic)
+    print(mdf_reduced.bic)
     seed = 42
     # print(mdf.params)
     model = L1LmeModelSR3()
@@ -304,45 +370,45 @@ if __name__ == '__main__':
     # We use standard functionality of sklearn to perform grid-search.
     # column_labels = ['group'] * 1 + ["fixed+random"] * 7 + ['variance'] * 1
     # row_labels = ['ferret'] + ['pitchoftarg', 'pitchofprecur', 'talker', 'side', 'gradinpitchprecur', 'gradinpitch', 'timeToTarget'] + ['variance']
-    df['variances'] = varianceofarray
-    problem = LMEProblem.from_dataframe(
-        data=df,
-        fixed_effects=['pitchoftarg', 'pitchofprecur', 'talker', 'side', 'gradinpitchprecur', 'gradinpitch'],
-        random_effects=['timeToTarget'],
-        groups='ferret',
-        variance='variances',
-        target='realRelReleaseTimes',
-        must_include_fe=['pitchoftarg'],
-        must_include_re=['timeToTarget'],
-    )
+    # df['variances'] = varianceofarray
+    # problem = LMEProblem.from_dataframe(
+    #     data=df,
+    #     fixed_effects=['talker', 'side', 'pitchoftarg', 'pitchofprecur','gradinpitchprecur', 'gradinpitch', 'timeToTarget'],
+    #     random_effects=[],
+    #     groups='ferret',
+    #     variance='variances',
+    #     target='realRelReleaseTimes',
+    #     must_include_fe=['talker'],
+    #     must_include_re=[],
+    # )
 
     # LMEProblem provides a very convenient representation
     # of the problem. See the documentation for more details.
 
     # It also can be converted to a more familiar representation
-    x, y, columns_labels = problem.to_x_y()
-    selector = RandomizedSearchCV(estimator=model,
-                                  param_distributions=params,
-                                  n_iter=2,  # number of points from parameters space to sample
-                                  # the class below implements CV-splits for LME models
-                                  cv=LMEStratifiedShuffleSplit(n_splits=2, test_size=0.5,
-                                                               random_state=seed, columns_labels=columns_labels),
-                                  # The function below will evaluate the information criterion
-                                  # on the test-sets during cross-validation.
-                                  # use the function below to evaluate the information criterion
-                                  scoring=lambda clf, x, y: -clf.get_information_criterion(exog2, endog2,
-                                                                                                    columns_labels=columns_labels,
-                                                                                                    ic="vaida_aic"),
-                                  random_state=seed,
-                                  n_jobs=20
-                                  )
-    selector.fit(x, y, columns_labels=columns_labels)
-    best_model = selector.best_estimator_
-
-    maybe_beta = best_model.coef_["beta"]
-    maybe_gamma = best_model.coef_["gamma"]
-    beta_coeffs_to_use = abs(maybe_beta) > 1e-2
-    gamma_coeffs_to_use = abs(maybe_gamma) > 1e-2
+    # x, y, columns_labels = problem.to_x_y()
+    # selector = RandomizedSearchCV(estimator=model,
+    #                               param_distributions=params,
+    #                               n_iter=5,  # number of points from parameters space to sample
+    #                               # the class below implements CV-splits for LME models
+    #                               cv=LMEStratifiedShuffleSplit(n_splits=2, test_size=0.5,
+    #                                                            random_state=seed, columns_labels=columns_labels),
+    #                               # The function below will evaluate the information criterion
+    #                               # on the test-sets during cross-validation.
+    #                               # use the function below to evaluate the information criterion
+    #                               scoring=lambda clf, x, y: -clf.get_information_criterion(exog2, endog2,
+    #                                                                                        columns_labels=columns_labels,
+    #                                                                                        ic="vaida_aic"),
+    #                               random_state=seed,
+    #                               n_jobs=20
+    #                               )
+    # selector.fit(x, y, columns_labels=columns_labels)
+    # best_model = selector.best_estimator_
+    #
+    # maybe_beta = best_model.coef_["beta"]
+    # maybe_gamma = best_model.coef_["gamma"]
+    # beta_coeffs_to_use = abs(maybe_beta) > 1e-2
+    # gamma_coeffs_to_use = abs(maybe_gamma) > 1e-2
     # # returning a binary array of 0 1 true false to get the actually relevant values?? -- yes as in the sk learn function y_true is the first argument and y_pred is the second argument
     # ftn, ffp, ffn, ftp = confusion_matrix(true_parameters["beta"], abs(maybe_beta) > 1e-2).ravel()
     # rtn, rfp, rfn, rtp = confusion_matrix(true_parameters["gamma"], abs(maybe_gamma) > 1e-2).ravel()
