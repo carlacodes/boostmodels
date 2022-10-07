@@ -286,42 +286,58 @@ if __name__ == '__main__':
     endog2 = df['realRelReleaseTimes'].to_numpy()
 
     exog = df[["ferret", "pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
-                "timeToTarget"]]
-    #testing AIC with different exog vars
-    exog_reduced = df[[ 'talker', 'gradinpitchprecur', 'timeToTarget', 'side', 'pitchofprecur']]
+               "timeToTarget"]]
+    # testing AIC with different exog vars
+    exog_reduced = df[['pitchofprecur', 'side','gradinpitchprecur', 'timeToTarget']]
 
-
-    df = df[["ferret", "pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitchprecur", "gradinpitch", "timeToTarget",
-         "realRelReleaseTimes"]]
     exog2 = df[["ferret", "pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
                 "timeToTarget"]].to_numpy()
-    #TODO: CLEAN CODE
+    # TODO: CLEAN CODE
     import matplotlib.pyplot as plt
     import numpy as np
     from sklearn.linear_model import RidgeCV
-    X=df[[ "pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
-                "timeToTarget"]].to_numpy()
 
-    y=endog2
+    X = df[["pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
+            "timeToTarget"]].to_numpy()
+
+    y = endog2
+
+    from sklearn.ensemble import ExtraTreesClassifier
+    from sklearn.feature_selection import SelectFromModel
+    from sklearn.svm import LinearSVC
+    from sklearn.linear_model import LassoCV
+
+
+
+
     ridge = RidgeCV(alphas=np.logspace(-6, 6, num=5)).fit(X, y)
     importance = np.abs(ridge.coef_)
-    feature_names = np.array(df[[ "pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
-                "timeToTarget"]].columns)
+    feature_names = np.array(df[["pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
+                                 "timeToTarget"]].columns)
     plt.bar(height=importance, x=feature_names)
     plt.title("Feature importances via coefficients")
+    plt.show()
+
+
+    lasso = LassoCV(alphas=np.logspace(-6, 6, num=5)).fit(X, y)
+    importance = np.abs(lasso.coef_)
+    feature_names = np.array(df[["pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
+                                 "timeToTarget"]].columns)
+    plt.bar(height=importance, x=feature_names)
+    plt.title("Feature importances via coefficients lasso")
     plt.show()
 
     from sklearn.feature_selection import SequentialFeatureSelector
 
     tic_fwd = time()
     sfs_forward = SequentialFeatureSelector(
-        ridge, n_features_to_select=3, direction="forward"
+        ridge, n_features_to_select=4, direction="forward"
     ).fit(X, y)
     toc_fwd = time()
 
     tic_bwd = time()
     sfs_backward = SequentialFeatureSelector(
-        ridge, n_features_to_select=3, direction="backward"
+        ridge, n_features_to_select=4, direction="backward"
     ).fit(X, y)
     toc_bwd = time()
 
@@ -338,9 +354,11 @@ if __name__ == '__main__':
 
     # varianceofarray = np.var(exog2, axis=1)
     from scipy.stats import sem
+
     stderrorofrealrelreleasetime = sem(df["realRelReleaseTimes"])
-    varianceofarray =np.ones((len(exog2))) *(stderrorofrealrelreleasetime*stderrorofrealrelreleasetime) #np.ones((len(exog2)))*1e-8 #taken as the
-    #varofvar=varianceofarray.var()
+    varianceofarray = np.ones((len(exog2))) * (
+                stderrorofrealrelreleasetime * stderrorofrealrelreleasetime)  # np.ones((len(exog2)))*1e-8 #taken as the
+    # varofvar=varianceofarray.var()
     exog2 = np.insert(exog2, 8, varianceofarray, axis=1)
     md = sm.MixedLM(endog, exog, groups=df["ferret"], exog_re=None)
 
