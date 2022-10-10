@@ -27,7 +27,7 @@ jupyterlab-widgets==3.0.3
 kiwisolver @ file:///D:/bld/kiwisolver_1657953239132/work
 llvmlite==0.38.1
 mat73==0.59
-matplotlib==3.5.3
+matplotlib~=3.6.0
 matplotlib-inline==0.1.6
 munkres==1.1.4
 neo==0.11.0
@@ -74,3 +74,10 @@ unicodedata2 @ file:///D:/bld/unicodedata2_1649112137711/work
 urllib3==1.26.12
 wcwidth==0.2.5
 widgetsnbextension==4.0.3
+
+pandas~=1.1.5
+numpy~=1.23.3
+seaborn~=0.12.0
+setuptools~=65.4.1
+statsmodels~=0.13.2
+pymer4~=0.7.8

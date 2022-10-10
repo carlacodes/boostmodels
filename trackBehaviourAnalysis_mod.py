@@ -2,10 +2,10 @@ import click
 import instruments
 from instruments.io.BehaviourIO import BehaviourDataSet, WeekBehaviourDataSet
 from instruments.config import behaviouralDataPath, behaviourOutput
-from instruments.behaviouralAnalysis import createWeekBehaviourFigs, reactionTimeAnalysis, outputbehaviordf
+from instruments.behaviouralAnalysis import createWeekBehaviourFigs, reactionTimeAnalysis  #outputbehaviordf
 import math
 from time import time
-from pymer4.models import Lmer
+#from pymer4.models import Lmer
 
 from scipy.stats import sem
 import os
@@ -23,6 +23,7 @@ from sklearn.metrics import accuracy_score, confusion_matrix
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.utils.fixes import loguniform
 import statistics as stats
+
 
 def cli_behaviour_week(path=None,
                        output=None,
@@ -119,12 +120,10 @@ def get_df_behav(path=None,
                                             finishDate=finishdate)
     fs = 24414.062500
     if includefaandmiss is True:
-        newdata = allData[(allData.response == 0) | (allData.response == 1) | (allData.response == 7) ]
+        newdata = allData[(allData.response == 0) | (allData.response == 1) | (allData.response == 7)]
     else:
-        newdata = allData[(allData.response == 0) | (allData.response == 1) ]
+        newdata = allData[(allData.response == 0) | (allData.response == 1)]
         newdata = newdata[(newdata.catchTrial == 0)]
-
-
 
     newdata = newdata[(newdata.correctionTrial == 0)]  # | (allData.response == 7)
 
@@ -144,7 +143,8 @@ def get_df_behav(path=None,
     gradinpitch = np.empty(len(pitchshiftmat))
     gradinpitchprecur = np.empty(len(pitchshiftmat))
     timetotarglist = np.empty(len(pitchshiftmat))
-    correctresp=np.empty(len(talkerlist))
+    correctresp = np.empty(shape=(0, 0))
+    droplist = np.empty(shape=(0, 0))
 
     for i in range(0, len(talkerlist)):
         chosenresponseindex = chosenresponse.values[i]
@@ -157,14 +157,18 @@ def get_df_behav(path=None,
 
         chosendisttrial = precursorlist.values[i]
         chosentalker = talkerlist.values[i]
+
         if chosentalker == 1:
             origF0 = 191
         else:
             origF0 = 124
 
         targpos = np.where(chosendisttrial == 1)
+        if chosenresponseindex == 0 or chosenresponseindex == 1:
+            correctresp = np.append(correctresp, 1)
+        else:
+            correctresp = np.append(correctresp, 0)
         try:
-
 
             pitchoftarg[i] = chosentrial[targpos[0] - 1]
             if chosentrial[targpos[0] - 1] == 1:
@@ -235,14 +239,11 @@ def get_df_behav(path=None,
             if chosentrial[targpos[0] - 2] == 0:
                 pitchofprecur[i] = origF0  # talkerlist.values[i]
             gradinpitchprecur[i] = origF0 - pitchofprecur[i]
-            if chosenresponseindex == 0 or chosenresponseindex == 1:
-                correctresp[i] = 1
-            else:
-                correctresp[i] = 0
+
         except:
             indexdrop = newdata.iloc[i].name
             newdata.drop(indexdrop, axis=0, inplace=True)
-            correctresp = np.delete(correctresp, i)
+            droplist = np.append(droplist, i)
             continue
         # if not isinstance(chosentrial, (np.ndarray, np.generic)):
         #     if math.isnan(chosentrial):
@@ -261,33 +262,35 @@ def get_df_behav(path=None,
         #     except:
         #         pitchoftarg[i] = 0
         #         pitchofprecur[i] = 0
-    #pitchoftarg = pitchoftarg[~np.isnan(pitchoftarg)]
+    # pitchoftarg = pitchoftarg[~np.isnan(pitchoftarg)]
     pitchofprecur = pitchofprecur[~np.isnan(pitchofprecur)]
     gradinpitch = gradinpitch[~np.isnan(gradinpitch)]
-    #gradinpitchprecur = gradinpitchprecur[~np.isnan(gradinpitchprecur)]
+    # gradinpitchprecur = gradinpitchprecur[~np.isnan(gradinpitchprecur)]
     correctresp = correctresp[~np.isnan(correctresp)]
 
-    pitchoftarg2=np.empty(shape=(0,0))
-    gradinpitch2=np.empty(shape=(0,0))
+    pitchoftarg2 = np.empty(shape=(0, 0))
+    gradinpitch2 = np.empty(shape=(0, 0))
 
-    pitchofprecur2=np.empty(shape=(0,0))
-    gradinpitchprecur2=np.empty(shape=(0,0))
+    pitchofprecur2 = np.empty(shape=(0, 0))
+    gradinpitchprecur2 = np.empty(shape=(0, 0))
 
     for i in range(0, len(pitchofprecur)):
-        if pitchofprecur[i]>1:
-            pitchofprecur2=np.append(pitchofprecur2, pitchofprecur[i])
-            gradinpitchprecur2=np.append(gradinpitchprecur2, gradinpitchprecur[i])
+        if pitchofprecur[i] > 1:
+            pitchofprecur2 = np.append(pitchofprecur2, pitchofprecur[i])
+            gradinpitchprecur2 = np.append(gradinpitchprecur2, gradinpitchprecur[i])
 
     for i in range(0, len(pitchoftarg)):
-        if pitchoftarg[i]>1:
-            pitchoftarg2=np.append(pitchoftarg2, pitchoftarg[i])
-            gradinpitch2=np.append(gradinpitch2, gradinpitch[i])
+        if pitchoftarg[i] > 1:
+            pitchoftarg2 = np.append(pitchoftarg2, pitchoftarg[i])
+            gradinpitch2 = np.append(gradinpitch2, gradinpitch[i])
 
     newdata['pitchoftarg'] = pitchoftarg2.tolist()
     newdata['pitchofprecur'] = pitchofprecur2.tolist()
 
     newdata['gradinpitch'] = gradinpitch2.tolist()
     newdata['gradinpitchprecur'] = gradinpitchprecur2.tolist()
+    droplist = [int(x) for x in droplist]
+    correctresp = np.delete(correctresp, droplist)
     newdata['correctresp'] = correctresp.tolist()
     newdata['timeToTarget'] = newdata['timeToTarget'] / 24414.0625
 
@@ -313,7 +316,7 @@ if __name__ == '__main__':
     exog = df[["ferret", "pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
                "timeToTarget"]]
     # testing AIC with different exog vars
-    exog_reduced = df[['pitchofprecur', 'side','gradinpitchprecur', 'timeToTarget']]
+    exog_reduced = df[['pitchofprecur', 'side', 'gradinpitchprecur', 'timeToTarget']]
 
     exog2 = df[["ferret", "pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
                 "timeToTarget"]].to_numpy()
@@ -332,9 +335,6 @@ if __name__ == '__main__':
     from sklearn.svm import LinearSVC
     from sklearn.linear_model import LassoCV
 
-
-
-
     ridge = RidgeCV(alphas=np.logspace(-6, 6, num=5)).fit(X, y)
     importance = np.abs(ridge.coef_)
     feature_names = np.array(df[["pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
@@ -342,7 +342,6 @@ if __name__ == '__main__':
     plt.bar(height=importance, x=feature_names)
     plt.title("Feature importances via coefficients")
     plt.show()
-
 
     lasso = LassoCV(alphas=np.logspace(-6, 6, num=5)).fit(X, y)
     importance = np.abs(lasso.coef_)
@@ -385,7 +384,7 @@ if __name__ == '__main__':
 
     stderrorofrealrelreleasetime = sem(df["realRelReleaseTimes"])
     varianceofarray = np.ones((len(exog2))) * (
-                stderrorofrealrelreleasetime * stderrorofrealrelreleasetime)  # np.ones((len(exog2)))*1e-8 #taken as the
+            stderrorofrealrelreleasetime * stderrorofrealrelreleasetime)  # np.ones((len(exog2)))*1e-8 #taken as the
     # varofvar=varianceofarray.var()
     exog2 = np.insert(exog2, 8, varianceofarray, axis=1)
     md = sm.MixedLM(endog, exog, groups=df["ferret"], exog_re=None)
@@ -403,23 +402,25 @@ if __name__ == '__main__':
     print(mdf_reduced.bic)
     seed = 42
     # print(mdf.params)
-    model = L1LmeModelSR3()
-    # x is  a long array of dependent VARS
-    # y is the independent VAR for your prediction
-    # We're going to select features by varying the strength of the prior
-    # and choosing the model_name that yields the best information criterion
-    # on the validation set.
-    params = {
-        "lam": loguniform(1e-3, 1e3)
-    }
-
-    from pymer4.models import Lmer
-
-    dfcat=get_df_behav(ferrets=ferrets, includefaandmiss=True, startdate='04-01-2020', finishdate='01-10-2022')
-    modellogreg = Lmer("correctresp  ~ pitchoftarg + pitchofprecur + side+ gradinpitch+ gradinpitchprecu r+ timeToTarget  + (ferret|Group)",
-                 data=dfcat, family='binomial')
-
-    print(modellogreg.fit())
+    # model = L1LmeModelSR3()
+    # # x is  a long array of dependent VARS
+    # # y is the independent VAR for your prediction
+    # # We're going to select features by varying the strength of the prior
+    # # and choosing the model_name that yields the best information criterion
+    # # on the validation set.
+    # params = {
+    #     "lam": loguniform(1e-3, 1e3)
+    # }
+    #
+    # from pymer4.models import Lmer
+    #
+    # dfcat = get_df_behav(ferrets=ferrets, includefaandmiss=True, startdate='04-01-2020', finishdate='01-10-2022')
+    # dfcatuse=dfcat[['realRelReleaseTimes', 'pitchoftarg', 'ferret']]
+    # modellogreg = Lmer("correctresp ~ pitchoftarg + (ferret|Group)",
+    #                    data=dfcatuse, family='binomial')
+    # #model = Lmer("DV ~ IV2 + (IV2|Group)", data=df)
+    #
+    # print(modellogreg.fit())
     # We use standard functionality of sklearn to perform grid-search.
     # column_labels = ['group'] * 1 + ["fixed+random"] * 7 + ['variance'] * 1
     # row_labels = ['ferret'] + ['pitchoftarg', 'pitchofprecur', 'talker', 'side', 'gradinpitchprecur', 'gradinpitch', 'timeToTarget'] + ['variance']
