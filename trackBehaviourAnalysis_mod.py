@@ -144,7 +144,7 @@ def get_df_behav(path=None,
     gradinpitch = np.empty(len(pitchshiftmat))
     gradinpitchprecur = np.empty(len(pitchshiftmat))
     timetotarglist = np.empty(len(pitchshiftmat))
-    correctresp=np.empty(len(pitchshiftmat))
+    correctresp=np.empty(len(talkerlist))
 
     for i in range(0, len(talkerlist)):
         chosenresponseindex = chosenresponse.values[i]
