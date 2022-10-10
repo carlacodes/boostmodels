@@ -316,7 +316,7 @@ if __name__ == '__main__':
     exog = df[["ferret", "pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
                "timeToTarget"]]
     # testing AIC with different exog vars
-    exog_reduced = df[['pitchofprecur', 'side', 'gradinpitchprecur', 'timeToTarget']]
+    exog_reduced = df[['pitchofprecur', 'pitchoftarg', 'side', 'gradinpitchprecur', 'timeToTarget']]
 
     exog2 = df[["ferret", "pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
                 "timeToTarget"]].to_numpy()
