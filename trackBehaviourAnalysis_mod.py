@@ -401,26 +401,26 @@ if __name__ == '__main__':
     print(mdf_reduced.aic)
     print(mdf_reduced.bic)
     seed = 42
-    # print(mdf.params)
-    # model = L1LmeModelSR3()
-    # # x is  a long array of dependent VARS
-    # # y is the independent VAR for your prediction
-    # # We're going to select features by varying the strength of the prior
-    # # and choosing the model_name that yields the best information criterion
-    # # on the validation set.
-    # params = {
-    #     "lam": loguniform(1e-3, 1e3)
-    # }
-    #
-    # from pymer4.models import Lmer
-    #
-    # dfcat = get_df_behav(ferrets=ferrets, includefaandmiss=True, startdate='04-01-2020', finishdate='01-10-2022')
-    # dfcatuse=dfcat[['realRelReleaseTimes', 'pitchoftarg', 'ferret']]
-    # modellogreg = Lmer("correctresp ~ pitchoftarg + (ferret|Group)",
-    #                    data=dfcatuse, family='binomial')
-    # #model = Lmer("DV ~ IV2 + (IV2|Group)", data=df)
-    #
-    # print(modellogreg.fit())
+    print(mdf.params)
+    model = L1LmeModelSR3()
+    # x is  a long array of dependent VARS
+    # y is the independent VAR for your prediction
+    # We're going to select features by varying the strength of the prior
+    # and choosing the model_name that yields the best information criterion
+    # on the validation set.
+    params = {
+        "lam": loguniform(1e-3, 1e3)
+    }
+
+    from pymer4.models import Lmer
+
+    dfcat = get_df_behav(ferrets=ferrets, includefaandmiss=True, startdate='04-01-2020', finishdate='01-10-2022')
+    dfcatuse=dfcat[['correctresp', 'realRelReleaseTimes', 'pitchoftarg', 'ferret']]
+    modellogreg = Lmer("correctresp ~ pitchoftarg +(1|ferret)",
+                       data=dfcatuse, family='binomial')
+    #model = Lmer("DV ~ IV2 + (IV2|Group)", data=df)
+
+    print(modellogreg.fit())
     # We use standard functionality of sklearn to perform grid-search.
     # column_labels = ['group'] * 1 + ["fixed+random"] * 7 + ['variance'] * 1
     # row_labels = ['ferret'] + ['pitchoftarg', 'pitchofprecur', 'talker', 'side', 'gradinpitchprecur', 'gradinpitch', 'timeToTarget'] + ['variance']
