@@ -5,6 +5,7 @@ from instruments.config import behaviouralDataPath, behaviourOutput
 from instruments.behaviouralAnalysis import createWeekBehaviourFigs, reactionTimeAnalysis, outputbehaviordf
 import math
 from time import time
+from pymer4.models import Lmer
 
 from scipy.stats import sem
 import os
@@ -23,18 +24,6 @@ from sklearn.model_selection import RandomizedSearchCV
 from sklearn.utils.fixes import loguniform
 import statistics as stats
 
-
-# jules' extract behvioural data analysis
-# @click.group()
-# def cli():
-#     pass
-#
-#
-# @click.command(name='behaviour_week')
-# @click.option('--path', '-p', type=click.Path(exists=True))
-# @click.option('--output', '-o', type=click.Path(exists=False))
-# @click.option('--ferrets', '-f', default=None)
-# @click.option('--day', '-d', default=None)
 def cli_behaviour_week(path=None,
                        output=None,
                        ferrets=None,
@@ -107,6 +96,7 @@ def cli_reaction_time(path=None,
 def get_df_behav(path=None,
                  output=None,
                  ferrets=None,
+                 includefaandmiss=False,
                  startdate=None,
                  finishdate=None):
     if output is None:
@@ -127,19 +117,15 @@ def get_df_behav(path=None,
                                outDir=output)
     allData, ferrets = extractAllFerretData(ferrets, path, startDate=startdate,
                                             finishDate=finishdate)
-
-    # allData = dataSet._load()
-
-    # for ferret in ferrets:
-    ferret = ferrets
-    # ferrData = allData.loc[allData.ferretname == ferret]
-    # if ferret == 'F1702_Zola':
-    #     ferrData = ferrData.loc[(ferrData.dates != '2021-10-04 10:25:00')]
-    # newdata = allData[allData['catchTrial'].isin([0])]
-    # newdata[newdata['response'].isin([0,1])]
-    # allData = newdata
     fs = 24414.062500
-    newdata = allData[(allData.response == 0) | (allData.response == 1)]  # | (allData.response == 7)
+    if includefaandmiss is True:
+        newdata = allData[(allData.response == 0) | (allData.response == 1) | (allData.response == 7) | (allData.response == 5)]
+    else:
+        newdata = allData[(allData.response == 0) | (allData.response == 1) ]
+        newdata = allData[(allData.catchTrial == 0)]
+
+
+
     newdata = newdata[(newdata.correctionTrial == 0)]  # | (allData.response == 7)
 
     # newdata = allData['absentTime'][0]
@@ -152,14 +138,16 @@ def get_df_behav(path=None,
     pitchshiftmat = newdata['PitchShiftMat']
     precursorlist = newdata['distractors']
     talkerlist = newdata['talker']
+    chosenresponse = newdata['response']
     pitchoftarg = np.empty(len(pitchshiftmat))
     pitchofprecur = np.empty(len(pitchshiftmat))
     gradinpitch = np.empty(len(pitchshiftmat))
     gradinpitchprecur = np.empty(len(pitchshiftmat))
     timetotarglist = np.empty(len(pitchshiftmat))
+    correctresp=np.empty(len(pitchshiftmat))
 
     for i in range(0, len(pitchshiftmat)):
-
+        chosenresponseindex = chosenresponse.values[i]
         chosentrial = pitchshiftmat.values[i]
         chosendisttrial = precursorlist.values[i]
         chosentalker = talkerlist.values[i]
@@ -170,6 +158,11 @@ def get_df_behav(path=None,
 
         targpos = np.where(chosendisttrial == 1)
         try:
+            if chosenresponseindex == 0 or chosenresponseindex == 1:
+                correctresp[i] = 1
+            else:
+                correctresp[i] = 0
+
             pitchoftarg[i] = chosentrial[targpos[0] - 1]
             if chosentrial[targpos[0] - 1] == 1:
                 pitchoftarg[i] = 191
@@ -264,6 +257,7 @@ def get_df_behav(path=None,
     newdata['pitchofprecur'] = pitchofprecur.tolist()
     newdata['gradinpitch'] = gradinpitch.tolist()
     newdata['gradinpitchprecur'] = gradinpitchprecur.tolist()
+    newdata['correctresp'] = correctresp.tolist()
     newdata['timeToTarget'] = newdata['timeToTarget'] / 24414.0625
 
     return newdata
@@ -385,6 +379,13 @@ if __name__ == '__main__':
     params = {
         "lam": loguniform(1e-3, 1e3)
     }
+
+    from pymer4.models import Lmer
+
+    modellogreg = Lmer("correctresp  ~ pitchoftarg + pitchofprecur + side+ gradinpitch+ gradinpitchprecu r+ timeToTarget  + (ferret|Group)",
+                 data=df, family='binomial')
+
+    print(modellogreg.fit())
     # We use standard functionality of sklearn to perform grid-search.
     # column_labels = ['group'] * 1 + ["fixed+random"] * 7 + ['variance'] * 1
     # row_labels = ['ferret'] + ['pitchoftarg', 'pitchofprecur', 'talker', 'side', 'gradinpitchprecur', 'gradinpitch', 'timeToTarget'] + ['variance']
