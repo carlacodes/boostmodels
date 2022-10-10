@@ -119,10 +119,10 @@ def get_df_behav(path=None,
                                             finishDate=finishdate)
     fs = 24414.062500
     if includefaandmiss is True:
-        newdata = allData[(allData.response == 0) | (allData.response == 1) | (allData.response == 7) | (allData.response == 5)]
+        newdata = allData[(allData.response == 0) | (allData.response == 1) | (allData.response == 7) ]
     else:
         newdata = allData[(allData.response == 0) | (allData.response == 1) ]
-        newdata = allData[(allData.catchTrial == 0)]
+        newdata = newdata[(newdata.catchTrial == 0)]
 
 
 
@@ -146,9 +146,15 @@ def get_df_behav(path=None,
     timetotarglist = np.empty(len(pitchshiftmat))
     correctresp=np.empty(len(pitchshiftmat))
 
-    for i in range(0, len(pitchshiftmat)):
+    for i in range(0, len(talkerlist)):
         chosenresponseindex = chosenresponse.values[i]
         chosentrial = pitchshiftmat.values[i]
+
+        # if chosentrial.size == 0:
+        #     indexdrop=newdata.iloc[i].name
+        #     newdata.drop(indexdrop, axis=0, inplace=True)
+        #     continue
+
         chosendisttrial = precursorlist.values[i]
         chosentalker = talkerlist.values[i]
         if chosentalker == 1:
@@ -233,7 +239,8 @@ def get_df_behav(path=None,
                 pitchofprecur[i] = origF0  # talkerlist.values[i]
             gradinpitchprecur[i] = origF0 - pitchofprecur[i]
         except:
-            newdata.drop(i)
+            indexdrop = newdata.iloc[i].name
+            newdata.drop(indexdrop, axis=0, inplace=True)
             continue
         # if not isinstance(chosentrial, (np.ndarray, np.generic)):
         #     if math.isnan(chosentrial):
@@ -252,6 +259,11 @@ def get_df_behav(path=None,
         #     except:
         #         pitchoftarg[i] = 0
         #         pitchofprecur[i] = 0
+    pitchoftarg = pitchoftarg[~np.isnan(pitchoftarg)]
+    pitchofprecur = pitchofprecur[~np.isnan(pitchofprecur)]
+    gradinpitch = gradinpitch[~np.isnan(gradinpitch)]
+    gradinpitchprecur = gradinpitchprecur[~np.isnan(gradinpitchprecur)]
+    correctresp = correctresp[~np.isnan(correctresp)]
 
     newdata['pitchoftarg'] = pitchoftarg.tolist()
     newdata['pitchofprecur'] = pitchofprecur.tolist()
@@ -273,7 +285,7 @@ if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
     # for i, currFerr in enumerate(ferrets):
     #     print(i, currFerr)
-    df = get_df_behav(ferrets=ferrets, startdate='04-01-2020', finishdate='27-01-2022')
+    df = get_df_behav(ferrets=ferrets, includefaandmiss=False, startdate='04-01-2020', finishdate='01-10-2022')
     # cli_reaction_time(ferrets='F1702_Zola', startdate='04-01-2020', finishdate='04-01-2022')
     # data = sm.datasets.get_rdataset("Sitka", "MASS").data
     endog = df['realRelReleaseTimes']
@@ -318,6 +330,9 @@ if __name__ == '__main__':
     feature_names = np.array(df[["pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
                                  "timeToTarget"]].columns)
     plt.bar(height=importance, x=feature_names)
+
+    plt.xticks(rotation=30, fontsize=6)
+
     plt.title("Feature importances via coefficients lasso")
     plt.show()
 
@@ -372,7 +387,6 @@ if __name__ == '__main__':
     model = L1LmeModelSR3()
     # x is  a long array of dependent VARS
     # y is the independent VAR for your prediction
-
     # We're going to select features by varying the strength of the prior
     # and choosing the model_name that yields the best information criterion
     # on the validation set.
@@ -382,8 +396,9 @@ if __name__ == '__main__':
 
     from pymer4.models import Lmer
 
+    dfcat=get_df_behav(ferrets=ferrets, includefaandmiss=True, startdate='04-01-2020', finishdate='01-10-2022')
     modellogreg = Lmer("correctresp  ~ pitchoftarg + pitchofprecur + side+ gradinpitch+ gradinpitchprecu r+ timeToTarget  + (ferret|Group)",
-                 data=df, family='binomial')
+                 data=dfcat, family='binomial')
 
     print(modellogreg.fit())
     # We use standard functionality of sklearn to perform grid-search.
