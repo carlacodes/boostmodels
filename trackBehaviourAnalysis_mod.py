@@ -5,7 +5,7 @@ from instruments.config import behaviouralDataPath, behaviourOutput
 from instruments.behaviouralAnalysis import createWeekBehaviourFigs, reactionTimeAnalysis  #outputbehaviordf
 import math
 from time import time
-#from pymer4.models import Lmer
+from pymer4.models import Lmer
 
 from scipy.stats import sem
 import os
