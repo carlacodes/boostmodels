@@ -126,6 +126,7 @@ def get_df_behav(path=None,
         newdata = newdata[(newdata.catchTrial == 0)]
 
     newdata = newdata[(newdata.correctionTrial == 0)]  # | (allData.response == 7)
+    newdata = newdata[(newdata.currAtten == 0)]  # | (allData.response == 7)
 
     # newdata = allData['absentTime'][0]
     newdata['targTimes'] = newdata['timeToTarget'] / fs
@@ -318,6 +319,7 @@ if __name__ == '__main__':
     # testing AIC with different exog vars
     exog_reduced = df[['pitchofprecur', 'pitchoftarg', 'side', 'gradinpitchprecur', 'timeToTarget']]
     exog_reduced = df[['side', 'talker', 'gradinpitch', 'timeToTarget']]  # forward selection
+    exog_reduced = df[['side', 'DaysSinceStart' ,'timeToTarget', 'AM']]
 
     exog2 = df[["ferret", "pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
                 "timeToTarget"]].to_numpy()
@@ -416,8 +418,10 @@ if __name__ == '__main__':
     from pymer4.models import Lmer
 
     dfcat = get_df_behav(ferrets=ferrets, includefaandmiss=True, startdate='04-01-2020', finishdate='01-10-2022')
-    dfcatuse = dfcat[['correctresp', 'realRelReleaseTimes', 'pitchoftarg', 'ferret']]
-    modellogreg = Lmer("correctresp ~ pitchoftarg +(1|ferret)",
+    dfcatuse = dfcat[["pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
+                      "timeToTarget", "DaysSinceStart", "AM", "correctresp", "ferret"]]
+    modellogreg = Lmer("correctresp ~ pitchoftarg + pitchofprecur + talker + side + gradinpitch + gradinpitchprecur"
+                       "+ timeToTarget + (1|ferret)",
                        data=dfcatuse, family='binomial')
     # model = Lmer("DV ~ IV2 + (IV2|Group)", data=df)
 
