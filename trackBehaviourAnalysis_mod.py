@@ -2,7 +2,7 @@ import click
 import instruments
 from instruments.io.BehaviourIO import BehaviourDataSet, WeekBehaviourDataSet
 from instruments.config import behaviouralDataPath, behaviourOutput
-from instruments.behaviouralAnalysis import createWeekBehaviourFigs, reactionTimeAnalysis  #outputbehaviordf
+from instruments.behaviouralAnalysis import createWeekBehaviourFigs, reactionTimeAnalysis  # outputbehaviordf
 import math
 from time import time
 from pymer4.models import Lmer
@@ -293,7 +293,7 @@ def get_df_behav(path=None,
     correctresp = np.delete(correctresp, droplist)
     newdata['correctresp'] = correctresp.tolist()
     newdata['timeToTarget'] = newdata['timeToTarget'] / 24414.0625
-
+    newdata['AM'] = newdata['AM'].astype(int)
     return newdata
 
     # ferretFigs = reactionTimeAnalysis(ferrData)
@@ -317,8 +317,7 @@ if __name__ == '__main__':
                "timeToTarget"]]
     # testing AIC with different exog vars
     exog_reduced = df[['pitchofprecur', 'pitchoftarg', 'side', 'gradinpitchprecur', 'timeToTarget']]
-    exog_reduced = df[['side', 'talker', 'gradinpitch', 'timeToTarget']] #forward selection
-
+    exog_reduced = df[['side', 'talker', 'gradinpitch', 'timeToTarget']]  # forward selection
 
     exog2 = df[["ferret", "pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
                 "timeToTarget"]].to_numpy()
@@ -328,7 +327,7 @@ if __name__ == '__main__':
     from sklearn.linear_model import RidgeCV
 
     X = df[["pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
-            "timeToTarget"]].to_numpy()
+            "timeToTarget", "DaysSinceStart", "AM"]].to_numpy()
 
     y = endog2
 
@@ -340,7 +339,7 @@ if __name__ == '__main__':
     ridge = RidgeCV(alphas=np.logspace(-6, 6, num=5)).fit(X, y)
     importance = np.abs(ridge.coef_)
     feature_names = np.array(df[["pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
-                                 "timeToTarget"]].columns)
+                                 "timeToTarget", "DaysSinceStart", "AM"]].columns)
     plt.bar(height=importance, x=feature_names)
     plt.title("Feature importances via coefficients")
     plt.show()
@@ -348,7 +347,7 @@ if __name__ == '__main__':
     lasso = LassoCV(alphas=np.logspace(-6, 6, num=10)).fit(X, y)
     importance = np.abs(lasso.coef_)
     feature_names = np.array(df[["pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
-                                 "timeToTarget"]].columns)
+                                 "timeToTarget", "DaysSinceStart", "AM"]].columns)
     plt.bar(height=importance, x=feature_names)
 
     plt.xticks(rotation=30, fontsize=6)
@@ -417,10 +416,10 @@ if __name__ == '__main__':
     from pymer4.models import Lmer
 
     dfcat = get_df_behav(ferrets=ferrets, includefaandmiss=True, startdate='04-01-2020', finishdate='01-10-2022')
-    dfcatuse=dfcat[['correctresp', 'realRelReleaseTimes', 'pitchoftarg', 'ferret']]
+    dfcatuse = dfcat[['correctresp', 'realRelReleaseTimes', 'pitchoftarg', 'ferret']]
     modellogreg = Lmer("correctresp ~ pitchoftarg +(1|ferret)",
                        data=dfcatuse, family='binomial')
-    #model = Lmer("DV ~ IV2 + (IV2|Group)", data=df)
+    # model = Lmer("DV ~ IV2 + (IV2|Group)", data=df)
 
     print(modellogreg.fit())
     # We use standard functionality of sklearn to perform grid-search.
