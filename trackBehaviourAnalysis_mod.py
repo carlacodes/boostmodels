@@ -317,6 +317,8 @@ if __name__ == '__main__':
                "timeToTarget"]]
     # testing AIC with different exog vars
     exog_reduced = df[['pitchofprecur', 'pitchoftarg', 'side', 'gradinpitchprecur', 'timeToTarget']]
+    exog_reduced = df[['side', 'talker', 'gradinpitch', 'timeToTarget']] #forward selection
+
 
     exog2 = df[["ferret", "pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
                 "timeToTarget"]].to_numpy()
@@ -343,7 +345,7 @@ if __name__ == '__main__':
     plt.title("Feature importances via coefficients")
     plt.show()
 
-    lasso = LassoCV(alphas=np.logspace(-6, 6, num=5)).fit(X, y)
+    lasso = LassoCV(alphas=np.logspace(-6, 6, num=10)).fit(X, y)
     importance = np.abs(lasso.coef_)
     feature_names = np.array(df[["pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
                                  "timeToTarget"]].columns)
