@@ -164,10 +164,7 @@ def get_df_behav(path=None,
 
         targpos = np.where(chosendisttrial == 1)
         try:
-            if chosenresponseindex == 0 or chosenresponseindex == 1:
-                correctresp[i] = 1
-            else:
-                correctresp[i] = 0
+
 
             pitchoftarg[i] = chosentrial[targpos[0] - 1]
             if chosentrial[targpos[0] - 1] == 1:
@@ -238,9 +235,14 @@ def get_df_behav(path=None,
             if chosentrial[targpos[0] - 2] == 0:
                 pitchofprecur[i] = origF0  # talkerlist.values[i]
             gradinpitchprecur[i] = origF0 - pitchofprecur[i]
+            if chosenresponseindex == 0 or chosenresponseindex == 1:
+                correctresp[i] = 1
+            else:
+                correctresp[i] = 0
         except:
             indexdrop = newdata.iloc[i].name
             newdata.drop(indexdrop, axis=0, inplace=True)
+            correctresp = np.delete(correctresp, i)
             continue
         # if not isinstance(chosentrial, (np.ndarray, np.generic)):
         #     if math.isnan(chosentrial):
@@ -259,16 +261,33 @@ def get_df_behav(path=None,
         #     except:
         #         pitchoftarg[i] = 0
         #         pitchofprecur[i] = 0
-    pitchoftarg = pitchoftarg[~np.isnan(pitchoftarg)]
+    #pitchoftarg = pitchoftarg[~np.isnan(pitchoftarg)]
     pitchofprecur = pitchofprecur[~np.isnan(pitchofprecur)]
     gradinpitch = gradinpitch[~np.isnan(gradinpitch)]
-    gradinpitchprecur = gradinpitchprecur[~np.isnan(gradinpitchprecur)]
+    #gradinpitchprecur = gradinpitchprecur[~np.isnan(gradinpitchprecur)]
     correctresp = correctresp[~np.isnan(correctresp)]
 
-    newdata['pitchoftarg'] = pitchoftarg.tolist()
-    newdata['pitchofprecur'] = pitchofprecur.tolist()
-    newdata['gradinpitch'] = gradinpitch.tolist()
-    newdata['gradinpitchprecur'] = gradinpitchprecur.tolist()
+    pitchoftarg2=np.empty(shape=(0,0))
+    gradinpitch2=np.empty(shape=(0,0))
+
+    pitchofprecur2=np.empty(shape=(0,0))
+    gradinpitchprecur2=np.empty(shape=(0,0))
+
+    for i in range(0, len(pitchofprecur)):
+        if pitchofprecur[i]>1:
+            pitchofprecur2=np.append(pitchofprecur2, pitchofprecur[i])
+            gradinpitchprecur2=np.append(gradinpitchprecur2, gradinpitchprecur[i])
+
+    for i in range(0, len(pitchoftarg)):
+        if pitchoftarg[i]>1:
+            pitchoftarg2=np.append(pitchoftarg2, pitchoftarg[i])
+            gradinpitch2=np.append(gradinpitch2, gradinpitch[i])
+
+    newdata['pitchoftarg'] = pitchoftarg2.tolist()
+    newdata['pitchofprecur'] = pitchofprecur2.tolist()
+
+    newdata['gradinpitch'] = gradinpitch2.tolist()
+    newdata['gradinpitchprecur'] = gradinpitchprecur2.tolist()
     newdata['correctresp'] = correctresp.tolist()
     newdata['timeToTarget'] = newdata['timeToTarget'] / 24414.0625
 
