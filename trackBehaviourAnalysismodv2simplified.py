@@ -140,12 +140,19 @@ def get_df_behav(path=None,
     newdata['centreRelease'] = newdata['lickRelease'] - newdata['startTrialLick']
     newdata['relReleaseTimes'] = newdata['centreRelease'] - newdata['targTimes']
     newdata['realRelReleaseTimes'] = newdata['relReleaseTimes'] - newdata['absentTime']
+
+    distractors= newdata['distractors']
+    talkermat = np.empty(len(pitchshiftmat))
+    talkerlist = newdata['talker']
+
+    for i0 in range(0,len(distractors)):
+        talkermat[i0]=talkerlist[i0]*np.ones((1,len(distractors[i0])))
+
     try:
         pitchshiftmat = newdata['PitchShiftMat']
     except:
-        pitchshiftmat = newdata['talker']  # if this is inter trial roving then talker is the pitch shift
+        pitchshiftmat = talkermat #make array equivalent to size of pitch shift mat just like talker [3,3,3,3] # if this is inter trial roving then talker is the pitch shift
     precursorlist = newdata['distractors']
-    talkerlist = newdata['talker']
     chosenresponse = newdata['response']
     pitchoftarg = np.empty(len(pitchshiftmat))
     pitchofprecur = np.empty(len(pitchshiftmat))
@@ -155,6 +162,7 @@ def get_df_behav(path=None,
     precur_and_targ_same = np.empty(len(pitchshiftmat))
     correctresp = np.empty(shape=(0, 0))
     droplist = np.empty(shape=(0, 0))
+
 
     for i in range(0, len(talkerlist)):
         chosenresponseindex = chosenresponse.values[i]
