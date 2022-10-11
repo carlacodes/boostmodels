@@ -147,7 +147,7 @@ def get_df_behav(path=None,
 
     for i0 in range(0, len(distractors)):
         talkermat[i0] = int(talkerlist.values[i0]) * np.ones(len(distractors.values[i0]))
-    talkermat=pd.Series(talkermat, index=talkermat.keys())
+    talkermat = pd.Series(talkermat, index=talkermat.keys())
 
     try:
         pitchshiftmat = newdata['PitchShiftMat']
@@ -182,8 +182,16 @@ def get_df_behav(path=None,
         else:
             correctresp = np.append(correctresp, 0)
         try:
-            pitchoftarg[i] = chosentrial[targpos[0] - 1]
-            pitchofprecur[i] = chosentrial[targpos[0] - 2]
+            if chosentrial[targpos[0]] == 8.0:
+                pitchoftarg[i] == 3.0
+            else:
+                pitchoftarg[i] = chosentrial[targpos[0]]
+
+            if chosentrial[targpos[0] - 1] == 8.0:
+                pitchofprecur[i] == 3.0
+            else:
+                pitchofprecur[i] = chosentrial[targpos[0] - 1]
+
             if pitchoftarg[i] == pitchofprecur[i]:
                 precur_and_targ_same[i] = 1
             else:
@@ -230,7 +238,7 @@ def get_df_behav(path=None,
     # pitchofprecur2 = np.array(scaler.fit_transform(pitchofprecur2.reshape(-1, 1)))
     # gradinpitch2 =  np.array(scaler.fit_transform(pitchofprecur2.reshape(-1, 1)))
     # gradinpitchprecur2 = np.array(scaler.fit_transform(gradinpitchprecur2.reshape(-1, 1)))
-    droplist = [int(x) for x in droplist] #drop corrupted metdata trials
+    droplist = [int(x) for x in droplist]  # drop corrupted metdata trials
 
     # df_normalized = pd.DataFrame(x_scaled)
     pitchoftarg = np.delete(pitchoftarg, droplist)
@@ -250,6 +258,11 @@ def get_df_behav(path=None,
     newdata['timeToTarget'] = newdata['timeToTarget'] / 24414.0625
     newdata['AM'] = newdata['AM'].astype(int)
     newdata['talker'] = (newdata['talker']).astype(float)
+    # optionvector=[1 3 5];, male optionvector=[2 8 13]
+    # only look at v2 pitches from recent experiments
+    newdata = newdata[(newdata.pitchoftarg == 1) | (newdata.pitchoftarg == 2) | (newdata.pitchoftarg == 3) | (
+                newdata.pitchoftarg == 5) | (newdata.pitchoftarg == 8) | (newdata.pitchoftarg == 13)]
+
     return newdata
 
     # ferretFigs = reactionTimeAnalysis(ferrData)
@@ -282,8 +295,7 @@ if __name__ == '__main__':
         data=dfuse, family='gaussian')
 
     print(modelreg.fit(factors={"side": ["0", "1"], "precur_and_targ_same": ['1', '0'], "AM": ["0", "1"],
-                                "pitchoftarg": ['0', '11', '5', '1', '13', '2', '6', '9', '12', '4', '8', '3',
-                                                '14', '10', '7'], "talker": ["2.0", "1.0"], }, REML=False,
+                                "pitchoftarg": ['1', '2', '3', '5', '13'], "talker": ["2.0", "1.0"], }, REML=False,
                        old_optimizer=True))
 
     dfcat = get_df_behav(ferrets=ferrets, includefaandmiss=True, startdate='04-01-2020', finishdate='01-10-2022')
@@ -296,6 +308,6 @@ if __name__ == '__main__':
         data=dfcat_use, family='binomial')
 
     print(modelregcat.fit(factors={"side": ["0", "1"], "precur_and_targ_same": ['1', '0'], "AM": ["0", "1"],
-                                   "pitchoftarg": ['0', '11', '5', '1', '13', '2', '6', '9', '12', '4', '8', '3',
-                                                   '14', '10', '7'], "talker": ["2.0", "1.0"], }, REML=False,
+                                   "pitchoftarg": ['1', '2', '3', '5', '13'], "talker": ["2.0", "1.0"], }, REML=False,
                           old_optimizer=True))
+    # 1 is 191, 2 is 124, 3 is 144, 5 is 251, 13 is
