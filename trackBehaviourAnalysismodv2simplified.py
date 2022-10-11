@@ -311,3 +311,4 @@ if __name__ == '__main__':
                                    "pitchoftarg": ['1', '2', '3', '5', '13'], "talker": ["2.0", "1.0"], }, REML=False,
                           old_optimizer=True))
     # 1 is 191, 2 is 124, 3 is 144, 5 is 251, 13 is
+    #pitchof targ 1 is 124hz male, pitchoftarg4 is 109Hz Male
