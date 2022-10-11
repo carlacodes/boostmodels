@@ -9,6 +9,7 @@ from pymer4.models import Lmer
 from sklearn.feature_selection import RFE
 from sklearn.svm import SVR
 from sklearn.preprocessing import MinMaxScaler
+from pymer4.models import Lmer
 
 scaler = MinMaxScaler()
 
@@ -331,6 +332,10 @@ if __name__ == '__main__':
     # for i, currFerr in enumerate(ferrets):
     #     print(i, currFerr)
     df = get_df_behav(ferrets=ferrets, includefaandmiss=False, startdate='04-01-2020', finishdate='01-10-2022')
+
+    dfuse = df[["pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
+                      "timeToTarget", "DaysSinceStart", "AM", "realRelReleaseTimes", "ferret"]]
+
     # cli_reaction_time(ferrets='F1702_Zola', startdate='04-01-2020', finishdate='04-01-2022')
     # data = sm.datasets.get_rdataset("Sitka", "MASS").data
     endog = df['realRelReleaseTimes']
@@ -355,7 +360,39 @@ if __name__ == '__main__':
             "timeToTarget", "DaysSinceStart", "AM"]].to_numpy()
 
     y = endog2
+    modelreg = Lmer("realRelReleaseTimes ~ pitchoftarg + talker + pitchofprecur+ side  + gradinpitch + gradinpitchprecur"
+                       "+ timeToTarget +DaysSinceStart+ AM+ (1|ferret)",
+                       data=dfuse, family='gaussian')  # talker causing the error of no convergence
+    # model = Lmer("DV ~ IV2 + (IV2|Group)", data=df)
 
+    print(modelreg.fit(factors={"side": ["0", "1"],"AM": ["0", "1"], "talker": ["2.0", "1.0"], },REML=False, old_optimizer=True ))
+    print(modelreg.fit(factors = {"gradinpitchprecur": ['0.0', '-0.03066344393392599', '-0.12418694793240026',
+       '0.04190670670969886', '-0.06490428966014335',
+       '0.007665860983481498', '-0.0899461022061829',
+       '0.024019697748242027', '-0.10629993897094343',
+       '-0.01022114797797533', '-0.034240845726217356',
+       '-0.07205909324472608'],
+               "gradinpitch": ['0.014971789004171872', '-0.025113968652159268',
+       '0.023061384675780866', '-0.007244414034276712', '0.0',
+       '0.001811103508569178', '-0.017024372980550272',
+       '-0.008089595671608996', '-0.029339876838820684',
+       '-0.0024148046780922373', '0.005674790993516758',
+       '0.009900699180178173', '-0.015334009705885708',
+       '-0.02125028116721169'], "talker": ["2.0", "1.0"],
+               "side": ["0", "1"], "AM": ["0", "1"]}, REML = False, old_optimizer = True))
+    #print(model.fit())    # Plot estimated model coefficients
+    modelreg.plot_summary()
+    plt.show()
+
+    modelsig = Lmer("realRelReleaseTimes ~  talker + side  + gradinpitch + timeToTarget"
+                       "+ DaysSinceStart+ AM+ (1|ferret)",
+                       data=dfuse, family='gaussian')  # talker causing the error of no convergence
+    # model = Lmer("DV ~ IV2 + (IV2|Group)", data=df)
+
+    print(modelsig.fit(factors={"side": ["0", "1"],"AM": ["0", "1"], "talker": ["2.0", "1.0"], },REML=False, old_optimizer=True ))
+    # print(model.fit())    # Plot estimated model coefficients
+    modelsig.plot_summary()
+    plt.show()
     from sklearn.ensemble import ExtraTreesClassifier
     from sklearn.feature_selection import SelectFromModel
     from sklearn.svm import LinearSVC
@@ -448,8 +485,9 @@ if __name__ == '__main__':
         "lam": loguniform(1e-3, 1e3)
     }
 
-    from pymer4.models import Lmer
 
+
+    ##get behavioural data with binary correct response variable
     dfcat = get_df_behav(ferrets=ferrets, includefaandmiss=True, startdate='04-01-2020', finishdate='01-10-2022')
     X = dfcat[["pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
                "timeToTarget", "DaysSinceStart", "AM"]].to_numpy()
@@ -465,9 +503,10 @@ if __name__ == '__main__':
     plt.bar(height=importance[0], x=feature_names)
 
     plt.xticks(rotation=30, fontsize=6)
-    from sklearn.linear_model import LogisticRegression
 
-    plt.title("Feature importances for correct response probability via coefficients log regression")
+    plt.title("Feature importances for correct response probability \n via coefficients log regression", fontsize=10)
+    plt.ylabel('Relative importance', fontsize=10)
+    plt.xlabel('feature', fontsize=10)
     plt.show()
 
     dfcatuse = dfcat[["pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
@@ -477,12 +516,20 @@ if __name__ == '__main__':
                        data=dfcatuse, family='binomial')  # talker causing the error of no convergence
     # model = Lmer("DV ~ IV2 + (IV2|Group)", data=df)
 
-    print(modellogreg.fit(factors={"side": ["0", "1"], "talker": ["2.0", "1.0"], },REML=False, old_optimizer=True ))
-    # print(model.fit())
-    # ANOVA results from fitted model
-    print(modellogreg.anova())
-    # Plot estimated model coefficients
+    print(modellogreg.fit(factors={"side": ["0", "1"], "AM": ["0", "1"], "talker": ["2.0", "1.0"], },REML=False, old_optimizer=True ))
+    # print(model.fit())    # Plot estimated model coefficients
     modellogreg.plot_summary()
+    plt.show()
+
+    #model based on only what is significant in the log reg
+    modellogreg2 = Lmer("correctresp ~  talker + side + pitchofprecur +gradinpitch+ gradinpitchprecur+ AM+ (1|ferret)",
+                       data=dfcatuse, family='binomial')  # talker causing the error of no convergence
+    # model = Lmer("DV ~ IV2 + (IV2|Group)", data=df)
+
+    print(modellogreg2.fit(factors={"side": ["0", "1"],"AM": ["0", "1"] ,"talker": ["2.0", "1.0"], },REML=False, old_optimizer=True ))
+    # print(model.fit())
+    # ANOVA results from fitted model    # Plot estimated model coefficients
+    modellogreg2.plot_summary()
     plt.show()
 
     modellogreg_reduc = Lmer(
