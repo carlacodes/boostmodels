@@ -284,7 +284,7 @@ if __name__ == '__main__':
 
     modelregcat = Lmer(
         "correctresp ~ pitchoftarg + talker +  side  + precur_and_targ_same + timeToTarget + DaysSinceStart + AM + (1|ferret)",
-        data=dfuse, family='binomial')
+        data=dfcat_use, family='binomial')
 
     print(modelregcat.fit(factors={"side": ["0", "1"], "precur_and_targ_same": ['1', '0'], "AM": ["0", "1"],
                                    "pitchoftarg": ['0', '11', '5', '1', '13', '2', '6', '9', '12', '4', '8', '3',
