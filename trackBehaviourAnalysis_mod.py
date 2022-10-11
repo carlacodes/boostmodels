@@ -6,6 +6,8 @@ from instruments.behaviouralAnalysis import createWeekBehaviourFigs, reactionTim
 import math
 from time import time
 from pymer4.models import Lmer
+from sklearn.feature_selection import RFE
+from sklearn.svm import SVR
 
 from scipy.stats import sem
 import os
@@ -319,7 +321,8 @@ if __name__ == '__main__':
     # testing AIC with different exog vars
     exog_reduced = df[['pitchofprecur', 'pitchoftarg', 'side', 'gradinpitchprecur', 'timeToTarget']]
     exog_reduced = df[['side', 'talker', 'gradinpitch', 'timeToTarget']]  # forward selection
-    exog_reduced = df[['side', 'DaysSinceStart' ,'timeToTarget', 'AM']]
+    exog_reduced = df[['side', 'DaysSinceStart', 'timeToTarget', 'AM']]
+    exog_reduced = df[['talker', 'side', 'timeToTarget', 'DaysSinceStart', 'AM']]
 
     exog2 = df[["ferret", "pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
                 "timeToTarget"]].to_numpy()
@@ -338,15 +341,17 @@ if __name__ == '__main__':
     from sklearn.svm import LinearSVC
     from sklearn.linear_model import LassoCV
 
-    ridge = RidgeCV(alphas=np.logspace(-6, 6, num=5)).fit(X, y)
+    ridge = RidgeCV(alphas=np.logspace(-100, 100, num=10)).fit(X, y)
     importance = np.abs(ridge.coef_)
     feature_names = np.array(df[["pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
                                  "timeToTarget", "DaysSinceStart", "AM"]].columns)
     plt.bar(height=importance, x=feature_names)
-    plt.title("Feature importances via coefficients")
+    plt.title("Feature importances via ridge regression coefficients")
+    plt.xticks(rotation=30, fontsize=6)
+
     plt.show()
 
-    lasso = LassoCV(alphas=np.logspace(-6, 6, num=10)).fit(X, y)
+    lasso = LassoCV(alphas=np.logspace(-100, 100, num=10)).fit(X, y)
     importance = np.abs(lasso.coef_)
     feature_names = np.array(df[["pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
                                  "timeToTarget", "DaysSinceStart", "AM"]].columns)
@@ -361,13 +366,13 @@ if __name__ == '__main__':
 
     tic_fwd = time()
     sfs_forward = SequentialFeatureSelector(
-        ridge, n_features_to_select=4, direction="forward"
+        ridge, n_features_to_select=6, direction="forward"
     ).fit(X, y)
     toc_fwd = time()
 
     tic_bwd = time()
     sfs_backward = SequentialFeatureSelector(
-        ridge, n_features_to_select=4, direction="backward"
+        ridge, n_features_to_select=6, direction="backward"
     ).fit(X, y)
     toc_bwd = time()
 
@@ -397,6 +402,14 @@ if __name__ == '__main__':
     print(mdf.summary())
     print(mdf.aic)
     print(mdf.bic)
+    print(mdf.pvalues)
+    print(mdf.conf_int())
+
+    # estimator =  SVR(kernel="linear")
+    #
+    # selector = RFE(estimator, n_features_to_select=5, step=1)
+    # selector = selector.fit(X, y)
+    # selectarray = selector.support_
 
     md_reduced = sm.MixedLM(endog, exog_reduced, groups=df["ferret"], exog_re=None)
     mdf_reduced = md_reduced.fit(reml=False)
@@ -418,6 +431,25 @@ if __name__ == '__main__':
     from pymer4.models import Lmer
 
     dfcat = get_df_behav(ferrets=ferrets, includefaandmiss=True, startdate='04-01-2020', finishdate='01-10-2022')
+    X= df[["pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
+            "timeToTarget", "DaysSinceStart", "AM"]].to_numpy()
+
+    y = df[["correctresp"]].to_numpy()
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.model_selection import RandomizedSearchCV
+
+    log = LogisticRegression(penalty='l1', solver='liblinear').fit(X,y)
+    importance = np.abs(log.coef_)
+    feature_names = np.array(df[["pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
+                                 "timeToTarget", "DaysSinceStart", "AM"]].columns)
+    plt.bar(height=importance, x=feature_names)
+
+    plt.xticks(rotation=30, fontsize=6)
+    from sklearn.linear_model import LogisticRegression
+
+    plt.title("Feature importances for correct response probability via coefficients log regression")
+    plt.show()
+
     dfcatuse = dfcat[["pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
                       "timeToTarget", "DaysSinceStart", "AM", "correctresp", "ferret"]]
     modellogreg = Lmer("correctresp ~ pitchoftarg + pitchofprecur + talker + side + gradinpitch + gradinpitchprecur"
