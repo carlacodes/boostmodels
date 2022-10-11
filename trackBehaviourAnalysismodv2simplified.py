@@ -141,17 +141,18 @@ def get_df_behav(path=None,
     newdata['relReleaseTimes'] = newdata['centreRelease'] - newdata['targTimes']
     newdata['realRelReleaseTimes'] = newdata['relReleaseTimes'] - newdata['absentTime']
 
-    distractors= newdata['distractors']
-    talkermat = np.empty(len(pitchshiftmat))
+    distractors = newdata['distractors']
+    talkermat = {}
     talkerlist = newdata['talker']
 
-    for i0 in range(0,len(distractors)):
-        talkermat[i0]=talkerlist[i0]*np.ones((1,len(distractors[i0])))
+    for i0 in range(0, len(distractors)):
+        talkermat[i0] = int(talkerlist.values[i0]) * np.ones(len(distractors.values[i0]))
+    talkermat=pd.Series(talkermat, index=talkermat.keys())
 
     try:
         pitchshiftmat = newdata['PitchShiftMat']
     except:
-        pitchshiftmat = talkermat #make array equivalent to size of pitch shift mat just like talker [3,3,3,3] # if this is inter trial roving then talker is the pitch shift
+        pitchshiftmat = talkermat  # make array equivalent to size of pitch shift mat just like talker [3,3,3,3] # if this is inter trial roving then talker is the pitch shift
     precursorlist = newdata['distractors']
     chosenresponse = newdata['response']
     pitchoftarg = np.empty(len(pitchshiftmat))
@@ -162,7 +163,6 @@ def get_df_behav(path=None,
     precur_and_targ_same = np.empty(len(pitchshiftmat))
     correctresp = np.empty(shape=(0, 0))
     droplist = np.empty(shape=(0, 0))
-
 
     for i in range(0, len(talkerlist)):
         chosenresponseindex = chosenresponse.values[i]
@@ -230,11 +230,12 @@ def get_df_behav(path=None,
     # pitchofprecur2 = np.array(scaler.fit_transform(pitchofprecur2.reshape(-1, 1)))
     # gradinpitch2 =  np.array(scaler.fit_transform(pitchofprecur2.reshape(-1, 1)))
     # gradinpitchprecur2 = np.array(scaler.fit_transform(gradinpitchprecur2.reshape(-1, 1)))
+    droplist = [int(x) for x in droplist] #drop corrupted metdata trials
 
     # df_normalized = pd.DataFrame(x_scaled)
+    pitchoftarg = np.delete(pitchoftarg, droplist)
 
     newdata['pitchoftarg'] = pitchoftarg.tolist()
-    droplist = [int(x) for x in droplist]
 
     # if droplist.size > 0:
     pitchofprecur = np.delete(pitchofprecur, droplist)
@@ -287,8 +288,8 @@ if __name__ == '__main__':
 
     dfcat = get_df_behav(ferrets=ferrets, includefaandmiss=True, startdate='04-01-2020', finishdate='01-10-2022')
     dfcat_use = dfcat[["pitchoftarg", "pitchofprecur", "talker", "side", "precur_and_targ_same",
-                    "timeToTarget", "DaysSinceStart", "AM",
-                    "correctresp", "ferret"]]
+                       "timeToTarget", "DaysSinceStart", "AM",
+                       "correctresp", "ferret"]]
 
     modelregcat = Lmer(
         "correctresp ~ pitchoftarg + talker +  side  + precur_and_targ_same + timeToTarget + DaysSinceStart + AM + (1|ferret)",
