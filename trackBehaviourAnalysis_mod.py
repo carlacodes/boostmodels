@@ -8,6 +8,9 @@ from time import time
 from pymer4.models import Lmer
 from sklearn.feature_selection import RFE
 from sklearn.svm import SVR
+from sklearn.preprocessing import MinMaxScaler
+
+scaler = MinMaxScaler()
 
 from scipy.stats import sem
 import os
@@ -287,18 +290,33 @@ def get_df_behav(path=None,
             pitchoftarg2 = np.append(pitchoftarg2, pitchoftarg[i])
             gradinpitch2 = np.append(gradinpitch2, gradinpitch[i])
 
+    pitchoftarg2 = pitchoftarg2 / np.linalg.norm(
+        pitchoftarg2)  # np.array(scaler.fit_transform(pitchoftarg2.reshape(-1, 1)))
+    pitchofprecur2 = pitchofprecur2 / np.linalg.norm(
+        pitchofprecur2)  # np.array(scaler.fit_transform(pitchofprecur2.reshape(-1, 1)))
+    gradinpitch2 = gradinpitch2 / np.linalg.norm(
+        gradinpitch2)  # np.array(scaler.fit_transform(gradinpitch2.reshape(-1, 1)))
+    gradinpitchprecur2 = gradinpitchprecur2 / np.linalg.norm(
+        gradinpitchprecur2)  # np.array(scaler.fit_transform(gradinpitchprecur2.reshape(-1, 1)))
+    # pitchofprecur2 = np.array(scaler.fit_transform(pitchofprecur2.reshape(-1, 1)))
+    # gradinpitch2 =  np.array(scaler.fit_transform(pitchofprecur2.reshape(-1, 1)))
+    # gradinpitchprecur2 = np.array(scaler.fit_transform(gradinpitchprecur2.reshape(-1, 1)))
+
+    # df_normalized = pd.DataFrame(x_scaled)
+
     newdata['pitchoftarg'] = pitchoftarg2.tolist()
+
     newdata['pitchofprecur'] = pitchofprecur2.tolist()
 
     newdata['gradinpitch'] = gradinpitch2.tolist()
     newdata['gradinpitchprecur'] = gradinpitchprecur2.tolist()
     droplist = [int(x) for x in droplist]
     correctresp = np.delete(correctresp, droplist)
-    correctresp=correctresp.astype(int)
+    correctresp = correctresp.astype(bool)
     newdata['correctresp'] = correctresp.tolist()
     newdata['timeToTarget'] = newdata['timeToTarget'] / 24414.0625
     newdata['AM'] = newdata['AM'].astype(int)
-    newdata['talker'] = (newdata['talker'] - 1)
+    newdata['talker'] = (newdata['talker']).astype(float)
     return newdata
 
     # ferretFigs = reactionTimeAnalysis(ferrData)
@@ -433,14 +451,14 @@ if __name__ == '__main__':
     from pymer4.models import Lmer
 
     dfcat = get_df_behav(ferrets=ferrets, includefaandmiss=True, startdate='04-01-2020', finishdate='01-10-2022')
-    X= dfcat[["pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
-            "timeToTarget", "DaysSinceStart", "AM"]].to_numpy()
+    X = dfcat[["pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
+               "timeToTarget", "DaysSinceStart", "AM"]].to_numpy()
 
     y = dfcat[["correctresp"]].to_numpy()
     from sklearn.linear_model import LogisticRegression
     from sklearn.model_selection import RandomizedSearchCV
 
-    log = LogisticRegression(penalty='l1', solver='liblinear').fit(X,y)
+    log = LogisticRegression(penalty='l1', solver='liblinear').fit(X, y)
     importance = np.abs(log.coef_)
     feature_names = np.array(df[["pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
                                  "timeToTarget", "DaysSinceStart", "AM"]].columns)
@@ -454,32 +472,45 @@ if __name__ == '__main__':
 
     dfcatuse = dfcat[["pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
                       "timeToTarget", "DaysSinceStart", "AM", "correctresp", "ferret"]]
-    modellogreg = Lmer("correctresp ~ pitchoftarg + pitchofprecur+ side  + gradinpitch + gradinpitchprecur"
+    modellogreg = Lmer("correctresp ~ pitchoftarg + talker + pitchofprecur+ side  + gradinpitch + gradinpitchprecur"
                        "+ timeToTarget +DaysSinceStart+ AM+ (1|ferret)",
-                       data=dfcatuse, family='binomial') #talker causing the error of no convergence
+                       data=dfcatuse, family='binomial')  # talker causing the error of no convergence
     # model = Lmer("DV ~ IV2 + (IV2|Group)", data=df)
 
-    print(modellogreg.fit(factors={"side": ["0","1"], "talker": ["0","1"], },ordered=True, REML=False))
-    #print(model.fit())
+    print(modellogreg.fit(factors={"side": ["0", "1"], "talker": ["2.0", "1.0"], }, ordered=True, REML=True))
+    # print(model.fit())
     # ANOVA results from fitted model
     print(modellogreg.anova())
     # Plot estimated model coefficients
     modellogreg.plot_summary()
     plt.show()
 
-
-    modellogreg_reduc = Lmer("correctresp ~  pitchofprecur+gradinpitchprecur  + talker +side + timeToTarget +DaysSinceStart+ AM+ (1|ferret)",
-                       data=dfcatuse, family='gaussian') #talker causing the error of no convergence
+    modellogreg_reduc = Lmer(
+        "correctresp ~  pitchofprecur+gradinpitchprecur + gradinpitch+ talker+ side+ timeToTarget +DaysSinceStart+ AM+ (1|ferret)",
+        data=dfcatuse, family='binomial')  # talker causing the error of no convergence
     # model = Lmer("DV ~ IV2 + (IV2|Group)", data=df)
 
-    #print(modellogreg_reduc.fit())
-    print(modellogreg_reduc.fit(factors={"side": ["0","1"], "talker": ["0","1"], },ordered=True, REML=False))
+    # print(modellogreg_reduc.fit())
+    print(modellogreg_reduc.fit(factors={"gradinpitchprecur": ['0.0', '-0.029152519472590174', '-0.00971750649086339',
+                                                               '-0.11806770386399021', '0.0398417766125399',
+                                                               '-0.061706166216982536', '0.007288129868147543',
+                                                               '-0.03255364674439236', '-0.08551405711959785',
+                                                               '0.02283614025352897', '-0.10106206750497927',
+                                                               '-0.06850842076058691'],
+                                         "gradinpitch": ['0.013474377038943238', '-0.02260218083951769',
+                                                         '0.020754887213210955', '-0.00651985985755318',
+                                                         '-0.013800370031820898', '0.0', '0.001629964964388295',
+                                                         '-0.0021732866191843934', '-0.015321670665249972',
+                                                         '-0.007280510174267717', '-0.026405432423090378',
+                                                         '0.005107223555083324', '0.008910475138656011',
+                                                         '-0.01912492224882266'], "talker": ["2.0", "1.0"], "side": ["0", "1"]}, ordered=True, REML=False))
 
-    #print(model.fit())
+    # print(model.fit())
     # ANOVA results from fitted model
     print(modellogreg_reduc.anova())
     # Plot estimated model coefficients
     modellogreg_reduc.plot_summary()
+    plt.legend()
     plt.show()
 
     # We use standard functionality of sklearn to perform grid-search.
