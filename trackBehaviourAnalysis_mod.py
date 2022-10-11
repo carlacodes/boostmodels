@@ -431,10 +431,10 @@ if __name__ == '__main__':
     from pymer4.models import Lmer
 
     dfcat = get_df_behav(ferrets=ferrets, includefaandmiss=True, startdate='04-01-2020', finishdate='01-10-2022')
-    X= df[["pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
+    X= dfcat[["pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
             "timeToTarget", "DaysSinceStart", "AM"]].to_numpy()
 
-    y = df[["correctresp"]].to_numpy()
+    y = dfcat[["correctresp"]].to_numpy()
     from sklearn.linear_model import LogisticRegression
     from sklearn.model_selection import RandomizedSearchCV
 
