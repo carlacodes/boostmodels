@@ -312,7 +312,7 @@ def get_df_behav(path=None,
     newdata['gradinpitchprecur'] = gradinpitchprecur2.tolist()
     droplist = [int(x) for x in droplist]
     correctresp = np.delete(correctresp, droplist)
-    correctresp = correctresp.astype(bool)
+    correctresp = correctresp.astype(int)
     newdata['correctresp'] = correctresp.tolist()
     newdata['timeToTarget'] = newdata['timeToTarget'] / 24414.0625
     newdata['AM'] = newdata['AM'].astype(int)
@@ -503,7 +503,7 @@ if __name__ == '__main__':
                                                          '-0.0021732866191843934', '-0.015321670665249972',
                                                          '-0.007280510174267717', '-0.026405432423090378',
                                                          '0.005107223555083324', '0.008910475138656011',
-                                                         '-0.01912492224882266'], "talker": ["2.0", "1.0"], "side": ["0", "1"]}, REML=False))
+                                                         '-0.01912492224882266'], "talker": ["2.0", "1.0"], "side": ["0", "1"]}, REML=False, old_optimizer=True))
 
     # print(model.fit())
     # ANOVA results from fitted model
