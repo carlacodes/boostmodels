@@ -226,10 +226,12 @@ def get_df_behav(path=None,
     # df_normalized = pd.DataFrame(x_scaled)
 
     newdata['pitchoftarg'] = pitchoftarg.tolist()
-    pitchofprecur = np.delete(pitchofprecur, droplist)
+    droplist = [int(x) for x in droplist]
+
+    if droplist.size > 0:
+        pitchofprecur = np.delete(pitchofprecur, droplist)
     newdata['pitchofprecur'] = pitchofprecur.tolist()
 
-    droplist = [int(x) for x in droplist]
     correctresp = np.delete(correctresp, droplist)
     correctresp = correctresp.astype(int)
     newdata['correctresp'] = correctresp.tolist()
