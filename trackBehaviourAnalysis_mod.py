@@ -477,7 +477,7 @@ if __name__ == '__main__':
                        data=dfcatuse, family='binomial')  # talker causing the error of no convergence
     # model = Lmer("DV ~ IV2 + (IV2|Group)", data=df)
 
-    print(modellogreg.fit(factors={"side": ["0", "1"], "talker": ["2.0", "1.0"], }, ordered=True, REML=True))
+    print(modellogreg.fit(factors={"side": ["0", "1"], "talker": ["2.0", "1.0"], },REML=False, old_optimizer=True ))
     # print(model.fit())
     # ANOVA results from fitted model
     print(modellogreg.anova())
@@ -503,7 +503,7 @@ if __name__ == '__main__':
                                                          '-0.0021732866191843934', '-0.015321670665249972',
                                                          '-0.007280510174267717', '-0.026405432423090378',
                                                          '0.005107223555083324', '0.008910475138656011',
-                                                         '-0.01912492224882266'], "talker": ["2.0", "1.0"], "side": ["0", "1"]}, ordered=True, REML=False))
+                                                         '-0.01912492224882266'], "talker": ["2.0", "1.0"], "side": ["0", "1"]}, REML=False))
 
     # print(model.fit())
     # ANOVA results from fitted model
