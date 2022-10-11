@@ -278,7 +278,7 @@ if __name__ == '__main__':
                        old_optimizer=True))
 
     dfcat = get_df_behav(ferrets=ferrets, includefaandmiss=True, startdate='04-01-2020', finishdate='01-10-2022')
-    dfcat_use = df[["pitchoftarg", "pitchofprecur", "talker", "side", "precur_and_targ_same",
+    dfcat_use = dfcat[["pitchoftarg", "pitchofprecur", "talker", "side", "precur_and_targ_same",
                     "timeToTarget", "DaysSinceStart", "AM",
                     "correctresp", "ferret"]]
 
