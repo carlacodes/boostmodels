@@ -228,11 +228,12 @@ def get_df_behav(path=None,
     newdata['pitchoftarg'] = pitchoftarg.tolist()
     droplist = [int(x) for x in droplist]
 
-    if droplist.size > 0:
-        pitchofprecur = np.delete(pitchofprecur, droplist)
+    # if droplist.size > 0:
+    pitchofprecur = np.delete(pitchofprecur, droplist)
     newdata['pitchofprecur'] = pitchofprecur.tolist()
 
     correctresp = np.delete(correctresp, droplist)
+    precur_and_targ_same = np.delete(precur_and_targ_same, droplist)
     correctresp = correctresp.astype(int)
     newdata['correctresp'] = correctresp.tolist()
     precur_and_targ_same = precur_and_targ_same.astype(int)
@@ -282,7 +283,7 @@ if __name__ == '__main__':
                     "correctresp", "ferret"]]
 
     modelregcat = Lmer(
-        "correcpresp ~ pitchoftarg + talker +  side  + precur_and_targ_same + timeToTarget + DaysSinceStart + AM + (1|ferret)",
+        "correctresp ~ pitchoftarg + talker +  side  + precur_and_targ_same + timeToTarget + DaysSinceStart + AM + (1|ferret)",
         data=dfuse, family='binomial')
 
     print(modelregcat.fit(factors={"side": ["0", "1"], "precur_and_targ_same": ['1', '0'], "AM": ["0", "1"],
