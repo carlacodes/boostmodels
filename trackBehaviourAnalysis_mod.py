@@ -294,9 +294,11 @@ def get_df_behav(path=None,
     newdata['gradinpitchprecur'] = gradinpitchprecur2.tolist()
     droplist = [int(x) for x in droplist]
     correctresp = np.delete(correctresp, droplist)
+    correctresp=correctresp.astype(int)
     newdata['correctresp'] = correctresp.tolist()
     newdata['timeToTarget'] = newdata['timeToTarget'] / 24414.0625
     newdata['AM'] = newdata['AM'].astype(int)
+    newdata['talker'] = (newdata['talker'] - 1)
     return newdata
 
     # ferretFigs = reactionTimeAnalysis(ferrData)
@@ -442,7 +444,7 @@ if __name__ == '__main__':
     importance = np.abs(log.coef_)
     feature_names = np.array(df[["pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
                                  "timeToTarget", "DaysSinceStart", "AM"]].columns)
-    plt.bar(height=importance, x=feature_names)
+    plt.bar(height=importance[0], x=feature_names)
 
     plt.xticks(rotation=30, fontsize=6)
     from sklearn.linear_model import LogisticRegression
@@ -452,12 +454,34 @@ if __name__ == '__main__':
 
     dfcatuse = dfcat[["pitchoftarg", "pitchofprecur", "talker", "side", "gradinpitch", "gradinpitchprecur",
                       "timeToTarget", "DaysSinceStart", "AM", "correctresp", "ferret"]]
-    modellogreg = Lmer("correctresp ~ pitchoftarg + pitchofprecur + talker + side + gradinpitch + gradinpitchprecur"
-                       "+ timeToTarget + (1|ferret)",
-                       data=dfcatuse, family='binomial')
+    modellogreg = Lmer("correctresp ~ pitchoftarg + pitchofprecur+ side  + gradinpitch + gradinpitchprecur"
+                       "+ timeToTarget +DaysSinceStart+ AM+ (1|ferret)",
+                       data=dfcatuse, family='binomial') #talker causing the error of no convergence
     # model = Lmer("DV ~ IV2 + (IV2|Group)", data=df)
 
-    print(modellogreg.fit())
+    print(modellogreg.fit(factors={"side": ["0","1"], "talker": ["0","1"], },ordered=True, REML=False))
+    #print(model.fit())
+    # ANOVA results from fitted model
+    print(modellogreg.anova())
+    # Plot estimated model coefficients
+    modellogreg.plot_summary()
+    plt.show()
+
+
+    modellogreg_reduc = Lmer("correctresp ~  pitchofprecur+gradinpitchprecur  + talker +side + timeToTarget +DaysSinceStart+ AM+ (1|ferret)",
+                       data=dfcatuse, family='gaussian') #talker causing the error of no convergence
+    # model = Lmer("DV ~ IV2 + (IV2|Group)", data=df)
+
+    #print(modellogreg_reduc.fit())
+    print(modellogreg_reduc.fit(factors={"side": ["0","1"], "talker": ["0","1"], },ordered=True, REML=False))
+
+    #print(model.fit())
+    # ANOVA results from fitted model
+    print(modellogreg_reduc.anova())
+    # Plot estimated model coefficients
+    modellogreg_reduc.plot_summary()
+    plt.show()
+
     # We use standard functionality of sklearn to perform grid-search.
     # column_labels = ['group'] * 1 + ["fixed+random"] * 7 + ['variance'] * 1
     # row_labels = ['ferret'] + ['pitchoftarg', 'pitchofprecur', 'talker', 'side', 'gradinpitchprecur', 'gradinpitch', 'timeToTarget'] + ['variance']
