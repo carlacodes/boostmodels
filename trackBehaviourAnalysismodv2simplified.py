@@ -149,10 +149,12 @@ def get_df_behav(path=None,
         talkermat[i0] = int(talkerlist.values[i0]) * np.ones(len(distractors.values[i0]))
     talkermat = pd.Series(talkermat, index=talkermat.keys())
 
-    try:
-        pitchshiftmat = newdata['PitchShiftMat']
-    except:
-        pitchshiftmat = talkermat  # make array equivalent to size of pitch shift mat just like talker [3,3,3,3] # if this is inter trial roving then talker is the pitch shift
+    pitchshiftmat = newdata['PitchShiftMat']
+    # if len(pitchshiftmat) == 0:
+    #     pitchshiftmat = talkermat  # make array equivalent to size of pitch shift mat just like talker [3,3,3,3] # if this is inter trial roving then talker is the pitch shift
+
+    # except:
+    #     pitchshiftmat = talkermat  # make array equivalent to size of pitch shift mat just like talker [3,3,3,3] # if this is inter trial roving then talker is the pitch shift
     precursorlist = newdata['distractors']
     chosenresponse = newdata['response']
     pitchoftarg = np.empty(len(pitchshiftmat))
@@ -161,15 +163,26 @@ def get_df_behav(path=None,
     gradinpitchprecur = np.empty(len(pitchshiftmat))
     timetotarglist = np.empty(len(pitchshiftmat))
     precur_and_targ_same = np.empty(len(pitchshiftmat))
+    talkerlist2= np.empty(len(pitchshiftmat))
     correctresp = np.empty(shape=(0, 0))
     droplist = np.empty(shape=(0, 0))
 
     for i in range(0, len(talkerlist)):
         chosenresponseindex = chosenresponse.values[i]
         chosentrial = pitchshiftmat.values[i]
-
+        if isinstance(chosentrial, float):
+            chosentrial = talkermat.values[i]
         chosendisttrial = precursorlist.values[i]
         chosentalker = talkerlist.values[i]
+        if chosentalker == 3:
+            chosentalker = 1
+        if chosentalker == 8:
+            chosentalker = 2
+        if chosentalker == 13:
+            chosentalker = 2
+        if chosentalker == 5:
+            chosentalker = 1
+        talkerlist2[i] = chosentalker
 
         if chosentalker == 1:
             origF0 = 191
@@ -203,6 +216,10 @@ def get_df_behav(path=None,
             newdata.drop(indexdrop, axis=0, inplace=True)
             droplist = np.append(droplist, i)
             continue
+    # indexdrop = newdata.iloc[i].name
+    # newdata=newdata.drop(indexdrop, axis=0, inplace=True)
+    droplist = [int(x) for x in droplist]  # drop corrupted metdata trials
+    # newdata = newdata.drop(droplist, axis=0, inplace=True)
 
     pitchoftarg = pitchoftarg[~np.isnan(pitchoftarg)]
     pitchoftarg = pitchoftarg.astype(int)
@@ -238,10 +255,10 @@ def get_df_behav(path=None,
     # pitchofprecur2 = np.array(scaler.fit_transform(pitchofprecur2.reshape(-1, 1)))
     # gradinpitch2 =  np.array(scaler.fit_transform(pitchofprecur2.reshape(-1, 1)))
     # gradinpitchprecur2 = np.array(scaler.fit_transform(gradinpitchprecur2.reshape(-1, 1)))
-    droplist = [int(x) for x in droplist]  # drop corrupted metdata trials
 
     # df_normalized = pd.DataFrame(x_scaled)
     pitchoftarg = np.delete(pitchoftarg, droplist)
+    talkerlist2 = np.delete(talkerlist2, droplist)
 
     newdata['pitchoftarg'] = pitchoftarg.tolist()
 
@@ -253,6 +270,7 @@ def get_df_behav(path=None,
     precur_and_targ_same = np.delete(precur_and_targ_same, droplist)
     correctresp = correctresp.astype(int)
     newdata['correctresp'] = correctresp.tolist()
+    newdata['talker'] = talkerlist2.tolist()
     precur_and_targ_same = precur_and_targ_same.astype(int)
     newdata['precur_and_targ_same'] = precur_and_targ_same.tolist()
     newdata['timeToTarget'] = newdata['timeToTarget'] / 24414.0625
@@ -261,7 +279,7 @@ def get_df_behav(path=None,
     # optionvector=[1 3 5];, male optionvector=[2 8 13]
     # only look at v2 pitches from recent experiments
     newdata = newdata[(newdata.pitchoftarg == 1) | (newdata.pitchoftarg == 2) | (newdata.pitchoftarg == 3) | (
-                newdata.pitchoftarg == 5) | (newdata.pitchoftarg == 8) | (newdata.pitchoftarg == 13)]
+            newdata.pitchoftarg == 5) | (newdata.pitchoftarg == 8) | (newdata.pitchoftarg == 13)]
 
     return newdata
 
@@ -310,5 +328,5 @@ if __name__ == '__main__':
     print(modelregcat.fit(factors={"side": ["0", "1"], "precur_and_targ_same": ['1', '0'], "AM": ["0", "1"],
                                    "pitchoftarg": ['1', '2', '3', '5', '13'], "talker": ["2.0", "1.0"], }, REML=False,
                           old_optimizer=True))
-    # 1 is 191, 2 is 124, 3 is 144, 5 is 251, 13 is
-    #pitchof targ 1 is 124hz male, pitchoftarg4 is 109Hz Male
+    # 1 is 191, 2 is 124, 3 is 144hz female, 5 is 251, 8 is 144hz male, 13 is109hz male
+    # pitchof targ 1 is 124hz male, pitchoftarg4 is 109Hz Male
