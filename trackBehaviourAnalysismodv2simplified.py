@@ -15,6 +15,7 @@ scaler = MinMaxScaler()
 
 from scipy.stats import sem
 import os
+import matplotlib.pyplot as plt
 import numpy as np
 from instruments.helpers.extract_helpers import extractAllFerretData
 import pandas as pd
@@ -275,7 +276,7 @@ def get_df_behav(path=None,
     newdata['precur_and_targ_same'] = precur_and_targ_same.tolist()
     newdata['timeToTarget'] = newdata['timeToTarget'] / 24414.0625
     newdata['AM'] = newdata['AM'].astype(int)
-    newdata['talker'] = (newdata['talker']).astype(float)
+    #newdata['talker'] = newdata['talker'].astype(np.int64)
     # optionvector=[1 3 5];, male optionvector=[2 8 13]
     # only look at v2 pitches from recent experiments
     newdata = newdata[(newdata.pitchoftarg == 1) | (newdata.pitchoftarg == 2) | (newdata.pitchoftarg == 3) | (
@@ -300,10 +301,6 @@ if __name__ == '__main__':
                 "timeToTarget", "DaysSinceStart", "AM",
                 "realRelReleaseTimes", "ferret"]]
     endog2 = df['realRelReleaseTimes'].to_numpy()
-
-    # TODO: CLEAN CODE
-    import numpy as np
-
     X = df[["pitchoftarg", "pitchofprecur", "talker", "side",
             "timeToTarget", "DaysSinceStart", "AM"]].to_numpy()
 
@@ -313,10 +310,11 @@ if __name__ == '__main__':
         data=dfuse, family='gaussian')
 
     print(modelreg.fit(factors={"side": ["0", "1"], "precur_and_targ_same": ['1', '0'], "AM": ["0", "1"],
-                                "pitchoftarg": ['1', '2', '3', '5', '13'], "talker": ["2.0", "1.0"], }, REML=False,
+                                "pitchoftarg": ['1', '2', '3', '5', '13'], "talker": ["1.0", "2.0"], }, REML=False,
                        old_optimizer=True))
-
+    #looking at whether the response is correct or not
     dfcat = get_df_behav(ferrets=ferrets, includefaandmiss=True, startdate='04-01-2020', finishdate='01-10-2022')
+
     dfcat_use = dfcat[["pitchoftarg", "pitchofprecur", "talker", "side", "precur_and_targ_same",
                        "timeToTarget", "DaysSinceStart", "AM",
                        "correctresp", "ferret"]]
@@ -326,7 +324,47 @@ if __name__ == '__main__':
         data=dfcat_use, family='binomial')
 
     print(modelregcat.fit(factors={"side": ["0", "1"], "precur_and_targ_same": ['1', '0'], "AM": ["0", "1"],
-                                   "pitchoftarg": ['1', '2', '3', '5', '13'], "talker": ["2.0", "1.0"], }, REML=False,
+                                   "pitchoftarg": ['1', '2', '3', '5', '13'] }, REML=False,
                           old_optimizer=True))
+    modelregcatreduc = Lmer(
+        "correctresp ~ pitchoftarg + talker +  side + (1|ferret)",
+        data=dfcat_use, family='binomial')
+    # modelregcatreduc = Lmer(
+    #     "correctresp ~ talker + (1|ferret)",
+    #     data=dfcat_use, family='binomial')
+    # print(modelregcat.fit())
+
+    print(modelregcat.fit(factors={"side": ["0", "1"], "pitchoftarg": ['1', '2', '3', '5', '13']}, REML=False,
+                          old_optimizer=True))
+    fitvar=modelregcat.fit(factors={"side": ["0", "1"], "pitchoftarg": ['1', '2', '3', '5', '13']}, REML=False,
+                          old_optimizer=True)
+
+    fig, ax = plt.subplots()
+
+    ax= modelregcat.plot_summary()
+    plt.title('Model Summary of Coefficients for P(Correct Responses)')
+    labels = [item.get_text() for item in ax.get_yticklabels()]
+    labels[0] = 'Intercept'
+    labels[1] = 'targ - 124 Hz vs ref. 191 Hz'
+    labels[2] = 'targ - 144 Hz vs ref. 191 Hz'
+    labels[3] = 'targ - 251 Hz vs ref. 191 Hz'
+    labels[4] = 'targ - 109 Hz vs ref. 191 Hz'
+    labels[5] = 'side - left vs right'
+    labels[6] = 'precur and targ same'
+    labels[7] = 'time to target'
+    labels[8] = 'days since start'
+    labels[9] = 'AM'
+
+
+    ax.set_yticklabels(labels)
+
+    plt.show()
+    fig, ax = plt.subplots()
+
+    ax=modelreg.plot_summary()
+    plt.title('Model Summary of Coefficients for Relative Release Times for Correct Responses')
+    ax.set_yticklabels(labels)
+
+    plt.show()
     # 1 is 191, 2 is 124, 3 is 144hz female, 5 is 251, 8 is 144hz male, 13 is109hz male
     # pitchof targ 1 is 124hz male, pitchoftarg4 is 109Hz Male
