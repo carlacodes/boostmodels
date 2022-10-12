@@ -276,7 +276,7 @@ def get_df_behav(path=None,
     newdata['precur_and_targ_same'] = precur_and_targ_same.tolist()
     newdata['timeToTarget'] = newdata['timeToTarget'] / 24414.0625
     newdata['AM'] = newdata['AM'].astype(int)
-    #newdata['talker'] = newdata['talker'].astype(np.int64)
+    newdata['talker'] = newdata['talker']-1
     # optionvector=[1 3 5];, male optionvector=[2 8 13]
     # only look at v2 pitches from recent experiments
     newdata = newdata[(newdata.pitchoftarg == 1) | (newdata.pitchoftarg == 2) | (newdata.pitchoftarg == 3) | (
@@ -306,12 +306,13 @@ if __name__ == '__main__':
 
     y = endog2
     modelreg = Lmer(
-        "realRelReleaseTimes ~ pitchoftarg + talker +  side  + precur_and_targ_same + timeToTarget + DaysSinceStart + AM + (1|ferret)",
+        "realRelReleaseTimes ~ talker*(pitchoftarg)+ talker*(precur_and_targ_same)+side + timeToTarget + DaysSinceStart + AM  + (1|ferret)",
         data=dfuse, family='gaussian')
 
     print(modelreg.fit(factors={"side": ["0", "1"], "precur_and_targ_same": ['1', '0'], "AM": ["0", "1"],
-                                "pitchoftarg": ['1', '2', '3', '5', '13'], "talker": ["1.0", "2.0"], }, REML=False,
-                       old_optimizer=True))
+                                "pitchoftarg": ['1', '2', '3', '5', '13'], "talker": ["0.0", "1.0"], },ordered=True, REML=False,
+                       old_optimizer=False))
+
     #looking at whether the response is correct or not
     dfcat = get_df_behav(ferrets=ferrets, includefaandmiss=True, startdate='04-01-2020', finishdate='01-10-2022')
 
@@ -320,24 +321,22 @@ if __name__ == '__main__':
                        "correctresp", "ferret"]]
 
     modelregcat = Lmer(
-        "correctresp ~ pitchoftarg + talker +  side  + precur_and_targ_same + timeToTarget + DaysSinceStart + AM + (1|ferret)",
+        "correctresp ~ talker*pitchoftarg  +  side  + talker * precur_and_targ_same + timeToTarget + DaysSinceStart + AM + (1|ferret)",
         data=dfcat_use, family='binomial')
 
     print(modelregcat.fit(factors={"side": ["0", "1"], "precur_and_targ_same": ['1', '0'], "AM": ["0", "1"],
-                                   "pitchoftarg": ['1', '2', '3', '5', '13'] }, REML=False,
+                                   "pitchoftarg": ['1', '2', '3', '5', '13'] , "talker": ["0.0", "1.0"]}, REML=False,
                           old_optimizer=True))
-    modelregcatreduc = Lmer(
-        "correctresp ~ pitchoftarg + talker +  side + (1|ferret)",
-        data=dfcat_use, family='binomial')
+    # modelregcatreduc = Lmer(
+    #     "correctresp ~ pitchoftarg + talker +  side + (1|ferret)",
+    #     data=dfcat_use, family='binomial')
     # modelregcatreduc = Lmer(
     #     "correctresp ~ talker + (1|ferret)",
     #     data=dfcat_use, family='binomial')
     # print(modelregcat.fit())
-
-    print(modelregcat.fit(factors={"side": ["0", "1"], "pitchoftarg": ['1', '2', '3', '5', '13']}, REML=False,
-                          old_optimizer=True))
-    fitvar=modelregcat.fit(factors={"side": ["0", "1"], "pitchoftarg": ['1', '2', '3', '5', '13']}, REML=False,
-                          old_optimizer=True)
+    #
+    # print(modelregcat.fit(factors={"side": ["0", "1"], "pitchoftarg": ['1', '2', '3', '5', '13']}, REML=False,
+    #                       old_optimizer=False))
 
     fig, ax = plt.subplots()
 
