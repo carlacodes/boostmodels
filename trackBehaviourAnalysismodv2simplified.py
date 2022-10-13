@@ -327,6 +327,22 @@ if __name__ == '__main__':
     print(modelregcat.fit(factors={"side": ["0", "1"], "precur_and_targ_same": ['1', '0'], "AM": ["0", "1"],
                                    "pitchoftarg": ['1', '2', '3', '5', '13'] , "talker": ["0.0", "1.0"]}, REML=False,
                           old_optimizer=True))
+
+    modelregcat_reduc = Lmer(
+        "correctresp ~ talker*pitchoftarg  +  side  + talker * precur_and_targ_same + timeToTarget + (1|ferret)",
+        data=dfcat_use, family='binomial')
+
+    print(modelregcat_reduc.fit(factors={"side": ["0", "1"], "precur_and_targ_same": ['1', '0'],
+                                   "pitchoftarg": ['1', '2', '3', '5', '13'], "talker": ["0.0", "1.0"]}, REML=False,
+                          old_optimizer=True))
+
+    modelreg_reduc = Lmer(
+        "realRelReleaseTimes ~ talker*(pitchoftarg)+ talker*(precur_and_targ_same)+side + timeToTarget  + (1|ferret)",
+        data=dfuse, family='gaussian')
+
+    print(modelreg_reduc.fit(factors={"side": ["0", "1"], "precur_and_targ_same": ['1', '0'],
+                                "pitchoftarg": ['1', '2', '3', '5', '13'], "talker": ["0.0", "1.0"], },ordered=True, REML=False,
+                       old_optimizer=False))
     # modelregcatreduc = Lmer(
     #     "correctresp ~ pitchoftarg + talker +  side + (1|ferret)",
     #     data=dfcat_use, family='binomial')
@@ -367,3 +383,48 @@ if __name__ == '__main__':
     plt.show()
     # 1 is 191, 2 is 124, 3 is 144hz female, 5 is 251, 8 is 144hz male, 13 is109hz male
     # pitchof targ 1 is 124hz male, pitchoftarg4 is 109Hz Male
+
+
+    fig, ax = plt.subplots()
+
+    ax= modelregcat_reduc.plot_summary()
+    plt.title('Model Summary of Coefficients for P(Correct Responses)')
+    labels = [item.get_text() for item in ax.get_yticklabels()]
+    labels[0] = 'Intercept'
+    labels[1] = 'male talker vs ref. female talker'
+    labels[2] = 'targ - 124 Hz vs ref. 191 Hz'
+    labels[3] = 'targ - 144 Hz vs ref. 191 Hz'
+    labels[4] = 'targ - 251 Hz vs ref. 191 Hz'
+    labels[5] = 'side - right vs ref. left'
+    labels[6] = 'precur == targ pitch'
+    labels[7] = 'time to target'
+    labels[8] = 'targ pitch ~ precur == targ pitch'
+
+
+
+
+    ax.set_yticklabels(labels)
+
+    plt.show()
+
+    fig, ax = plt.subplots()
+
+    ax= modelreg_reduc.plot_summary()
+    plt.title('Model Summary of Coefficients for Correct Release Times')
+    labels = [item.get_text() for item in ax.get_yticklabels()]
+    labels[0] = 'Intercept'
+    labels[1] = 'male talker vs ref. female talker'
+    labels[2] = 'targ - 124 Hz vs ref. 191 Hz'
+    labels[3] = 'targ - 144 Hz vs ref. 191 Hz'
+    labels[4] = 'targ - 251 Hz vs ref. 191 Hz'
+    labels[5] = 'side - right vs ref. left'
+    labels[6] = 'precur == targ pitch'
+    labels[7] = 'time to target'
+    labels[8] = 'targ pitch ~ precur == targ pitch'
+
+
+
+
+    ax.set_yticklabels(labels, fontsize=10)
+
+    plt.show()
