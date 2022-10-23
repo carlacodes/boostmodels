@@ -325,14 +325,14 @@ if __name__ == '__main__':
 
     dfuse = df[["pitchoftarg", "pitchofprecur", "talker", "side", "precur_and_targ_same",
                 "timeToTarget", "DaysSinceStart", "AM",
-                "realRelReleaseTimes", "ferret"]]
+                "realRelReleaseTimes", "ferret", "stepval", "pitchofprecur"]]
     endog2 = df['realRelReleaseTimes'].to_numpy()
     X = df[["pitchoftarg", "pitchofprecur", "talker", "side",
             "timeToTarget", "DaysSinceStart", "AM"]].to_numpy()
 
     y = endog2
     modelreg = Lmer(
-        "realRelReleaseTimes ~ talker*(pitchoftarg)+ talker*(precur_and_targ_same)+side + timeToTarget + DaysSinceStart + AM  + (1|ferret)",
+        "realRelReleaseTimes ~ talker*(pitchoftarg)+ talker*(precur_and_targ_same)+side+stepval + timeToTarget + DaysSinceStart + AM  + (1|ferret)",
         data=dfuse, family='gaussian')
 
     print(modelreg.fit(factors={"side": ["0", "1"], "precur_and_targ_same": ['1', '0'], "AM": ["0", "1"],
@@ -345,10 +345,10 @@ if __name__ == '__main__':
 
     dfcat_use = dfcat[["pitchoftarg", "pitchofprecur", "talker", "side", "precur_and_targ_same",
                        "timeToTarget", "DaysSinceStart", "AM",
-                       "correctresp", "ferret"]]
+                       "correctresp", "ferret", "stepval", "pitchofprecur"]]
 
     modelregcat = Lmer(
-        "correctresp ~ talker*pitchoftarg  +  side  + talker * precur_and_targ_same + timeToTarget + DaysSinceStart + AM + (1|ferret)",
+        "correctresp ~ talker*pitchoftarg +  side  + talker * precur_and_targ_same + stepval+timeToTarget + DaysSinceStart + AM + (1|ferret)",
         data=dfcat_use, family='binomial')
 
     print(modelregcat.fit(factors={"side": ["0", "1"], "precur_and_targ_same": ['1', '0'], "AM": ["0", "1"],
@@ -356,20 +356,20 @@ if __name__ == '__main__':
                           old_optimizer=True))
 
     modelregcat_reduc = Lmer(
-        "correctresp ~ talker*pitchoftarg  +  side  + talker * precur_and_targ_same + timeToTarget + (1|ferret)",
+        "correctresp ~ talker*pitchoftarg  +  side + timeToTarget +talker*stepval+(1|ferret)",
         data=dfcat_use, family='binomial')
 
-    print(modelregcat_reduc.fit(factors={"side": ["0", "1"], "precur_and_targ_same": ['1', '0'],
-                                         "pitchoftarg": ['1', '2', '3', '5', '13'], "talker": ["0.0", "1.0"]},
+    print(modelregcat_reduc.fit(factors={"side": ["0", "1"],
+                                         "pitchoftarg": ['1', '2', '3', '5', '13'], "talker": ["0.0", "1.0"], "stepval": ["0.0", "1.0",  "2.0"]},
                                 REML=False,
                                 old_optimizer=True))
 
     modelreg_reduc = Lmer(
-        "realRelReleaseTimes ~ talker*(pitchoftarg)+ talker*(precur_and_targ_same)+side + timeToTarget  + (1|ferret)",
+        "realRelReleaseTimes ~ talker*(pitchoftarg)+side + talker*stepval+timeToTarget  + (1|ferret)",
         data=dfuse, family='gaussian')
 
-    print(modelreg_reduc.fit(factors={"side": ["0", "1"], "precur_and_targ_same": ['1', '0'],
-                                      "pitchoftarg": ['1', '2', '3', '5', '13'], "talker": ["0.0", "1.0"], },
+    print(modelreg_reduc.fit(factors={"side": ["0", "1"],
+                                      "pitchoftarg": ['1', '2', '3', '5', '13'], "talker": ["0.0", "1.0"],"stepval": ["0.0", "1.0",  "2.0"] },
                              ordered=True, REML=False,
                              old_optimizer=False))
     # modelregcatreduc = Lmer(
