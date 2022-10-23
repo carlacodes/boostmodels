@@ -169,6 +169,7 @@ def get_df_behav(path=None,
     chosenresponse = newdata['response']
     pitchoftarg = np.empty(len(pitchshiftmat))
     pitchofprecur = np.empty(len(pitchshiftmat))
+    stepval = np.empty(len(pitchshiftmat))
     gradinpitch = np.empty(len(pitchshiftmat))
     gradinpitchprecur = np.empty(len(pitchshiftmat))
     timetotarglist = np.empty(len(pitchshiftmat))
@@ -214,6 +215,20 @@ def get_df_behav(path=None,
                 pitchofprecur[i] == 3.0
             else:
                 pitchofprecur[i] = chosentrial[targpos[0] - 1]
+                # 1 is 191, 2 is 124, 3 is 144hz female, 5 is 251, 8 is 144hz male, 13 is109hz male
+                # pitchof targ 1 is 124hz male, pitchoftarg4 is 109Hz Male
+
+            if chosentrial[targpos[0] - 1]== 3.0:
+                stepval[i] = 1.0
+            elif chosentrial[targpos[0] - 1] == 8.0:
+                stepval[i] = 2.0
+            elif chosentrial[targpos[0] - 1] == 13.0:
+                stepval[i] = 1.0
+            elif chosentrial[targpos[0]-1] == 5.0:
+                stepval[i] = 1.0
+            else:
+                stepval[i] = 0.0
+
 
             if pitchoftarg[i] == pitchofprecur[i]:
                 precur_and_targ_same[i] = 1
@@ -269,6 +284,7 @@ def get_df_behav(path=None,
     # df_normalized = pd.DataFrame(x_scaled)
     pitchoftarg = np.delete(pitchoftarg, droplist)
     talkerlist2 = np.delete(talkerlist2, droplist)
+    stepval = np.delete(stepval, droplist)
 
     newdata['pitchoftarg'] = pitchoftarg.tolist()
 
@@ -281,6 +297,7 @@ def get_df_behav(path=None,
     correctresp = correctresp.astype(int)
     newdata['correctresp'] = correctresp.tolist()
     newdata['talker'] = talkerlist2.tolist()
+    newdata['stepval'] = stepval.tolist()
     precur_and_targ_same = precur_and_targ_same.astype(int)
     newdata['precur_and_targ_same'] = precur_and_targ_same.tolist()
     newdata['timeToTarget'] = newdata['timeToTarget'] / 24414.0625
