@@ -450,17 +450,19 @@ if __name__ == '__main__':
     labels[3] = 'targ - 144 Hz vs ref. 191 Hz'
     labels[4] = 'targ - 251 Hz vs ref. 191 Hz'
     labels[5] = 'side - right vs ref. left'
-    labels[6] = 'precur == targ pitch'
-    labels[7] = 'time to target'
-    labels[8] = 'targ pitch ~ precur == targ pitch'
+    labels[6] = 'pos. difference in F0 between precursor and talker'
+    labels[7] = 'high neg. difference in F0 between precursor and talker'
 
-    ax.set_yticklabels(labels, fontsize=10)
+    labels[8] = 'time to target'
+    labels[9] = 'talker corr. with stepval'
+
+    #ax.set_yticklabels(labels, fontsize=10)
     plt.gca().get_yticklabels()[0].set_color("blue")
     plt.gca().get_yticklabels()[2].set_color("blue")
     plt.gca().get_yticklabels()[3].set_color("blue")
     plt.gca().get_yticklabels()[4].set_color("blue")
-    plt.gca().get_yticklabels()[6].set_color("blue")
-    plt.gca().get_yticklabels()[7].set_color("blue")
+    plt.gca().get_yticklabels()[5].set_color("blue")
+    plt.gca().get_yticklabels()[8].set_color("blue")
 
     plt.show()
     #explainedvar = performance.r2_nakagawa(modelregcat, by_group=True, tolerance=1e-05)
