@@ -372,16 +372,6 @@ if __name__ == '__main__':
                                       "pitchoftarg": ['1', '2', '3', '5', '13'], "talker": ["0.0", "1.0"],"stepval": ["0.0", "1.0",  "2.0"] },
                              ordered=True, REML=False,
                              old_optimizer=False))
-    # modelregcatreduc = Lmer(
-    #     "correctresp ~ pitchoftarg + talker +  side + (1|ferret)",
-    #     data=dfcat_use, family='binomial')
-    # modelregcatreduc = Lmer(
-    #     "correctresp ~ talker + (1|ferret)",
-    #     data=dfcat_use, family='binomial')
-    # print(modelregcat.fit())
-    #
-    # print(modelregcat.fit(factors={"side": ["0", "1"], "pitchoftarg": ['1', '2', '3', '5', '13']}, REML=False,
-    #                       old_optimizer=False))
 
     fig, ax = plt.subplots()
 
@@ -423,11 +413,12 @@ if __name__ == '__main__':
     labels[3] = 'targ - 144 Hz vs ref. 191 Hz'
     labels[4] = 'targ - 251 Hz vs ref. 191 Hz'
     labels[5] = 'side - right vs ref. left'
-    labels[6] = 'precur == targ pitch'
-    labels[7] = 'time to target'
-    labels[8] = 'targ pitch ~ precur == targ pitch'
+    labels[6] = 'time to target'
+    labels[7] = 'pos. step from precursor to target'
+    labels[8] = 'neg. step from precursor to target'
+    labels[9] = 'targ pitch ~ step val'
 
-    ax.set_yticklabels(labels)
+   #ax.set_yticklabels(labels)
     plt.gca().get_yticklabels()[0].set_color("blue")
     plt.gca().get_yticklabels()[1].set_color("blue")
     plt.gca().get_yticklabels()[2].set_color("blue")
@@ -440,7 +431,6 @@ if __name__ == '__main__':
     fig, ax = plt.subplots()
 
     ax = modelreg_reduc.plot_summary()
-    # ax= modelreg_reduc.plot()
 
     plt.title('Model Summary of Coefficients for Correct Release Times')
     labels = [item.get_text() for item in ax.get_yticklabels()]
@@ -450,9 +440,8 @@ if __name__ == '__main__':
     labels[3] = 'targ - 144 Hz vs ref. 191 Hz'
     labels[4] = 'targ - 251 Hz vs ref. 191 Hz'
     labels[5] = 'side - right vs ref. left'
-    labels[6] = 'pos. difference in F0 between precursor and talker'
-    labels[7] = 'high neg. difference in F0 between precursor and talker'
-
+    labels[6] = 'pos. difference in F0 b/t precursor and talker'
+    labels[7] = 'neg. difference in F0 b/t precursor and talker'
     labels[8] = 'time to target'
     labels[9] = 'talker corr. with stepval'
 
