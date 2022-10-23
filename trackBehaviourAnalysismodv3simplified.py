@@ -15,6 +15,7 @@ scaler = MinMaxScaler()
 
 from scipy.stats import sem
 import os
+
 import matplotlib.pyplot as plt
 import numpy as np
 from instruments.helpers.extract_helpers import extractAllFerretData
@@ -25,6 +26,7 @@ from statsmodels.tools.sm_exceptions import ConvergenceWarning
 from pysr3.lme.models import L1LmeModelSR3
 from pysr3.lme.problems import LMEProblem, LMEStratifiedShuffleSplit
 import numpy as np
+import pymer4
 import rpy2.robjects.numpy2ri
 rpy2.robjects.numpy2ri.activate()
 from pysr3.linear.models import LinearL1ModelSR3
@@ -454,4 +456,5 @@ if __name__ == '__main__':
     plt.gca().get_yticklabels()[8].set_color("blue")
 
     plt.show()
-    #explainedvar = performance.r2_nakagawa(modelregcat, by_group=True, tolerance=1e-05)
+    testmodel=pymer4.utils.pandas2R(modelreg_reduc.coefs)
+    explainedvar = performance.r2_nakagawa(modelregcat_reduc.model_obj, by_group=False, tolerance=1e-05)
