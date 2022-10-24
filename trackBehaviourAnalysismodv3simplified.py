@@ -203,7 +203,7 @@ def get_df_behav(path=None,
             origF0 = 124
 
         targpos = np.where(chosendisttrial == 1)
-        if chosenresponseindex == 0 or chosenresponseindex == 1:
+        if (chosenresponseindex == 0 or chosenresponseindex == 1) and newdata['realRelReleaseTimes'].values[i] >=0:
             correctresp = np.append(correctresp, 1)
         else:
             correctresp = np.append(correctresp, 0)
@@ -309,7 +309,8 @@ def get_df_behav(path=None,
     # only look at v2 pitches from recent experiments
     newdata = newdata[(newdata.pitchoftarg == 1) | (newdata.pitchoftarg == 2) | (newdata.pitchoftarg == 3) | (
             newdata.pitchoftarg == 5) | (newdata.pitchoftarg == 8) | (newdata.pitchoftarg == 13)]
-
+    if includefaandmiss is False:
+        newdata = newdata[(newdata.correctresp == 1)]
     return newdata
 
     # ferretFigs = reactionTimeAnalysis(ferrData)
@@ -335,7 +336,7 @@ if __name__ == '__main__':
     y = endog2
     modelreg = Lmer(
         "realRelReleaseTimes ~ talker*(pitchoftarg)+ talker*(stepval)+ side + timeToTarget + DaysSinceStart + AM  + (1|ferret)",
-        data=dfuse, family='gaussian')
+        data=dfuse, family='gamma')
 
     print(modelreg.fit(factors={"side": ["0", "1"], "stepval": ["0.0", "1.0",  "2.0"],"AM": ["0", "1"],
                                 "pitchoftarg": ['1', '2', '3', '5', '13'], "talker": ["0.0", "1.0"], }, ordered=True,
@@ -368,7 +369,7 @@ if __name__ == '__main__':
 
     modelreg_reduc = Lmer(
         "realRelReleaseTimes ~ talker*(pitchoftarg)+side + talker*stepval+timeToTarget  + (1|ferret)",
-        data=dfuse, family='gaussian')
+        data=dfuse, family='gamma')
 
     print(modelreg_reduc.fit(factors={"side": ["0", "1"],
                                       "pitchoftarg": ['1', '2', '3', '5', '13'], "talker": ["0.0", "1.0"],"stepval": ["0.0", "1.0",  "2.0"] },
@@ -458,3 +459,8 @@ if __name__ == '__main__':
     plt.show()
     testmodel=pymer4.utils.pandas2R(modelreg_reduc.coefs)
     explainedvar = performance.r2_nakagawa(modelregcat_reduc.model_obj, by_group=False, tolerance=1e-05)
+    explainvarreleasetime=performance.r2_nakagawa(modelreg_reduc.model_obj, by_group=False, tolerance=1e-05)
+    print(explainedvar)
+    ##the marginal R2 encompassing variance explained by only the fixed effects, and the conditional R2 comprising variance explained by both
+    # fixed and random effects i.e. the variance explained by the whole model
+    print(explainvarreleasetime)
