@@ -496,7 +496,7 @@ def plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use):
     ax.set_title('Predicted vs. Actual Correct Response')
     ax.plot([0, 1], [0, 0], transform=ax.transAxes)
     plt.show()
-    cm=sklearn.metrics.confusion_matrix(dfcat_use['correctresp'], predictedcorrectresp)
+    cm=sklearn.metrics.confusion_matrix(dfcat_use['correctresp'].astype(bool), predictedcorrectresp)
     sklearn.metrics.ConfusionMatrixDisplay(cm, display_labels=['Incorrect', 'Correct']).plot()
     plt.show()
 
