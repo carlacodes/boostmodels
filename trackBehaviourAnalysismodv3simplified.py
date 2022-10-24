@@ -1,4 +1,6 @@
 import click
+import sklearn.metrics
+
 import instruments
 from instruments.io.BehaviourIO import BehaviourDataSet, WeekBehaviourDataSet
 from instruments.config import behaviouralDataPath, behaviourOutput
@@ -28,6 +30,7 @@ from pysr3.lme.problems import LMEProblem, LMEStratifiedShuffleSplit
 import numpy as np
 import pymer4
 import rpy2.robjects.numpy2ri
+
 rpy2.robjects.numpy2ri.activate()
 from pysr3.linear.models import LinearL1ModelSR3
 from sklearn.metrics import accuracy_score, confusion_matrix
@@ -204,7 +207,7 @@ def get_df_behav(path=None,
             origF0 = 124
 
         targpos = np.where(chosendisttrial == 1)
-        if (chosenresponseindex == 0 or chosenresponseindex == 1) and newdata['realRelReleaseTimes'].values[i] >=0:
+        if (chosenresponseindex == 0 or chosenresponseindex == 1) and newdata['realRelReleaseTimes'].values[i] >= 0:
             correctresp = np.append(correctresp, 1)
         else:
             correctresp = np.append(correctresp, 0)
@@ -221,17 +224,16 @@ def get_df_behav(path=None,
                 # 1 is 191, 2 is 124, 3 is 144hz female, 5 is 251, 8 is 144hz male, 13 is109hz male
                 # pitchof targ 1 is 124hz male, pitchoftarg4 is 109Hz Male
 
-            if chosentrial[targpos[0] - 1]== 3.0:
+            if chosentrial[targpos[0] - 1] == 3.0:
                 stepval[i] = 1.0
             elif chosentrial[targpos[0] - 1] == 8.0:
                 stepval[i] = 2.0
             elif chosentrial[targpos[0] - 1] == 13.0:
                 stepval[i] = 1.0
-            elif chosentrial[targpos[0]-1] == 5.0:
+            elif chosentrial[targpos[0] - 1] == 5.0:
                 stepval[i] = 1.0
             else:
                 stepval[i] = 0.0
-
 
             if pitchoftarg[i] == pitchofprecur[i]:
                 precur_and_targ_same[i] = 1
@@ -463,10 +465,44 @@ def run_mixed_effects_analysis(ferrets):
     ##the marginal R2 encompassing variance explained by only the fixed effects, and the conditional R2 comprising variance explained by both
     # fixed and random effects i.e. the variance explained by the whole model
     print(explainvarreleasetime)
-    predictedrelease=rstats.predict(modelreg_reduc.model_obj, type='response')
-    print(predictedrelease)
+    predictedrelease = rstats.predict(modelreg_reduc.model_obj, type='response')
+    predictedcorrectresp = rstats.predict(modelregcat_reduc.model_obj, type='response')
+
+
+    return modelreg_reduc, modelregcat_reduc, modelregcat, modelreg, predictedrelease, dfuse, dfcat_use, predictedcorrectresp
+
+
+def plotpredictedversusactual(predictedrelease, dfuse):
+    fig, ax = plt.subplots()
+    ax.scatter(dfuse['realRelReleaseTimes'], predictedrelease, alpha=0.5)
+    ax.set_xlabel('Actual Release Time')
+    ax.set_ylabel('Predicted Release Time')
+    ax.set_title('Predicted vs. Actual Release Time')
+    ax.plot([0, 1], [0, 1], transform=ax.transAxes)
+    plt.show()
+    fig, ax = plt.subplots()
+    ax.scatter(dfuse['realRelReleaseTimes'], dfuse['realRelReleaseTimes'] - predictedrelease, alpha=0.5)
+    ax.set_xlabel('Actual Release Time')
+    ax.set_ylabel('Actual - Predicted Release Time')
+    ax.set_title('Actual - Predicted Release Time')
+    ax.plot([0, 1], [0, 0], transform=ax.transAxes)
+    plt.show()
+
+def plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use):
+    fig, ax = plt.subplots()
+    ax.scatter(dfcat_use['correctresp'], predictedcorrectresp, alpha=0.5)
+    ax.set_xlabel('Actual Correct Response')
+    ax.set_ylabel('Predicted Correct Response')
+    ax.set_title('Predicted vs. Actual Correct Response')
+    ax.plot([0, 1], [0, 0], transform=ax.transAxes)
+    plt.show()
+    cm=sklearn.metrics.confusion_matrix(dfcat_use['correctresp'], predictedcorrectresp)
+    sklearn.metrics.ConfusionMatrixDisplay(cm, display_labels=['Incorrect', 'Correct']).plot()
+    plt.show()
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
-    run_mixed_effects_analysis(ferrets)
-
+    modelreg_reduc, modelregcat_reduc, modelregcat, modelreg, predictedrelease, df_use, dfcat_use, predictedcorrectresp= run_mixed_effects_analysis(
+        ferrets)
+    plotpredictedversusactual(predictedrelease, df_use)
+    plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use)
