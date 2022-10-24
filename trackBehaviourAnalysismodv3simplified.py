@@ -41,6 +41,7 @@ from rpy2.robjects.packages import importr
 base = importr('base')
 easystats = importr('easystats')
 performance = importr('performance')
+rstats = importr('stats')
 
 
 def cli_behaviour_week(path=None,
@@ -319,11 +320,7 @@ def get_df_behav(path=None,
 
 # editing to extract different vars from df
 # cli.add_command(cli_reaction_time)
-
-if __name__ == '__main__':
-    ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
-    # for i, currFerr in enumerate(ferrets):
-    #     print(i, currFerr)
+def run_mixed_effects_analysis(ferrets):
     df = get_df_behav(ferrets=ferrets, includefaandmiss=False, startdate='04-01-2020', finishdate='01-10-2022')
 
     dfuse = df[["pitchoftarg", "pitchofprecur", "talker", "side", "precur_and_targ_same",
@@ -338,7 +335,7 @@ if __name__ == '__main__':
         "realRelReleaseTimes ~ talker*(pitchoftarg)+ talker*(stepval)+ side + timeToTarget + DaysSinceStart + AM  + (1|ferret)",
         data=dfuse, family='gamma')
 
-    print(modelreg.fit(factors={"side": ["0", "1"], "stepval": ["0.0", "1.0",  "2.0"],"AM": ["0", "1"],
+    print(modelreg.fit(factors={"side": ["0", "1"], "stepval": ["0.0", "1.0", "2.0"], "AM": ["0", "1"],
                                 "pitchoftarg": ['1', '2', '3', '5', '13'], "talker": ["0.0", "1.0"], }, ordered=True,
                        REML=False,
                        old_optimizer=False))
@@ -354,7 +351,7 @@ if __name__ == '__main__':
         "correctresp ~ talker*pitchoftarg +  side  + talker * stepval + stepval+timeToTarget + DaysSinceStart + AM + (1|ferret)",
         data=dfcat_use, family='binomial')
 
-    print(modelregcat.fit(factors={"side": ["0", "1"], "stepval": ["0.0", "1.0",  "2.0"], "AM": ["0", "1"],
+    print(modelregcat.fit(factors={"side": ["0", "1"], "stepval": ["0.0", "1.0", "2.0"], "AM": ["0", "1"],
                                    "pitchoftarg": ['1', '2', '3', '5', '13'], "talker": ["0.0", "1.0"]}, REML=False,
                           old_optimizer=True))
 
@@ -363,7 +360,8 @@ if __name__ == '__main__':
         data=dfcat_use, family='binomial')
 
     print(modelregcat_reduc.fit(factors={"side": ["0", "1"],
-                                         "pitchoftarg": ['1', '2', '3', '5', '13'], "talker": ["0.0", "1.0"], "stepval": ["0.0", "1.0",  "2.0"]},
+                                         "pitchoftarg": ['1', '2', '3', '5', '13'], "talker": ["0.0", "1.0"],
+                                         "stepval": ["0.0", "1.0", "2.0"]},
                                 REML=False,
                                 old_optimizer=True))
 
@@ -372,7 +370,8 @@ if __name__ == '__main__':
         data=dfuse, family='gamma')
 
     print(modelreg_reduc.fit(factors={"side": ["0", "1"],
-                                      "pitchoftarg": ['1', '2', '3', '5', '13'], "talker": ["0.0", "1.0"],"stepval": ["0.0", "1.0",  "2.0"] },
+                                      "pitchoftarg": ['1', '2', '3', '5', '13'], "talker": ["0.0", "1.0"],
+                                      "stepval": ["0.0", "1.0", "2.0"]},
                              ordered=True, REML=False,
                              old_optimizer=False))
 
@@ -421,7 +420,7 @@ if __name__ == '__main__':
     labels[8] = 'neg. step from precursor to target'
     labels[9] = 'targ pitch ~ step val'
 
-   #ax.set_yticklabels(labels)
+    # ax.set_yticklabels(labels)
     plt.gca().get_yticklabels()[0].set_color("blue")
     plt.gca().get_yticklabels()[1].set_color("blue")
     plt.gca().get_yticklabels()[2].set_color("blue")
@@ -448,7 +447,7 @@ if __name__ == '__main__':
     labels[8] = 'time to target'
     labels[9] = 'talker corr. with stepval'
 
-    #ax.set_yticklabels(labels, fontsize=10)
+    # ax.set_yticklabels(labels, fontsize=10)
     plt.gca().get_yticklabels()[0].set_color("blue")
     plt.gca().get_yticklabels()[2].set_color("blue")
     plt.gca().get_yticklabels()[3].set_color("blue")
@@ -457,10 +456,17 @@ if __name__ == '__main__':
     plt.gca().get_yticklabels()[8].set_color("blue")
 
     plt.show()
-    testmodel=pymer4.utils.pandas2R(modelreg_reduc.coefs)
+    testmodel = pymer4.utils.pandas2R(modelreg_reduc.coefs)
     explainedvar = performance.r2_nakagawa(modelregcat_reduc.model_obj, by_group=False, tolerance=1e-05)
-    explainvarreleasetime=performance.r2_nakagawa(modelreg_reduc.model_obj, by_group=False, tolerance=1e-05)
+    explainvarreleasetime = performance.r2_nakagawa(modelreg_reduc.model_obj, by_group=False, tolerance=1e-05)
     print(explainedvar)
     ##the marginal R2 encompassing variance explained by only the fixed effects, and the conditional R2 comprising variance explained by both
     # fixed and random effects i.e. the variance explained by the whole model
     print(explainvarreleasetime)
+    predictedrelease=rstats.predict(modelreg_reduc.model_obj, type='response')
+    print(predictedrelease)
+
+if __name__ == '__main__':
+    ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
+    run_mixed_effects_analysis(ferrets)
+
