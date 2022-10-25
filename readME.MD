@@ -9,6 +9,6 @@ For model selection (i.e. feature or variable elimination), I used BIC which you
 Stepwise, or recursive feature elimination does not work well for mixed models. For the R^2 metric, I'm using the Nakagawa 2012 measure of the R2 coefficient for mixed models. 
 Kind of controversial because it is a mixed model but it's still a solid metric that works by considering both the conditional and marginal variance. 
 This uses the easystats nakagwa_r2 function and it is one line of code to import it into Python <br>
-Ask Jules for the extractparams file to extract the data from the .mat experimental files so you can nicely store all information in a dataframe! <br>
+Ask Jules for permission to fork extractparams helper function file from the instruments repo. This will allow you to extract the data from the .mat experimental files so you can nicely store all information in a dataframe! <br>
 []: # Language: Python <br>
 []: # Path: trackBehaviourAnalysis_modv3simplified.py
