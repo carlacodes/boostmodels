@@ -239,38 +239,7 @@ def get_df_behav(path=None,
     pitchoftarg = pitchoftarg.astype(int)
     pitchofprecur = pitchofprecur[~np.isnan(pitchofprecur)]
     gradinpitch = gradinpitch[~np.isnan(gradinpitch)]
-    # gradinpitchprecur = gradinpitchprecur[~np.isnan(gradinpitchprecur)]
     correctresp = correctresp[~np.isnan(correctresp)]
-    #
-    # pitchoftarg2 = np.empty(shape=(0, 0))
-    # gradinpitch2 = np.empty(shape=(0, 0))
-    #
-    # pitchofprecur2 = np.empty(shape=(0, 0))
-    # gradinpitchprecur2 = np.empty(shape=(0, 0))
-
-    # for i in range(0, len(pitchofprecur)):
-    #     if pitchofprecur[i] > 1:
-    #         pitchofprecur2 = np.append(pitchofprecur2, pitchofprecur[i])
-    #         gradinpitchprecur2 = np.append(gradinpitchprecur2, gradinpitchprecur[i])
-    #
-    # for i in range(0, len(pitchoftarg)):
-    #     if pitchoftarg[i] > 1:
-    #         pitchoftarg2 = np.append(pitchoftarg2, pitchoftarg[i])
-    #         gradinpitch2 = np.append(gradinpitch2, gradinpitch[i])
-
-    # pitchoftarg2 = pitchoftarg2 / np.linalg.norm(
-    #     pitchoftarg2)  # np.array(scaler.fit_transform(pitchoftarg2.reshape(-1, 1)))
-    # pitchofprecur2 = pitchofprecur2 / np.linalg.norm(
-    #     pitchofprecur2)  # np.array(scaler.fit_transform(pitchofprecur2.reshape(-1, 1)))
-    # gradinpitch2 = gradinpitch2 / np.linalg.norm(
-    #     gradinpitch2)  # np.array(scaler.fit_transform(gradinpitch2.reshape(-1, 1)))
-    # gradinpitchprecur2 = gradinpitchprecur2 / np.linalg.norm(
-    #     gradinpitchprecur2)  # np.array(scaler.fit_transform(gradinpitchprecur2.reshape(-1, 1)))
-    # pitchofprecur2 = np.array(scaler.fit_transform(pitchofprecur2.reshape(-1, 1)))
-    # gradinpitch2 =  np.array(scaler.fit_transform(pitchofprecur2.reshape(-1, 1)))
-    # gradinpitchprecur2 = np.array(scaler.fit_transform(gradinpitchprecur2.reshape(-1, 1)))
-
-    # df_normalized = pd.DataFrame(x_scaled)
     pitchoftarg = np.delete(pitchoftarg, droplist)
     talkerlist2 = np.delete(talkerlist2, droplist)
     stepval = np.delete(stepval, droplist)
@@ -300,12 +269,9 @@ def get_df_behav(path=None,
         newdata = newdata[(newdata.correctresp == 1)]
     return newdata
 
-    # ferretFigs = reactionTimeAnalysis(ferrData)
-    # dataSet._save(figs=ferretFigs, file_name='reaction_times_{}_{}_{}.pdf'.format(ferret, startdate, finishdate))
 
 
 # editing to extract different vars from df
-# cli.add_command(cli_reaction_time)
 def run_mixed_effects_analysis(ferrets):
     df = get_df_behav(ferrets=ferrets, includefaandmiss=False, startdate='04-01-2020', finishdate='01-10-2022')
 
