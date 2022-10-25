@@ -14,30 +14,14 @@ from sklearn.preprocessing import MinMaxScaler
 from pymer4.models import Lmer
 
 scaler = MinMaxScaler()
-
-from scipy.stats import sem
 import os
-
 import matplotlib.pyplot as plt
-import numpy as np
 from instruments.helpers.extract_helpers import extractAllFerretData
 import pandas as pd
-import statsmodels.api as sm
-import statsmodels.formula.api as smf
-from statsmodels.tools.sm_exceptions import ConvergenceWarning
-from pysr3.lme.models import L1LmeModelSR3
-from pysr3.lme.problems import LMEProblem, LMEStratifiedShuffleSplit
 import numpy as np
-import pymer4
 import rpy2.robjects.numpy2ri
 
 rpy2.robjects.numpy2ri.activate()
-from pysr3.linear.models import LinearL1ModelSR3
-from sklearn.metrics import accuracy_score, confusion_matrix
-from sklearn.model_selection import RandomizedSearchCV
-from sklearn.utils.fixes import loguniform
-import statistics as stats
-import rpy2
 from rpy2.robjects.packages import importr
 
 # import R's "base" package
@@ -328,11 +312,9 @@ def run_mixed_effects_analysis(ferrets):
     dfuse = df[["pitchoftarg", "pitchofprecur", "talker", "side", "precur_and_targ_same",
                 "timeToTarget", "DaysSinceStart", "AM",
                 "realRelReleaseTimes", "ferret", "stepval", "pitchofprecur"]]
-    endog2 = df['realRelReleaseTimes'].to_numpy()
     X = df[["pitchoftarg", "pitchofprecur", "talker", "side",
             "timeToTarget", "DaysSinceStart", "AM"]].to_numpy()
 
-    y = endog2
     modelreg = Lmer(
         "realRelReleaseTimes ~ talker*(pitchoftarg)+ talker*(stepval)+ side + timeToTarget + DaysSinceStart + AM  + (1|ferret)",
         data=dfuse, family='gamma')
@@ -458,7 +440,6 @@ def run_mixed_effects_analysis(ferrets):
     plt.gca().get_yticklabels()[8].set_color("blue")
 
     plt.show()
-    testmodel = pymer4.utils.pandas2R(modelreg_reduc.coefs)
     explainedvar = performance.r2_nakagawa(modelregcat_reduc.model_obj, by_group=False, tolerance=1e-05)
     explainvarreleasetime = performance.r2_nakagawa(modelreg_reduc.model_obj, by_group=False, tolerance=1e-05)
     print(explainedvar)
