@@ -341,7 +341,7 @@ def run_mixed_effects_analysis(ferrets):
     labels[8] = 'days since start'
     labels[9] = 'AM'
 
-    ax.set_yticklabels(labels)
+    #ax.set_yticklabels(labels)
 
     plt.show()
     fig, ax = plt.subplots()
@@ -392,8 +392,8 @@ def run_mixed_effects_analysis(ferrets):
     labels[3] = 'targ - 144 Hz vs ref. 191 Hz'
     labels[4] = 'targ - 251 Hz vs ref. 191 Hz'
     labels[5] = 'side - right vs ref. left'
-    labels[6] = 'pos. difference in F0 b/t precursor and talker'
-    labels[7] = 'neg. difference in F0 b/t precursor and talker'
+    labels[6] = 'pos. step in F0 \n b/t precursor and talker'
+    labels[7] = 'neg. step in F0 \n b/t precursor and talker'
     labels[8] = 'time to target'
     labels[9] = 'talker corr. with stepval'
 
