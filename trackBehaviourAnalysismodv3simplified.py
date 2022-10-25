@@ -330,16 +330,16 @@ def run_mixed_effects_analysis(ferrets):
     ax = modelregcat.plot_summary()
     plt.title('Model Summary of Coefficients for P(Correct Responses)')
     labels = [item.get_text() for item in ax.get_yticklabels()]
-    labels[0] = 'Intercept'
-    labels[1] = 'targ - 124 Hz vs ref. 191 Hz'
-    labels[2] = 'targ - 144 Hz vs ref. 191 Hz'
-    labels[3] = 'targ - 251 Hz vs ref. 191 Hz'
-    labels[4] = 'targ - 109 Hz vs ref. 191 Hz'
-    labels[5] = 'side - left vs right'
-    labels[6] = 'precur and targ same'
-    labels[7] = 'time to target'
-    labels[8] = 'days since start'
-    labels[9] = 'AM'
+    # labels[0] = 'Intercept'
+    # labels[1] = 'targ - 124 Hz vs ref. 191 Hz'
+    # labels[2] = 'targ - 144 Hz vs ref. 191 Hz'
+    # labels[3] = 'targ - 251 Hz vs ref. 191 Hz'
+    # labels[4] = 'targ - 109 Hz vs ref. 191 Hz'
+    # labels[5] = 'side - left vs right'
+    # labels[6] = 'precur and targ same'
+    # labels[7] = 'time to target'
+    # labels[8] = 'days since start'
+    # labels[9] = 'AM'
 
     #ax.set_yticklabels(labels)
 
