@@ -416,7 +416,7 @@ def run_mixed_effects_analysis(ferrets):
     predictedcorrectresp = rstats.predict(modelregcat_reduc.model_obj, type='response')
 
 
-    return modelreg_reduc, modelregcat_reduc, modelregcat, modelreg, predictedrelease, dfuse, dfcat_use, predictedcorrectresp
+    return modelreg_reduc, modelregcat_reduc, modelregcat, modelreg, predictedrelease, dfuse, dfcat_use, predictedcorrectresp, explainedvar, explainvarreleasetime
 
 
 def plotpredictedversusactual(predictedrelease, dfuse):
@@ -452,7 +452,7 @@ def plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use):
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
-    modelreg_reduc, modelregcat_reduc, modelregcat, modelreg, predictedrelease, df_use, dfcat_use, predictedcorrectresp= run_mixed_effects_analysis(
+    modelreg_reduc, modelregcat_reduc, modelregcat, modelreg, predictedrelease, df_use, dfcat_use, predictedcorrectresp, explainedvar, explainvarreleasetime= run_mixed_effects_analysis(
         ferrets)
     plotpredictedversusactual(predictedrelease, df_use)
     plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use)
