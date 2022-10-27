@@ -185,10 +185,6 @@ def get_df_behav(path=None,
             chosentalker = 1
         talkerlist2[i] = chosentalker
 
-        if chosentalker == 1:
-            origF0 = 191
-        else:
-            origF0 = 124
 
         targpos = np.where(chosendisttrial == 1)
         if (chosenresponseindex == 0 or chosenresponseindex == 1) and newdata['realRelReleaseTimes'].values[i] >= 0:
@@ -230,10 +226,8 @@ def get_df_behav(path=None,
             newdata.drop(indexdrop, axis=0, inplace=True)
             droplist = np.append(droplist, i)
             continue
-    # indexdrop = newdata.iloc[i].name
-    # newdata=newdata.drop(indexdrop, axis=0, inplace=True)
+
     droplist = [int(x) for x in droplist]  # drop corrupted metdata trials
-    # newdata = newdata.drop(droplist, axis=0, inplace=True)
 
     pitchoftarg = pitchoftarg[~np.isnan(pitchoftarg)]
     pitchoftarg = pitchoftarg.astype(int)
@@ -246,7 +240,6 @@ def get_df_behav(path=None,
 
     newdata['pitchoftarg'] = pitchoftarg.tolist()
 
-    # if droplist.size > 0:
     pitchofprecur = np.delete(pitchofprecur, droplist)
     newdata['pitchofprecur'] = pitchofprecur.tolist()
 
@@ -330,18 +323,6 @@ def run_mixed_effects_analysis(ferrets):
     ax = modelregcat.plot_summary()
     plt.title('Model Summary of Coefficients for P(Correct Responses)')
     labels = [item.get_text() for item in ax.get_yticklabels()]
-    # labels[0] = 'Intercept'
-    # labels[1] = 'targ - 124 Hz vs ref. 191 Hz'
-    # labels[2] = 'targ - 144 Hz vs ref. 191 Hz'
-    # labels[3] = 'targ - 251 Hz vs ref. 191 Hz'
-    # labels[4] = 'targ - 109 Hz vs ref. 191 Hz'
-    # labels[5] = 'side - left vs right'
-    # labels[6] = 'precur and targ same'
-    # labels[7] = 'time to target'
-    # labels[8] = 'days since start'
-    # labels[9] = 'AM'
-
-    #ax.set_yticklabels(labels)
 
     plt.show()
     fig, ax = plt.subplots()
