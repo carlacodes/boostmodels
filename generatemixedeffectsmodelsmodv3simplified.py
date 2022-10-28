@@ -112,16 +112,11 @@ def get_df_behav(path=None,
     if path is None:
         path = behaviouralDataPath
 
-    #    if ferrets is not None:
-    #        ferrets = [ferrets]
-    #    else:
-    #        ferrets = [ferret for ferret in next(os.walk(db_path))[1] if ferret.startswith('F')]
-
-    dataSet = BehaviourDataSet(filepath=path,
-                               startDate=startdate,
-                               finishDate=finishdate,
-                               ferrets=ferrets,
-                               outDir=output)
+    # dataSet = BehaviourDataSet(filepath=path,
+    #                            startDate=startdate,
+    #                            finishDate=finishdate,
+    #                            ferrets=ferrets,
+    #                            outDir=output)
     allData, ferrets = extractAllFerretData(ferrets, path, startDate=startdate,
                                             finishDate=finishdate)
     fs = 24414.062500
