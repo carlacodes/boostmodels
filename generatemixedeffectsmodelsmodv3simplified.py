@@ -386,10 +386,11 @@ def run_mixed_effects_analysis(ferrets):
     explainedvar_nagelkerke=performance.r2(modelregcat_reduc.model_obj)
     explainvarreleasetime = performance.r2_nakagawa(modelreg_reduc.model_obj, by_group=False, tolerance=1e-05)
     print(explainedvar)
-    print(['nagalkerke variance']+explainedvar_nagelkerke)
+    print( explainedvar_nagelkerke)
     ##the marginal R2 encompassing variance explained by only the fixed effects, and the conditional R2 comprising variance explained by both
     # fixed and random effects i.e. the variance explained by the whole model
     print(explainvarreleasetime)
+    #TODO: need to make new data frame that is converted to R which only includes individual ferret names, then plot the individual ferrets' responses
     predictedrelease = rstats.predict(modelreg_reduc.model_obj, type='response')
     predictedcorrectresp = rstats.predict(modelregcat_reduc.model_obj, type='response')
 
