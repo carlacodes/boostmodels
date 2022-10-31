@@ -383,8 +383,10 @@ def run_mixed_effects_analysis(ferrets):
 
     plt.show()
     explainedvar = performance.r2_nakagawa(modelregcat_reduc.model_obj, by_group=False, tolerance=1e-05)
+    explainedvar_nagelkerke=performance.r2(modelregcat_reduc.model_obj)
     explainvarreleasetime = performance.r2_nakagawa(modelreg_reduc.model_obj, by_group=False, tolerance=1e-05)
     print(explainedvar)
+    print(['nagalkerke variance']+explainedvar_nagelkerke)
     ##the marginal R2 encompassing variance explained by only the fixed effects, and the conditional R2 comprising variance explained by both
     # fixed and random effects i.e. the variance explained by the whole model
     print(explainvarreleasetime)
