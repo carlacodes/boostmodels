@@ -1,5 +1,7 @@
 import click
 import sklearn.metrics
+from rpy2.robjects import pandas2ri
+from rpy2.robjects.conversion import localconverter
 
 import instruments
 from instruments.io.BehaviourIO import BehaviourDataSet, WeekBehaviourDataSet
@@ -20,7 +22,12 @@ from instruments.helpers.extract_helpers import extractAllFerretData
 import pandas as pd
 import numpy as np
 import rpy2.robjects.numpy2ri
+import pandas as pd
+import rpy2.robjects as ro
+from rpy2.robjects.packages import importr
+from rpy2.robjects import pandas2ri
 
+from rpy2.robjects.conversion import localconverter
 rpy2.robjects.numpy2ri.activate()
 from rpy2.robjects.packages import importr
 
@@ -180,7 +187,6 @@ def get_df_behav(path=None,
             chosentalker = 1
         talkerlist2[i] = chosentalker
 
-
         targpos = np.where(chosendisttrial == 1)
         if (chosenresponseindex == 0 or chosenresponseindex == 1) and newdata['realRelReleaseTimes'].values[i] >= 0:
             correctresp = np.append(correctresp, 1)
@@ -256,7 +262,6 @@ def get_df_behav(path=None,
     if includefaandmiss is False:
         newdata = newdata[(newdata.correctresp == 1)]
     return newdata
-
 
 
 # editing to extract different vars from df
@@ -383,19 +388,23 @@ def run_mixed_effects_analysis(ferrets):
 
     plt.show()
     explainedvar = performance.r2_nakagawa(modelregcat_reduc.model_obj, by_group=False, tolerance=1e-05)
-    explainedvar_nagelkerke=performance.r2(modelregcat_reduc.model_obj)
+    explainedvar_nagelkerke = performance.r2(modelregcat_reduc.model_obj)
     explainvarreleasetime = performance.r2_nakagawa(modelreg_reduc.model_obj, by_group=False, tolerance=1e-05)
     print(explainedvar)
-    print( explainedvar_nagelkerke)
+    print(explainedvar_nagelkerke)
     ##the marginal R2 encompassing variance explained by only the fixed effects, and the conditional R2 comprising variance explained by both
     # fixed and random effects i.e. the variance explained by the whole model
     print(explainvarreleasetime)
-    #TODO: need to make new data frame that is converted to R which only includes individual ferret names, then plot the individual ferrets' responses
+    # TODO: need to make new data frame that is converted to R which only includes individual ferret names, then plot the individual ferrets' responses
+
+    data_from_ferret = dfuse.loc[dfuse['ferret'] == 'F1815_Cruella']
     predictedrelease = rstats.predict(modelreg_reduc.model_obj, type='response')
+    with localconverter(ro.default_converter + pandas2ri.converter):
+        r_from_pd_df = ro.conversion.py2rpy(data_from_ferret)
+    predictedrelease_cruella=rstats.predict(modelreg_reduc.model_obj, newdata=r_from_pd_df, type='response')
     predictedcorrectresp = rstats.predict(modelregcat_reduc.model_obj, type='response')
 
-
-    return modelreg_reduc, modelregcat_reduc, modelregcat, modelreg, predictedrelease, dfuse, dfcat_use, predictedcorrectresp, explainedvar, explainvarreleasetime
+    return modelreg_reduc, modelregcat_reduc, modelregcat, modelreg, predictedrelease, dfuse, dfcat_use, predictedcorrectresp, explainedvar, explainvarreleasetime, predictedrelease_cruella
 
 
 def plotpredictedversusactual(predictedrelease, dfuse):
@@ -414,6 +423,7 @@ def plotpredictedversusactual(predictedrelease, dfuse):
     ax.plot([0, 1], [0, 0], transform=ax.transAxes)
     plt.show()
 
+
 def plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use):
     fig, ax = plt.subplots()
     ax.scatter(dfcat_use['correctresp'], predictedcorrectresp, alpha=0.5)
@@ -422,16 +432,17 @@ def plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use):
     ax.set_title('Predicted vs. Actual Correct Response')
     ax.plot([0, 1], [0, 0], transform=ax.transAxes)
     plt.show()
-    #np round rounds down to the nearest integer
-    cm=sklearn.metrics.confusion_matrix(dfcat_use['correctresp'], np.round(predictedcorrectresp))
+    # np round rounds down to the nearest integer
+    cm = sklearn.metrics.confusion_matrix(dfcat_use['correctresp'], np.round(predictedcorrectresp))
     sklearn.metrics.ConfusionMatrixDisplay(cm, display_labels=['Incorrect', 'Correct']).plot()
     accuracy = sklearn.metrics.accuracy_score(dfcat_use['correctresp'], np.round(predictedcorrectresp))
     plt.show()
     print(accuracy)
 
+
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
-    modelreg_reduc, modelregcat_reduc, modelregcat, modelreg, predictedrelease, df_use, dfcat_use, predictedcorrectresp, explainedvar, explainvarreleasetime= run_mixed_effects_analysis(
+    modelreg_reduc, modelregcat_reduc, modelregcat, modelreg, predictedrelease, df_use, dfcat_use, predictedcorrectresp, explainedvar, explainvarreleasetime, predictedrelease_cruella = run_mixed_effects_analysis(
         ferrets)
     plotpredictedversusactual(predictedrelease, df_use)
     plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use)
