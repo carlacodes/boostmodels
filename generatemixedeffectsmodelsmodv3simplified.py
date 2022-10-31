@@ -28,6 +28,7 @@ from rpy2.robjects.packages import importr
 from rpy2.robjects import pandas2ri
 
 from rpy2.robjects.conversion import localconverter
+
 rpy2.robjects.numpy2ri.activate()
 from rpy2.robjects.packages import importr
 
@@ -391,20 +392,48 @@ def run_mixed_effects_analysis(ferrets):
     explainedvar_nagelkerke = performance.r2(modelregcat_reduc.model_obj)
     explainvarreleasetime = performance.r2_nakagawa(modelreg_reduc.model_obj, by_group=False, tolerance=1e-05)
     print(explainedvar)
+    # side of audio likely adds behavioural noise to the data
     print(explainedvar_nagelkerke)
     ##the marginal R2 encompassing variance explained by only the fixed effects, and the conditional R2 comprising variance explained by both
     # fixed and random effects i.e. the variance explained by the whole model
     print(explainvarreleasetime)
     # TODO: need to make new data frame that is converted to R which only includes individual ferret names, then plot the individual ferrets' responses
 
-    data_from_ferret = dfuse.loc[dfuse['ferret'] == 'F1815_Cruella']
+    #    data_from_ferret = dfuse.loc[[dfuse['pitchoftarg'] == 1 | dfuse['pitchoftarg'] == 2]]
+    data_from_ferret = dfuse[(dfuse['pitchoftarg'] == 1) | (dfuse['pitchoftarg'] == 13)]
+    data_from_ferret.isnull().values.any()
     predictedrelease = rstats.predict(modelreg_reduc.model_obj, type='response')
-    with localconverter(ro.default_converter + pandas2ri.converter):
-        r_from_pd_df = ro.conversion.py2rpy(data_from_ferret)
-    predictedrelease_cruella=rstats.predict(modelreg_reduc.model_obj, newdata=r_from_pd_df, type='response')
+    # with localconverter(ro.default_converter + pandas2ri.converter):
+    #     r_from_pd_df = ro.conversion.py2rpy(data_from_ferret)
+    # predictedrelease_cruella=rstats.predict(modelreg_reduc.model_obj,  newdata=r_from_pd_df)
     predictedcorrectresp = rstats.predict(modelregcat_reduc.model_obj, type='response')
+    # write all applicable dataframes to csv files
+    p = 'D:/dfformixedmodels/'
+    os.path.normpath(p)
+    from pathlib import Path
+    filepath = Path('D:/dfformixedmodels/dfuse.csv')
+    filepath.parent.mkdir(parents=True, exist_ok=True)
+    dfuse.to_csv(filepath)
 
-    return modelreg_reduc, modelregcat_reduc, modelregcat, modelreg, predictedrelease, dfuse, dfcat_use, predictedcorrectresp, explainedvar, explainvarreleasetime, predictedrelease_cruella
+    filepath = Path('D:/dfformixedmodels/dfcat.csv')
+    filepath.parent.mkdir(parents=True, exist_ok=True)
+    dfcat.to_csv(filepath)
+
+    filepath = Path('D:/dfformixedmodels/df.csv')
+    filepath.parent.mkdir(parents=True, exist_ok=True)
+    df.to_csv(filepath)
+
+    filepath = Path('D:/dfformixedmodels/dfcat_use.csv')
+    dfcat_use.to_csv(filepath)
+
+
+
+    # dfuse.to_csv('dfuse.csv', sep=',', path_or_buf=os.PathLike['D:/dfformixedmodels/'])
+    # dfcat_use.to_csv('dfcat_use.csv', path_or_buf=os.path.normpath(p))
+    # df.to_csv('df.csv', path_or_buf=os.path.normpath(p))
+    # dfcat.to_csv('dfcat.csv', path_or_buf=os.path.normpath(p))
+
+    return modelreg_reduc, modelregcat_reduc, modelregcat, modelreg, predictedrelease, dfuse, dfcat_use, predictedcorrectresp, explainedvar, explainvarreleasetime
 
 
 def plotpredictedversusactual(predictedrelease, dfuse):
