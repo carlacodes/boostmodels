@@ -120,11 +120,6 @@ def get_df_behav(path=None,
     if path is None:
         path = behaviouralDataPath
 
-    # dataSet = BehaviourDataSet(filepath=path,
-    #                            startDate=startdate,
-    #                            finishDate=finishdate,
-    #                            ferrets=ferrets,
-    #                            outDir=output)
 
     allData, ferrets = extractAllFerretData(ferrets, path, startDate=startdate,
                                             finishDate=finishdate)
