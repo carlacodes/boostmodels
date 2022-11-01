@@ -125,144 +125,200 @@ def get_df_behav(path=None,
     #                            finishDate=finishdate,
     #                            ferrets=ferrets,
     #                            outDir=output)
+
     allData, ferrets = extractAllFerretData(ferrets, path, startDate=startdate,
                                             finishDate=finishdate)
     fs = 24414.062500
-    if includefaandmiss is True:
-        newdata = allData[(allData.response == 0) | (allData.response == 1) | (allData.response == 7)]
-    else:
-        newdata = allData[(allData.response == 0) | (allData.response == 1)]
-        newdata = newdata[(newdata.catchTrial == 0)]
+    bigdata = pd.DataFrame()
+    numofferrets = allData['ferret'].unique()
+    for ferret in numofferrets:
+        print(ferret)
+        # newdata = allData.iloc(allData['ferret'] == ferret)
+        newdata = allData[allData['ferret'] == ferret]
+        # newdata = allData['absentTime'][0]
+        newdata['targTimes'] = newdata['timeToTarget'] / fs
 
-    newdata = newdata[(newdata.correctionTrial == 0)]  # | (allData.response == 7)
-    newdata = newdata[(newdata.currAtten == 0)]  # | (allData.response == 7)
+        newdata['centreRelease'] = newdata['lickRelease'] - newdata['startTrialLick']
+        newdata['relReleaseTimes'] = newdata['centreRelease'] - newdata['targTimes']
+        newdata['realRelReleaseTimes'] = newdata['relReleaseTimes'] - newdata['absentTime']
 
-    # newdata = allData['absentTime'][0]
-    newdata['targTimes'] = newdata['timeToTarget'] / fs
+        distractors = newdata['distractors']
+        talkermat = {}
+        talkerlist = newdata['talker']
 
-    newdata['centreRelease'] = newdata['lickRelease'] - newdata['startTrialLick']
-    newdata['relReleaseTimes'] = newdata['centreRelease'] - newdata['targTimes']
-    newdata['realRelReleaseTimes'] = newdata['relReleaseTimes'] - newdata['absentTime']
+        for i0 in range(1, len(distractors)):
+            talkermat[i0] = int(talkerlist.values[i0]) * np.ones(len(distractors.values[i0]))
+        talkermat = pd.Series(talkermat, index=talkermat.keys())
 
-    distractors = newdata['distractors']
-    talkermat = {}
-    talkerlist = newdata['talker']
+        pitchshiftmat = newdata['PitchShiftMat']
+        # if len(pitchshiftmat) == 0:
+        #     pitchshiftmat = talkermat  # make array equivalent to size of pitch shift mat just like talker [3,3,3,3] # if this is inter trial roving then talker is the pitch shift
 
-    for i0 in range(0, len(distractors)):
-        talkermat[i0] = int(talkerlist.values[i0]) * np.ones(len(distractors.values[i0]))
-    talkermat = pd.Series(talkermat, index=talkermat.keys())
+        # except:
+        #     pitchshiftmat = talkermat  # make array equivalent to size of pitch shift mat just like talker [3,3,3,3] # if this is inter trial roving then talker is the pitch shift
+        precursorlist = newdata['distractors']
+        catchtriallist = newdata['catchTrial']
+        chosenresponse = newdata['response']
+        realrelreleasetimelist = newdata['realRelReleaseTimes']
+        pitchoftarg = np.empty(len(pitchshiftmat))
+        pitchofprecur = np.empty(len(pitchshiftmat) )
+        stepval = np.empty(len(pitchshiftmat) )
+        gradinpitch = np.empty(len(pitchshiftmat))
+        gradinpitchprecur = np.empty(len(pitchshiftmat))
+        timetotarglist = np.empty(len(pitchshiftmat))
 
-    pitchshiftmat = newdata['PitchShiftMat']
-    # if len(pitchshiftmat) == 0:
-    #     pitchshiftmat = talkermat  # make array equivalent to size of pitch shift mat just like talker [3,3,3,3] # if this is inter trial roving then talker is the pitch shift
+        precur_and_targ_same = np.empty(len(pitchshiftmat))
+        talkerlist2 = np.empty(len(pitchshiftmat))
 
-    # except:
-    #     pitchshiftmat = talkermat  # make array equivalent to size of pitch shift mat just like talker [3,3,3,3] # if this is inter trial roving then talker is the pitch shift
-    precursorlist = newdata['distractors']
-    chosenresponse = newdata['response']
-    pitchoftarg = np.empty(len(pitchshiftmat))
-    pitchofprecur = np.empty(len(pitchshiftmat))
-    stepval = np.empty(len(pitchshiftmat))
-    gradinpitch = np.empty(len(pitchshiftmat))
-    gradinpitchprecur = np.empty(len(pitchshiftmat))
-    timetotarglist = np.empty(len(pitchshiftmat))
-    precur_and_targ_same = np.empty(len(pitchshiftmat))
-    talkerlist2 = np.empty(len(pitchshiftmat))
-    correctresp = np.empty(shape=(0, 0))
-    droplist = np.empty(shape=(0, 0))
+        correctresp = np.empty(shape=(0, 0))
+        pastcorrectresp = np.empty(shape=(0, 0))
+        pastcatchtrial = np.empty(shape=(0, 0))
+        droplist = np.empty(shape=(0, 0))
+        droplistnew = np.empty(shape=(0, 0))
+        print(len(newdata['realRelReleaseTimes'].values))
 
-    for i in range(0, len(talkerlist)):
-        chosenresponseindex = chosenresponse.values[i]
-        chosentrial = pitchshiftmat.values[i]
-        if isinstance(chosentrial, float):
-            chosentrial = talkermat.values[i]
-        chosendisttrial = precursorlist.values[i]
-        chosentalker = talkerlist.values[i]
-        if chosentalker == 3:
-            chosentalker = 1
-        if chosentalker == 8:
-            chosentalker = 2
-        if chosentalker == 13:
-            chosentalker = 2
-        if chosentalker == 5:
-            chosentalker = 1
-        talkerlist2[i] = chosentalker
+        for i in range(1, len(newdata['realRelReleaseTimes'].values)):
+            chosenresponseindex = chosenresponse.values[i]
+            pastcatchtrialindex = catchtriallist.values[i - 1]
 
-        targpos = np.where(chosendisttrial == 1)
-        if (chosenresponseindex == 0 or chosenresponseindex == 1) and newdata['realRelReleaseTimes'].values[i] >= 0:
-            correctresp = np.append(correctresp, 1)
+            realrelreleasetime = realrelreleasetimelist.values[i]
+            pastrealrelreleasetime = realrelreleasetimelist.values[i - 1]
+            pastresponseindex = chosenresponse.values[(i - 1)]
+            chosentrial = pitchshiftmat.values[i]
+            if isinstance(chosentrial, float):
+                chosentrial = talkermat.values[i]
+            chosendisttrial = precursorlist.values[i]
+            chosentalker = talkerlist.values[i]
+            if chosentalker == 3:
+                chosentalker = 1
+            if chosentalker == 8:
+                chosentalker = 2
+            if chosentalker == 13:
+                chosentalker = 2
+            if chosentalker == 5:
+                chosentalker = 1
+            talkerlist2[i] = chosentalker
+
+            targpos = np.where(chosendisttrial == 1)
+            if ((
+                        chosenresponseindex == 0 or chosenresponseindex == 1) and realrelreleasetime >= 0) or chosenresponseindex == 3:
+                correctresp = np.append(correctresp, 1)
+            else:
+                correctresp = np.append(correctresp, 0)
+            if ((pastresponseindex == 0 or pastresponseindex == 1) and pastrealrelreleasetime >= 0) or pastresponseindex == 3:
+                pastcorrectresp = np.append(pastcorrectresp, 1)
+            else:
+                pastcorrectresp = np.append(pastcorrectresp, 0)
+
+            if pastcatchtrialindex == 1:
+                pastcatchtrial = np.append(pastcatchtrial, 1)
+            else:
+                pastcatchtrial = np.append(pastcatchtrial, 0)
+            try:
+                if chosentrial[targpos[0]] == 8.0:
+                    pitchoftarg[i] == 3.0
+                else:
+                    pitchoftarg[i] = chosentrial[targpos[0]]
+
+                if chosentrial[targpos[0] - 1] == 8.0:
+                    pitchofprecur[i] == 3.0
+                else:
+                    pitchofprecur[i] = chosentrial[targpos[0] - 1]
+                    # 1 is 191, 2 is 124, 3 is 144hz female, 5 is 251, 8 is 144hz male, 13 is109hz male
+                    # pitchof targ 1 is 124hz male, pitchoftarg4 is 109Hz Male
+
+                if chosentrial[targpos[0] - 1] == 3.0:
+                    stepval[i] = 1.0
+                elif chosentrial[targpos[0] - 1] == 8.0:
+                    stepval[i] = 2.0
+                elif chosentrial[targpos[0] - 1] == 13.0:
+                    stepval[i] = 1.0
+                elif chosentrial[targpos[0] - 1] == 5.0:
+                    stepval[i] = 1.0
+                else:
+                    stepval[i] = 0.0
+
+                if pitchoftarg[i] == pitchofprecur[i]:
+                    precur_and_targ_same[i] = 1
+                else:
+                    precur_and_targ_same[i] = 0
+
+
+            except:
+                print(len(newdata))
+                indexdrop = newdata.iloc[i].name
+                droplist = np.append(droplist, i)
+                droplistnew = np.append(droplistnew, indexdrop)
+                continue
+        newdata.drop(0, axis=0, inplace=True)  # drop first trial for each animal
+        newdata.drop(droplistnew, axis=0, inplace=True)
+
+        # TODO: CHECK IF DATA IS EXTRACTED SEQUENTIALLY SO TRIAL NUMS ARE CONCATENATED CORRECTLY
+        droplist = [int(x) for x in droplist]  # drop corrupted metdata trials
+
+        pitchoftarg = pitchoftarg[~np.isnan(pitchoftarg)]
+        pitchoftarg = pitchoftarg.astype(int)
+        pitchofprecur = pitchofprecur[~np.isnan(pitchofprecur)]
+        gradinpitch = gradinpitch[~np.isnan(gradinpitch)]
+
+        correctresp = correctresp[~np.isnan(correctresp)]
+        pastcorrectresp = pastcorrectresp[~np.isnan(pastcorrectresp)]
+
+        pastcatchtrial = pastcatchtrial[~np.isnan(pastcatchtrial)]
+
+        pitchoftarg = np.delete(pitchoftarg, 0)
+        talkerlist2 = np.delete(talkerlist2, 0)
+        stepval = np.delete(stepval, 0)
+        pitchofprecur = np.delete(pitchofprecur, 0)
+        precur_and_targ_same = np.delete(precur_and_targ_same, 0)
+
+        pitchoftarg = np.delete(pitchoftarg, droplist)
+        talkerlist2 = np.delete(talkerlist2, droplist)
+        stepval = np.delete(stepval, droplist)
+
+        newdata['pitchoftarg'] = pitchoftarg.tolist()
+
+        pitchofprecur = np.delete(pitchofprecur, droplist)
+        newdata['pitchofprecur'] = pitchofprecur.tolist()
+
+        correctresp = np.delete(correctresp, droplist)
+        pastcorrectresp = np.delete(pastcorrectresp, droplist)
+        pastcatchtrial = np.delete(pastcatchtrial, droplist)
+
+        precur_and_targ_same = np.delete(precur_and_targ_same, droplist)
+
+        correctresp = correctresp.astype(int)
+        pastcatchtrial = pastcatchtrial.astype(int)
+        pastcorrectresp = pastcorrectresp.astype(int)
+
+        newdata['correctresp'] = correctresp.tolist()
+        print(len(pastcorrectresp))
+        print(len(correctresp))
+        newdata['pastcorrectresp'] = pastcorrectresp.tolist()
+        newdata['talker'] = talkerlist2.tolist()
+        newdata['pastcatchtrial'] = pastcatchtrial.tolist()
+        newdata['stepval'] = stepval.tolist()
+        precur_and_targ_same = precur_and_targ_same.astype(int)
+        newdata['precur_and_targ_same'] = precur_and_targ_same.tolist()
+        newdata['timeToTarget'] = newdata['timeToTarget'] / 24414.0625
+        newdata['AM'] = newdata['AM'].astype(int)
+        newdata['talker'] = newdata['talker'] - 1
+        # optionvector=[1 3 5];, male optionvector=[2 8 13]
+        # only look at v2 pitches from recent experiments
+        newdata = newdata[(newdata.pitchoftarg == 1) | (newdata.pitchoftarg == 2) | (newdata.pitchoftarg == 3) | (
+                newdata.pitchoftarg == 5) | (newdata.pitchoftarg == 8) | (newdata.pitchoftarg == 13)]
+
+        newdata = newdata[(newdata.correctionTrial == 0)]  # | (allData.response == 7)
+        newdata = newdata[(newdata.currAtten == 0)]  # | (allData.response == 7)
+        if includefaandmiss is True:
+            newdata = newdata[(newdata.response == 0) | (newdata.response == 1) | (newdata.response == 7)]
         else:
-            correctresp = np.append(correctresp, 0)
-        try:
-            if chosentrial[targpos[0]] == 8.0:
-                pitchoftarg[i] == 3.0
-            else:
-                pitchoftarg[i] = chosentrial[targpos[0]]
-
-            if chosentrial[targpos[0] - 1] == 8.0:
-                pitchofprecur[i] == 3.0
-            else:
-                pitchofprecur[i] = chosentrial[targpos[0] - 1]
-                # 1 is 191, 2 is 124, 3 is 144hz female, 5 is 251, 8 is 144hz male, 13 is109hz male
-                # pitchof targ 1 is 124hz male, pitchoftarg4 is 109Hz Male
-
-            if chosentrial[targpos[0] - 1] == 3.0:
-                stepval[i] = 1.0
-            elif chosentrial[targpos[0] - 1] == 8.0:
-                stepval[i] = 2.0
-            elif chosentrial[targpos[0] - 1] == 13.0:
-                stepval[i] = 1.0
-            elif chosentrial[targpos[0] - 1] == 5.0:
-                stepval[i] = 1.0
-            else:
-                stepval[i] = 0.0
-
-            if pitchoftarg[i] == pitchofprecur[i]:
-                precur_and_targ_same[i] = 1
-            else:
-                precur_and_targ_same[i] = 0
-
-
-        except:
-            indexdrop = newdata.iloc[i].name
-            newdata.drop(indexdrop, axis=0, inplace=True)
-            droplist = np.append(droplist, i)
-            continue
-
-    droplist = [int(x) for x in droplist]  # drop corrupted metdata trials
-
-    pitchoftarg = pitchoftarg[~np.isnan(pitchoftarg)]
-    pitchoftarg = pitchoftarg.astype(int)
-    pitchofprecur = pitchofprecur[~np.isnan(pitchofprecur)]
-    gradinpitch = gradinpitch[~np.isnan(gradinpitch)]
-    correctresp = correctresp[~np.isnan(correctresp)]
-    pitchoftarg = np.delete(pitchoftarg, droplist)
-    talkerlist2 = np.delete(talkerlist2, droplist)
-    stepval = np.delete(stepval, droplist)
-
-    newdata['pitchoftarg'] = pitchoftarg.tolist()
-
-    pitchofprecur = np.delete(pitchofprecur, droplist)
-    newdata['pitchofprecur'] = pitchofprecur.tolist()
-
-    correctresp = np.delete(correctresp, droplist)
-    precur_and_targ_same = np.delete(precur_and_targ_same, droplist)
-    correctresp = correctresp.astype(int)
-    newdata['correctresp'] = correctresp.tolist()
-    newdata['talker'] = talkerlist2.tolist()
-    newdata['stepval'] = stepval.tolist()
-    precur_and_targ_same = precur_and_targ_same.astype(int)
-    newdata['precur_and_targ_same'] = precur_and_targ_same.tolist()
-    newdata['timeToTarget'] = newdata['timeToTarget'] / 24414.0625
-    newdata['AM'] = newdata['AM'].astype(int)
-    newdata['talker'] = newdata['talker'] - 1
-    # optionvector=[1 3 5];, male optionvector=[2 8 13]
-    # only look at v2 pitches from recent experiments
-    newdata = newdata[(newdata.pitchoftarg == 1) | (newdata.pitchoftarg == 2) | (newdata.pitchoftarg == 3) | (
-            newdata.pitchoftarg == 5) | (newdata.pitchoftarg == 8) | (newdata.pitchoftarg == 13)]
-    if includefaandmiss is False:
-        newdata = newdata[(newdata.correctresp == 1)]
-    return newdata
+            newdata = newdata[(newdata.response == 0) | (newdata.response == 1)]
+            newdata = newdata[(newdata.catchTrial == 0)]
+        if includefaandmiss is False:
+            newdata = newdata[(newdata.correctresp == 1)]
+        bigdata = bigdata.append(newdata)
+    return bigdata
 
 
 # editing to extract different vars from df
@@ -426,8 +482,6 @@ def run_mixed_effects_analysis(ferrets):
     filepath = Path('D:/dfformixedmodels/dfcat_use.csv')
     dfcat_use.to_csv(filepath)
 
-
-
     # dfuse.to_csv('dfuse.csv', sep=',', path_or_buf=os.PathLike['D:/dfformixedmodels/'])
     # dfcat_use.to_csv('dfcat_use.csv', path_or_buf=os.path.normpath(p))
     # df.to_csv('df.csv', path_or_buf=os.path.normpath(p))
@@ -471,7 +525,7 @@ def plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use):
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
-    modelreg_reduc, modelregcat_reduc, modelregcat, modelreg, predictedrelease, df_use, dfcat_use, predictedcorrectresp, explainedvar, explainvarreleasetime, predictedrelease_cruella = run_mixed_effects_analysis(
+    modelreg_reduc, modelregcat_reduc, modelregcat, modelreg, predictedrelease, df_use, dfcat_use, predictedcorrectresp, explainedvar, explainvarreleasetime = run_mixed_effects_analysis(
         ferrets)
     plotpredictedversusactual(predictedrelease, df_use)
     plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use)
