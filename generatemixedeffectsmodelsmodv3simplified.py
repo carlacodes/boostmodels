@@ -1,8 +1,6 @@
-import click
 import sklearn.metrics
 from rpy2.robjects import pandas2ri
 from rpy2.robjects.conversion import localconverter
-
 import instruments
 from instruments.io.BehaviourIO import BehaviourDataSet, WeekBehaviourDataSet
 from instruments.config import behaviouralDataPath, behaviourOutput
@@ -14,7 +12,6 @@ from sklearn.feature_selection import RFE
 from sklearn.svm import SVR
 from sklearn.preprocessing import MinMaxScaler
 from pymer4.models import Lmer
-
 scaler = MinMaxScaler()
 import os
 import matplotlib.pyplot as plt
@@ -119,7 +116,6 @@ def get_df_behav(path=None,
 
     if path is None:
         path = behaviouralDataPath
-
 
     allData, ferrets = extractAllFerretData(ferrets, path, startDate=startdate,
                                             finishDate=finishdate)
