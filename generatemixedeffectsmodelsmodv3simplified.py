@@ -146,7 +146,7 @@ def get_df_behav(path=None,
         talkermat = {}
         talkerlist = newdata['talker']
 
-        for i0 in range(1, len(distractors)):
+        for i0 in range(0, len(distractors)):
             talkermat[i0] = int(talkerlist.values[i0]) * np.ones(len(distractors.values[i0]))
         talkermat = pd.Series(talkermat, index=talkermat.keys())
 
@@ -250,7 +250,10 @@ def get_df_behav(path=None,
                 droplist = np.append(droplist, i)
                 droplistnew = np.append(droplistnew, indexdrop)
                 continue
-        newdata.drop(0, axis=0, inplace=True)  # drop first trial for each animal
+        #newdata.drop(0, axis=0, inplace=True)  # drop first trial for each animal
+        newdata.drop(index=newdata.index[0],
+                axis=0,
+                inplace=True)
         newdata.drop(droplistnew, axis=0, inplace=True)
 
         # TODO: CHECK IF DATA IS EXTRACTED SEQUENTIALLY SO TRIAL NUMS ARE CONCATENATED CORRECTLY
