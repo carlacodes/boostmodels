@@ -446,8 +446,6 @@ def run_mixed_effects_analysis(ferrets):
     ##the marginal R2 encompassing variance explained by only the fixed effects, and the conditional R2 comprising variance explained by both
     # fixed and random effects i.e. the variance explained by the whole model
     print(explainvarreleasetime)
-    # TODO: need to make new data frame that is converted to R which only includes individual ferret names, then plot the individual ferrets' responses
-
     #    data_from_ferret = dfuse.loc[[dfuse['pitchoftarg'] == 1 | dfuse['pitchoftarg'] == 2]]
     data_from_ferret = dfuse[(dfuse['pitchoftarg'] == 1) | (dfuse['pitchoftarg'] == 13)]
     data_from_ferret.isnull().values.any()
