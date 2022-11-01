@@ -261,7 +261,7 @@ def get_df_behav(path=None,
 
         pitchoftarg = pitchoftarg[~np.isnan(pitchoftarg)]
         pitchoftarg = pitchoftarg.astype(int)
-        pitchofprecur = pitchofprecur[~np.isnan(pitchofprecur)]
+        #pitchofprecur = pitchofprecur[~np.isnan(pitchofprecur)]
         gradinpitch = gradinpitch[~np.isnan(gradinpitch)]
 
         correctresp = correctresp[~np.isnan(correctresp)]
