@@ -175,9 +175,11 @@ def get_df_behav(path=None,
             realrelreleasetime = realrelreleasetimelist.values[i]
             pastrealrelreleasetime = realrelreleasetimelist.values[i - 1]
             pastresponseindex = chosenresponse.values[(i - 1)]
+
             chosentrial = pitchshiftmat.values[i]
             if isinstance(chosentrial, float):
                 chosentrial = talkermat.values[i]
+
             chosendisttrial = precursorlist.values[i]
             chosentalker = talkerlist.values[i]
             if chosentalker == 3:
@@ -203,6 +205,7 @@ def get_df_behav(path=None,
                 pastcorrectresp = np.append(pastcorrectresp, 0)
 
             if pastcatchtrialindex == 1:
+                print('catch trial detected')
                 pastcatchtrial = np.append(pastcatchtrial, 1)
             else:
                 pastcatchtrial = np.append(pastcatchtrial, 0)
@@ -237,12 +240,15 @@ def get_df_behav(path=None,
 
 
             except:
-                print(len(newdata))
+                #print(len(newdata))
                 indexdrop = newdata.iloc[i].name
-                droplist = np.append(droplist, i)
+                droplist = np.append(droplist, i-1)
+                ##arrays START AT 0, but the index starts at 1, so the index is 1 less than the array
                 droplistnew = np.append(droplistnew, indexdrop)
                 continue
         #newdata.drop(0, axis=0, inplace=True)  # drop first trial for each animal
+        #accidentally dropping all catch trials?
+        ##TODO: CHECK THIS
         newdata.drop(index=newdata.index[0],
                 axis=0,
                 inplace=True)
@@ -286,8 +292,8 @@ def get_df_behav(path=None,
         pastcorrectresp = pastcorrectresp.astype(int)
 
         newdata['correctresp'] = correctresp.tolist()
-        print(len(pastcorrectresp))
-        print(len(correctresp))
+        # print(len(pastcorrectresp))
+        # print(len(correctresp))
         newdata['pastcorrectresp'] = pastcorrectresp.tolist()
         newdata['talker'] = talkerlist2.tolist()
         newdata['pastcatchtrial'] = pastcatchtrial.tolist()
