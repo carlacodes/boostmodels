@@ -196,6 +196,7 @@ def get_df_behav(path=None,
                 correctresp = np.append(correctresp, 1)
             else:
                 correctresp = np.append(correctresp, 0)
+
             if ((pastresponseindex == 0 or pastresponseindex == 1) and pastrealrelreleasetime >= 0) or pastresponseindex == 3:
                 pastcorrectresp = np.append(pastcorrectresp, 1)
             else:
@@ -446,7 +447,9 @@ def run_mixed_effects_analysis(ferrets):
     ##the marginal R2 encompassing variance explained by only the fixed effects, and the conditional R2 comprising variance explained by both
     # fixed and random effects i.e. the variance explained by the whole model
     print(explainvarreleasetime)
-    #    data_from_ferret = dfuse.loc[[dfuse['pitchoftarg'] == 1 | dfuse['pitchoftarg'] == 2]]
+    #    data_from_ferret = dfuse.
+    #
+    #    [[dfuse['pitchoftarg'] == 1 | dfuse['pitchoftarg'] == 2]]
     data_from_ferret = dfuse[(dfuse['pitchoftarg'] == 1) | (dfuse['pitchoftarg'] == 13)]
     data_from_ferret.isnull().values.any()
     predictedrelease = rstats.predict(modelreg_reduc.model_obj, type='response')
