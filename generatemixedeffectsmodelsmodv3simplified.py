@@ -205,7 +205,6 @@ def get_df_behav(path=None,
                 pastcorrectresp = np.append(pastcorrectresp, 0)
 
             if pastcatchtrialindex == 1:
-                print('catch trial detected')
                 pastcatchtrial = np.append(pastcatchtrial, 1)
             else:
                 pastcatchtrial = np.append(pastcatchtrial, 0)
@@ -515,7 +514,7 @@ def plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use):
     ax.set_title('Predicted vs. Actual Correct Response')
     ax.plot([0, 1], [0, 0], transform=ax.transAxes)
     plt.show()
-    # np round rounds down to the nearest integer
+    # np round down to the nearest integer
     cm = sklearn.metrics.confusion_matrix(dfcat_use['correctresp'], np.round(predictedcorrectresp))
     sklearn.metrics.ConfusionMatrixDisplay(cm, display_labels=['Incorrect', 'Correct']).plot()
     accuracy = sklearn.metrics.accuracy_score(dfcat_use['correctresp'], np.round(predictedcorrectresp))
