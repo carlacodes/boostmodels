@@ -3,6 +3,7 @@ from rpy2.robjects import pandas2ri
 from rpy2.robjects.conversion import localconverter
 import instruments
 from instruments.io.BehaviourIO import BehaviourDataSet, WeekBehaviourDataSet
+from sklearn.inspection import permutation_importance
 from instruments.config import behaviouralDataPath, behaviourOutput
 from instruments.behaviouralAnalysis import createWeekBehaviourFigs, reactionTimeAnalysis  # outputbehaviordf
 import math
@@ -658,8 +659,8 @@ def runlgbcorrectresponse(dfcat_use):
     dfx = dfcat_use.loc[:, dfcat_use.columns != col]
     #remove ferret as possible feature
     col = 'ferret'
-
-
+    dfx = dfx.loc[:, dfx.columns != col]
+    col = 'pitchofprecur'
     dfx = dfx.loc[:, dfx.columns != col]
 
     X_train, X_test, y_train, y_test = train_test_split(dfx, dfcat_use['correctresp'], test_size=0.2, random_state=42)
@@ -671,7 +672,7 @@ def runlgbcorrectresponse(dfcat_use):
     # param['nthread'] = 4
     # param['eval_metric'] = 'auc'
     evallist = [(dtrain, 'train'), (dtest, 'eval')]
-    xg_reg = lgb.LGBMClassifier( colsample_bytree=0.3, learning_rate=0.1,
+    xg_reg = lgb.LGBMClassifier(colsample_bytree=0.3, learning_rate=0.1,
                               max_depth=10, alpha=10, n_estimators=10)
 
     xg_reg.fit(X_train, y_train)
@@ -680,16 +681,16 @@ def runlgbcorrectresponse(dfcat_use):
     plt.show()
 
     kfold = KFold(n_splits=10)
-    results = cross_val_score(xg_reg, X_train, y_train, scoring ='accuracy', cv=kfold)
+    results = cross_val_score(xg_reg, X_train, y_train, scoring ='balanced_accuracy', cv=kfold)
     print("Accuracy: %.2f%%" % (np.mean(results) * 100.0))
     print(results)
     shap_values = shap.TreeExplainer(xg_reg).shap_values(dfx)
     shap.summary_plot(shap_values, dfx)
     plt.show()
-    shap.dependence_plot("timeToTarget", shap_values, dfx)#
-    plt.show()
+    # shap.dependence_plot("timeToTarget", shap_values, dfx)#
+    # plt.show()
 
-    return xg_reg, ypred, y_test, results
+    return xg_reg, ypred, y_test, results, shap_values
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
@@ -698,5 +699,5 @@ if __name__ == '__main__':
     plotpredictedversusactual(predictedrelease, df_use)
     plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use)
     xg_reg, ypred, y_test, results = runlgbreleasetimes(df_use)
-    xg_reg2, ypred2, y_test2, results2 = runlgbcorrectresponse(dfcat_use)
+    xg_reg2, ypred2, y_test2, results2,shap_values = runlgbcorrectresponse(dfcat_use)
 
