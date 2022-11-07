@@ -681,14 +681,23 @@ def runlgbcorrectresponse(dfcat_use):
     plt.show()
 
     kfold = KFold(n_splits=10)
-    results = cross_val_score(xg_reg, X_train, y_train, scoring ='balanced_accuracy', cv=kfold)
+    results = cross_val_score(xg_reg, X_train, y_train, scoring ='accuracy', cv=kfold)
     print("Accuracy: %.2f%%" % (np.mean(results) * 100.0))
     print(results)
     shap_values = shap.TreeExplainer(xg_reg).shap_values(dfx)
     shap.summary_plot(shap_values, dfx)
     plt.show()
-    # shap.dependence_plot("timeToTarget", shap_values, dfx)#
-    # plt.show()
+    shap.dependence_plot("timeToTarget", shap_values, dfx)#
+    plt.show()
+    result = permutation_importance(xg_reg, X_test, y_test, n_repeats=10,
+                                    random_state=42, n_jobs=2)
+    sorted_idx = result.importances_mean.argsort()
+
+    fig, ax = plt.subplots()
+    ax.barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T)
+    ax.set_title("Permutation Importances (test set)")
+    fig.tight_layout()
+    plt.show()
 
     return xg_reg, ypred, y_test, results, shap_values
 
