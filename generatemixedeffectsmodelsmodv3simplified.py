@@ -187,7 +187,7 @@ def get_df_behav(path=None,
 
             chosentrial = pitchshiftmat.values[i]
             if isinstance(chosentrial, float):
-                chosentrial = talkermat.values[i]
+                chosentrial = talkermat.values[i].astype(int)
 
             chosendisttrial = precursorlist.values[i]
             chosentalker = talkerlist.values[i]
@@ -223,6 +223,8 @@ def get_df_behav(path=None,
                 else:
                     pitchoftarg[i] = chosentrial[targpos[0]]
 
+
+
                 if chosentrial[targpos[0] - 1] == 8.0:
                     pitchofprecur[i] == 3.0
                 else:
@@ -233,11 +235,11 @@ def get_df_behav(path=None,
                 if chosentrial[targpos[0] - 1] == 3.0:
                     stepval[i] = 1.0
                 elif chosentrial[targpos[0] - 1] == 8.0:
-                    stepval[i] = 2.0
+                    stepval[i] = -1.0
                 elif chosentrial[targpos[0] - 1] == 13.0:
                     stepval[i] = 1.0
                 elif chosentrial[targpos[0] - 1] == 5.0:
-                    stepval[i] = 1.0
+                    stepval[i] = -1.0
                 else:
                     stepval[i] = 0.0
 
@@ -245,6 +247,19 @@ def get_df_behav(path=None,
                     precur_and_targ_same[i] = 1
                 else:
                     precur_and_targ_same[i] = 0
+                # if pitchofprecur[i] == 1.0:
+                #     pitchofprecur[i] = 4.0
+                #
+                # if pitchofprecur[i] == 13.0:
+                #     pitchofprecur[i] = 1.0
+                #
+                # if pitchoftarg[i] == 1.0:
+                #     print('pitch of targ original')
+                #     pitchoftarg[i] = 4.0
+                #
+                # if pitchoftarg[i] == 13.0:
+                #     pitchoftarg[i] = 1.0
+
 
 
             except:
@@ -298,6 +313,8 @@ def get_df_behav(path=None,
         correctresp = correctresp.astype(int)
         pastcatchtrial = pastcatchtrial.astype(int)
         pastcorrectresp = pastcorrectresp.astype(int)
+        pitchoftarg[pitchoftarg == 1] = 4
+        pitchoftarg[pitchoftarg == 13] = 1
 
         newdata['correctresp'] = correctresp.tolist()
         # print(len(pastcorrectresp))
@@ -314,7 +331,7 @@ def get_df_behav(path=None,
         # optionvector=[1 3 5];, male optionvector=[2 8 13]
         # only look at v2 pitches from recent experiments
         newdata = newdata[(newdata.pitchoftarg == 1) | (newdata.pitchoftarg == 2) | (newdata.pitchoftarg == 3) | (
-                newdata.pitchoftarg == 5) | (newdata.pitchoftarg == 8) | (newdata.pitchoftarg == 13)]
+                newdata.pitchoftarg == 4) | (newdata.pitchoftarg == 5)]
 
         newdata = newdata[(newdata.correctionTrial == 0)]  # | (allData.response == 7)
         newdata = newdata[(newdata.currAtten == 0)]  # | (allData.response == 7)
@@ -343,8 +360,8 @@ def run_mixed_effects_analysis(ferrets):
         "realRelReleaseTimes ~ talker*(pitchoftarg)+ talker*(stepval)+ side + timeToTarget + DaysSinceStart + AM  + (1|ferret)",
         data=dfuse, family='gamma')
 
-    print(modelreg.fit(factors={"side": ["0", "1"], "stepval": ["0.0", "1.0", "2.0"], "AM": ["0", "1"],
-                                "pitchoftarg": ['1', '2', '3', '5', '13'], "talker": ["0.0", "1.0"], }, ordered=True,
+    print(modelreg.fit(factors={"side": ["0", "1"], "stepval": ["0.0", "1.0", "-1.0"], "AM": ["0", "1"],
+                                "pitchoftarg": ['1', '2', '3', '4', '5'], "talker": ["0.0", "1.0"], }, ordered=True,
                        REML=False,
                        old_optimizer=False))
 
@@ -359,8 +376,8 @@ def run_mixed_effects_analysis(ferrets):
         "correctresp ~ talker*pitchoftarg +  side  + talker * stepval + stepval+timeToTarget + DaysSinceStart + AM + (1|ferret)",
         data=dfcat_use, family='binomial')
 
-    print(modelregcat.fit(factors={"side": ["0", "1"], "stepval": ["0.0", "1.0", "2.0"], "AM": ["0", "1"],
-                                   "pitchoftarg": ['1', '2', '3', '5', '13'], "talker": ["0.0", "1.0"]}, REML=False,
+    print(modelregcat.fit(factors={"side": ["0", "1"], "stepval": ["0.0", "-1.0", "1.0"], "AM": ["0", "1"],
+                                   "pitchoftarg": ['1', '2', '3', '4', '5'], "talker": ["0.0", "1.0"]}, REML=False,
                           old_optimizer=True))
 
     modelregcat_reduc = Lmer(
@@ -368,8 +385,8 @@ def run_mixed_effects_analysis(ferrets):
         data=dfcat_use, family='binomial')
 
     print(modelregcat_reduc.fit(factors={"side": ["0", "1"],
-                                         "pitchoftarg": ['1', '2', '3', '5', '13'], "talker": ["0.0", "1.0"],
-                                         "stepval": ["0.0", "1.0", "2.0"]},
+                                         "pitchoftarg": ['1', '2', '3', '4', '5'], "talker": ["0.0", "1.0"],
+                                         "stepval": ["0.0", "-1.0", "1.0"]},
                                 REML=False,
                                 old_optimizer=True))
 
@@ -378,8 +395,8 @@ def run_mixed_effects_analysis(ferrets):
         data=dfuse, family='gamma')
 
     print(modelreg_reduc.fit(factors={"side": ["0", "1"],
-                                      "pitchoftarg": ['1', '2', '3', '5', '13'], "talker": ["0.0", "1.0"],
-                                      "stepval": ["0.0", "1.0", "2.0"]},
+                                      "pitchoftarg": ['1', '2', '3', '4', '5'], "talker": ["0.0", "1.0"],
+                                      "stepval": ["0.0", "-1.0", "1.0"]},
                              ordered=True, REML=False,
                              old_optimizer=False))
 
@@ -640,6 +657,9 @@ def runlgbreleasetimes(df_use):
     shap_values = shap.TreeExplainer(xg_reg).shap_values(dfx)
     shap.summary_plot(shap_values, dfx)
     plt.show()
+    shap.dependence_plot("timeToTarget", shap_values, dfx)#
+    plt.show()
+
     return xg_reg, ypred, y_test, results
 
 
