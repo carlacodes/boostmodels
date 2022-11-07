@@ -594,14 +594,14 @@ def runlgbreleasetimes(df_use):
 
 
     dfx = dfx.loc[:, dfx.columns != col]
-    dfx['pitchoftarg'] = dfx['pitchoftarg'].astype('category')
-    dfx['side'] = dfx['side'].astype('category')
-    dfx['talker'] = dfx['talker'].astype('category')
-    dfx['stepval'] = dfx['stepval'].astype('category')
-    dfx['pitchofprecur'] = dfx['pitchofprecur'].astype('category')
-    dfx['AM'] = dfx['AM'].astype('category')
-    dfx['DaysSinceStart'] = dfx['DaysSinceStart'].astype('category')
-    dfx['precur_and_targ_same'] = dfx['precur_and_targ_same'].astype('category')
+    # dfx['pitchoftarg'] = dfx['pitchoftarg'].astype('category')
+    # dfx['side'] = dfx['side'].astype('category')
+    # dfx['talker'] = dfx['talker'].astype('category')
+    # dfx['stepval'] = dfx['stepval'].astype('category')
+    # dfx['pitchofprecur'] = dfx['pitchofprecur'].astype('category')
+    # dfx['AM'] = dfx['AM'].astype('category')
+    # dfx['DaysSinceStart'] = dfx['DaysSinceStart'].astype('category')
+    # dfx['precur_and_targ_same'] = dfx['precur_and_targ_same'].astype('category')
 
 
 
@@ -627,7 +627,7 @@ def runlgbreleasetimes(df_use):
 
     xg_reg.fit(X_train, y_train)
     ypred = xg_reg.predict(X_test)
-    xgb.plot_importance(xg_reg)
+    lgb.plot_importance(xg_reg)
     plt.show()
 
     kfold = KFold(n_splits=10)
@@ -637,8 +637,8 @@ def runlgbreleasetimes(df_use):
     print("MSE: %.2f" % (mse))
     print("negative MSE: %.2f%%" % (np.mean(results) * 100.0))
     print(results)
-    shap_values = shap.TreeExplainer(xg_reg).shap_values(X_train)
-    shap.summary_plot(shap_values, X)
+    shap_values = shap.TreeExplainer(xg_reg).shap_values(dfx)
+    shap.summary_plot(shap_values, dfx)
     plt.show()
     return xg_reg, ypred, y_test, results
 
