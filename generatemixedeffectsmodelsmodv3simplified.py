@@ -698,6 +698,12 @@ def runlgbcorrectresponse(dfcat_use):
     ax.set_title("Permutation Importances (test set)")
     fig.tight_layout()
     plt.show()
+    explainer = shap.Explainer(xg_reg, dfx)
+    shap_values2= explainer(dfx)
+    shap.plots.scatter(shap_values2[:, "talker"])
+    plt.show()
+    shap.plots.scatter(shap_values2[:, "precur_and_targ_same"])
+    plt.show()
 
     return xg_reg, ypred, y_test, results, shap_values
 
