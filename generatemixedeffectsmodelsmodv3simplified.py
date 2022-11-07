@@ -530,6 +530,11 @@ def plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use):
 def runxgboostreleasetimes(df_use):
     col = 'realRelReleaseTimes'
     dfx = df_use.loc[:, df_use.columns != col]
+    #remove ferret as possible feature
+    col = 'ferret'
+
+    dfx = dfx.loc[:, dfx.columns != col]
+
 
     X_train, X_test, y_train, y_test = train_test_split(dfx, df_use['realRelReleaseTimes'], test_size=0.2, random_state=42)
 
@@ -546,8 +551,7 @@ def runxgboostreleasetimes(df_use):
                               max_depth=10, alpha=10, n_estimators=10)
 
     xg_reg.fit(X_train, y_train)
-
-    ypred = xg_reg.predict(dtest)
+    ypred = xg_reg.predict(X_test)
     xgb.plot_importance(xg_reg)
     plt.show()
 
@@ -556,8 +560,9 @@ def runxgboostreleasetimes(df_use):
 
     mse = mean_squared_error(ypred, y_test)
     print("MSE: %.2f" % (mse))
-    print("Accuracy: %.2f%%" % (results.mean() * 100.0))
-    return xg_reg, ypred, y_test
+    print("MSE: %.2f%%" % (mse * 100.0))
+    print(results)
+    return xg_reg, ypred, y_test, results
 
 
 if __name__ == '__main__':
@@ -566,4 +571,4 @@ if __name__ == '__main__':
         ferrets)
     plotpredictedversusactual(predictedrelease, df_use)
     plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use)
-    runxgboostreleasetimes(df_use)
+    xg_reg, ypred, y_test, results = runxgboostreleasetimes(df_use)
