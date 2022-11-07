@@ -620,23 +620,6 @@ def runlgbreleasetimes(df_use):
 
 
     dfx = dfx.loc[:, dfx.columns != col]
-    # dfx['pitchoftarg'] = dfx['pitchoftarg'].astype('category')
-    # dfx['side'] = dfx['side'].astype('category')
-    # dfx['talker'] = dfx['talker'].astype('category')
-    # dfx['stepval'] = dfx['stepval'].astype('category')
-    # dfx['pitchofprecur'] = dfx['pitchofprecur'].astype('category')
-    # dfx['AM'] = dfx['AM'].astype('category')
-    # dfx['DaysSinceStart'] = dfx['DaysSinceStart'].astype('category')
-    # dfx['precur_and_targ_same'] = dfx['precur_and_targ_same'].astype('category')
-
-
-
-    # dfuse = df[["pitchoftarg", "pitchofprecur", "talker", "side", "precur_and_targ_same",
-    #             "timeToTarget", "DaysSinceStart", "AM",
-    #             "realRelReleaseTimes", "ferret", "stepval"]]
-
-
-
 
     X_train, X_test, y_train, y_test = train_test_split(dfx, df_use['realRelReleaseTimes'], test_size=0.2, random_state=42)
 
@@ -670,7 +653,43 @@ def runlgbreleasetimes(df_use):
     plt.show()
 
     return xg_reg, ypred, y_test, results
+def runlgbcorrectresponse(dfcat_use):
+    col = 'correctresp'
+    dfx = dfcat_use.loc[:, dfcat_use.columns != col]
+    #remove ferret as possible feature
+    col = 'ferret'
 
+
+    dfx = dfx.loc[:, dfx.columns != col]
+
+    X_train, X_test, y_train, y_test = train_test_split(dfx, dfcat_use['correctresp'], test_size=0.2, random_state=42)
+
+    dtrain = lgb.Dataset(X_train, label=y_train)
+    dtest = lgb.Dataset(X_test, label=y_test)
+
+    # param = {'max_depth': 2, 'eta': 1, 'objective': 'reg:squarederror'}
+    # param['nthread'] = 4
+    # param['eval_metric'] = 'auc'
+    evallist = [(dtrain, 'train'), (dtest, 'eval')]
+    xg_reg = lgb.LGBMClassifier( colsample_bytree=0.3, learning_rate=0.1,
+                              max_depth=10, alpha=10, n_estimators=10)
+
+    xg_reg.fit(X_train, y_train)
+    ypred = xg_reg.predict(X_test)
+    lgb.plot_importance(xg_reg)
+    plt.show()
+
+    kfold = KFold(n_splits=10)
+    results = cross_val_score(xg_reg, X_train, y_train, scoring ='accuracy', cv=kfold)
+    print("Accuracy: %.2f%%" % (np.mean(results) * 100.0))
+    print(results)
+    shap_values = shap.TreeExplainer(xg_reg).shap_values(dfx)
+    shap.summary_plot(shap_values, dfx)
+    plt.show()
+    shap.dependence_plot("timeToTarget", shap_values, dfx)#
+    plt.show()
+
+    return xg_reg, ypred, y_test, results
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
@@ -679,3 +698,5 @@ if __name__ == '__main__':
     plotpredictedversusactual(predictedrelease, df_use)
     plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use)
     xg_reg, ypred, y_test, results = runlgbreleasetimes(df_use)
+    xg_reg2, ypred2, y_test2, results2 = runlgbcorrectresponse(dfcat_use)
+
