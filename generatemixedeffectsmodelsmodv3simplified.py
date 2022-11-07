@@ -362,7 +362,7 @@ def run_mixed_effects_analysis(ferrets):
 
     dfuse = df[["pitchoftarg", "pitchofprecur", "talker", "side", "precur_and_targ_same",
                 "timeToTarget", "DaysSinceStart", "AM",
-                "realRelReleaseTimes", "ferret", "stepval"]]
+                "realRelReleaseTimes", "ferret", "stepval", "pastcorrectresp", "pastcatchtrial","trialNum" ]]
     X = df[["pitchoftarg", "pitchofprecur", "talker", "side",
             "timeToTarget", "DaysSinceStart", "AM"]].to_numpy()
 
@@ -380,7 +380,7 @@ def run_mixed_effects_analysis(ferrets):
 
     dfcat_use = dfcat[["pitchoftarg", "pitchofprecur", "talker", "side", "precur_and_targ_same",
                        "timeToTarget", "DaysSinceStart", "AM",
-                       "correctresp", "ferret", "stepval"]]
+                       "correctresp", "ferret", "stepval", "pastcorrectresp", "pastcatchtrial", "trialNum"]]
 
     modelregcat = Lmer(
         "correctresp ~ talker*pitchoftarg +  side  + talker * stepval + stepval+timeToTarget + DaysSinceStart + AM + (1|ferret)",
@@ -687,7 +687,7 @@ def runlgbcorrectresponse(dfcat_use):
     shap_values = shap.TreeExplainer(xg_reg).shap_values(dfx)
     shap.summary_plot(shap_values, dfx)
     plt.show()
-    shap.dependence_plot("timeToTarget", shap_values, dfx)#
+    shap.dependence_plot("pitchoftarg", shap_values[0], dfx)#
     plt.show()
     result = permutation_importance(xg_reg, X_test, y_test, n_repeats=10,
                                     random_state=42, n_jobs=2)
