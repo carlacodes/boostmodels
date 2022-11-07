@@ -534,13 +534,14 @@ def runxgboostreleasetimes(df_use):
     col = 'ferret'
 
     dfx = dfx.loc[:, dfx.columns != col]
+    dfx['pitchoftarg'] = dfx['pitchoftarg'].astype('category')
 
 
     X_train, X_test, y_train, y_test = train_test_split(dfx, df_use['realRelReleaseTimes'], test_size=0.2, random_state=42)
 
-    dtrain = xgb.DMatrix(X_train, label=y_train)
+    dtrain = xgb.DMatrix(X_train, label=y_train, enable_categorical=True)
     dtest = xgb.DMatrix(X_test, label=y_test)
-    num_round = 10
+
     param = {'max_depth': 2, 'eta': 1, 'objective': 'reg:squarederror'}
     param['nthread'] = 4
     param['eval_metric'] = 'auc'
@@ -556,11 +557,11 @@ def runxgboostreleasetimes(df_use):
     plt.show()
 
     kfold = KFold(n_splits=10)
-    results = cross_val_score(xg_reg, X_train, y_train, cv=kfold)
+    results = cross_val_score(xg_reg, X_train, y_train, scoring ='neg_mean_squared_error', cv=kfold)
 
     mse = mean_squared_error(ypred, y_test)
     print("MSE: %.2f" % (mse))
-    print("MSE: %.2f%%" % (mse * 100.0))
+    print("negative MSE: %.2f%%" % (np.mean(results) * 100.0))
     print(results)
     return xg_reg, ypred, y_test, results
 
