@@ -535,6 +535,21 @@ def runxgboostreleasetimes(df_use):
 
     dfx = dfx.loc[:, dfx.columns != col]
     dfx['pitchoftarg'] = dfx['pitchoftarg'].astype('category')
+    dfx['side'] = dfx['side'].astype('category')
+    dfx['talker'] = dfx['talker'].astype('category')
+    dfx['stepval'] = dfx['stepval'].astype('category')
+    dfx['pitchofprecur'] = dfx['pitchofprecur'].astype('category')
+    dfx['AM'] = dfx['AM'].astype('category')
+    dfx['DaysSinceStart'] = dfx['DaysSinceStart'].astype('category')
+    dfx['precur_and_targ_same'] = dfx['precur_and_targ_same'].astype('category')
+
+
+
+    # dfuse = df[["pitchoftarg", "pitchofprecur", "talker", "side", "precur_and_targ_same",
+    #             "timeToTarget", "DaysSinceStart", "AM",
+    #             "realRelReleaseTimes", "ferret", "stepval"]]
+
+
 
 
     X_train, X_test, y_train, y_test = train_test_split(dfx, df_use['realRelReleaseTimes'], test_size=0.2, random_state=42)
@@ -548,8 +563,8 @@ def runxgboostreleasetimes(df_use):
     evallist = [(dtrain, 'train'), (dtest, 'eval')]
 
     #bst = xgb.train(param, dtrain, num_round, evallist)
-    xg_reg = xgb.XGBRegressor(objective='reg:squarederror', colsample_bytree=0.3, learning_rate=0.1,
-                              max_depth=10, alpha=10, n_estimators=10)
+    xg_reg = xgb.XGBRegressor(tree_method= 'gpu_hist', objective='reg:squarederror', colsample_bytree=0.3, learning_rate=0.1,
+                              max_depth=10, alpha=10, n_estimators=10, enable_categorical=True)
 
     xg_reg.fit(X_train, y_train)
     ypred = xg_reg.predict(X_test)
