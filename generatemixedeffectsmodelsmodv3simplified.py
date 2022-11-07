@@ -379,7 +379,7 @@ def run_mixed_effects_analysis(ferrets):
 
     dfcat_use = dfcat[["pitchoftarg", "pitchofprecur", "talker", "side", "precur_and_targ_same",
                        "timeToTarget", "DaysSinceStart", "AM",
-                       "correctresp", "ferret", "stepval", "pitchofprecur"]]
+                       "correctresp", "ferret", "stepval"]]
 
     modelregcat = Lmer(
         "correctresp ~ talker*pitchoftarg +  side  + talker * stepval + stepval+timeToTarget + DaysSinceStart + AM + (1|ferret)",
