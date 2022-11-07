@@ -541,19 +541,23 @@ def runxgboostreleasetimes(df_use):
     param['eval_metric'] = 'auc'
     evallist = [(dtrain, 'train'), (dtest, 'eval')]
 
-    bst = xgb.train(param, dtrain, num_round, evallist)
+    #bst = xgb.train(param, dtrain, num_round, evallist)
+    xg_reg = xgb.XGBRegressor(objective='reg:squarederror', colsample_bytree=0.3, learning_rate=0.1,
+                              max_depth=10, alpha=10, n_estimators=10)
 
-    ypred = bst.predict(dtest)
-    xgb.plot_importance(bst)
+    xg_reg.fit(X_train, y_train)
+
+    ypred = xg_reg.predict(dtest)
+    xgb.plot_importance(xg_reg)
     plt.show()
 
     kfold = KFold(n_splits=10)
-    results = cross_val_score(bst, X_train, y_train, cv=kfold)
+    results = cross_val_score(xg_reg, X_train, y_train, cv=kfold)
 
     mse = mean_squared_error(ypred, y_test)
     print("MSE: %.2f" % (mse))
     print("Accuracy: %.2f%%" % (results.mean() * 100.0))
-    return bst, ypred, y_test
+    return xg_reg, ypred, y_test
 
 
 if __name__ == '__main__':
