@@ -12,6 +12,9 @@ from sklearn.feature_selection import RFE
 from sklearn.svm import SVR
 from sklearn.preprocessing import MinMaxScaler
 from pymer4.models import Lmer
+from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import KFold
+from sklearn.model_selection import cross_val_score
 scaler = MinMaxScaler()
 import os
 import xgboost as xgb
@@ -543,6 +546,14 @@ def runxgboostreleasetimes(df_use):
     ypred = bst.predict(dtest)
     xgb.plot_importance(bst)
     plt.show()
+
+    kfold = KFold(n_splits=10, random_state=7)
+    results = cross_val_score(bst, X_train, y_train, cv=kfold)
+
+    mse = mean_squared_error(ypred, y_test)
+    print("MSE: %.2f" % (mse))
+    print("Accuracy: %.2f%%" % (results.mean() * 100.0))
+    return bst, ypred, y_test
 
 
 if __name__ == '__main__':
