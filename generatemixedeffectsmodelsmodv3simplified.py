@@ -547,7 +547,7 @@ def runxgboostreleasetimes(df_use):
     xgb.plot_importance(bst)
     plt.show()
 
-    kfold = KFold(n_splits=10, random_state=7)
+    kfold = KFold(n_splits=10)
     results = cross_val_score(bst, X_train, y_train, cv=kfold)
 
     mse = mean_squared_error(ypred, y_test)
