@@ -14,18 +14,21 @@ from sklearn.preprocessing import MinMaxScaler
 from pymer4.models import Lmer
 scaler = MinMaxScaler()
 import os
+import xgboost as xgb
 import matplotlib.pyplot as plt
 from instruments.helpers.extract_helpers import extractAllFerretData
 import pandas as pd
 import numpy as np
 import rpy2.robjects.numpy2ri
 import pandas as pd
+import sklearn
+from sklearn.model_selection import train_test_split
+
 import rpy2.robjects as ro
 from rpy2.robjects.packages import importr
 from rpy2.robjects import pandas2ri
 
 from rpy2.robjects.conversion import localconverter
-
 rpy2.robjects.numpy2ri.activate()
 from rpy2.robjects.packages import importr
 
@@ -326,7 +329,7 @@ def run_mixed_effects_analysis(ferrets):
 
     dfuse = df[["pitchoftarg", "pitchofprecur", "talker", "side", "precur_and_targ_same",
                 "timeToTarget", "DaysSinceStart", "AM",
-                "realRelReleaseTimes", "ferret", "stepval", "pitchofprecur"]]
+                "realRelReleaseTimes", "ferret", "stepval"]]
     X = df[["pitchoftarg", "pitchofprecur", "talker", "side",
             "timeToTarget", "DaysSinceStart", "AM"]].to_numpy()
 
@@ -521,6 +524,26 @@ def plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use):
     plt.show()
     print(accuracy)
 
+def runxgboostreleasetimes(df_use):
+    col = 'realRelReleaseTimes'
+    dfx = df_use.loc[:, df_use.columns != col]
+
+    X_train, X_test, y_train, y_test = train_test_split(dfx, df_use['realRelReleaseTimes'], test_size=0.2, random_state=42)
+
+    dtrain = xgb.DMatrix(X_train, label=y_train)
+    dtest = xgb.DMatrix(X_test, label=y_test)
+    num_round = 10
+    param = {'max_depth': 2, 'eta': 1, 'objective': 'reg:squarederror'}
+    param['nthread'] = 4
+    param['eval_metric'] = 'auc'
+    evallist = [(dtrain, 'train'), (dtest, 'eval')]
+
+    bst = xgb.train(param, dtrain, num_round, evallist)
+
+    ypred = bst.predict(dtest)
+    xgb.plot_importance(bst)
+    plt.show()
+
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
@@ -528,3 +551,4 @@ if __name__ == '__main__':
         ferrets)
     plotpredictedversusactual(predictedrelease, df_use)
     plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use)
+    runxgboostreleasetimes(df_use)
