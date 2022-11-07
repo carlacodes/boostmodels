@@ -15,6 +15,9 @@ from pymer4.models import Lmer
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import KFold
 from sklearn.model_selection import cross_val_score
+import shap
+import lightgbm as lgb
+
 scaler = MinMaxScaler()
 import os
 import xgboost as xgb
@@ -578,6 +581,65 @@ def runxgboostreleasetimes(df_use):
     print("MSE: %.2f" % (mse))
     print("negative MSE: %.2f%%" % (np.mean(results) * 100.0))
     print(results)
+    shap_values = shap.TreeExplainer(xg_reg).shap_values(X_train)
+    shap.summary_plot(shap_values, X)
+    plt.show()
+    return xg_reg, ypred, y_test, results
+
+def runlgbreleasetimes(df_use):
+    col = 'realRelReleaseTimes'
+    dfx = df_use.loc[:, df_use.columns != col]
+    #remove ferret as possible feature
+    col = 'ferret'
+
+
+    dfx = dfx.loc[:, dfx.columns != col]
+    dfx['pitchoftarg'] = dfx['pitchoftarg'].astype('category')
+    dfx['side'] = dfx['side'].astype('category')
+    dfx['talker'] = dfx['talker'].astype('category')
+    dfx['stepval'] = dfx['stepval'].astype('category')
+    dfx['pitchofprecur'] = dfx['pitchofprecur'].astype('category')
+    dfx['AM'] = dfx['AM'].astype('category')
+    dfx['DaysSinceStart'] = dfx['DaysSinceStart'].astype('category')
+    dfx['precur_and_targ_same'] = dfx['precur_and_targ_same'].astype('category')
+
+
+
+    # dfuse = df[["pitchoftarg", "pitchofprecur", "talker", "side", "precur_and_targ_same",
+    #             "timeToTarget", "DaysSinceStart", "AM",
+    #             "realRelReleaseTimes", "ferret", "stepval"]]
+
+
+
+
+    X_train, X_test, y_train, y_test = train_test_split(dfx, df_use['realRelReleaseTimes'], test_size=0.2, random_state=42)
+
+    dtrain = lgb.Dataset(X_train, label=y_train, enable_categorical=True)
+    dtest = lgb.Dataset(X_test, label=y_test, enable_categorical=True)
+
+    param = {'max_depth': 2, 'eta': 1, 'objective': 'reg:squarederror'}
+    param['nthread'] = 4
+    param['eval_metric'] = 'auc'
+    evallist = [(dtrain, 'train'), (dtest, 'eval')]
+    #bst = xgb.train(param, dtrain, num_round, evallist)
+    xg_reg = lgb.LGBMRegressor(objective='reg:squarederror', colsample_bytree=0.3, learning_rate=0.1,
+                              max_depth=10, alpha=10, n_estimators=10)
+
+    xg_reg.fit(X_train, y_train)
+    ypred = xg_reg.predict(X_test)
+    xgb.plot_importance(xg_reg)
+    plt.show()
+
+    kfold = KFold(n_splits=10)
+    results = cross_val_score(xg_reg, X_train, y_train, scoring ='neg_mean_squared_error', cv=kfold)
+
+    mse = mean_squared_error(ypred, y_test)
+    print("MSE: %.2f" % (mse))
+    print("negative MSE: %.2f%%" % (np.mean(results) * 100.0))
+    print(results)
+    shap_values = shap.TreeExplainer(xg_reg).shap_values(X_train)
+    shap.summary_plot(shap_values, X)
+    plt.show()
     return xg_reg, ypred, y_test, results
 
 
@@ -587,4 +649,4 @@ if __name__ == '__main__':
         ferrets)
     plotpredictedversusactual(predictedrelease, df_use)
     plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use)
-    xg_reg, ypred, y_test, results = runxgboostreleasetimes(df_use)
+    xg_reg, ypred, y_test, results = runlgbreleasetimes(df_use)
