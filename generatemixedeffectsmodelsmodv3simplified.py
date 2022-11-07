@@ -186,8 +186,10 @@ def get_df_behav(path=None,
             pastresponseindex = chosenresponse.values[(i - 1)]
 
             chosentrial = pitchshiftmat.values[i]
-            if isinstance(chosentrial, float):
+            is_all_zero = np.all((chosentrial == 0))
+            if isinstance(chosentrial, float) or is_all_zero:
                 chosentrial = talkermat.values[i].astype(int)
+
 
             chosendisttrial = precursorlist.values[i]
             chosentalker = talkerlist.values[i]
@@ -226,7 +228,7 @@ def get_df_behav(path=None,
 
 
                 if chosentrial[targpos[0] - 1] == 8.0:
-                    pitchofprecur[i] == 3.0
+                    pitchofprecur[i] == 3
                 else:
                     pitchofprecur[i] = chosentrial[targpos[0] - 1]
                     # 1 is 191, 2 is 124, 3 is 144hz female, 5 is 251, 8 is 144hz male, 13 is109hz male
@@ -247,18 +249,18 @@ def get_df_behav(path=None,
                     precur_and_targ_same[i] = 1
                 else:
                     precur_and_targ_same[i] = 0
-                # if pitchofprecur[i] == 1.0:
-                #     pitchofprecur[i] = 4.0
-                #
-                # if pitchofprecur[i] == 13.0:
-                #     pitchofprecur[i] = 1.0
-                #
-                # if pitchoftarg[i] == 1.0:
-                #     print('pitch of targ original')
-                #     pitchoftarg[i] = 4.0
-                #
-                # if pitchoftarg[i] == 13.0:
-                #     pitchoftarg[i] = 1.0
+                if pitchofprecur[i] == 1.0:
+                    pitchofprecur[i] = 4.0
+
+                if pitchofprecur[i] == 13.0:
+                    pitchofprecur[i] = 1.0
+
+                if pitchoftarg[i] == 1.0:
+                    #print('pitch of targ original')
+                    pitchoftarg[i] = 4.0
+
+                if pitchoftarg[i] == 13.0:
+                    pitchoftarg[i] = 1.0
 
 
 
@@ -282,6 +284,8 @@ def get_df_behav(path=None,
 
         pitchoftarg = pitchoftarg[~np.isnan(pitchoftarg)]
         pitchoftarg = pitchoftarg.astype(int)
+        pitchofprecur = pitchofprecur[~np.isnan(pitchofprecur)]
+        pitchofprecur = pitchofprecur.astype(int)
         gradinpitch = gradinpitch[~np.isnan(gradinpitch)]
 
         correctresp = correctresp[~np.isnan(correctresp)]
@@ -313,8 +317,11 @@ def get_df_behav(path=None,
         correctresp = correctresp.astype(int)
         pastcatchtrial = pastcatchtrial.astype(int)
         pastcorrectresp = pastcorrectresp.astype(int)
-        pitchoftarg[pitchoftarg == 1] = 4
-        pitchoftarg[pitchoftarg == 13] = 1
+        # pitchoftarg[pitchoftarg == 1] = 4
+        # pitchoftarg[pitchoftarg == 13] = 1
+        #
+        # pitchofprecur[pitchofprecur == 1] = 4
+        # pitchofprecur[pitchofprecur == 13] = 1
 
         newdata['correctresp'] = correctresp.tolist()
         # print(len(pastcorrectresp))
@@ -332,6 +339,8 @@ def get_df_behav(path=None,
         # only look at v2 pitches from recent experiments
         newdata = newdata[(newdata.pitchoftarg == 1) | (newdata.pitchoftarg == 2) | (newdata.pitchoftarg == 3) | (
                 newdata.pitchoftarg == 4) | (newdata.pitchoftarg == 5)]
+        newdata = newdata[(newdata.pitchofprecur == 1) | (newdata.pitchofprecur == 2) | (newdata.pitchofprecur == 3) | (
+                newdata.pitchofprecur == 4) | (newdata.pitchofprecur == 5)]
 
         newdata = newdata[(newdata.correctionTrial == 0)]  # | (allData.response == 7)
         newdata = newdata[(newdata.currAtten == 0)]  # | (allData.response == 7)
