@@ -540,7 +540,7 @@ def runxgboostreleasetimes(df_use):
     X_train, X_test, y_train, y_test = train_test_split(dfx, df_use['realRelReleaseTimes'], test_size=0.2, random_state=42)
 
     dtrain = xgb.DMatrix(X_train, label=y_train, enable_categorical=True)
-    dtest = xgb.DMatrix(X_test, label=y_test)
+    dtest = xgb.DMatrix(X_test, label=y_test, enable_categorical=True)
 
     param = {'max_depth': 2, 'eta': 1, 'objective': 'reg:squarederror'}
     param['nthread'] = 4
