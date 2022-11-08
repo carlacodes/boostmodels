@@ -20,7 +20,8 @@ import shap
 import lightgbm as lgb
 import optuna
 from optuna.integration import LightGBMPruningCallback
-
+from sklearn.metrics import log_loss
+from sklearn.model_selection import StratifiedKFold
 scaler = MinMaxScaler()
 import os
 import xgboost as xgb
@@ -48,42 +49,6 @@ performance = importr('performance')
 rstats = importr('stats')
 
 
-def cli_behaviour_week(path=None,
-                       output=None,
-                       ferrets=None,
-                       day=None):
-    if output is None:
-        output = behaviourOutput
-
-    if path is None:
-        path = behaviouralDataPath
-
-    dataSet = WeekBehaviourDataSet(filepath=path,
-                                   outDir=output,
-                                   ferrets=ferrets,
-                                   day=day)
-
-    if ferrets is not None:
-        ferrets = [ferrets]
-    else:
-        ferrets = [ferret for ferret in next(os.walk(db_path))[1] if ferret.startswith('F')]
-
-    allData = dataSet._load()
-    for ferret in ferrets:
-        ferretFigs = createWeekBehaviourFigs(allData, ferret)
-        dataSet._save(figs=ferretFigs)
-
-
-#
-# cli.add_command(cli_behaviour_week)
-
-
-# @click.command(name='reaction_time')
-# @click.option('--path', '-p', type=click.Path(exists=True))
-# @click.option('--output', '-o', type=click.Path(exists=False))
-# @click.option('--ferrets', '-f', default=None)
-# @click.option('--startdate', '-sta', default=None)
-# @click.option('--finishdate', '-sto', default=None)
 def cli_reaction_time(path=None,
                       output=None,
                       ferrets=None,
@@ -611,7 +576,7 @@ def runxgboostreleasetimes(df_use):
     print("negative MSE: %.2f%%" % (np.mean(results) * 100.0))
     print(results)
     shap_values = shap.TreeExplainer(xg_reg).shap_values(X_train)
-    shap.summary_plot(shap_values, X)
+    shap.summary_plot(shap_values, X_train)
     plt.show()
     return xg_reg, ypred, y_test, results
 
@@ -722,7 +687,6 @@ def runlgbcorrectresponse(dfcat_use):
     shap_values2 = explainer(dfx)
     fig, ax = plt.subplots(figsize=(15,15))
     shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "precur_and_targ_same"])
-    ax.set_yticklabels(rotation=0, fontsize=3)
 
     fig.tight_layout()
     plt.tight_layout()
@@ -769,7 +733,7 @@ def objective(trial, X, y):
         X_train, X_test = X.iloc[train_idx], X.iloc[test_idx]
         y_train, y_test = y[train_idx], y[test_idx]
 
-        model = lgbm.LGBMClassifier(objective="binary", **param_grid)
+        model = lgb.LGBMClassifier(objective="binary", random_state=42, **param_grid)
         model.fit(
             X_train,
             y_train,
@@ -796,6 +760,7 @@ def run_optuna_study_correctresp(X,y):
 
     for key, value in study.best_params.items():
         print(f"\t\t{key}: {value}")
+
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
     modelreg_reduc, modelregcat_reduc, modelregcat, modelreg, predictedrelease, df_use, dfcat_use, predictedcorrectresp, explainedvar, explainvarreleasetime = run_mixed_effects_analysis(
