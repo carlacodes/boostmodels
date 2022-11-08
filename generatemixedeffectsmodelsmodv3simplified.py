@@ -22,6 +22,7 @@ import optuna
 from optuna.integration import LightGBMPruningCallback
 from sklearn.metrics import log_loss
 from sklearn.model_selection import StratifiedKFold
+
 scaler = MinMaxScaler()
 import os
 import xgboost as xgb
@@ -39,6 +40,7 @@ from rpy2.robjects.packages import importr
 from rpy2.robjects import pandas2ri
 
 from rpy2.robjects.conversion import localconverter
+
 rpy2.robjects.numpy2ri.activate()
 from rpy2.robjects.packages import importr
 
@@ -129,8 +131,8 @@ def get_df_behav(path=None,
         chosenresponse = newdata['response']
         realrelreleasetimelist = newdata['realRelReleaseTimes']
         pitchoftarg = np.empty(len(pitchshiftmat))
-        pitchofprecur = np.empty(len(pitchshiftmat) )
-        stepval = np.empty(len(pitchshiftmat) )
+        pitchofprecur = np.empty(len(pitchshiftmat))
+        stepval = np.empty(len(pitchshiftmat))
         gradinpitch = np.empty(len(pitchshiftmat))
         gradinpitchprecur = np.empty(len(pitchshiftmat))
         timetotarglist = np.empty(len(pitchshiftmat))
@@ -158,7 +160,6 @@ def get_df_behav(path=None,
             if isinstance(chosentrial, float) or is_all_zero:
                 chosentrial = talkermat.values[i].astype(int)
 
-
             chosendisttrial = precursorlist.values[i]
             chosentalker = talkerlist.values[i]
             if chosentalker == 3:
@@ -178,7 +179,8 @@ def get_df_behav(path=None,
             else:
                 correctresp = np.append(correctresp, 0)
 
-            if ((pastresponseindex == 0 or pastresponseindex == 1) and pastrealrelreleasetime >= 0) or pastresponseindex == 3:
+            if ((
+                        pastresponseindex == 0 or pastresponseindex == 1) and pastrealrelreleasetime >= 0) or pastresponseindex == 3:
                 pastcorrectresp = np.append(pastcorrectresp, 1)
             else:
                 pastcorrectresp = np.append(pastcorrectresp, 0)
@@ -192,8 +194,6 @@ def get_df_behav(path=None,
                     pitchoftarg[i] == 3.0
                 else:
                     pitchoftarg[i] = chosentrial[targpos[0]]
-
-
 
                 if chosentrial[targpos[0] - 1] == 8.0:
                     pitchofprecur[i] == 3
@@ -224,7 +224,7 @@ def get_df_behav(path=None,
                     pitchofprecur[i] = 1.0
 
                 if pitchoftarg[i] == 1.0:
-                    #print('pitch of targ original')
+                    # print('pitch of targ original')
                     pitchoftarg[i] = 4.0
 
                 if pitchoftarg[i] == 13.0:
@@ -233,33 +233,33 @@ def get_df_behav(path=None,
 
 
             except:
-                #print(len(newdata))
+                # print(len(newdata))
                 indexdrop = newdata.iloc[i].name
-                droplist = np.append(droplist, i-1)
+                droplist = np.append(droplist, i - 1)
                 ##arrays START AT 0, but the index starts at 1, so the index is 1 less than the array
                 droplistnew = np.append(droplistnew, indexdrop)
                 continue
-        #newdata.drop(0, axis=0, inplace=True)  # drop first trial for each animal
-        #accidentally dropping all catch trials?
+        # newdata.drop(0, axis=0, inplace=True)  # drop first trial for each animal
+        # accidentally dropping all catch trials?
         ##TODO: CHECK THIS
         newdata.drop(index=newdata.index[0],
-                axis=0,
-                inplace=True)
+                     axis=0,
+                     inplace=True)
         newdata.drop(droplistnew, axis=0, inplace=True)
 
         # TODO: CHECK IF DATA IS EXTRACTED SEQUENTIALLY SO TRIAL NUMS ARE CONCATENATED CORRECTLY
         droplist = [int(x) for x in droplist]  # drop corrupted metdata trials
 
-        pitchoftarg = pitchoftarg[~np.isnan(pitchoftarg)]
+        #pitchoftarg = pitchoftarg[~np.isnan(pitchoftarg)]
         pitchoftarg = pitchoftarg.astype(int)
-        pitchofprecur = pitchofprecur[~np.isnan(pitchofprecur)]
+        #pitchofprecur = pitchofprecur[~np.isnan(pitchofprecur)]
         pitchofprecur = pitchofprecur.astype(int)
-        gradinpitch = gradinpitch[~np.isnan(gradinpitch)]
+        #gradinpitch = gradinpitch[~np.isnan(gradinpitch)]
 
         correctresp = correctresp[~np.isnan(correctresp)]
-        pastcorrectresp = pastcorrectresp[~np.isnan(pastcorrectresp)]
+        #pastcorrectresp = pastcorrectresp[~np.isnan(pastcorrectresp)]
 
-        pastcatchtrial = pastcatchtrial[~np.isnan(pastcatchtrial)]
+        #pastcatchtrial = pastcatchtrial[~np.isnan(pastcatchtrial)]
 
         pitchoftarg = np.delete(pitchoftarg, 0)
         talkerlist2 = np.delete(talkerlist2, 0)
@@ -329,7 +329,7 @@ def run_mixed_effects_analysis(ferrets):
 
     dfuse = df[["pitchoftarg", "pitchofprecur", "talker", "side", "precur_and_targ_same",
                 "timeToTarget", "DaysSinceStart", "AM",
-                "realRelReleaseTimes", "ferret", "stepval", "pastcorrectresp", "pastcatchtrial","trialNum" ]]
+                "realRelReleaseTimes", "ferret", "stepval", "pastcorrectresp", "pastcatchtrial", "trialNum"]]
     X = df[["pitchoftarg", "pitchofprecur", "talker", "side",
             "timeToTarget", "DaysSinceStart", "AM"]].to_numpy()
 
@@ -524,10 +524,11 @@ def plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use):
     plt.show()
     print(accuracy)
 
+
 def runxgboostreleasetimes(df_use):
     col = 'realRelReleaseTimes'
     dfx = df_use.loc[:, df_use.columns != col]
-    #remove ferret as possible feature
+    # remove ferret as possible feature
     col = 'ferret'
 
     dfx = dfx.loc[:, dfx.columns != col]
@@ -540,16 +541,12 @@ def runxgboostreleasetimes(df_use):
     dfx['DaysSinceStart'] = dfx['DaysSinceStart'].astype('category')
     dfx['precur_and_targ_same'] = dfx['precur_and_targ_same'].astype('category')
 
-
-
     # dfuse = df[["pitchoftarg", "pitchofprecur", "talker", "side", "precur_and_targ_same",
     #             "timeToTarget", "DaysSinceStart", "AM",
     #             "realRelReleaseTimes", "ferret", "stepval"]]
 
-
-
-
-    X_train, X_test, y_train, y_test = train_test_split(dfx, df_use['realRelReleaseTimes'], test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(dfx, df_use['realRelReleaseTimes'], test_size=0.2,
+                                                        random_state=42)
 
     dtrain = xgb.DMatrix(X_train, label=y_train, enable_categorical=True)
     dtest = xgb.DMatrix(X_test, label=y_test, enable_categorical=True)
@@ -559,8 +556,9 @@ def runxgboostreleasetimes(df_use):
     param['eval_metric'] = 'auc'
     evallist = [(dtrain, 'train'), (dtest, 'eval')]
 
-    #bst = xgb.train(param, dtrain, num_round, evallist)
-    xg_reg = xgb.XGBRegressor(tree_method= 'gpu_hist', objective='reg:squarederror', colsample_bytree=0.3, learning_rate=0.1,
+    # bst = xgb.train(param, dtrain, num_round, evallist)
+    xg_reg = xgb.XGBRegressor(tree_method='gpu_hist', objective='reg:squarederror', colsample_bytree=0.3,
+                              learning_rate=0.1,
                               max_depth=10, alpha=10, n_estimators=10, enable_categorical=True)
 
     xg_reg.fit(X_train, y_train)
@@ -569,7 +567,7 @@ def runxgboostreleasetimes(df_use):
     plt.show()
 
     kfold = KFold(n_splits=10)
-    results = cross_val_score(xg_reg, X_train, y_train, scoring ='neg_mean_squared_error', cv=kfold)
+    results = cross_val_score(xg_reg, X_train, y_train, scoring='neg_mean_squared_error', cv=kfold)
 
     mse = mean_squared_error(ypred, y_test)
     print("MSE: %.2f" % (mse))
@@ -580,16 +578,17 @@ def runxgboostreleasetimes(df_use):
     plt.show()
     return xg_reg, ypred, y_test, results
 
+
 def runlgbreleasetimes(df_use):
     col = 'realRelReleaseTimes'
     dfx = df_use.loc[:, df_use.columns != col]
-    #remove ferret as possible feature
+    # remove ferret as possible feature
     col = 'ferret'
-
 
     dfx = dfx.loc[:, dfx.columns != col]
 
-    X_train, X_test, y_train, y_test = train_test_split(dfx, df_use['realRelReleaseTimes'], test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(dfx, df_use['realRelReleaseTimes'], test_size=0.2,
+                                                        random_state=42)
 
     dtrain = lgb.Dataset(X_train, label=y_train)
     dtest = lgb.Dataset(X_test, label=y_test)
@@ -598,9 +597,9 @@ def runlgbreleasetimes(df_use):
     param['nthread'] = 4
     param['eval_metric'] = 'auc'
     evallist = [(dtrain, 'train'), (dtest, 'eval')]
-    #bst = xgb.train(param, dtrain, num_round, evallist)
-    xg_reg = lgb.LGBMRegressor( colsample_bytree=0.3, learning_rate=0.1,
-                              max_depth=10, alpha=10, n_estimators=10)
+    # bst = xgb.train(param, dtrain, num_round, evallist)
+    xg_reg = lgb.LGBMRegressor(colsample_bytree=0.3, learning_rate=0.1,
+                               max_depth=10, alpha=10, n_estimators=10)
 
     xg_reg.fit(X_train, y_train)
     ypred = xg_reg.predict(X_test)
@@ -608,7 +607,7 @@ def runlgbreleasetimes(df_use):
     plt.show()
 
     kfold = KFold(n_splits=10)
-    results = cross_val_score(xg_reg, X_train, y_train, scoring ='neg_mean_squared_error', cv=kfold)
+    results = cross_val_score(xg_reg, X_train, y_train, scoring='neg_mean_squared_error', cv=kfold)
 
     mse = mean_squared_error(ypred, y_test)
     print("MSE: %.2f" % (mse))
@@ -617,7 +616,7 @@ def runlgbreleasetimes(df_use):
     shap_values = shap.TreeExplainer(xg_reg).shap_values(dfx)
     shap.summary_plot(shap_values, dfx)
     plt.show()
-    shap.dependence_plot("timeToTarget", shap_values, dfx)#
+    shap.dependence_plot("timeToTarget", shap_values, dfx)  #
     plt.show()
 
     explainer = shap.Explainer(xg_reg, dfx)
@@ -632,16 +631,18 @@ def runlgbreleasetimes(df_use):
     shap.plots.scatter(shap_values2[:, "pitchoftarg"], color=shap_values2[:, "talker"])
     plt.title('Reaction Time Model')
     plt.show()
-    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"], title='Correct Responses - Reaction Time Model SHAP response \n vs. trial number')
+    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"],
+                       title='Correct Responses - Reaction Time Model SHAP response \n vs. trial number')
 
     plt.show()
 
     return xg_reg, ypred, y_test, results
 
+
 def runlgbcorrectresponse(dfcat_use):
     col = 'correctresp'
     dfx = dfcat_use.loc[:, dfcat_use.columns != col]
-    #remove ferret as possible feature
+    # remove ferret as possible feature
     col = 'ferret'
     dfx = dfx.loc[:, dfx.columns != col]
     col = 'pitchofprecur'
@@ -656,8 +657,30 @@ def runlgbcorrectresponse(dfcat_use):
     # param['nthread'] = 4
     # param['eval_metric'] = 'auc'
     evallist = [(dtrain, 'train'), (dtest, 'eval')]
-    xg_reg = lgb.LGBMClassifier(colsample_bytree=0.3, learning_rate=0.1,
-                              max_depth=10, alpha=10, n_estimators=10)
+    params2 = {"n_estimators": [10000],
+              "learning_rate": [0.06977031132379583],
+              "num_leaves": [2320],
+              "max_depth": [12],
+              "min_data_in_leaf": [1800],
+              "lambda_l1": [80],
+              "lambda_l2": [80],
+              "min_gain_to_split": [2.9236711561123263],
+              "bagging_fraction": [0.9],
+              "bagging_freq": [1],
+              "feature_fraction": [0.9]}
+    #		n_estimators: 10000
+		# learning_rate: 0.2540226146383017
+		# num_leaves: 1940
+		# max_depth: 4
+		# min_data_in_leaf: 200
+		# lambda_l1: 0
+		# lambda_l2: 80
+		# min_gain_to_split: 3.8658315563123966
+		# bagging_fraction: 0.9
+		# bagging_freq: 1
+		# feature_fraction: 0.2
+
+    xg_reg = lgb.LGBMClassifier(colsample_bytree=0.3,  alpha=10, n_estimators=10, learning_rate=params2['learning_rate'], num_leaves=params2['num_leaves'], max_depth=params2['max_depth'], min_data_in_leaf=params2['min_data_in_leaf'], lambda_l1=params2['lambda_l1'], lambda_l2=params2['lambda_l2'], min_gain_to_split=params2['min_gain_to_split'], bagging_fraction=params2['bagging_fraction'], bagging_freq=params2['bagging_freq'], feature_fraction=params2['feature_fraction'])
 
     xg_reg.fit(X_train, y_train)
     ypred = xg_reg.predict(X_test)
@@ -665,26 +688,26 @@ def runlgbcorrectresponse(dfcat_use):
     plt.show()
 
     kfold = KFold(n_splits=10)
-    results = cross_val_score(xg_reg, X_train, y_train, scoring ='accuracy', cv=kfold)
+    results = cross_val_score(xg_reg, X_train, y_train, scoring='accuracy', cv=kfold)
     print("Accuracy: %.2f%%" % (np.mean(results) * 100.0))
     print(results)
     shap_values = shap.TreeExplainer(xg_reg).shap_values(dfx)
     shap.summary_plot(shap_values, dfx)
     plt.show()
-    shap.dependence_plot("pitchoftarg", shap_values[0], dfx)#
+    shap.dependence_plot("pitchoftarg", shap_values[0], dfx)  #
     plt.show()
     result = permutation_importance(xg_reg, X_test, y_test, n_repeats=10,
                                     random_state=42, n_jobs=2)
     sorted_idx = result.importances_mean.argsort()
 
-    fig, ax = plt.subplots(figsize=(15,15))
+    fig, ax = plt.subplots(figsize=(15, 15))
     ax.barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T)
     ax.set_title("Permutation Importances (test set)")
     fig.tight_layout()
     plt.show()
     explainer = shap.Explainer(xg_reg, dfx)
     shap_values2 = explainer(dfx)
-    fig, ax = plt.subplots(figsize=(15,15))
+    fig, ax = plt.subplots(figsize=(15, 15))
     shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "precur_and_targ_same"])
 
     fig.tight_layout()
@@ -694,7 +717,6 @@ def runlgbcorrectresponse(dfcat_use):
     plt.show()
     shap.plots.scatter(shap_values2[:, "pitchoftarg"], color=shap_values2[:, "talker"])
     plt.show()
-
 
     shap.plots.scatter(shap_values2[:, "pitchoftarg"], color=shap_values2[:, "precur_and_targ_same"])
     plt.show()
@@ -729,7 +751,7 @@ def objective(trial, X, y):
 
     cv_scores = np.empty(5)
     for idx, (train_idx, test_idx) in enumerate(cv.split(X, y)):
-        X_train, X_test = X.iloc[train_idx], X.iloc[test_idx]
+        X_train, X_test = X[train_idx], X[test_idx]
         y_train, y_test = y[train_idx], y[test_idx]
 
         model = lgb.LGBMClassifier(objective="binary", random_state=42, **param_grid)
@@ -749,16 +771,18 @@ def objective(trial, X, y):
     return np.mean(cv_scores)
 
 
-def run_optuna_study_correctresp(X,y):
+def run_optuna_study_correctresp(X, y):
     study = optuna.create_study(direction="minimize", study_name="LGBM Classifier")
     func = lambda trial: objective(trial, X, y)
-    study.optimize(func, n_trials=20)
+    study.optimize(func, n_trials=100)
     print("Number of finished trials: ", len(study.trials))
     print(f"\tBest value (rmse): {study.best_value:.5f}")
     print(f"\tBest params:")
 
     for key, value in study.best_params.items():
         print(f"\t\t{key}: {value}")
+    return study
+
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
@@ -767,6 +791,6 @@ if __name__ == '__main__':
     plotpredictedversusactual(predictedrelease, df_use)
     plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use)
     xg_reg, ypred, y_test, results = runlgbreleasetimes(df_use)
-    xg_reg2, ypred2, y_test2, results2,shap_values, X_train, y_train = runlgbcorrectresponse(dfcat_use)
-    run_optuna_study_correctresp(X_train.to_numpy(), y_train.to_numpy())
 
+    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train = runlgbcorrectresponse(dfcat_use)
+    study = run_optuna_study_correctresp(X_train.to_numpy(), y_train.to_numpy())
