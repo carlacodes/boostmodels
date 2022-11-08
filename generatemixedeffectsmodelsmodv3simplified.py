@@ -693,16 +693,23 @@ def runlgbcorrectresponse(dfcat_use):
                                     random_state=42, n_jobs=2)
     sorted_idx = result.importances_mean.argsort()
 
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(15,15))
     ax.barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T)
     ax.set_title("Permutation Importances (test set)")
     fig.tight_layout()
     plt.show()
     explainer = shap.Explainer(xg_reg, dfx)
-    shap_values2= explainer(dfx)
-    shap.plots.scatter(shap_values2[:, "talker"])
+    shap_values2 = explainer(dfx)
+    fig, ax = plt.subplots(figsize=(15,15))
+    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "precur_and_targ_same"])
+    ax.set_yticklabels(rotation=0, fontsize=3)
+
+    fig.tight_layout()
+    plt.tight_layout()
+    plt.subplots_adjust(left=-10, right=0.5)
+
     plt.show()
-    shap.plots.scatter(shap_values2[:, "precur_and_targ_same"])
+    shap.plots.scatter(shap_values2[:, "precur_and_targ_same"], color=shap_values2[:, "talker"])
     plt.show()
 
     return xg_reg, ypred, y_test, results, shap_values
