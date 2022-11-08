@@ -653,6 +653,25 @@ def runlgbreleasetimes(df_use):
     shap.dependence_plot("timeToTarget", shap_values, dfx)#
     plt.show()
 
+    explainer = shap.Explainer(xg_reg, dfx)
+    shap_values2 = explainer(dfx)
+    fig, ax = plt.subplots(figsize=(15, 15))
+    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "precur_and_targ_same"])
+    fig.tight_layout()
+
+    plt.subplots_adjust(left=-10, right=0.5)
+
+    plt.show()
+    shap.plots.scatter(shap_values2[:, "pitchoftarg"], color=shap_values2[:, "talker"])
+    plt.title('Reaction Time Model')
+    plt.show()
+    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"])
+    plt.title('Reaction Time Model')
+
+    plt.show()
+
+
+
     return xg_reg, ypred, y_test, results
 def runlgbcorrectresponse(dfcat_use):
     col = 'correctresp'
@@ -709,6 +728,13 @@ def runlgbcorrectresponse(dfcat_use):
     plt.subplots_adjust(left=-10, right=0.5)
 
     plt.show()
+    shap.plots.scatter(shap_values2[:, "pitchoftarg"], color=shap_values2[:, "talker"])
+    plt.show()
+
+
+    shap.plots.scatter(shap_values2[:, "pitchoftarg"], color=shap_values2[:, "precur_and_targ_same"])
+    plt.show()
+
     shap.plots.scatter(shap_values2[:, "precur_and_targ_same"], color=shap_values2[:, "talker"])
     plt.show()
 
