@@ -636,9 +636,8 @@ def runlgbreleasetimes(df_use):
 
     plt.show()
 
-
-
     return xg_reg, ypred, y_test, results
+
 def runlgbcorrectresponse(dfcat_use):
     col = 'correctresp'
     dfx = dfcat_use.loc[:, dfcat_use.columns != col]
@@ -769,5 +768,5 @@ if __name__ == '__main__':
     plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use)
     xg_reg, ypred, y_test, results = runlgbreleasetimes(df_use)
     xg_reg2, ypred2, y_test2, results2,shap_values, X_train, y_train = runlgbcorrectresponse(dfcat_use)
-    run_optuna_study_correctresp(X_train, y_train)
+    run_optuna_study_correctresp(X_train.to_numpy(), y_train.to_numpy())
 
