@@ -739,7 +739,7 @@ def runlgbcorrectresponse(dfcat_use):
     shap.plots.scatter(shap_values2[:, "precur_and_targ_same"], color=shap_values2[:, "talker"])
     plt.show()
 
-    return xg_reg, ypred, y_test, results, shap_values
+    return xg_reg, ypred, y_test, results, shap_values, X_train, y_train
 
 
 def objective(trial, X, y):
@@ -803,5 +803,6 @@ if __name__ == '__main__':
     plotpredictedversusactual(predictedrelease, df_use)
     plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use)
     xg_reg, ypred, y_test, results = runlgbreleasetimes(df_use)
-    xg_reg2, ypred2, y_test2, results2,shap_values = runlgbcorrectresponse(dfcat_use)
+    xg_reg2, ypred2, y_test2, results2,shap_values, X_train, y_train = runlgbcorrectresponse(dfcat_use)
+    run_optuna_study_correctresp(X_train, y_train)
 
