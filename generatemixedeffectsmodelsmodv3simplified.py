@@ -726,13 +726,14 @@ def runlgbcorrectresponse(dfcat_use):
     return xg_reg, ypred, y_test, results, shap_values, X_train, y_train
 
 
-def objective(trial, X, y):
+def objective(trial, X, y, coeffofweight):
     param_grid = {
         # "device_type": trial.suggest_categorical("device_type", ['gpu']),
+        "scale_pos_weight": trial.suggest_categorical("scale_pos_weight", [coeffofweight]),
         "n_estimators": trial.suggest_categorical("n_estimators", [10000]),
         "learning_rate": trial.suggest_float("learning_rate", 0.0001, 0.3),
         "num_leaves": trial.suggest_int("num_leaves", 20, 3000, step=10),
-        "max_depth": trial.suggest_int("max_depth", 3, 12),
+        "max_depth": trial.suggest_int("max_depth", 3, 20),
         "min_data_in_leaf": trial.suggest_int("min_data_in_leaf", 200, 10000, step=100),
         "lambda_l1": trial.suggest_int("lambda_l1", 0, 100, step=2),
         "lambda_l2": trial.suggest_int("lambda_l2", 0, 100, step=2),
@@ -753,15 +754,15 @@ def objective(trial, X, y):
         X_train, X_test = X[train_idx], X[test_idx]
         y_train, y_test = y[train_idx], y[test_idx]
 
-        model = lgb.LGBMClassifier(objective="binary", random_state=42, **param_grid)
+        model = lgb.LGBMClassifier(objective="binary_logloss", random_state=42, **param_grid)
         model.fit(
             X_train,
             y_train,
             eval_set=[(X_test, y_test)],
-            eval_metric="average_precision",
-            early_stopping_rounds=200,
+            eval_metric="binary_error",
+            early_stopping_rounds=500,
             callbacks=[
-                LightGBMPruningCallback(trial, "average_precision")
+                LightGBMPruningCallback(trial, "binary_logloss")
             ],  # Add a pruning callback
         )
         preds = model.predict_proba(X_test)
@@ -770,10 +771,10 @@ def objective(trial, X, y):
     return np.mean(cv_scores)
 
 
-def run_optuna_study_correctresp(X, y):
-    study = optuna.create_study(direction="maximize", study_name="LGBM Classifier")
-    func = lambda trial: objective(trial, X, y)
-    study.optimize(func, n_trials=1000)
+def run_optuna_study_correctresp(X, y, coeffofweight):
+    study = optuna.create_study(direction="minimize", study_name="LGBM Classifier")
+    func = lambda trial: objective(trial, X, y, coeffofweight)
+    study.optimize(func, n_trials=500)
     print("Number of finished trials: ", len(study.trials))
     print(f"\tBest value: {study.best_value:.5f}")
     print(f"\tBest params:")
@@ -790,6 +791,6 @@ if __name__ == '__main__':
     plotpredictedversusactual(predictedrelease, df_use)
     plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use)
     xg_reg, ypred, y_test, results = runlgbreleasetimes(df_use)
-
+    coeffofweight = len(dfcat_use[dfcat_use['correctresp'] == 0]) / len(dfcat_use[dfcat_use['correctresp'] == 1])
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train = runlgbcorrectresponse(dfcat_use)
-    study = run_optuna_study_correctresp(X_train.to_numpy(), y_train.to_numpy())
+    study = run_optuna_study_correctresp(X_train.to_numpy(), y_train.to_numpy(), coeffofweight)
