@@ -754,12 +754,12 @@ def objective(trial, X, y, coeffofweight):
         X_train, X_test = X[train_idx], X[test_idx]
         y_train, y_test = y[train_idx], y[test_idx]
 
-        model = lgb.LGBMClassifier(objective="binary_logloss", random_state=42, **param_grid)
+        model = lgb.LGBMClassifier(objective="binary", random_state=42, **param_grid)
         model.fit(
             X_train,
             y_train,
             eval_set=[(X_test, y_test)],
-            eval_metric="binary_error",
+            eval_metric="binary_logloss",
             early_stopping_rounds=500,
             callbacks=[
                 LightGBMPruningCallback(trial, "binary_logloss")
