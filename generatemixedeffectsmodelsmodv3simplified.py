@@ -658,28 +658,27 @@ def runlgbcorrectresponse(dfcat_use):
     # param['eval_metric'] = 'auc'
     evallist = [(dtrain, 'train'), (dtest, 'eval')]
     params2 = {"n_estimators": [10000],
-              "learning_rate": [0.06977031132379583],
-              "num_leaves": [2320],
-              "max_depth": [12],
-              "min_data_in_leaf": [1800],
-              "lambda_l1": [80],
-              "lambda_l2": [80],
-              "min_gain_to_split": [2.9236711561123263],
-              "bagging_fraction": [0.9],
+              "learning_rate": [0.13122993837755098],
+              "num_leaves": [920],
+              "max_depth": [3],
+              "min_data_in_leaf": [600],
+              "lambda_l1": [0],
+              "lambda_l2": [15],
+              "min_gain_to_split": [5.47804091648],
+              "bagging_fraction": [0.5],
               "bagging_freq": [1],
-              "feature_fraction": [0.9]}
-    #		n_estimators: 10000
-		# learning_rate: 0.2540226146383017
-		# num_leaves: 1940
-		# max_depth: 4
-		# min_data_in_leaf: 200
-		# lambda_l1: 0
-		# lambda_l2: 80
-		# min_gain_to_split: 3.8658315563123966
-		# bagging_fraction: 0.9
-		# bagging_freq: 1
-		# feature_fraction: 0.2
-
+              "feature_fraction": [0.8]}
+    # n_estimators: 10000
+    # learning_rate: 0.13122993837755098
+    # num_leaves: 920
+    # max_depth: 3
+    # min_data_in_leaf: 600
+    # lambda_l1: 0
+    # lambda_l2: 15
+    # min_gain_to_split: 5.478040916480662
+    # bagging_fraction: 0.5
+    # bagging_freq: 1
+    # feature_fraction: 0.8
     xg_reg = lgb.LGBMClassifier(colsample_bytree=0.3,  alpha=10, n_estimators=10, learning_rate=params2['learning_rate'], num_leaves=params2['num_leaves'], max_depth=params2['max_depth'], min_data_in_leaf=params2['min_data_in_leaf'], lambda_l1=params2['lambda_l1'], lambda_l2=params2['lambda_l2'], min_gain_to_split=params2['min_gain_to_split'], bagging_fraction=params2['bagging_fraction'], bagging_freq=params2['bagging_freq'], feature_fraction=params2['feature_fraction'])
 
     xg_reg.fit(X_train, y_train)
@@ -688,7 +687,7 @@ def runlgbcorrectresponse(dfcat_use):
     plt.show()
 
     kfold = KFold(n_splits=10)
-    results = cross_val_score(xg_reg, X_train, y_train, scoring='accuracy', cv=kfold)
+    results = cross_val_score(xg_reg, X_train, y_train, scoring='balanced_accuracy', cv=kfold)
     print("Accuracy: %.2f%%" % (np.mean(results) * 100.0))
     print(results)
     shap_values = shap.TreeExplainer(xg_reg).shap_values(dfx)
@@ -731,12 +730,12 @@ def objective(trial, X, y):
     param_grid = {
         # "device_type": trial.suggest_categorical("device_type", ['gpu']),
         "n_estimators": trial.suggest_categorical("n_estimators", [10000]),
-        "learning_rate": trial.suggest_float("learning_rate", 0.01, 0.3),
-        "num_leaves": trial.suggest_int("num_leaves", 20, 3000, step=20),
+        "learning_rate": trial.suggest_float("learning_rate", 0.0001, 0.3),
+        "num_leaves": trial.suggest_int("num_leaves", 20, 3000, step=10),
         "max_depth": trial.suggest_int("max_depth", 3, 12),
         "min_data_in_leaf": trial.suggest_int("min_data_in_leaf", 200, 10000, step=100),
-        "lambda_l1": trial.suggest_int("lambda_l1", 0, 100, step=5),
-        "lambda_l2": trial.suggest_int("lambda_l2", 0, 100, step=5),
+        "lambda_l1": trial.suggest_int("lambda_l1", 0, 100, step=2),
+        "lambda_l2": trial.suggest_int("lambda_l2", 0, 100, step=2),
         "min_gain_to_split": trial.suggest_float("min_gain_to_split", 0, 15),
         "bagging_fraction": trial.suggest_float(
             "bagging_fraction", 0.2, 0.95, step=0.1
@@ -759,10 +758,10 @@ def objective(trial, X, y):
             X_train,
             y_train,
             eval_set=[(X_test, y_test)],
-            eval_metric="binary_logloss",
-            early_stopping_rounds=100,
+            eval_metric="average_precision",
+            early_stopping_rounds=200,
             callbacks=[
-                LightGBMPruningCallback(trial, "binary_logloss")
+                LightGBMPruningCallback(trial, "average_precision")
             ],  # Add a pruning callback
         )
         preds = model.predict_proba(X_test)
@@ -772,11 +771,11 @@ def objective(trial, X, y):
 
 
 def run_optuna_study_correctresp(X, y):
-    study = optuna.create_study(direction="minimize", study_name="LGBM Classifier")
+    study = optuna.create_study(direction="maximize", study_name="LGBM Classifier")
     func = lambda trial: objective(trial, X, y)
-    study.optimize(func, n_trials=100)
+    study.optimize(func, n_trials=1000)
     print("Number of finished trials: ", len(study.trials))
-    print(f"\tBest value (rmse): {study.best_value:.5f}")
+    print(f"\tBest value: {study.best_value:.5f}")
     print(f"\tBest params:")
 
     for key, value in study.best_params.items():
