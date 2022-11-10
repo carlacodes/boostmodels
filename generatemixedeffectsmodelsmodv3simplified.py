@@ -658,48 +658,49 @@ def runlgbcorrectresponse(dfcat_use):
     # param['nthread'] = 4
     # param['eval_metric'] = 'auc'
     evallist = [(dtrain, 'train'), (dtest, 'eval')]
-    params2 = {"n_estimators": [10000],
-               "learning_rate": [0.1048975004873027],
-               "num_leaves": [1200],
-               "max_depth": [16],
-               "min_data_in_leaf": [1100],
-               "lambda_l1": [16],
-               "lambda_l2": [8],
-               "min_gain_to_split": [11.067660605814119],
-               "bagging_fraction": [0.9],
-               "bagging_freq": [1],
-               "feature_fraction": [0.5]}
+    params2 = {"n_estimators": 10000,
+               "scale_pos_weight": 0.26714856967087053,
+               "learning_rate": 0.8432125276398842,
+               "num_leaves": 2830,
+               "max_depth": 11,
+               "min_data_in_leaf": 7800,
+               "lambda_l1": 66,
+               "lambda_l2": 24,
+               "min_gain_to_split": 2.338199823970764,
+               "bagging_fraction": 0.4,
+               "bagging_freq": 1,
+               "feature_fraction": 0.9}
+
     # device_type: gpu
-    # colsample_bytree: 0.8572063812868711
-    # alpha: 17.84412943742098
+    # colsample_bytree: 0.4398528259745191
+    # alpha: 14.412788226345182
     # scale_pos_weight: 0.26714856967087053
-    # n_estimators: 10000
-    # learning_rate: 0.1048975004873027
-    # num_leaves: 1200
-    # max_depth: 16
-    # min_data_in_leaf: 1100
-    # lambda_l1: 16
-    # lambda_l2: 8
-    # min_gain_to_split: 11.067660605814119
-    # bagging_fraction: 0.9
+    # n_estimators: 100000
+    # learning_rate: 0.8432125276398842
+    # num_leaves: 2830
+    # max_depth: 11
+    # min_data_in_leaf: 7800
+    # lambda_l1: 66
+    # lambda_l2: 24
+    # min_gain_to_split: 2.338199823970764
+    # bagging_fraction: 0.4
     # bagging_freq: 1
-    # feature_fraction: 0.5
-    xg_reg = lgb.LGBMClassifier(objective="binary", colsample_bytree=0.8572063812868711, alpha=17.84412943742098,
-                                n_estimators=10000, learning_rate=params2['learning_rate'],
+    # feature_fraction: 0.9
+    xg_reg = lgb.LGBMClassifier(objective="binary", colsample_bytree=0.4398528259745191, alpha=14.412788226345182,
+                                n_estimators=100000, learning_rate=params2['learning_rate'],
                                 num_leaves=params2['num_leaves'], max_depth=params2['max_depth'],
                                 min_data_in_leaf=params2['min_data_in_leaf'], lambda_l1=params2['lambda_l1'],
                                 lambda_l2=params2['lambda_l2'], min_gain_to_split=params2['min_gain_to_split'],
                                 bagging_fraction=params2['bagging_fraction'], bagging_freq=params2['bagging_freq'],
                                 feature_fraction=params2['feature_fraction'])
 
-    xg_reg.fit(X_train, y_train, eval_metric="binary_logloss", eval_set=[(X_train, y_train), (X_test, y_test)],
-               early_stopping_rounds=100, verbose=1000)
+    xg_reg.fit(X_train, y_train, eval_metric="cross_entropy_lambda",verbose=1000)
     ypred = xg_reg.predict(X_test)
-    lgb.plot_importance(xg_reg)
-    plt.show()
+    # lgb.plot_importance(xg_reg)
+    # plt.show()
 
     kfold = KFold(n_splits=10)
-    results = cross_val_score(xg_reg, X_test, y_test, scoring='recall', cv=kfold)
+    results = cross_val_score(xg_reg, X_test, y_test, scoring='accuracy', cv=kfold)
     print("Accuracy: %.2f%%" % (np.mean(results) * 100.0))
     print(results)
     shap_values = shap.TreeExplainer(xg_reg).shap_values(dfx)
@@ -781,7 +782,7 @@ def objective(trial, X, y, coeffofweight):
             ],  # Add a pruning callback
         )
         preds = model.predict_proba(X_test)
-        cv_scores[idx] = sklearn.metrics.cross_entropy_lambda(y_test, preds)
+        cv_scores[idx] = sklearn.metrics.log_loss(y_test, preds)
         #cv_scores2[idx] = balanced_accuracy_score(y_test, preds)
 
     return np.mean(cv_scores)
@@ -808,10 +809,10 @@ if __name__ == '__main__':
     plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use)
     xg_reg, ypred, y_test, results = runlgbreleasetimes(df_use)
     coeffofweight = len(dfcat_use[dfcat_use['correctresp'] == 0]) / len(dfcat_use[dfcat_use['correctresp'] == 1])
-    #xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train = runlgbcorrectresponse(dfcat_use)
+    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train = runlgbcorrectresponse(dfcat_use)
     col = 'correctresp'
     dfx = dfcat_use.loc[:, dfcat_use.columns != col]
     # remove ferret as possible feature
     col = 'ferret'
     dfx = dfx.loc[:, dfx.columns != col]
-    study = run_optuna_study_correctresp(dfx.to_numpy(), dfcat_use['correctresp'].to_numpy(), coeffofweight)
+    #study = run_optuna_study_correctresp(dfx.to_numpy(), dfcat_use['correctresp'].to_numpy(), coeffofweight)
