@@ -14,6 +14,7 @@ from sklearn.svm import SVR
 from sklearn.preprocessing import MinMaxScaler
 from pymer4.models import Lmer
 from sklearn.metrics import mean_squared_error
+from sklearn.metrics import auc
 from sklearn.model_selection import KFold
 from sklearn.model_selection import cross_val_score
 import shap
@@ -21,6 +22,7 @@ import lightgbm as lgb
 import optuna
 from optuna.integration import LightGBMPruningCallback
 from sklearn.metrics import log_loss
+from sklearn.metrics import balanced_accuracy_score
 from sklearn.model_selection import StratifiedKFold
 
 scaler = MinMaxScaler()
@@ -250,16 +252,16 @@ def get_df_behav(path=None,
         # TODO: CHECK IF DATA IS EXTRACTED SEQUENTIALLY SO TRIAL NUMS ARE CONCATENATED CORRECTLY
         droplist = [int(x) for x in droplist]  # drop corrupted metdata trials
 
-        #pitchoftarg = pitchoftarg[~np.isnan(pitchoftarg)]
+        # pitchoftarg = pitchoftarg[~np.isnan(pitchoftarg)]
         pitchoftarg = pitchoftarg.astype(int)
-        #pitchofprecur = pitchofprecur[~np.isnan(pitchofprecur)]
+        # pitchofprecur = pitchofprecur[~np.isnan(pitchofprecur)]
         pitchofprecur = pitchofprecur.astype(int)
-        #gradinpitch = gradinpitch[~np.isnan(gradinpitch)]
+        # gradinpitch = gradinpitch[~np.isnan(gradinpitch)]
 
         correctresp = correctresp[~np.isnan(correctresp)]
-        #pastcorrectresp = pastcorrectresp[~np.isnan(pastcorrectresp)]
+        # pastcorrectresp = pastcorrectresp[~np.isnan(pastcorrectresp)]
 
-        #pastcatchtrial = pastcatchtrial[~np.isnan(pastcatchtrial)]
+        # pastcatchtrial = pastcatchtrial[~np.isnan(pastcatchtrial)]
 
         pitchoftarg = np.delete(pitchoftarg, 0)
         talkerlist2 = np.delete(talkerlist2, 0)
@@ -584,7 +586,6 @@ def runlgbreleasetimes(df_use):
     dfx = df_use.loc[:, df_use.columns != col]
     # remove ferret as possible feature
     col = 'ferret'
-
     dfx = dfx.loc[:, dfx.columns != col]
 
     X_train, X_test, y_train, y_test = train_test_split(dfx, df_use['realRelReleaseTimes'], test_size=0.2,
@@ -645,8 +646,8 @@ def runlgbcorrectresponse(dfcat_use):
     # remove ferret as possible feature
     col = 'ferret'
     dfx = dfx.loc[:, dfx.columns != col]
-    col = 'pitchofprecur'
-    dfx = dfx.loc[:, dfx.columns != col]
+    # col = 'pitchofprecur'
+    # dfx = dfx.loc[:, dfx.columns != col]
 
     X_train, X_test, y_train, y_test = train_test_split(dfx, dfcat_use['correctresp'], test_size=0.2, random_state=42)
 
@@ -658,36 +659,47 @@ def runlgbcorrectresponse(dfcat_use):
     # param['eval_metric'] = 'auc'
     evallist = [(dtrain, 'train'), (dtest, 'eval')]
     params2 = {"n_estimators": [10000],
-              "learning_rate": [0.13122993837755098],
-              "num_leaves": [920],
-              "max_depth": [3],
-              "min_data_in_leaf": [600],
-              "lambda_l1": [0],
-              "lambda_l2": [15],
-              "min_gain_to_split": [5.47804091648],
-              "bagging_fraction": [0.5],
-              "bagging_freq": [1],
-              "feature_fraction": [0.8]}
+               "learning_rate": [0.1048975004873027],
+               "num_leaves": [1200],
+               "max_depth": [16],
+               "min_data_in_leaf": [1100],
+               "lambda_l1": [16],
+               "lambda_l2": [8],
+               "min_gain_to_split": [11.067660605814119],
+               "bagging_fraction": [0.9],
+               "bagging_freq": [1],
+               "feature_fraction": [0.5]}
+    # device_type: gpu
+    # colsample_bytree: 0.8572063812868711
+    # alpha: 17.84412943742098
+    # scale_pos_weight: 0.26714856967087053
     # n_estimators: 10000
-    # learning_rate: 0.13122993837755098
-    # num_leaves: 920
-    # max_depth: 3
-    # min_data_in_leaf: 600
-    # lambda_l1: 0
-    # lambda_l2: 15
-    # min_gain_to_split: 5.478040916480662
-    # bagging_fraction: 0.5
+    # learning_rate: 0.1048975004873027
+    # num_leaves: 1200
+    # max_depth: 16
+    # min_data_in_leaf: 1100
+    # lambda_l1: 16
+    # lambda_l2: 8
+    # min_gain_to_split: 11.067660605814119
+    # bagging_fraction: 0.9
     # bagging_freq: 1
-    # feature_fraction: 0.8
-    xg_reg = lgb.LGBMClassifier(colsample_bytree=0.3,  alpha=10, n_estimators=10, learning_rate=params2['learning_rate'], num_leaves=params2['num_leaves'], max_depth=params2['max_depth'], min_data_in_leaf=params2['min_data_in_leaf'], lambda_l1=params2['lambda_l1'], lambda_l2=params2['lambda_l2'], min_gain_to_split=params2['min_gain_to_split'], bagging_fraction=params2['bagging_fraction'], bagging_freq=params2['bagging_freq'], feature_fraction=params2['feature_fraction'])
+    # feature_fraction: 0.5
+    xg_reg = lgb.LGBMClassifier(objective="binary", colsample_bytree=0.8572063812868711, alpha=17.84412943742098,
+                                n_estimators=10000, learning_rate=params2['learning_rate'],
+                                num_leaves=params2['num_leaves'], max_depth=params2['max_depth'],
+                                min_data_in_leaf=params2['min_data_in_leaf'], lambda_l1=params2['lambda_l1'],
+                                lambda_l2=params2['lambda_l2'], min_gain_to_split=params2['min_gain_to_split'],
+                                bagging_fraction=params2['bagging_fraction'], bagging_freq=params2['bagging_freq'],
+                                feature_fraction=params2['feature_fraction'])
 
-    xg_reg.fit(X_train, y_train)
+    xg_reg.fit(X_train, y_train, eval_metric="binary_logloss", eval_set=[(X_train, y_train), (X_test, y_test)],
+               early_stopping_rounds=100, verbose=1000)
     ypred = xg_reg.predict(X_test)
     lgb.plot_importance(xg_reg)
     plt.show()
 
     kfold = KFold(n_splits=10)
-    results = cross_val_score(xg_reg, X_train, y_train, scoring='balanced_accuracy', cv=kfold)
+    results = cross_val_score(xg_reg, X_test, y_test, scoring='recall', cv=kfold)
     print("Accuracy: %.2f%%" % (np.mean(results) * 100.0))
     print(results)
     shap_values = shap.TreeExplainer(xg_reg).shap_values(dfx)
@@ -728,10 +740,12 @@ def runlgbcorrectresponse(dfcat_use):
 
 def objective(trial, X, y, coeffofweight):
     param_grid = {
-        # "device_type": trial.suggest_categorical("device_type", ['gpu']),
-        "scale_pos_weight": trial.suggest_categorical("scale_pos_weight", [coeffofweight]),
-        "n_estimators": trial.suggest_categorical("n_estimators", [10000]),
-        "learning_rate": trial.suggest_float("learning_rate", 0.0001, 0.3),
+        "device_type": trial.suggest_categorical("device_type", ['gpu']),
+        "colsample_bytree": trial.suggest_float("colsample_bytree", 0.3, 1),
+        "alpha": trial.suggest_float("alpha", 10, 20),
+        "scale_pos_weight": trial.suggest_float("scale_pos_weight", coeffofweight, coeffofweight),
+        "n_estimators": trial.suggest_categorical("n_estimators", [100000]),
+        "learning_rate": trial.suggest_float("learning_rate", 0.00001, 0.9),
         "num_leaves": trial.suggest_int("num_leaves", 20, 3000, step=10),
         "max_depth": trial.suggest_int("max_depth", 3, 20),
         "min_data_in_leaf": trial.suggest_int("min_data_in_leaf", 200, 10000, step=100),
@@ -747,9 +761,10 @@ def objective(trial, X, y, coeffofweight):
         ),
     }
 
-    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=1121218)
+    cv = StratifiedKFold(n_splits=10, shuffle=True, random_state=42)
 
-    cv_scores = np.empty(5)
+    cv_scores = np.empty(10)
+    cv_scores2 = np.empty(10)
     for idx, (train_idx, test_idx) in enumerate(cv.split(X, y)):
         X_train, X_test = X[train_idx], X[test_idx]
         y_train, y_test = y[train_idx], y[test_idx]
@@ -759,14 +774,15 @@ def objective(trial, X, y, coeffofweight):
             X_train,
             y_train,
             eval_set=[(X_test, y_test)],
-            eval_metric="binary_logloss",
-            early_stopping_rounds=500,
+            eval_metric="cross_entropy_lambda",
+            early_stopping_rounds=100,
             callbacks=[
-                LightGBMPruningCallback(trial, "binary_logloss")
+                LightGBMPruningCallback(trial, "cross_entropy_lambda")
             ],  # Add a pruning callback
         )
         preds = model.predict_proba(X_test)
-        cv_scores[idx] = log_loss(y_test, preds)
+        cv_scores[idx] = sklearn.metrics.cross_entropy_lambda(y_test, preds)
+        #cv_scores2[idx] = balanced_accuracy_score(y_test, preds)
 
     return np.mean(cv_scores)
 
@@ -774,9 +790,9 @@ def objective(trial, X, y, coeffofweight):
 def run_optuna_study_correctresp(X, y, coeffofweight):
     study = optuna.create_study(direction="minimize", study_name="LGBM Classifier")
     func = lambda trial: objective(trial, X, y, coeffofweight)
-    study.optimize(func, n_trials=500)
+    study.optimize(func, n_trials=300)
     print("Number of finished trials: ", len(study.trials))
-    print(f"\tBest value: {study.best_value:.5f}")
+    print(f"\tBest value of binary log loss: {study.best_value:.5f}")
     print(f"\tBest params:")
 
     for key, value in study.best_params.items():
@@ -792,5 +808,10 @@ if __name__ == '__main__':
     plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use)
     xg_reg, ypred, y_test, results = runlgbreleasetimes(df_use)
     coeffofweight = len(dfcat_use[dfcat_use['correctresp'] == 0]) / len(dfcat_use[dfcat_use['correctresp'] == 1])
-    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train = runlgbcorrectresponse(dfcat_use)
-    study = run_optuna_study_correctresp(X_train.to_numpy(), y_train.to_numpy(), coeffofweight)
+    #xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train = runlgbcorrectresponse(dfcat_use)
+    col = 'correctresp'
+    dfx = dfcat_use.loc[:, dfcat_use.columns != col]
+    # remove ferret as possible feature
+    col = 'ferret'
+    dfx = dfx.loc[:, dfx.columns != col]
+    study = run_optuna_study_correctresp(dfx.to_numpy(), dfcat_use['correctresp'].to_numpy(), coeffofweight)
