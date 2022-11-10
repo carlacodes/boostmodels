@@ -848,5 +848,5 @@ if __name__ == '__main__':
     dfx = dfx.loc[:, dfx.columns != col]
     dfx, dfy = balanced_subsample(dfx, dfcat_use['correctresp'], 0.5)
     study = run_optuna_study_correctresp(dfx.to_numpy(), dfy.to_numpy())
-    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train = runlgbcorrectresponse(dfx, dfy, study.best_params.items())
+    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train = runlgbcorrectresponse(dfx, dfy, study.best_params)
 
