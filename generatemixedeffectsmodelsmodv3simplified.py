@@ -669,17 +669,16 @@ def balanced_subsample(x,y,subsample_size=1.0):
 
     xs = pd.concat(xs)
     ys = pd.Series(data=np.concatenate(ys), name='target')
-
     return xs,ys
-def runlgbcorrectresponse(dfcat_use):
-    col = 'correctresp'
-    dfx = dfcat_use.loc[:, dfcat_use.columns != col]
-    # remove ferret as possible feature
-    col = 'ferret'
-    dfx = dfx.loc[:, dfx.columns != col]
-    # col = 'pitchofprecur'
+def runlgbcorrectresponse(dfx, dfy, paramsinput):
+    # col = 'correctresp'
+    # dfx = dfcat_use.loc[:, dfcat_use.columns != col]
+    # # remove ferret as possible feature
+    # col = 'ferret'
     # dfx = dfx.loc[:, dfx.columns != col]
-    dfx, dfy = balanced_subsample(dfx, dfcat_use['correctresp'], 0.5)
+    # # col = 'pitchofprecur'
+    # # dfx = dfx.loc[:, dfx.columns != col]
+    # dfx, dfy = balanced_subsample(dfx, dfcat_use['correctresp'], 0.5)
 
     X_train, X_test, y_train, y_test = train_test_split(dfx, dfy, test_size=0.2, random_state=42)
     print(X_train.shape)
@@ -692,17 +691,19 @@ def runlgbcorrectresponse(dfcat_use):
     # param['nthread'] = 4
     # param['eval_metric'] = 'auc'
     evallist = [(dtrain, 'train'), (dtest, 'eval')]
-    params2 = {"n_estimators": [10000],
-               "learning_rate": [0.13122993837755098],
-               "num_leaves": [920],
-               "max_depth": [3],
-               "min_data_in_leaf": [600],
-               "lambda_l1": [0],
-               "lambda_l2": [15],
-               "min_gain_to_split": [5.47804091648],
-               "bagging_fraction": [0.5],
-               "bagging_freq": [1],
-               "feature_fraction": [0.8]}
+    params2 = {"n_estimators": 100000,
+               "colsample_bytree": 0.6388809985894107,
+               "alpha": 16.26,
+               "learning_rate": 0.7036149067810812,
+               "num_leaves": 2190,
+               "max_depth": 20,
+               "min_data_in_leaf": 500,
+               "lambda_l1": 74,
+               "lambda_l2": 100,
+               "min_gain_to_split": 1.1276269444587,
+               "bagging_fraction": 0.8,
+               "bagging_freq":1,
+               "feature_fraction": 0.8}
 
     # device_type: gpu
     # colsample_bytree: 0.4398528259745191
@@ -719,7 +720,7 @@ def runlgbcorrectresponse(dfcat_use):
     # bagging_fraction: 0.4
     # bagging_freq: 1
     # feature_fraction: 0.9
-    xg_reg = lgb.LGBMClassifier(objective="binary") #colsample_bytree=0.4398528259745191, alpha=14.412788226345182,
+    xg_reg = lgb.LGBMClassifier(objective="binary",random_state=42, **paramsinput) #colsample_bytree=0.4398528259745191, alpha=14.412788226345182,
                                 # n_estimators=10000, learning_rate=params2['learning_rate'],
                                 # num_leaves=params2['num_leaves'], max_depth=params2['max_depth'],
                                 # min_data_in_leaf=params2['min_data_in_leaf'], lambda_l1=params2['lambda_l1'],
@@ -797,7 +798,6 @@ def objective(trial, X, y):
     cv = StratifiedKFold(n_splits=10, shuffle=True, random_state=42)
 
     cv_scores = np.empty(10)
-    cv_scores2 = np.empty(10)
     for idx, (train_idx, test_idx) in enumerate(cv.split(X, y)):
         X_train, X_test = X[train_idx], X[test_idx]
         y_train, y_test = y[train_idx], y[test_idx]
@@ -820,9 +820,9 @@ def objective(trial, X, y):
     return np.mean(cv_scores)
 
 
-def run_optuna_study_correctresp(X, y, coeffofweight):
+def run_optuna_study_correctresp(X, y):
     study = optuna.create_study(direction="minimize", study_name="LGBM Classifier")
-    func = lambda trial: objective(trial, X, y, coeffofweight)
+    func = lambda trial: objective(trial, X, y)
     study.optimize(func, n_trials=300)
     print("Number of finished trials: ", len(study.trials))
     print(f"\tBest value of binary log loss: {study.best_value:.5f}")
@@ -841,7 +841,6 @@ if __name__ == '__main__':
     plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use)
     xg_reg, ypred, y_test, results = runlgbreleasetimes(df_use)
     coeffofweight = len(dfcat_use[dfcat_use['correctresp'] == 0]) / len(dfcat_use[dfcat_use['correctresp'] == 1])
-    #xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train = runlgbcorrectresponse(dfcat_use)
     col = 'correctresp'
     dfx = dfcat_use.loc[:, dfcat_use.columns != col]
     # remove ferret as possible feature
@@ -849,3 +848,5 @@ if __name__ == '__main__':
     dfx = dfx.loc[:, dfx.columns != col]
     dfx, dfy = balanced_subsample(dfx, dfcat_use['correctresp'], 0.5)
     study = run_optuna_study_correctresp(dfx.to_numpy(), dfy.to_numpy())
+    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train = runlgbcorrectresponse(dfx, dfy, study.best_params.items())
+
