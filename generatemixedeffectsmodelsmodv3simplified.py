@@ -568,7 +568,7 @@ def runxgboostreleasetimes(df_use):
     xgb.plot_importance(xg_reg)
     plt.show()
 
-    kfold = KFold(n_splits=10)
+    kfold = KFold(n_splits=20)
     results = cross_val_score(xg_reg, X_train, y_train, scoring='neg_mean_squared_error', cv=kfold)
 
     mse = mean_squared_error(ypred, y_test)
@@ -733,10 +733,13 @@ def runlgbcorrectresponse(dfx, dfy, paramsinput):
     # lgb.plot_importance(xg_reg)
     # plt.show()
 
-    kfold = KFold(n_splits=5)
+    kfold = KFold(n_splits=10)
     results = cross_val_score(xg_reg, X_test, y_test, scoring='accuracy', cv=kfold)
+    bal_accuracy = cross_val_score(xg_reg, X_test, y_test, scoring='balanced_accuracy', cv=kfold)
     print("Accuracy: %.2f%%" % (np.mean(results) * 100.0))
     print(results)
+    print('Balanced Accuracy: %.2f%%' % (np.mean(bal_accuracy) * 100.0))
+
     shap_values = shap.TreeExplainer(xg_reg).shap_values(dfx)
     shap.summary_plot(shap_values, dfx)
     plt.show()
@@ -770,16 +773,16 @@ def runlgbcorrectresponse(dfx, dfy, paramsinput):
     shap.plots.scatter(shap_values2[:, "precur_and_targ_same"], color=shap_values2[:, "talker"])
     plt.show()
 
-    return xg_reg, ypred, y_test, results, shap_values, X_train, y_train
+    return xg_reg, ypred, y_test, results, shap_values, X_train, y_train, bal_accuracy
 
 
 def objective(trial, X, y):
     param_grid = {
-        "device_type": trial.suggest_categorical("device_type", ['gpu']),
+       # "device_type": trial.suggest_categorical("device_type", ['gpu']),
         "colsample_bytree": trial.suggest_float("colsample_bytree", 0.3, 1),
         "alpha": trial.suggest_float("alpha", 1, 20),
-        "n_estimators": trial.suggest_categorical("n_estimators", [100000]),
-        "learning_rate": trial.suggest_float("learning_rate", 0.00001, 0.9),
+        "n_estimators": trial.suggest_int("n_estimators", 100,10000, step=100),
+        "learning_rate": trial.suggest_float("learning_rate", 0.001, 0.5),
         "num_leaves": trial.suggest_int("num_leaves", 20, 3000, step=10),
         "max_depth": trial.suggest_int("max_depth", 3, 20),
         "min_data_in_leaf": trial.suggest_int("min_data_in_leaf", 200, 10000, step=100),
@@ -795,9 +798,9 @@ def objective(trial, X, y):
         ),
     }
 
-    cv = StratifiedKFold(n_splits=10, shuffle=True, random_state=42)
+    cv = StratifiedKFold(n_splits=20, shuffle=True, random_state=42)
 
-    cv_scores = np.empty(10)
+    cv_scores = np.empty(20)
     for idx, (train_idx, test_idx) in enumerate(cv.split(X, y)):
         X_train, X_test = X[train_idx], X[test_idx]
         y_train, y_test = y[train_idx], y[test_idx]
@@ -823,7 +826,7 @@ def objective(trial, X, y):
 def run_optuna_study_correctresp(X, y):
     study = optuna.create_study(direction="minimize", study_name="LGBM Classifier")
     func = lambda trial: objective(trial, X, y)
-    study.optimize(func, n_trials=300)
+    study.optimize(func, n_trials=1000)
     print("Number of finished trials: ", len(study.trials))
     print(f"\tBest value of binary log loss: {study.best_value:.5f}")
     print(f"\tBest params:")
@@ -839,14 +842,14 @@ if __name__ == '__main__':
         ferrets)
     plotpredictedversusactual(predictedrelease, df_use)
     plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use)
-    xg_reg, ypred, y_test, results = runlgbreleasetimes(df_use)
+    #xg_reg, ypred, y_test, results = runlgbreleasetimes(df_use)
     coeffofweight = len(dfcat_use[dfcat_use['correctresp'] == 0]) / len(dfcat_use[dfcat_use['correctresp'] == 1])
     col = 'correctresp'
     dfx = dfcat_use.loc[:, dfcat_use.columns != col]
     # remove ferret as possible feature
     col = 'ferret'
     dfx = dfx.loc[:, dfx.columns != col]
-    dfx, dfy = balanced_subsample(dfx, dfcat_use['correctresp'], 0.5)
-    study = run_optuna_study_correctresp(dfx.to_numpy(), dfy.to_numpy())
-    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train = runlgbcorrectresponse(dfx, dfy, study.best_params)
+    #dfx, dfy = balanced_subsample(dfx, dfcat_use['correctresp'], 0.5)
+    study = run_optuna_study_correctresp(dfx.to_numpy(), dfcat_use['correctresp'].to_numpy(), coeffofweight)
+    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy = runlgbcorrectresponse(dfx,  dfcat_use['correctresp'], study.best_params)
 
