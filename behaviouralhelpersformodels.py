@@ -228,9 +228,14 @@ class behaviouralhelperscg:
             newdata = newdata[
                 (newdata.pitchofprecur == 1) | (newdata.pitchofprecur == 2) | (newdata.pitchofprecur == 3) | (
                         newdata.pitchofprecur == 4) | (newdata.pitchofprecur == 5)]
+            # newdata = newdata[
+            #     (newdata.response == 1) | (newdata.response == 0) | (newdata.response == 5) | (
+            #             newdata.pitchofprecur == 4) | (newdata.pitchofprecur == 5)]
 
             newdata = newdata[(newdata.correctionTrial == 0)]  # | (allData.response == 7)
             newdata = newdata[(newdata.currAtten == 0)]  # | (allData.response == 7)
+            newdata = newdata[(newdata.catchTrial == 0)]  # | (allData.response == 7)
+
 
             bigdata = bigdata.append(newdata)
         return bigdata

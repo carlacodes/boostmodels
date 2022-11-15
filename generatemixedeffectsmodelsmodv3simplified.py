@@ -315,12 +315,13 @@ def get_df_behav(path=None,
         newdata = newdata[(newdata.correctionTrial == 0)]  # | (allData.response == 7)
         newdata = newdata[(newdata.currAtten == 0)]  # | (allData.response == 7)
         if includefaandmiss is True:
-            newdata = newdata[(newdata.response == 0) | (newdata.response == 1) | (newdata.response == 7)]
+            newdata = newdata[
+                (newdata.response == 0) | (newdata.response == 1) | (newdata.response == 7) | (newdata.response == 5)]
         else:
             newdata = newdata[(newdata.response == 0) | (newdata.response == 1)]
             newdata = newdata[(newdata.catchTrial == 0)]
-        if includefaandmiss is False:
-            newdata = newdata[(newdata.correctresp == 1)]
+        # if includefaandmiss is False:
+        #     newdata = newdata[(newdata.correctresp == 1)]
         bigdata = bigdata.append(newdata)
     return bigdata
 
@@ -348,7 +349,7 @@ def run_mixed_effects_analysis(ferrets):
     dfcat = get_df_behav(ferrets=ferrets, includefaandmiss=True, startdate='04-01-2020', finishdate='01-10-2022')
 
     dfcat_use = dfcat[["pitchoftarg", "pitchofprecur", "talker", "side", "precur_and_targ_same",
-                       "timeToTarget", "DaysSinceStart", "AM",
+                       "targTimes", "DaysSinceStart", "AM",
                        "correctresp", "ferret", "stepval", "pastcorrectresp", "pastcatchtrial", "trialNum"]]
 
     modelregcat = Lmer(
@@ -842,8 +843,9 @@ def run_optuna_study_correctresp(X, y, coeffofweight):
 
 
 def runlgbfaornot(dataframe):
-    df_to_use = dataframe[["distractor_or_fa", "pitchofprecur", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
-                           "falsealarm", "pastcorrectresp", "pastcatchtrial", "trialNum", "targTimes"]]
+    df_to_use = dataframe[
+        ["distractor_or_fa", "pitchofprecur", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
+         "falsealarm", "pastcorrectresp", "pastcatchtrial", "trialNum", "targTimes", ]]
 
     col = 'falsealarm'
     dfx = df_to_use.loc[:, df_to_use.columns != col]
