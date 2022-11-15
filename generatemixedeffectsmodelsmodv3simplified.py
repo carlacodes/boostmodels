@@ -843,7 +843,7 @@ def run_optuna_study_correctresp(X, y, coeffofweight):
 
 def runlgbfaornot(dataframe):
     df_to_use = dataframe[["distractor_or_fa", "pitchofprecur", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
-                           "falsealarm", "pastcorrectresp", "pastcatchtrial", "trialNum"]]
+                           "falsealarm", "pastcorrectresp", "pastcatchtrial", "trialNum", "targTimes"]]
 
     col = 'falsealarm'
     dfx = df_to_use.loc[:, df_to_use.columns != col]
