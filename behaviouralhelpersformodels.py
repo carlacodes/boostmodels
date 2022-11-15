@@ -189,6 +189,7 @@ class behaviouralhelperscg:
 
             pitchoftarg = np.delete(pitchoftarg, 0)
             talkerlist2 = np.delete(talkerlist2, 0)
+            distractor_or_fa = np.delete(distractor_or_fa, 0)
             stepval = np.delete(stepval, 0)
             pitchofprecur = np.delete(pitchofprecur, 0)
             intra_trial_roving = np.delete(intra_trial_roving, 0)
