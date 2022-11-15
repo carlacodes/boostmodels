@@ -145,7 +145,6 @@ class behaviouralhelperscg:
                         pitchofprecur[i] = 1.0
 
                     if pitchoftarg[i] == 1.0:
-                        # print('pitch of targ original')
                         pitchoftarg[i] = 4.0
 
                     if pitchoftarg[i] == 13.0:
@@ -154,7 +153,6 @@ class behaviouralhelperscg:
 
 
                 except:
-                    # print(len(newdata))
                     indexdrop = newdata.iloc[i].name
                     droplist = np.append(droplist, i - 1)
                     ##arrays START AT 0, but the index starts at 1, so the index is 1 less than the array
