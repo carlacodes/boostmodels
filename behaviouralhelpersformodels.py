@@ -66,7 +66,6 @@ class behaviouralhelperscg:
             pastcatchtrial = np.empty(shape=(0, 0))
             droplist = np.empty(shape=(0, 0))
             droplistnew = np.empty(shape=(0, 0))
-            print(len(newdata['realRelReleaseTimes'].values))
 
             for i in range(1, len(newdata['realRelReleaseTimes'].values)):
                 chosenresponseindex = chosenresponse.values[i]
