@@ -349,7 +349,7 @@ def run_mixed_effects_analysis(ferrets):
 
     dfcat_use = dfcat[["pitchoftarg", "pitchofprecur", "talker", "side", "precur_and_targ_same",
                        "timeToTarget", "DaysSinceStart", "AM",
-                       "correctresp", "ferret", "stepval", "pastcorrectresp", "pastcatchtrial", "trialNum"]]
+                       "correctresp", "ferret", "stepval", "pastcorrectresp", "pastcatchtrial", "trialNum", "response"]]
 
     modelregcat = Lmer(
         "correctresp ~ talker*pitchoftarg +  side  + talker * stepval + stepval+timeToTarget + DaysSinceStart + AM + (1|ferret)",
@@ -691,35 +691,34 @@ def runlgbcorrectresponse(dfx, dfy, paramsinput):
     # param['nthread'] = 4
     # param['eval_metric'] = 'auc'
     evallist = [(dtrain, 'train'), (dtest, 'eval')]
-    params2 = {"n_estimators": 100000,
-               "colsample_bytree": 0.6388809985894107,
-               "alpha": 16.26,
-               "learning_rate": 0.7036149067810812,
-               "num_leaves": 2190,
-               "max_depth": 20,
-               "min_data_in_leaf": 500,
-               "lambda_l1": 74,
-               "lambda_l2": 100,
-               "min_gain_to_split": 1.1276269444587,
-               "bagging_fraction": 0.8,
+    params2 = {"n_estimators": 9300,
+               "scale_pos_weight": 0.3,
+               "colsample_bytree":  0.8163174226131737,
+               "alpha": 4.971464509571637,
+               "learning_rate": 0.2744671988597753,
+               "num_leaves": 530,
+               "max_depth": 15,
+               "min_data_in_leaf": 400,
+               "lambda_l1": 2,
+               "lambda_l2": 44,
+               "min_gain_to_split": 0.008680941888662716,
+               "bagging_fraction": 0.9,
                "bagging_freq":1,
-               "feature_fraction": 0.8}
+               "feature_fraction": 0.6000000000000001}
 
-    # device_type: gpu
-    # colsample_bytree: 0.4398528259745191
-    # alpha: 14.412788226345182
-    # scale_pos_weight: 0.26714856967087053
-    # n_estimators: 100000
-    # learning_rate: 0.8432125276398842
-    # num_leaves: 2830
-    # max_depth: 11
-    # min_data_in_leaf: 7800
-    # lambda_l1: 66
-    # lambda_l2: 24
-    # min_gain_to_split: 2.338199823970764
-    # bagging_fraction: 0.4
+    # colsample_bytree: 0.8163174226131737
+    # alpha: 4.971464509571637
+    # n_estimators: 9300
+    # learning_rate: 0.2744671988597753
+    # num_leaves: 530
+    # max_depth: 15
+    # min_data_in_leaf: 400
+    # lambda_l1: 2
+    # lambda_l2: 44
+    # min_gain_to_split: 0.008680941888662716
+    # bagging_fraction: 0.9
     # bagging_freq: 1
-    # feature_fraction: 0.9
+    # feature_fraction: 0.6000000000000001
     xg_reg = lgb.LGBMClassifier(objective="binary",random_state=42, **paramsinput) #colsample_bytree=0.4398528259745191, alpha=14.412788226345182,
                                 # n_estimators=10000, learning_rate=params2['learning_rate'],
                                 # num_leaves=params2['num_leaves'], max_depth=params2['max_depth'],
@@ -772,15 +771,18 @@ def runlgbcorrectresponse(dfx, dfy, paramsinput):
 
     shap.plots.scatter(shap_values2[:, "precur_and_targ_same"], color=shap_values2[:, "talker"])
     plt.show()
+    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"])
+    plt.show()
 
     return xg_reg, ypred, y_test, results, shap_values, X_train, y_train, bal_accuracy
 
 
-def objective(trial, X, y):
+def objective(trial, X, y, coeffofweight):
     param_grid = {
        # "device_type": trial.suggest_categorical("device_type", ['gpu']),
         "colsample_bytree": trial.suggest_float("colsample_bytree", 0.3, 1),
         "alpha": trial.suggest_float("alpha", 1, 20),
+        "is_unbalanced": trial.suggest_categorical("is_unbalanced", [True]),
         "n_estimators": trial.suggest_int("n_estimators", 100,10000, step=100),
         "learning_rate": trial.suggest_float("learning_rate", 0.001, 0.5),
         "num_leaves": trial.suggest_int("num_leaves", 20, 3000, step=10),
@@ -792,7 +794,7 @@ def objective(trial, X, y):
         "bagging_fraction": trial.suggest_float(
             "bagging_fraction", 0.2, 0.95, step=0.1
         ),
-        "bagging_freq": trial.suggest_categorical("bagging_freq", [1]),
+        "bagging_freq": trial.suggest_int("bagging_freq", 1, 20, step=1),
         "feature_fraction": trial.suggest_float(
             "feature_fraction", 0.2, 0.95, step=0.1
         ),
@@ -823,9 +825,9 @@ def objective(trial, X, y):
     return np.mean(cv_scores)
 
 
-def run_optuna_study_correctresp(X, y):
+def run_optuna_study_correctresp(X, y,coeffofweight):
     study = optuna.create_study(direction="minimize", study_name="LGBM Classifier")
-    func = lambda trial: objective(trial, X, y)
+    func = lambda trial: objective(trial, X, y, coeffofweight)
     study.optimize(func, n_trials=1000)
     print("Number of finished trials: ", len(study.trials))
     print(f"\tBest value of binary log loss: {study.best_value:.5f}")
