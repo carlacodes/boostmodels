@@ -844,7 +844,7 @@ def run_optuna_study_correctresp(X, y, coeffofweight):
 def runlgbfaornot(dataframe):
     df_to_use = dataframe[["distractor_or_fa", "pitchofprecur", "talker", "side", "intra_trial_roving",
                            "timeToTarget", "DaysSinceStart", "AM",
-                           "falsealarm", "ferret", "stepval", "pastcorrectresp", "pastcatchtrial", "trialNum",
+                           "falsealarm", "ferret", "pastcorrectresp", "pastcatchtrial", "trialNum",
                            "response"]]
 
     col = 'falsealarm'
@@ -908,20 +908,20 @@ def runlgbfaornot(dataframe):
     explainer = shap.Explainer(xg_reg, dfx)
     shap_values2 = explainer(dfx)
     fig, ax = plt.subplots(figsize=(15, 15))
-    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "precur_and_targ_same"])
+    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "intra_trial_roving"])
 
     fig.tight_layout()
     plt.tight_layout()
     plt.subplots_adjust(left=-10, right=0.5)
 
     plt.show()
-    shap.plots.scatter(shap_values2[:, "pitchoftarg"], color=shap_values2[:, "talker"])
+    shap.plots.scatter(shap_values2[:, "pitchofprecur"], color=shap_values2[:, "talker"])
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "pitchoftarg"], color=shap_values2[:, "precur_and_targ_same"])
+    shap.plots.scatter(shap_values2[:, "pitchofprecur"], color=shap_values2[:, "intra_trial_roving"])
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "precur_and_targ_same"], color=shap_values2[:, "talker"])
+    shap.plots.scatter(shap_values2[:, "intra_trial_roving"], color=shap_values2[:, "talker"])
     plt.show()
     shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"])
     plt.show()
