@@ -191,21 +191,14 @@ class behaviouralhelperscg:
             correctresp = np.delete(correctresp, droplist)
             pastcorrectresp = np.delete(pastcorrectresp, droplist)
             pastcatchtrial = np.delete(pastcatchtrial, droplist)
-
             precur_and_targ_same = np.delete(precur_and_targ_same, droplist)
 
             correctresp = correctresp.astype(int)
             pastcatchtrial = pastcatchtrial.astype(int)
             pastcorrectresp = pastcorrectresp.astype(int)
-            # pitchoftarg[pitchoftarg == 1] = 4
-            # pitchoftarg[pitchoftarg == 13] = 1
-            #
-            # pitchofprecur[pitchofprecur == 1] = 4
-            # pitchofprecur[pitchofprecur == 13] = 1
+
 
             newdata['correctresp'] = correctresp.tolist()
-            # print(len(pastcorrectresp))
-            # print(len(correctresp))
             newdata['pastcorrectresp'] = pastcorrectresp.tolist()
             newdata['talker'] = talkerlist2.tolist()
             newdata['pastcatchtrial'] = pastcatchtrial.tolist()
@@ -215,8 +208,7 @@ class behaviouralhelperscg:
             newdata['timeToTarget'] = newdata['timeToTarget'] / 24414.0625
             newdata['AM'] = newdata['AM'].astype(int)
             newdata['talker'] = newdata['talker'] - 1
-            # optionvector=[1 3 5];, male optionvector=[2 8 13]
-            # only look at v2 pitches from recent experiments
+
             newdata = newdata[(newdata.pitchoftarg == 1) | (newdata.pitchoftarg == 2) | (newdata.pitchoftarg == 3) | (
                     newdata.pitchoftarg == 4) | (newdata.pitchoftarg == 5)]
             newdata = newdata[
@@ -225,12 +217,10 @@ class behaviouralhelperscg:
 
             newdata = newdata[(newdata.correctionTrial == 0)]  # | (allData.response == 7)
             newdata = newdata[(newdata.currAtten == 0)]  # | (allData.response == 7)
-            if includefaandmiss is True:
-                newdata = newdata[(newdata.response == 0) | (newdata.response == 1) | (newdata.response == 7)]
-            else:
-                newdata = newdata[(newdata.response == 0) | (newdata.response == 1)]
-                newdata = newdata[(newdata.catchTrial == 0)]
-            if includefaandmiss is False:
-                newdata = newdata[(newdata.correctresp == 1)]
+            # if includefaandmiss is True:
+            #     newdata = newdata[(newdata.response == 0) | (newdata.response == 1) | (newdata.response == 7)]
+            # else:
+            #     newdata = newdata[(newdata.response == 0) | (newdata.response == 1)]
+            #     newdata = newdata[(newdata.catchTrial == 0)]
             bigdata = bigdata.append(newdata)
         return bigdata
