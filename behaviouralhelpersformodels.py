@@ -4,11 +4,11 @@ from sklearn.preprocessing import MinMaxScaler
 from instruments.helpers.extract_helpers import extractAllFerretData
 import pandas as pd
 import numpy as np
-import rpy2.robjects.numpy2ri
 import pandas as pd
 
 
 class behaviouralhelperscg:
+
     def get_false_alarm_behavdata(path=None,
                      output=None,
                      ferrets=None,
@@ -54,11 +54,13 @@ class behaviouralhelperscg:
             pitchoftarg = np.empty(len(pitchshiftmat))
             pitchofprecur = np.empty(len(pitchshiftmat))
             stepval = np.empty(len(pitchshiftmat))
+            distractor_or_fa = np.empty(len(pitchshiftmat))
             gradinpitch = np.empty(len(pitchshiftmat))
             gradinpitchprecur = np.empty(len(pitchshiftmat))
             timetotarglist = np.empty(len(pitchshiftmat))
 
             precur_and_targ_same = np.empty(len(pitchshiftmat))
+            intra_trial_roving = np.empty(len(pitchshiftmat))
             talkerlist2 = np.empty(len(pitchshiftmat))
 
             falsealarm = np.empty(shape=(0, 0))
@@ -79,6 +81,9 @@ class behaviouralhelperscg:
                 is_all_zero = np.all((chosentrial == 0))
                 if isinstance(chosentrial, float) or is_all_zero:
                     chosentrial = talkermat.values[i].astype(int)
+                    intra_trial_roving[i] = 0
+                else:
+                    intra_trial_roving[i] = 1
 
                 chosendisttrial = precursorlist.values[i]
                 chosentalker = talkerlist.values[i]
@@ -92,7 +97,6 @@ class behaviouralhelperscg:
                     chosentalker = 1
                 talkerlist2[i] = chosentalker
 
-                targpos = np.where(chosendisttrial == 1)
                 if ((
                             chosenresponseindex == 0 or chosenresponseindex == 1) and realrelreleasetime >= 0) or chosenresponseindex == 3 or chosenresponseindex==7:
                     falsealarm = np.append(falsealarm, 0)
@@ -110,6 +114,9 @@ class behaviouralhelperscg:
                 else:
                     pastcatchtrial = np.append(pastcatchtrial, 0)
                 try:
+                    targpos = np.where(chosendisttrial == 1)
+                    distractor_or_fa[i] = chosendisttrial[targpos[0] - 1]
+
                     if chosentrial[targpos[0]] == 8.0:
                         pitchoftarg[i] == 3.0
                     else:
@@ -133,10 +140,6 @@ class behaviouralhelperscg:
                     else:
                         stepval[i] = 0.0
 
-                    if pitchoftarg[i] == pitchofprecur[i]:
-                        precur_and_targ_same[i] = 1
-                    else:
-                        precur_and_targ_same[i] = 0
                     if pitchofprecur[i] == 1.0:
                         pitchofprecur[i] = 4.0
 
@@ -153,14 +156,28 @@ class behaviouralhelperscg:
 
                 except:
                     indexdrop = newdata.iloc[i].name
-                    droplist = np.append(droplist, i - 1)
+                    #droplist = np.append(droplist, i - 1)
                     #arrays START AT 0, but the index starts at 1, so the index is 1 less than the array
-                    droplistnew = np.append(droplistnew, indexdrop)
+                    #droplistnew = np.append(droplistnew, indexdrop)
+                    pitchoftarg[i] = np.nan
+                    pitchofprecur[i] =chosentrial[ chosendisttrial[-1]]
+                    if pitchofprecur[i] == 1.0:
+                        pitchofprecur[i] = 4.0
+
+                    if pitchofprecur[i] == 13.0:
+                        pitchofprecur[i] = 1.0
+
+                    if pitchoftarg[i] == 1.0:
+                        pitchoftarg[i] = 4.0
+
+                    if pitchoftarg[i] == 13.0:
+                        pitchoftarg[i] = 1.0
+                    distractor_or_fa[i] = chosendisttrial[-1]
                     continue
             newdata.drop(index=newdata.index[0],
                          axis=0,
                          inplace=True)
-            newdata.drop(droplistnew, axis=0, inplace=True)
+            #newdata.drop(droplistnew, axis=0, inplace=True)
             droplist = [int(x) for x in droplist]  # drop corrupted metdata trials
 
             pitchoftarg = pitchoftarg.astype(int)
@@ -171,21 +188,21 @@ class behaviouralhelperscg:
             talkerlist2 = np.delete(talkerlist2, 0)
             stepval = np.delete(stepval, 0)
             pitchofprecur = np.delete(pitchofprecur, 0)
-            precur_and_targ_same = np.delete(precur_and_targ_same, 0)
+            intra_trial_roving = np.delete(intra_trial_roving, 0)
 
-            pitchoftarg = np.delete(pitchoftarg, droplist)
-            talkerlist2 = np.delete(talkerlist2, droplist)
-            stepval = np.delete(stepval, droplist)
+
+            # pitchoftarg = np.delete(pitchoftarg, droplist)
+            # talkerlist2 = np.delete(talkerlist2, droplist)
+            # stepval = np.delete(stepval, droplist)
 
             newdata['pitchoftarg'] = pitchoftarg.tolist()
 
-            pitchofprecur = np.delete(pitchofprecur, droplist)
+            # pitchofprecur = np.delete(pitchofprecur, droplist)
             newdata['pitchofprecur'] = pitchofprecur.tolist()
 
-            falsealarm = np.delete(falsealarm, droplist)
-            pastcorrectresp = np.delete(pastcorrectresp, droplist)
-            pastcatchtrial = np.delete(pastcatchtrial, droplist)
-            precur_and_targ_same = np.delete(precur_and_targ_same, droplist)
+            # falsealarm = np.delete(falsealarm, droplist)
+            # pastcorrectresp = np.delete(pastcorrectresp, droplist)
+            # pastcatchtrial = np.delete(pastcatchtrial, droplist)
 
             falsealarm = falsealarm.astype(int)
             pastcatchtrial = pastcatchtrial.astype(int)
@@ -193,12 +210,12 @@ class behaviouralhelperscg:
 
 
             newdata['falsealarm'] = falsealarm.tolist()
+            newdata['intra_trial_roving'] = intra_trial_roving.tolist()
+            newdata['distractor_or_fa'] = distractor_or_fa.tolist()
             newdata['pastcorrectresp'] = pastcorrectresp.tolist()
             newdata['talker'] = talkerlist2.tolist()
             newdata['pastcatchtrial'] = pastcatchtrial.tolist()
             newdata['stepval'] = stepval.tolist()
-            precur_and_targ_same = precur_and_targ_same.astype(int)
-            newdata['precur_and_targ_same'] = precur_and_targ_same.tolist()
             newdata['timeToTarget'] = newdata['timeToTarget'] / 24414.0625
             newdata['AM'] = newdata['AM'].astype(int)
             newdata['talker'] = newdata['talker'] - 1
