@@ -12,7 +12,6 @@ class behaviouralhelperscg:
     def get_false_alarm_behavdata(path=None,
                      output=None,
                      ferrets=None,
-                     includefaandmiss=False,
                      startdate=None,
                      finishdate=None):
         if output is None:
@@ -224,18 +223,14 @@ class behaviouralhelperscg:
             newdata['AM'] = newdata['AM'].astype(int)
             newdata['talker'] = newdata['talker'] - 1
 
-            newdata = newdata[(newdata.pitchoftarg == 1) | (newdata.pitchoftarg == 2) | (newdata.pitchoftarg == 3) | (
-                    newdata.pitchoftarg == 4) | (newdata.pitchoftarg == 5)]
+            # newdata = newdata[(newdata.pitchoftarg == 1) | (newdata.pitchoftarg == 2) | (newdata.pitchoftarg == 3) | (
+            #         newdata.pitchoftarg == 4) | (newdata.pitchoftarg == 5)]
             newdata = newdata[
                 (newdata.pitchofprecur == 1) | (newdata.pitchofprecur == 2) | (newdata.pitchofprecur == 3) | (
                         newdata.pitchofprecur == 4) | (newdata.pitchofprecur == 5)]
 
             newdata = newdata[(newdata.correctionTrial == 0)]  # | (allData.response == 7)
             newdata = newdata[(newdata.currAtten == 0)]  # | (allData.response == 7)
-            # if includefaandmiss is True:
-            #     newdata = newdata[(newdata.response == 0) | (newdata.response == 1) | (newdata.response == 7)]
-            # else:
-            #     newdata = newdata[(newdata.response == 0) | (newdata.response == 1)]
-            #     newdata = newdata[(newdata.catchTrial == 0)]
+
             bigdata = bigdata.append(newdata)
         return bigdata

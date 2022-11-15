@@ -840,7 +840,7 @@ def run_optuna_study_correctresp(X, y,coeffofweight):
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
-    resultingfa_df=behaviouralhelperscg.get_false_alarm_behavdata(ferrets=ferrets, includefaandmiss=False, startdate='04-01-2020', finishdate='01-10-2022')
+    resultingfa_df=behaviouralhelperscg.get_false_alarm_behavdata(ferrets=ferrets, startdate='04-01-2020', finishdate='01-10-2022')
     modelreg_reduc, modelregcat_reduc, modelregcat, modelreg, predictedrelease, df_use, dfcat_use, predictedcorrectresp, explainedvar, explainvarreleasetime = run_mixed_effects_analysis(
         ferrets)
     plotpredictedversusactual(predictedrelease, df_use)
