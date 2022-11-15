@@ -160,7 +160,10 @@ class behaviouralhelperscg:
                     #arrays START AT 0, but the index starts at 1, so the index is 1 less than the array
                     #droplistnew = np.append(droplistnew, indexdrop)
                     pitchoftarg[i] = np.nan
-                    pitchofprecur[i] =chosentrial[ chosendisttrial[-1]]
+                    if isinstance(chosentrial, int):
+                        pitchofprecur[i] = chosentrial
+                    else:
+                        pitchofprecur[i] =chosentrial[-1]
                     if pitchofprecur[i] == 1.0:
                         pitchofprecur[i] = 4.0
 
