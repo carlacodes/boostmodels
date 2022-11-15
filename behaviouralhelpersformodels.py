@@ -155,12 +155,9 @@ class behaviouralhelperscg:
                 except:
                     indexdrop = newdata.iloc[i].name
                     droplist = np.append(droplist, i - 1)
-                    ##arrays START AT 0, but the index starts at 1, so the index is 1 less than the array
+                    #arrays START AT 0, but the index starts at 1, so the index is 1 less than the array
                     droplistnew = np.append(droplistnew, indexdrop)
                     continue
-            # newdata.drop(0, axis=0, inplace=True)  # drop first trial for each animal
-            # accidentally dropping all catch trials?
-            ##TODO: CHECK THIS
             newdata.drop(index=newdata.index[0],
                          axis=0,
                          inplace=True)
