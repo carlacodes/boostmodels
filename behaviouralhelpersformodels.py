@@ -61,7 +61,7 @@ class behaviouralhelperscg:
             precur_and_targ_same = np.empty(len(pitchshiftmat))
             talkerlist2 = np.empty(len(pitchshiftmat))
 
-            correctresp = np.empty(shape=(0, 0))
+            falsealarm = np.empty(shape=(0, 0))
             pastcorrectresp = np.empty(shape=(0, 0))
             pastcatchtrial = np.empty(shape=(0, 0))
             droplist = np.empty(shape=(0, 0))
@@ -94,10 +94,10 @@ class behaviouralhelperscg:
 
                 targpos = np.where(chosendisttrial == 1)
                 if ((
-                            chosenresponseindex == 0 or chosenresponseindex == 1) and realrelreleasetime >= 0) or chosenresponseindex == 3:
-                    correctresp = np.append(correctresp, 1)
+                            chosenresponseindex == 0 or chosenresponseindex == 1) and realrelreleasetime >= 0) or chosenresponseindex == 3 or chosenresponseindex==7:
+                    falsealarm = np.append(falsealarm, 0)
                 else:
-                    correctresp = np.append(correctresp, 0)
+                    falsealarm = np.append(falsealarm, 1)
 
                 if ((
                             pastresponseindex == 0 or pastresponseindex == 1) and pastrealrelreleasetime >= 0) or pastresponseindex == 3:
@@ -165,7 +165,7 @@ class behaviouralhelperscg:
 
             pitchoftarg = pitchoftarg.astype(int)
             pitchofprecur = pitchofprecur.astype(int)
-            correctresp = correctresp[~np.isnan(correctresp)]
+            falsealarm = falsealarm[~np.isnan(falsealarm)]
 
             pitchoftarg = np.delete(pitchoftarg, 0)
             talkerlist2 = np.delete(talkerlist2, 0)
@@ -182,17 +182,17 @@ class behaviouralhelperscg:
             pitchofprecur = np.delete(pitchofprecur, droplist)
             newdata['pitchofprecur'] = pitchofprecur.tolist()
 
-            correctresp = np.delete(correctresp, droplist)
+            falsealarm = np.delete(falsealarm, droplist)
             pastcorrectresp = np.delete(pastcorrectresp, droplist)
             pastcatchtrial = np.delete(pastcatchtrial, droplist)
             precur_and_targ_same = np.delete(precur_and_targ_same, droplist)
 
-            correctresp = correctresp.astype(int)
+            falsealarm = falsealarm.astype(int)
             pastcatchtrial = pastcatchtrial.astype(int)
             pastcorrectresp = pastcorrectresp.astype(int)
 
 
-            newdata['correctresp'] = correctresp.tolist()
+            newdata['falsealarm'] = falsealarm.tolist()
             newdata['pastcorrectresp'] = pastcorrectresp.tolist()
             newdata['talker'] = talkerlist2.tolist()
             newdata['pastcatchtrial'] = pastcatchtrial.tolist()
