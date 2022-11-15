@@ -349,7 +349,7 @@ def run_mixed_effects_analysis(ferrets):
 
     dfcat_use = dfcat[["pitchoftarg", "pitchofprecur", "talker", "side", "precur_and_targ_same",
                        "timeToTarget", "DaysSinceStart", "AM",
-                       "correctresp", "ferret", "stepval", "pastcorrectresp", "pastcatchtrial", "trialNum", "response"]]
+                       "correctresp", "ferret", "stepval", "pastcorrectresp", "pastcatchtrial", "trialNum"]]
 
     modelregcat = Lmer(
         "correctresp ~ talker*pitchoftarg +  side  + talker * stepval + stepval+timeToTarget + DaysSinceStart + AM + (1|ferret)",
@@ -893,7 +893,7 @@ def runlgbfaornot(dataframe):
     shap_values = shap.TreeExplainer(xg_reg).shap_values(dfx)
     shap.summary_plot(shap_values, dfx)
     plt.show()
-    shap.dependence_plot("pitchoftarg", shap_values[0], dfx)  #
+    shap.dependence_plot("pitchofprecur", shap_values[0], dfx)  #
     plt.show()
     result = permutation_importance(xg_reg, X_test, y_test, n_repeats=10,
                                     random_state=42, n_jobs=2)
