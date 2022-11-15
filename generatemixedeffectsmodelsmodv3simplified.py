@@ -639,8 +639,8 @@ def runlgbreleasetimes(df_use):
 
     return xg_reg, ypred, y_test, results
 
-def balanced_subsample(x,y,subsample_size=1.0):
 
+def balanced_subsample(x, y, subsample_size=1.0):
     class_xs = []
     min_elems = None
 
@@ -652,12 +652,12 @@ def balanced_subsample(x,y,subsample_size=1.0):
 
     use_elems = min_elems
     if subsample_size < 1:
-        use_elems = int(min_elems*subsample_size)
+        use_elems = int(min_elems * subsample_size)
 
     xs = []
     ys = []
 
-    for ci,this_xs in class_xs:
+    for ci, this_xs in class_xs:
         if len(this_xs) > use_elems:
             this_xs = this_xs.reindex(np.random.permutation(this_xs.index))
         x_ = this_xs[:use_elems]
@@ -669,7 +669,9 @@ def balanced_subsample(x,y,subsample_size=1.0):
 
     xs = pd.concat(xs)
     ys = pd.Series(data=np.concatenate(ys), name='target')
-    return xs,ys
+    return xs, ys
+
+
 def runlgbcorrectresponse(dfx, dfy, paramsinput):
     # col = 'correctresp'
     # dfx = dfcat_use.loc[:, dfcat_use.columns != col]
@@ -693,7 +695,7 @@ def runlgbcorrectresponse(dfx, dfy, paramsinput):
     evallist = [(dtrain, 'train'), (dtest, 'eval')]
     params2 = {"n_estimators": 9300,
                "scale_pos_weight": 0.3,
-               "colsample_bytree":  0.8163174226131737,
+               "colsample_bytree": 0.8163174226131737,
                "alpha": 4.971464509571637,
                "learning_rate": 0.2744671988597753,
                "num_leaves": 530,
@@ -703,7 +705,7 @@ def runlgbcorrectresponse(dfx, dfy, paramsinput):
                "lambda_l2": 44,
                "min_gain_to_split": 0.008680941888662716,
                "bagging_fraction": 0.9,
-               "bagging_freq":1,
+               "bagging_freq": 1,
                "feature_fraction": 0.6000000000000001}
 
     # colsample_bytree: 0.8163174226131737
@@ -719,15 +721,16 @@ def runlgbcorrectresponse(dfx, dfy, paramsinput):
     # bagging_fraction: 0.9
     # bagging_freq: 1
     # feature_fraction: 0.6000000000000001
-    xg_reg = lgb.LGBMClassifier(objective="binary",random_state=42, **paramsinput) #colsample_bytree=0.4398528259745191, alpha=14.412788226345182,
-                                # n_estimators=10000, learning_rate=params2['learning_rate'],
-                                # num_leaves=params2['num_leaves'], max_depth=params2['max_depth'],
-                                # min_data_in_leaf=params2['min_data_in_leaf'], lambda_l1=params2['lambda_l1'],
-                                # lambda_l2=params2['lambda_l2'], min_gain_to_split=params2['min_gain_to_split'],
-                                # bagging_fraction=params2['bagging_fraction'], bagging_freq=params2['bagging_freq'],
-                                # feature_fraction=params2['feature_fraction']
+    xg_reg = lgb.LGBMClassifier(objective="binary", random_state=42,
+                                **paramsinput)  # colsample_bytree=0.4398528259745191, alpha=14.412788226345182,
+    # n_estimators=10000, learning_rate=params2['learning_rate'],
+    # num_leaves=params2['num_leaves'], max_depth=params2['max_depth'],
+    # min_data_in_leaf=params2['min_data_in_leaf'], lambda_l1=params2['lambda_l1'],
+    # lambda_l2=params2['lambda_l2'], min_gain_to_split=params2['min_gain_to_split'],
+    # bagging_fraction=params2['bagging_fraction'], bagging_freq=params2['bagging_freq'],
+    # feature_fraction=params2['feature_fraction']
 
-    xg_reg.fit(X_train, y_train, eval_metric="cross_entropy_lambda",verbose=1000)
+    xg_reg.fit(X_train, y_train, eval_metric="cross_entropy_lambda", verbose=1000)
     ypred = xg_reg.predict_proba(X_test)
     # lgb.plot_importance(xg_reg)
     # plt.show()
@@ -779,11 +782,11 @@ def runlgbcorrectresponse(dfx, dfy, paramsinput):
 
 def objective(trial, X, y, coeffofweight):
     param_grid = {
-       # "device_type": trial.suggest_categorical("device_type", ['gpu']),
+        # "device_type": trial.suggest_categorical("device_type", ['gpu']),
         "colsample_bytree": trial.suggest_float("colsample_bytree", 0.3, 1),
         "alpha": trial.suggest_float("alpha", 1, 20),
         "is_unbalanced": trial.suggest_categorical("is_unbalanced", [True]),
-        "n_estimators": trial.suggest_int("n_estimators", 100,10000, step=100),
+        "n_estimators": trial.suggest_int("n_estimators", 100, 10000, step=100),
         "learning_rate": trial.suggest_float("learning_rate", 0.001, 0.5),
         "num_leaves": trial.suggest_int("num_leaves", 20, 3000, step=10),
         "max_depth": trial.suggest_int("max_depth", 3, 20),
@@ -820,12 +823,12 @@ def objective(trial, X, y, coeffofweight):
         )
         preds = model.predict_proba(X_test)
         cv_scores[idx] = sklearn.metrics.log_loss(y_test, preds)
-        #cv_scores2[idx] = balanced_accuracy_score(y_test, preds)
+        # cv_scores2[idx] = balanced_accuracy_score(y_test, preds)
 
     return np.mean(cv_scores)
 
 
-def run_optuna_study_correctresp(X, y,coeffofweight):
+def run_optuna_study_correctresp(X, y, coeffofweight):
     study = optuna.create_study(direction="minimize", study_name="LGBM Classifier")
     func = lambda trial: objective(trial, X, y, coeffofweight)
     study.optimize(func, n_trials=1000)
@@ -836,13 +839,16 @@ def run_optuna_study_correctresp(X, y,coeffofweight):
     for key, value in study.best_params.items():
         print(f"\t\t{key}: {value}")
     return study
+
+
 def runlgbfaornot(dataframe):
     df_to_use = dataframe[["distractor_or_fa", "pitchofprecur", "talker", "side", "intra_trial_roving",
-                       "timeToTarget", "DaysSinceStart", "AM",
-                       "falsealarm", "ferret", "stepval", "pastcorrectresp", "pastcatchtrial", "trialNum", "response"]]
+                           "timeToTarget", "DaysSinceStart", "AM",
+                           "falsealarm", "ferret", "stepval", "pastcorrectresp", "pastcatchtrial", "trialNum",
+                           "response"]]
 
     col = 'falsealarm'
-    dfx = dfcat_use.loc[:, dfcat_use.columns != col]
+    dfx = df_to_use.loc[:, df_to_use.columns != col]
     # remove ferret as possible feature
 
     X_train, X_test, y_train, y_test = train_test_split(dfx, df_to_use['falsealarm'], test_size=0.2, random_state=42)
@@ -851,10 +857,9 @@ def runlgbfaornot(dataframe):
 
     dtrain = lgb.Dataset(X_train, label=y_train)
     dtest = lgb.Dataset(X_test, label=y_test)
-    evallist = [(dtrain, 'train'), (dtest, 'eval')]
     params2 = {"n_estimators": 9300,
-               "is_unbalanced":True,
-               "colsample_bytree":  0.8163174226131737,
+               "is_unbalanced": True,
+               "colsample_bytree": 0.8163174226131737,
                "alpha": 4.971464509571637,
                "learning_rate": 0.2744671988597753,
                "num_leaves": 530,
@@ -864,18 +869,19 @@ def runlgbfaornot(dataframe):
                "lambda_l2": 44,
                "min_gain_to_split": 0.008680941888662716,
                "bagging_fraction": 0.9,
-               "bagging_freq":1,
+               "bagging_freq": 1,
                "feature_fraction": 0.6000000000000001}
 
-    xg_reg = lgb.LGBMClassifier(objective="binary",random_state=42, **params2) #colsample_bytree=0.4398528259745191, alpha=14.412788226345182,
-                                # n_estimators=10000, learning_rate=params2['learning_rate'],
-                                # num_leaves=params2['num_leaves'], max_depth=params2['max_depth'],
-                                # min_data_in_leaf=params2['min_data_in_leaf'], lambda_l1=params2['lambda_l1'],
-                                # lambda_l2=params2['lambda_l2'], min_gain_to_split=params2['min_gain_to_split'],
-                                # bagging_fraction=params2['bagging_fraction'], bagging_freq=params2['bagging_freq'],
-                                # feature_fraction=params2['feature_fraction']
+    xg_reg = lgb.LGBMClassifier(objective="binary", random_state=42,
+                                **params2)  # colsample_bytree=0.4398528259745191, alpha=14.412788226345182,
+    # n_estimators=10000, learning_rate=params2['learning_rate'],
+    # num_leaves=params2['num_leaves'], max_depth=params2['max_depth'],
+    # min_data_in_leaf=params2['min_data_in_leaf'], lambda_l1=params2['lambda_l1'],
+    # lambda_l2=params2['lambda_l2'], min_gain_to_split=params2['min_gain_to_split'],
+    # bagging_fraction=params2['bagging_fraction'], bagging_freq=params2['bagging_freq'],
+    # feature_fraction=params2['feature_fraction']
 
-    xg_reg.fit(X_train, y_train, eval_metric="cross_entropy_lambda",verbose=1000)
+    xg_reg.fit(X_train, y_train, eval_metric="cross_entropy_lambda", verbose=1000)
     ypred = xg_reg.predict_proba(X_test)
 
     kfold = KFold(n_splits=10)
@@ -925,20 +931,23 @@ def runlgbfaornot(dataframe):
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
-    resultingfa_df=behaviouralhelperscg.get_false_alarm_behavdata(ferrets=ferrets, startdate='04-01-2020', finishdate='01-10-2022')
+    resultingfa_df = behaviouralhelperscg.get_false_alarm_behavdata(ferrets=ferrets, startdate='04-01-2020',
+                                                                    finishdate='01-10-2022')
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy = runlgbfaornot(resultingfa_df)
     modelreg_reduc, modelregcat_reduc, modelregcat, modelreg, predictedrelease, df_use, dfcat_use, predictedcorrectresp, explainedvar, explainvarreleasetime = run_mixed_effects_analysis(
         ferrets)
     plotpredictedversusactual(predictedrelease, df_use)
     plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use)
-    #xg_reg, ypred, y_test, results = runlgbreleasetimes(df_use)
+    # xg_reg, ypred, y_test, results = runlgbreleasetimes(df_use)
     coeffofweight = len(dfcat_use[dfcat_use['correctresp'] == 0]) / len(dfcat_use[dfcat_use['correctresp'] == 1])
     col = 'correctresp'
     dfx = dfcat_use.loc[:, dfcat_use.columns != col]
     # remove ferret as possible feature
     col = 'ferret'
     dfx = dfx.loc[:, dfx.columns != col]
-    #dfx, dfy = balanced_subsample(dfx, dfcat_use['correctresp'], 0.5)
+    # dfx, dfy = balanced_subsample(dfx, dfcat_use['correctresp'], 0.5)
     study = run_optuna_study_correctresp(dfx.to_numpy(), dfcat_use['correctresp'].to_numpy(), coeffofweight)
-    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy = runlgbcorrectresponse(dfx,  dfcat_use['correctresp'], study.best_params)
-
+    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy = runlgbcorrectresponse(dfx,
+                                                                                                            dfcat_use[
+                                                                                                                'correctresp'],
+                                                                                                            study.best_params)
