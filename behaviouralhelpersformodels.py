@@ -9,7 +9,7 @@ import pandas as pd
 
 
 class behaviouralhelperscg:
-    def get_df_behav(path=None,
+    def get_false_alarm_behavdata(path=None,
                      output=None,
                      ferrets=None,
                      includefaandmiss=False,
@@ -46,11 +46,7 @@ class behaviouralhelperscg:
             talkermat = pd.Series(talkermat, index=talkermat.keys())
 
             pitchshiftmat = newdata['PitchShiftMat']
-            # if len(pitchshiftmat) == 0:
-            #     pitchshiftmat = talkermat  # make array equivalent to size of pitch shift mat just like talker [3,3,3,3] # if this is inter trial roving then talker is the pitch shift
 
-            # except:
-            #     pitchshiftmat = talkermat  # make array equivalent to size of pitch shift mat just like talker [3,3,3,3] # if this is inter trial roving then talker is the pitch shift
             precursorlist = newdata['distractors']
             catchtriallist = newdata['catchTrial']
             chosenresponse = newdata['response']
@@ -171,20 +167,11 @@ class behaviouralhelperscg:
                          axis=0,
                          inplace=True)
             newdata.drop(droplistnew, axis=0, inplace=True)
-
-            # TODO: CHECK IF DATA IS EXTRACTED SEQUENTIALLY SO TRIAL NUMS ARE CONCATENATED CORRECTLY
             droplist = [int(x) for x in droplist]  # drop corrupted metdata trials
 
-            # pitchoftarg = pitchoftarg[~np.isnan(pitchoftarg)]
             pitchoftarg = pitchoftarg.astype(int)
-            # pitchofprecur = pitchofprecur[~np.isnan(pitchofprecur)]
             pitchofprecur = pitchofprecur.astype(int)
-            # gradinpitch = gradinpitch[~np.isnan(gradinpitch)]
-
             correctresp = correctresp[~np.isnan(correctresp)]
-            # pastcorrectresp = pastcorrectresp[~np.isnan(pastcorrectresp)]
-
-            # pastcatchtrial = pastcatchtrial[~np.isnan(pastcatchtrial)]
 
             pitchoftarg = np.delete(pitchoftarg, 0)
             talkerlist2 = np.delete(talkerlist2, 0)
