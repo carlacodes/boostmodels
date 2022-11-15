@@ -836,11 +836,97 @@ def run_optuna_study_correctresp(X, y,coeffofweight):
     for key, value in study.best_params.items():
         print(f"\t\t{key}: {value}")
     return study
+def runlgbfaornot(dataframe):
+    df_to_use = dataframe[["distractor_or_fa", "pitchofprecur", "talker", "side", "intra_trial_roving",
+                       "timeToTarget", "DaysSinceStart", "AM",
+                       "falsealarm", "ferret", "stepval", "pastcorrectresp", "pastcatchtrial", "trialNum", "response"]]
+
+    col = 'falsealarm'
+    dfx = dfcat_use.loc[:, dfcat_use.columns != col]
+    # remove ferret as possible feature
+
+    X_train, X_test, y_train, y_test = train_test_split(dfx, df_to_use['falsealarm'], test_size=0.2, random_state=42)
+    print(X_train.shape)
+    print(X_test.shape)
+
+    dtrain = lgb.Dataset(X_train, label=y_train)
+    dtest = lgb.Dataset(X_test, label=y_test)
+    evallist = [(dtrain, 'train'), (dtest, 'eval')]
+    params2 = {"n_estimators": 9300,
+               "is_unbalanced":True,
+               "colsample_bytree":  0.8163174226131737,
+               "alpha": 4.971464509571637,
+               "learning_rate": 0.2744671988597753,
+               "num_leaves": 530,
+               "max_depth": 15,
+               "min_data_in_leaf": 400,
+               "lambda_l1": 2,
+               "lambda_l2": 44,
+               "min_gain_to_split": 0.008680941888662716,
+               "bagging_fraction": 0.9,
+               "bagging_freq":1,
+               "feature_fraction": 0.6000000000000001}
+
+    xg_reg = lgb.LGBMClassifier(objective="binary",random_state=42, **params2) #colsample_bytree=0.4398528259745191, alpha=14.412788226345182,
+                                # n_estimators=10000, learning_rate=params2['learning_rate'],
+                                # num_leaves=params2['num_leaves'], max_depth=params2['max_depth'],
+                                # min_data_in_leaf=params2['min_data_in_leaf'], lambda_l1=params2['lambda_l1'],
+                                # lambda_l2=params2['lambda_l2'], min_gain_to_split=params2['min_gain_to_split'],
+                                # bagging_fraction=params2['bagging_fraction'], bagging_freq=params2['bagging_freq'],
+                                # feature_fraction=params2['feature_fraction']
+
+    xg_reg.fit(X_train, y_train, eval_metric="cross_entropy_lambda",verbose=1000)
+    ypred = xg_reg.predict_proba(X_test)
+
+    kfold = KFold(n_splits=10)
+    results = cross_val_score(xg_reg, X_test, y_test, scoring='accuracy', cv=kfold)
+    bal_accuracy = cross_val_score(xg_reg, X_test, y_test, scoring='balanced_accuracy', cv=kfold)
+    print("Accuracy: %.2f%%" % (np.mean(results) * 100.0))
+    print(results)
+    print('Balanced Accuracy: %.2f%%' % (np.mean(bal_accuracy) * 100.0))
+
+    shap_values = shap.TreeExplainer(xg_reg).shap_values(dfx)
+    shap.summary_plot(shap_values, dfx)
+    plt.show()
+    shap.dependence_plot("pitchoftarg", shap_values[0], dfx)  #
+    plt.show()
+    result = permutation_importance(xg_reg, X_test, y_test, n_repeats=10,
+                                    random_state=42, n_jobs=2)
+    sorted_idx = result.importances_mean.argsort()
+
+    fig, ax = plt.subplots(figsize=(15, 15))
+    ax.barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T)
+    ax.set_title("Permutation Importances (test set)")
+    fig.tight_layout()
+    plt.show()
+    explainer = shap.Explainer(xg_reg, dfx)
+    shap_values2 = explainer(dfx)
+    fig, ax = plt.subplots(figsize=(15, 15))
+    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "precur_and_targ_same"])
+
+    fig.tight_layout()
+    plt.tight_layout()
+    plt.subplots_adjust(left=-10, right=0.5)
+
+    plt.show()
+    shap.plots.scatter(shap_values2[:, "pitchoftarg"], color=shap_values2[:, "talker"])
+    plt.show()
+
+    shap.plots.scatter(shap_values2[:, "pitchoftarg"], color=shap_values2[:, "precur_and_targ_same"])
+    plt.show()
+
+    shap.plots.scatter(shap_values2[:, "precur_and_targ_same"], color=shap_values2[:, "talker"])
+    plt.show()
+    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"])
+    plt.show()
+
+    return xg_reg, ypred, y_test, results, shap_values, X_train, y_train, bal_accuracy
 
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
     resultingfa_df=behaviouralhelperscg.get_false_alarm_behavdata(ferrets=ferrets, startdate='04-01-2020', finishdate='01-10-2022')
+    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy = runlgbfaornot(resultingfa_df)
     modelreg_reduc, modelregcat_reduc, modelregcat, modelreg, predictedrelease, df_use, dfcat_use, predictedcorrectresp, explainedvar, explainvarreleasetime = run_mixed_effects_analysis(
         ferrets)
     plotpredictedversusactual(predictedrelease, df_use)
