@@ -318,7 +318,7 @@ def get_df_behav(path=None,
             newdata = newdata[
                 (newdata.response == 0) | (newdata.response == 1) | (newdata.response == 7) | (newdata.response == 5)]
         else:
-            newdata = newdata[(newdata.response == 0) | (newdata.response == 1)]
+            newdata = newdata[(newdata.response == 0) | (newdata.response == 1) | newdata.correctresp==1]
             newdata = newdata[(newdata.catchTrial == 0)]
         # if includefaandmiss is False:
         #     newdata = newdata[(newdata.correctresp == 1)]
@@ -931,14 +931,14 @@ def runlgbfaornot(dataframe):
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
-    resultingfa_df = behaviouralhelperscg.get_false_alarm_behavdata(ferrets=ferrets, startdate='04-01-2020',
-                                                                    finishdate='01-10-2022')
-    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy = runlgbfaornot(resultingfa_df)
+    # resultingfa_df = behaviouralhelperscg.get_false_alarm_behavdata(ferrets=ferrets, startdate='04-01-2020',
+    #                                                                 finishdate='01-10-2022')
+    # xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy = runlgbfaornot(resultingfa_df)
     modelreg_reduc, modelregcat_reduc, modelregcat, modelreg, predictedrelease, df_use, dfcat_use, predictedcorrectresp, explainedvar, explainvarreleasetime = run_mixed_effects_analysis(
         ferrets)
-    plotpredictedversusactual(predictedrelease, df_use)
-    plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use)
-    # xg_reg, ypred, y_test, results = runlgbreleasetimes(df_use)
+    # plotpredictedversusactual(predictedrelease, df_use)
+    # plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use)
+    xg_reg, ypred, y_test, results = runlgbreleasetimes(df_use)
     coeffofweight = len(dfcat_use[dfcat_use['correctresp'] == 0]) / len(dfcat_use[dfcat_use['correctresp'] == 1])
     col = 'correctresp'
     dfx = dfcat_use.loc[:, dfcat_use.columns != col]
