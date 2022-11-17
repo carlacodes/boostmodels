@@ -349,7 +349,7 @@ def run_mixed_effects_analysis(ferrets):
     dfcat = get_df_behav(ferrets=ferrets, includefaandmiss=True, startdate='04-01-2020', finishdate='01-10-2022')
 
     dfcat_use = dfcat[["pitchoftarg", "pitchofprecur", "talker", "side", "precur_and_targ_same",
-                       "targTimes", "DaysSinceStart", "AM",
+                       "targTimes", "DaysSinceStart", "AM", "timeToTarget",
                        "correctresp", "ferret", "stepval", "pastcorrectresp", "pastcatchtrial", "trialNum"]]
 
     modelregcat = Lmer(
@@ -601,22 +601,27 @@ def runlgbreleasetimes(df_use):
     evallist = [(dtrain, 'train'), (dtest, 'eval')]
     # bst = xgb.train(param, dtrain, num_round, evallist)
     xg_reg = lgb.LGBMRegressor(colsample_bytree=0.3, learning_rate=0.1,
-                               max_depth=10, alpha=10, n_estimators=10)
+                               max_depth=10, alpha=10, n_estimators=10, verbose=1)
 
-    xg_reg.fit(X_train, y_train)
+    xg_reg.fit(X_train, y_train, eval_metric='neg_mean_squared_error', verbose=1)
     ypred = xg_reg.predict(X_test)
     lgb.plot_importance(xg_reg)
+    plt.title('feature importances for the LGBM Correct Release Times model')
     plt.show()
 
     kfold = KFold(n_splits=10)
     results = cross_val_score(xg_reg, X_train, y_train, scoring='neg_mean_squared_error', cv=kfold)
+    mse_train = mean_squared_error(ypred, y_test)
 
     mse = mean_squared_error(ypred, y_test)
     print("MSE: %.2f" % (mse))
     print("negative MSE: %.2f%%" % (np.mean(results) * 100.0))
     print(results)
     shap_values = shap.TreeExplainer(xg_reg).shap_values(dfx)
+    fig, ax = plt.subplots(figsize=(15, 15))
     shap.summary_plot(shap_values, dfx)
+    fig.title('SHAP values for the LGBM Correct Release Times model')
+
     plt.show()
     shap.dependence_plot("timeToTarget", shap_values, dfx)  #
     plt.show()
@@ -925,29 +930,35 @@ def runlgbfaornot(dataframe):
     plt.show()
     shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"])
     plt.show()
+    shap.plots.scatter(shap_values2[:, "distractor_or_fa"], color=shap_values2[:, "talker"])
+    plt.show()
+
+
 
     return xg_reg, ypred, y_test, results, shap_values, X_train, y_train, bal_accuracy
 
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
-    # resultingfa_df = behaviouralhelperscg.get_false_alarm_behavdata(ferrets=ferrets, startdate='04-01-2020',
-    #                                                                 finishdate='01-10-2022')
-    # xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy = runlgbfaornot(resultingfa_df)
-    modelreg_reduc, modelregcat_reduc, modelregcat, modelreg, predictedrelease, df_use, dfcat_use, predictedcorrectresp, explainedvar, explainvarreleasetime = run_mixed_effects_analysis(
-        ferrets)
-    # plotpredictedversusactual(predictedrelease, df_use)
-    # plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use)
-    xg_reg, ypred, y_test, results = runlgbreleasetimes(df_use)
-    coeffofweight = len(dfcat_use[dfcat_use['correctresp'] == 0]) / len(dfcat_use[dfcat_use['correctresp'] == 1])
-    col = 'correctresp'
-    dfx = dfcat_use.loc[:, dfcat_use.columns != col]
-    # remove ferret as possible feature
-    col = 'ferret'
-    dfx = dfx.loc[:, dfx.columns != col]
-    # dfx, dfy = balanced_subsample(dfx, dfcat_use['correctresp'], 0.5)
-    study = run_optuna_study_correctresp(dfx.to_numpy(), dfcat_use['correctresp'].to_numpy(), coeffofweight)
-    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy = runlgbcorrectresponse(dfx,
-                                                                                                            dfcat_use[
-                                                                                                                'correctresp'],
-                                                                                                            study.best_params)
+    resultingfa_df = behaviouralhelperscg.get_false_alarm_behavdata(ferrets=ferrets, startdate='04-01-2020',
+                                                                    finishdate='01-10-2022')
+    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy = runlgbfaornot(resultingfa_df)
+
+
+    # modelreg_reduc, modelregcat_reduc, modelregcat, modelreg, predictedrelease, df_use, dfcat_use, predictedcorrectresp, explainedvar, explainvarreleasetime = run_mixed_effects_analysis(
+    #     ferrets)
+    # # plotpredictedversusactual(predictedrelease, df_use)
+    # # plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use)
+    # xg_reg, ypred, y_test, results = runlgbreleasetimes(df_use)
+    # coeffofweight = len(dfcat_use[dfcat_use['correctresp'] == 0]) / len(dfcat_use[dfcat_use['correctresp'] == 1])
+    # col = 'correctresp'
+    # dfx = dfcat_use.loc[:, dfcat_use.columns != col]
+    # # remove ferret as possible feature
+    # col = 'ferret'
+    # dfx = dfx.loc[:, dfx.columns != col]
+    # # dfx, dfy = balanced_subsample(dfx, dfcat_use['correctresp'], 0.5)
+    # study = run_optuna_study_correctresp(dfx.to_numpy(), dfcat_use['correctresp'].to_numpy(), coeffofweight)
+    # xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy = runlgbcorrectresponse(dfx,
+    #                                                                                                         dfcat_use[
+    #                                                                                                             'correctresp'],
+    #                                                                                                         study.best_params)
