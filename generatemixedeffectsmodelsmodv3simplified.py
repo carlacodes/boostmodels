@@ -318,7 +318,7 @@ def get_df_behav(path=None,
             newdata = newdata[
                 (newdata.response == 0) | (newdata.response == 1) | (newdata.response == 7) | (newdata.response == 5)]
         else:
-            newdata = newdata[(newdata.response == 0) | (newdata.response == 1) | newdata.correctresp==1]
+            newdata = newdata[newdata.correctresp == 1]
             newdata = newdata[(newdata.catchTrial == 0)]
         # if includefaandmiss is False:
         #     newdata = newdata[(newdata.correctresp == 1)]
