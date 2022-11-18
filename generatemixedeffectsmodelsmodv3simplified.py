@@ -896,10 +896,10 @@ def runlgbfaornot(dataframe):
     print(results)
     print('Balanced Accuracy: %.2f%%' % (np.mean(bal_accuracy) * 100.0))
 
-    shap_values = shap.TreeExplainer(xg_reg).shap_values(dfx)
-    shap.summary_plot(shap_values, dfx)
+    shap_values1 = shap.TreeExplainer(xg_reg).shap_values(dfx)
+    shap.summary_plot(shap_values1, dfx)
     plt.show()
-    shap.dependence_plot("pitchofprecur", shap_values[0], dfx)  #
+    shap.dependence_plot("pitchofprecur", shap_values1[0], dfx)  #
     plt.show()
     result = permutation_importance(xg_reg, X_test, y_test, n_repeats=10,
                                     random_state=42, n_jobs=2)
@@ -935,14 +935,14 @@ def runlgbfaornot(dataframe):
 
 
 
-    return xg_reg, ypred, y_test, results, shap_values, X_train, y_train, bal_accuracy
+    return xg_reg, ypred, y_test, results, shap_values1, X_train, y_train, bal_accuracy, shap_values2
 
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
     resultingfa_df = behaviouralhelperscg.get_false_alarm_behavdata(ferrets=ferrets, startdate='04-01-2020',
                                                                     finishdate='01-10-2022')
-    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy = runlgbfaornot(resultingfa_df)
+    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbfaornot(resultingfa_df)
 
 
     # modelreg_reduc, modelregcat_reduc, modelregcat, modelreg, predictedrelease, df_use, dfcat_use, predictedcorrectresp, explainedvar, explainvarreleasetime = run_mixed_effects_analysis(
