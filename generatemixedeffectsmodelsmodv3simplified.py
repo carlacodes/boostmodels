@@ -624,6 +624,20 @@ def runlgbreleasetimes(df_use):
     fig, ax = plt.gcf(), plt.gca()
     plt.title('SHAP values for the LGBM Correct Release Times model')
 
+    labels = [item.get_text() for item in ax.get_yticklabels()]
+    print(labels)
+    labels[11] = 'distance to reward'
+    labels[8] ='precursor = target F0'
+    labels[4] = 'day of Week'
+    labels[10] = 'target F0'
+    labels[9] = 'trial number'
+    labels[3] = 'precursor F0'
+    labels[0] = 'past trial was correct'
+    labels[2] = 'past trial catch'
+
+
+    ax.set_yticklabels(labels)
+
     plt.show()
     shap.dependence_plot("timeToTarget", shap_values, dfx)  #
     plt.show()
