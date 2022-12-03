@@ -476,6 +476,8 @@ def run_mixed_effects_analysis(ferrets):
     filepath.parent.mkdir(parents=True, exist_ok=True)
     dfuse.to_csv(filepath)
 
+
+
     filepath = Path('D:/dfformixedmodels/dfcat.csv')
     filepath.parent.mkdir(parents=True, exist_ok=True)
     dfcat.to_csv(filepath)
@@ -628,7 +630,7 @@ def runlgbreleasetimes(df_use):
     print(labels)
     labels[11] = 'distance to reward'
     labels[8] ='precursor = target F0'
-    labels[4] = 'day of Week'
+    labels[4] = 'day of week'
     labels[10] = 'target F0'
     labels[9] = 'trial number'
     labels[3] = 'precursor F0'
