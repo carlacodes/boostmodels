@@ -624,7 +624,7 @@ def runlgbreleasetimes(df_use):
     #title kwargs still does nothing so need this workaround for summary plots
     shap.summary_plot(shap_values, dfx, show=False)
     fig, ax = plt.gcf(), plt.gca()
-    plt.title('SHAP values for the LGBM Correct Release Times model')
+    plt.title('Ranked list of features over their impact in predicting reaction time (correct responses)')
 
     labels = [item.get_text() for item in ax.get_yticklabels()]
     print(labels)
@@ -635,6 +635,8 @@ def runlgbreleasetimes(df_use):
     labels[9] = 'trial number'
     labels[3] = 'precursor F0'
     labels[0] = 'past trial was correct'
+    labels[1] = 'trial took place in AM'
+    labels[5] = 'target F0 - precursor F0'
     labels[2] = 'past trial catch'
 
 
