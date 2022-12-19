@@ -66,11 +66,14 @@ def calc_cosine_acrossdata(data, pos):
 
     # get word
     word = data[pos]
-
+    cosinesimvector=[]
     # get cosine similarity
-    cosine_similarity = calc_cosine_similarity(data, word)
+    for i in range(0, len(data)):
+        cosinesim = calc_cosine_similarity(word, data[i])
+        cosinesimvector.append(cosinesim)
 
-    return cosine_similarity
+
+    return cosinesimvector
     # data is a vector of audio samples
     # fs is the sampling frequency in Hz
     # returns a vector of audio samples with word durations embedded in it
@@ -103,8 +106,8 @@ def main():
     cosinesimvectorfemale = calc_cosine_acrossdata(word_times, 0)
     word_times_male = run_word_durations_male(dirmale)
     cosinesimvectormale = calc_cosine_acrossdata(word_times_male,0)
-    np.save('cosinesimvectorfemale', cosinesimvectorfemale)
-    np.save('cosinesimvectormale', cosinesimvectormale)
+    np.save('D:/Stimuli/cosinesimvectorfemale.npy', cosinesimvectorfemale)
+    np.save('D:/Stimuli/cosinesimvectormale.npy', cosinesimvectormale)
 
 
 if __name__ == "__main__":
