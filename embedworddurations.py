@@ -5,9 +5,13 @@ import sys
 import scipy
 import scipy.io
 import argparse
+from scipy import spatial
+
 import scipy.io.wavfile as wav
 import scipy.signal as signal
 import matplotlib.pyplot as plt
+import sklearn
+import sklearn.metrics
 
 def run_word_durations(dirfemale):
 
@@ -29,7 +33,7 @@ def run_word_durations(dirfemale):
     #
     # # save wav file
     # wav.write(args.wavfile, fs, data)
-    return word_times
+    return word_times, word_dictionary_np
 
 
 def run_word_durations_male(dirfemale):
@@ -53,11 +57,14 @@ def run_word_durations_male(dirfemale):
     #
     # # save wav file
     # wav.write(args.wavfile, fs, data)
-    return word_times
+    return word_times, word_dictionary_np
+
+
 def calc_cosine_similarity(x, y):
     # x and y are vectors
     # returns the cosine similarity between x and y
     return np.dot(x, y) / (np.linalg.norm(x) * np.linalg.norm(y))
+
 
 def calc_cosine_acrossdata(data, pos):
     # data is a vector of audio samples
@@ -66,12 +73,28 @@ def calc_cosine_acrossdata(data, pos):
 
     # get word
     word = data[pos]
-    cosinesimvector=[]
-    # get cosine similarity
-    for i in range(0, len(data)):
-        cosinesim = calc_cosine_similarity(word, data[i])
-        cosinesimvector.append(cosinesim)
+    word = np.reshape(word, (1, len(word)))
+    #word = word / np.linalg.norm(word)
 
+    # get cosine similarity
+    for i in range(1, len(data)):
+        otherword = data[i]
+        if len(otherword) > np.size(word,1):
+            #add zero padding to shorter word
+            #print('yes')
+            word = np.pad(word, (0, abs(np.size(word,1) - len(otherword))), 'constant')
+        elif len(otherword) <  np.size(word,1):
+            #print('less than')
+            otherword = np.pad(otherword, (0, abs(np.size(word,1)- len(otherword))), 'constant')
+
+        cosinesim = calc_cosine_similarity(word, otherword)
+        print(cosinesim)
+        if i == 0:
+            cosinesimvector = cosinesim
+        else:
+            cosinesimvector = np.append(cosinesimvector, cosinesim)
+
+    #cosine_similarity = calc_cosine_similarity(data, word)
 
     return cosinesimvector
     # data is a vector of audio samples
@@ -101,12 +124,15 @@ def embed_word_durations(data, fs):
 def main():
     dirfemale = 'D:/Stimuli/19122022/FemaleSounds24k_addedPinkNoiseRevTargetdB.mat'
     dirmale = 'D:/Stimuli/19122022/MaleSounds24k_addedPinkNoiseRevTargetdB.mat'
-    word_times = run_word_durations(dirfemale)
-    print(word_times)
-    cosinesimvectorfemale = calc_cosine_acrossdata(word_times, 0)
-    word_times_male = run_word_durations_male(dirmale)
-    cosinesimvectormale = calc_cosine_acrossdata(word_times_male,0)
-    np.save('D:/Stimuli/cosinesimvectorfemale.npy', cosinesimvectorfemale)
+    word_times, worddictionary_female= run_word_durations(dirfemale)
+    #print(word_times)
+    #cosinesimvectorfemale = calc_cosine_acrossdata(worddictionary_female, 0)
+    word_times_male, worddictionary_male = run_word_durations_male(dirmale)
+    # word_times_male_normalised = word_times_male/word_times_male[0]
+    # word_times_female_normalised = word_times/word_times[0]
+
+    cosinesimvectormale = calc_cosine_acrossdata(worddictionary_male,0)
+    #np.save('D:/Stimuli/cosinesimvectorfemale.npy', word_times_male_normalised)
     np.save('D:/Stimuli/cosinesimvectormale.npy', cosinesimvectormale)
 
 
