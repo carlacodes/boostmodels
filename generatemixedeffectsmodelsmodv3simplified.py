@@ -873,7 +873,7 @@ def run_optuna_study_correctresp(X, y, coeffofweight):
 
 def runlgbfaornot(dataframe):
     df_to_use = dataframe[
-        ["distractor_or_fa", "pitchofprecur", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
+        ["cosinesim", "pitchofprecur", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
          "falsealarm", "pastcorrectresp", "pastcatchtrial", "trialNum", "targTimes", ]]
 
     col = 'falsealarm'
@@ -954,7 +954,7 @@ def runlgbfaornot(dataframe):
     plt.show()
     shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"])
     plt.show()
-    shap.plots.scatter(shap_values2[:, "distractor_or_fa"], color=shap_values2[:, "talker"])
+    shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "talker"])
     plt.show()
 
 
@@ -966,7 +966,7 @@ if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
     resultingfa_df = behaviouralhelperscg.get_false_alarm_behavdata(ferrets=ferrets, startdate='04-01-2020',
                                                                     finishdate='01-10-2022')
-    # xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbfaornot(resultingfa_df)
+    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbfaornot(resultingfa_df)
 
 
     modelreg_reduc, modelregcat_reduc, modelregcat, modelreg, predictedrelease, df_use, dfcat_use, predictedcorrectresp, explainedvar, explainvarreleasetime = run_mixed_effects_analysis(
