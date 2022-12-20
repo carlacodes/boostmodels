@@ -64,6 +64,11 @@ def calc_cosine_similarity(x, y):
     # x and y are vectors
     # returns the cosine similarity between x and y
     return np.dot(x, y) / (np.linalg.norm(x) * np.linalg.norm(y))
+def scaledata(datain, minval, maxval):
+    dataout = datain - min(datain.flatten())
+    dataout = (dataout / (max(datain.flatten()) - min(datain.flatten()))) * (maxval - minval)
+    dataout = dataout + minval
+    return dataout
 
 
 def calc_cosine_acrossdata(data, pos):
@@ -74,19 +79,29 @@ def calc_cosine_acrossdata(data, pos):
     # get word
     word = data[pos]
     word = np.reshape(word, (1, len(word)))
+    word = np.squeeze(word)
+    zeros_array = np.zeros((round(24414.0625 * 0.08)))
+
+    word = np.concatenate((word, zeros_array), axis=0)
+    word = scaledata(word, -7797, 7797)
+
     #word = word / np.linalg.norm(word)
 
     # get cosine similarity
-    for i in range(1, len(data)):
+    for i in range(0, len(data)):
         otherword = data[i]
-        if len(otherword) > np.size(word,1):
+        otherword = np.squeeze(otherword)
+        otherword = np.concatenate((otherword, zeros_array), axis=0)
+        otherword = scaledata(otherword, -7797, 7797)
+
+        if len(otherword) > np.size(word,0):
             #add zero padding to shorter word
             #print('yes')
-            word = np.pad(word, (0, abs(np.size(word,1) - len(otherword))), 'constant')
-        elif len(otherword) <  np.size(word,1):
+            word = np.concatenate((word, np.zeros(abs(np.size(word,0) - len(otherword)))))
+        elif len(otherword) <  np.size(word,0):
             #print('less than')
-            otherword = np.pad(otherword, (0, abs(np.size(word,1)- len(otherword))), 'constant')
-
+            #otherword = np.pad(otherword, (1, abs(np.size(word,1)- len(otherword))), 'constant')
+            otherword = np.concatenate((otherword, np.zeros(abs(np.size(word,0) - len(otherword)))))
         cosinesim = calc_cosine_similarity(word, otherword)
         print(cosinesim)
         if i == 0:
@@ -126,13 +141,13 @@ def main():
     dirmale = 'D:/Stimuli/19122022/MaleSounds24k_addedPinkNoiseRevTargetdB.mat'
     word_times, worddictionary_female= run_word_durations(dirfemale)
     #print(word_times)
-    #cosinesimvectorfemale = calc_cosine_acrossdata(worddictionary_female, 0)
+    cosinesimvectorfemale = calc_cosine_acrossdata(worddictionary_female, 0)
     word_times_male, worddictionary_male = run_word_durations_male(dirmale)
     # word_times_male_normalised = word_times_male/word_times_male[0]
     # word_times_female_normalised = word_times/word_times[0]
 
     cosinesimvectormale = calc_cosine_acrossdata(worddictionary_male,0)
-    #np.save('D:/Stimuli/cosinesimvectorfemale.npy', word_times_male_normalised)
+    np.save('D:/Stimuli/cosinesimvectorfemale.npy', cosinesimvectorfemale)
     np.save('D:/Stimuli/cosinesimvectormale.npy', cosinesimvectormale)
 
 

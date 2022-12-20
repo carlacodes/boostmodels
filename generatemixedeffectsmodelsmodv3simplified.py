@@ -305,6 +305,8 @@ def get_df_behav(path=None,
         newdata['timeToTarget'] = newdata['timeToTarget'] / 24414.0625
         newdata['AM'] = newdata['AM'].astype(int)
         newdata['talker'] = newdata['talker'] - 1
+
+
         # optionvector=[1 3 5];, male optionvector=[2 8 13]
         # only look at v2 pitches from recent experiments
         newdata = newdata[(newdata.pitchoftarg == 1) | (newdata.pitchoftarg == 2) | (newdata.pitchoftarg == 3) | (

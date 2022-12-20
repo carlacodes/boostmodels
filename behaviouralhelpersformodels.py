@@ -223,6 +223,18 @@ class behaviouralhelperscg:
             newdata['AM'] = newdata['AM'].astype(int)
             newdata['talker'] = newdata['talker'] - 1
 
+            cosinesimfemale = np.load('D:/Stimuli/cosinesimvectorfemale.npy')
+            cosinesimmale = np.load('D:/Stimuli/cosinesimvectormale.npy')
+
+            distinds = newdata['distractor_or_fa'].values
+            correspondcosinelist = []
+            for i in range(len(distinds)):
+                if newdata['talker'].values[i] == 0:
+                    correspondcosinelist.append(cosinesimfemale[distinds[i]])
+                else:
+                    correspondcosinelist.append(cosinesimmale[distinds[i]])
+            newdata['cosinesim'] = correspondcosinelist
+
             # newdata = newdata[(newdata.pitchoftarg == 1) | (newdata.pitchoftarg == 2) | (newdata.pitchoftarg == 3) | (
             #         newdata.pitchoftarg == 4) | (newdata.pitchoftarg == 5)]
             newdata = newdata[
