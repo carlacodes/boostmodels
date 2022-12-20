@@ -930,25 +930,25 @@ def runlgbfaornot(dataframe):
     fig.tight_layout()
     plt.show()
     explainer = shap.Explainer(xg_reg, dfx)
-    shap_values2 = explainer(dfx)
+    shap_values2 = explainer(X_train)
     fig, ax = plt.subplots(figsize=(15, 15))
-    shap.plots.scatter(shap_values1[:, "talker"], color=shap_values1[:, "intra_trial_roving"])
+    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "intra_trial_roving"])
     fig.tight_layout()
     plt.tight_layout()
     plt.subplots_adjust(left=-10, right=0.5)
 
     plt.show()
-    shap.plots.scatter(shap_values1[:, "pitchofprecur"], color=shap_values1[:, "talker"])
+    shap.plots.scatter(shap_values2[:, "pitchofprecur"], color=shap_values2[:, "talker"])
     plt.show()
 
-    shap.plots.scatter(shap_values1[:, "pitchofprecur"], color=shap_values1[:, "intra_trial_roving"])
+    shap.plots.scatter(shap_values2[:, "pitchofprecur"], color=shap_values2[:, "intra_trial_roving"])
     plt.show()
 
-    shap.plots.scatter(shap_values1[:, "intra_trial_roving"], color=shap_values1[:, "talker"])
+    shap.plots.scatter(shap_values2[:, "intra_trial_roving"], color=shap_values2[:, "talker"])
     plt.show()
-    shap.plots.scatter(shap_values1[:, "trialNum"], color=shap_values1[:, "talker"])
+    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"])
     plt.show()
-    shap.plots.scatter(shap_values1[:, "cosinesim"], color=shap_values1[:, "talker"])
+    shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "talker"])
     plt.show()
 
 
@@ -958,9 +958,9 @@ def runlgbfaornot(dataframe):
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
-    # resultingfa_df = behaviouralhelperscg.get_false_alarm_behavdata(ferrets=ferrets, startdate='04-01-2020',
-    #                                                                 finishdate='01-10-2022')
-    # xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbfaornot(resultingfa_df)
+    resultingfa_df = behaviouralhelperscg.get_false_alarm_behavdata(ferrets=ferrets, startdate='04-01-2020',
+                                                                    finishdate='01-10-2022')
+    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbfaornot(resultingfa_df)
 
 
     modelreg_reduc, modelregcat_reduc, modelregcat, modelreg, predictedrelease, df_use, dfcat_use, predictedcorrectresp, explainedvar, explainvarreleasetime = run_mixed_effects_analysis(
