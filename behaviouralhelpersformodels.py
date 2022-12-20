@@ -222,11 +222,13 @@ class behaviouralhelperscg:
             newdata['timeToTarget'] = newdata['timeToTarget'] / 24414.0625
             newdata['AM'] = newdata['AM'].astype(int)
             newdata['talker'] = newdata['talker'] - 1
+            newdata = newdata[newdata['distractor_or_fa'].values<=57]
 
             cosinesimfemale = np.load('D:/Stimuli/cosinesimvectorfemale.npy')
             cosinesimmale = np.load('D:/Stimuli/cosinesimvectormale.npy')
 
             distinds = newdata['distractor_or_fa'].values
+            distinds = distinds-1;
             correspondcosinelist = []
             for i in range(len(distinds)):
                 if newdata['talker'].values[i] == 0:
