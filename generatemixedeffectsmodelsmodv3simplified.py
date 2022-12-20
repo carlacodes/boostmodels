@@ -902,18 +902,13 @@ def runlgbfaornot(dataframe):
                "feature_fraction": 0.6000000000000001}
 
     xg_reg = lgb.LGBMClassifier(objective="binary", random_state=42,
-                                **params2)  # colsample_bytree=0.4398528259745191, alpha=14.412788226345182,
-    # n_estimators=10000, learning_rate=params2['learning_rate'],
-    # num_leaves=params2['num_leaves'], max_depth=params2['max_depth'],
-    # min_data_in_leaf=params2['min_data_in_leaf'], lambda_l1=params2['lambda_l1'],
-    # lambda_l2=params2['lambda_l2'], min_gain_to_split=params2['min_gain_to_split'],
-    # bagging_fraction=params2['bagging_fraction'], bagging_freq=params2['bagging_freq'],
-    # feature_fraction=params2['feature_fraction']
+                                **params2)
+
 
     xg_reg.fit(X_train, y_train, eval_metric="cross_entropy_lambda", verbose=1000)
     ypred = xg_reg.predict_proba(X_test)
 
-    kfold = KFold(n_splits=10)
+    kfold = KFold(n_splits=3)
     results = cross_val_score(xg_reg, X_test, y_test, scoring='accuracy', cv=kfold)
     bal_accuracy = cross_val_score(xg_reg, X_test, y_test, scoring='balanced_accuracy', cv=kfold)
     print("Accuracy: %.2f%%" % (np.mean(results) * 100.0))
@@ -937,24 +932,23 @@ def runlgbfaornot(dataframe):
     explainer = shap.Explainer(xg_reg, dfx)
     shap_values2 = explainer(dfx)
     fig, ax = plt.subplots(figsize=(15, 15))
-    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "intra_trial_roving"])
-
+    shap.plots.scatter(shap_values1[:, "talker"], color=shap_values1[:, "intra_trial_roving"])
     fig.tight_layout()
     plt.tight_layout()
     plt.subplots_adjust(left=-10, right=0.5)
 
     plt.show()
-    shap.plots.scatter(shap_values2[:, "pitchofprecur"], color=shap_values2[:, "talker"])
+    shap.plots.scatter(shap_values1[:, "pitchofprecur"], color=shap_values1[:, "talker"])
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "pitchofprecur"], color=shap_values2[:, "intra_trial_roving"])
+    shap.plots.scatter(shap_values1[:, "pitchofprecur"], color=shap_values1[:, "intra_trial_roving"])
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "intra_trial_roving"], color=shap_values2[:, "talker"])
+    shap.plots.scatter(shap_values1[:, "intra_trial_roving"], color=shap_values1[:, "talker"])
     plt.show()
-    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"])
+    shap.plots.scatter(shap_values1[:, "trialNum"], color=shap_values1[:, "talker"])
     plt.show()
-    shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "talker"])
+    shap.plots.scatter(shap_values1[:, "cosinesim"], color=shap_values1[:, "talker"])
     plt.show()
 
 
@@ -964,9 +958,9 @@ def runlgbfaornot(dataframe):
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
-    resultingfa_df = behaviouralhelperscg.get_false_alarm_behavdata(ferrets=ferrets, startdate='04-01-2020',
-                                                                    finishdate='01-10-2022')
-    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbfaornot(resultingfa_df)
+    # resultingfa_df = behaviouralhelperscg.get_false_alarm_behavdata(ferrets=ferrets, startdate='04-01-2020',
+    #                                                                 finishdate='01-10-2022')
+    # xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbfaornot(resultingfa_df)
 
 
     modelreg_reduc, modelregcat_reduc, modelregcat, modelreg, predictedrelease, df_use, dfcat_use, predictedcorrectresp, explainedvar, explainvarreleasetime = run_mixed_effects_analysis(
@@ -974,7 +968,7 @@ if __name__ == '__main__':
     # plotpredictedversusactual(predictedrelease, df_use)
     # plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use)
     xg_reg, ypred, y_test, results = runlgbreleasetimes(df_use)
-    # coeffofweight = len(dfcat_use[dfcat_use['correctresp'] == 0]) / len(dfcat_use[dfcat_use['correctresp'] == 1])
+    coeffofweight = len(dfcat_use[dfcat_use['correctresp'] == 0]) / len(dfcat_use[dfcat_use['correctresp'] == 1])
     # col = 'correctresp'
     # dfx = dfcat_use.loc[:, dfcat_use.columns != col]
     # # remove ferret as possible feature
