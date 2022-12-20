@@ -230,9 +230,9 @@ class behaviouralhelperscg:
             correspondcosinelist = []
             for i in range(len(distinds)):
                 if newdata['talker'].values[i] == 0:
-                    correspondcosinelist.append(cosinesimfemale[distinds[i]])
+                    correspondcosinelist.append(cosinesimfemale[int(distinds[i])])
                 else:
-                    correspondcosinelist.append(cosinesimmale[distinds[i]])
+                    correspondcosinelist.append(cosinesimmale[int(distinds[i])])
             newdata['cosinesim'] = correspondcosinelist
 
             # newdata = newdata[(newdata.pitchoftarg == 1) | (newdata.pitchoftarg == 2) | (newdata.pitchoftarg == 3) | (
