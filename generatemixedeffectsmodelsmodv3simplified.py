@@ -928,6 +928,7 @@ def runlgbfaornot(dataframe):
     ax.barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T)
     ax.set_title("Permutation Importances (test set)")
     fig.tight_layout()
+    plt.savefig('D:/behavmodelfigs/permutation_importance.png', dpi = 500 )
     plt.show()
     explainer = shap.Explainer(xg_reg, dfx)
     shap_values2 = explainer(X_train)
@@ -948,7 +949,26 @@ def runlgbfaornot(dataframe):
     plt.show()
     shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"])
     plt.show()
-    shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "talker"])
+    shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "intra_trial_roving"])
+
+    plt.savefig('D:/behavmodelfigs/cosinesimdepenencyplot.png', dpi=500)
+    plt.show()
+
+    shap.plots.scatter(shap_values2[:, "intra_trial_roving"], color=shap_values2[:, "cosinesim"])
+    plt.savefig('D:/behavmodelfigs/intratrialrovingcosinecolor.png', dpi=500)
+
+    plt.show()
+
+    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "cosinesim"])
+    plt.savefig('D:/behavmodelfigs/trialnumcosinecolor.png', dpi=500)
+    plt.show()
+
+    shap.plots.scatter(shap_values2[:, "targTimes"], color=shap_values2[:, "cosinesim"])
+    plt.savefig('D:/behavmodelfigs/targtimescosinecolor.png', dpi=500)
+    plt.show()
+
+    shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "targTimes"])
+    plt.savefig('D:/behavmodelfigs/cosinesimtargtimes.png', dpi=500)
     plt.show()
 
 

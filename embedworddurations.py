@@ -44,7 +44,7 @@ def run_word_durations_male(dirfemale):
 
     frequency = 24414.0625
     word_dictionary2 = word_dictionary[0]
-    word_dictionary2 = word_dictionary2[0]
+    word_dictionary2 = word_dictionary2[3] #taking the fourth stimuli set in matlab, 3rd index in python
     word_dictionary_np = np.array(word_dictionary2)
     word_dictionary_np=word_dictionary_np[0]
     word_times = embed_word_durations(word_dictionary_np, frequency)
