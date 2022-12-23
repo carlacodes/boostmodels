@@ -1028,8 +1028,8 @@ def runlgbfaornot(dataframe):
     ypred = xg_reg.predict_proba(X_test)
 
     kfold = KFold(n_splits=3)
-    results = cross_val_score(xg_reg, X_test, y_test, scoring='accuracy', cv=kfold)
-    bal_accuracy = cross_val_score(xg_reg, X_test, y_test, scoring='balanced_accuracy', cv=kfold)
+    results = cross_val_score(xg_reg, X_test, y_test, scoring='accuracy', cv=kfold, random_state=42)
+    bal_accuracy = cross_val_score(xg_reg, X_test, y_test, scoring='balanced_accuracy', cv=kfold, random_state=42)
     print("Accuracy: %.2f%%" % (np.mean(results) * 100.0))
     print(results)
     print('Balanced Accuracy: %.2f%%' % (np.mean(bal_accuracy) * 100.0))
