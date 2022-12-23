@@ -570,7 +570,7 @@ def runxgboostreleasetimes(df_use):
     xgb.plot_importance(xg_reg)
     plt.show()
 
-    kfold = KFold(n_splits=20)
+    kfold = KFold(n_splits=3, shuffle=True, random_state=42)
     results = cross_val_score(xg_reg, X_train, y_train, scoring='neg_mean_squared_error', cv=kfold)
 
     mse = mean_squared_error(ypred, y_test)
@@ -761,7 +761,7 @@ def runlgbcorrectresponse(dfx, dfy, paramsinput):
     # lgb.plot_importance(xg_reg)
     # plt.show()
 
-    kfold = KFold(n_splits=10)
+    kfold = KFold(n_splits=10, shuffle=True, random_state=42)
     results = cross_val_score(xg_reg, X_test, y_test, scoring='accuracy', cv=kfold)
     bal_accuracy = cross_val_score(xg_reg, X_test, y_test, scoring='balanced_accuracy', cv=kfold)
     print("Accuracy: %.2f%%" % (np.mean(results) * 100.0))
@@ -898,22 +898,8 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput):
     print(X_train.shape)
     print(X_test.shape)
 
-    dtrain = lgb.Dataset(X_train, label=y_train)
-    dtest = lgb.Dataset(X_test, label=y_test)
-    params2 = {"n_estimators": 9300,
-               "is_unbalanced": True,
-               "colsample_bytree": 0.8163174226131737,
-               "alpha": 4.971464509571637,
-               "learning_rate": 0.2744671988597753,
-               "num_leaves": 530,
-               "max_depth": 15,
-               "min_data_in_leaf": 400,
-               "lambda_l1": 2,
-               "lambda_l2": 44,
-               "min_gain_to_split": 0.008680941888662716,
-               "bagging_fraction": 0.9,
-               "bagging_freq": 1,
-               "feature_fraction": 0.6000000000000001}
+    # dtrain = lgb.Dataset(X_train, label=y_train)
+    # dtest = lgb.Dataset(X_test, label=y_test)
 
     xg_reg = lgb.LGBMClassifier(objective="binary", random_state=42,
                                 **paramsinput)
@@ -921,7 +907,7 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput):
     xg_reg.fit(X_train, y_train, eval_metric="cross_entropy_lambda", verbose=1000)
     ypred = xg_reg.predict_proba(X_test)
 
-    kfold = KFold(n_splits=3)
+    kfold = KFold(n_splits=3, shuffle=True, random_state=42)
     results = cross_val_score(xg_reg, X_test, y_test, scoring='accuracy', cv=kfold)
     bal_accuracy = cross_val_score(xg_reg, X_test, y_test, scoring='balanced_accuracy', cv=kfold)
     print("Accuracy: %.2f%%" % (np.mean(results) * 100.0))
@@ -1027,9 +1013,9 @@ def runlgbfaornot(dataframe):
     xg_reg.fit(X_train, y_train, eval_metric="cross_entropy_lambda", verbose=1000)
     ypred = xg_reg.predict_proba(X_test)
 
-    kfold = KFold(n_splits=3)
-    results = cross_val_score(xg_reg, X_test, y_test, scoring='accuracy', cv=kfold, random_state=42)
-    bal_accuracy = cross_val_score(xg_reg, X_test, y_test, scoring='balanced_accuracy', cv=kfold, random_state=42)
+    kfold = KFold(n_splits=3, shuffle=True, random_state=42)
+    results = cross_val_score(xg_reg, X_test, y_test, scoring='accuracy', cv=kfold)
+    bal_accuracy = cross_val_score(xg_reg, X_test, y_test, scoring='balanced_accuracy', cv=kfold)
     print("Accuracy: %.2f%%" % (np.mean(results) * 100.0))
     print(results)
     print('Balanced Accuracy: %.2f%%' % (np.mean(bal_accuracy) * 100.0))
