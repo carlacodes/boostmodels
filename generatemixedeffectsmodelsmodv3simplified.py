@@ -907,7 +907,7 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput):
     xg_reg.fit(X_train, y_train, eval_metric="cross_entropy_lambda", verbose=1000)
     ypred = xg_reg.predict_proba(X_test)
 
-    kfold = KFold(n_splits=3, shuffle=True, random_state=42)
+    kfold = StratifiedKFold(n_splits=3, shuffle=True, random_state=42)
     results = cross_val_score(xg_reg, X_test, y_test, scoring='accuracy', cv=kfold)
     bal_accuracy = cross_val_score(xg_reg, X_test, y_test, scoring='balanced_accuracy', cv=kfold)
     print("Accuracy: %.2f%%" % (np.mean(results) * 100.0))
@@ -1091,7 +1091,7 @@ def runfalsealarmpipeline(ferrets):
     print(study.best_params)
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbfaornotwithoptuna(
         resultingfa_df, study.best_params)
-    np.save('D:/behavmodelfigs/falsealarmoptunaparams.npy', study.best_params)
+    np.save('D:/behavmodelfigs/falsealarmoptunaparams2.npy', study.best_params)
     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
 if __name__ == '__main__':
