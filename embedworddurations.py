@@ -41,6 +41,7 @@ def run_word_durations_male(dirfemale):
     # load mat file
     mat = scipy.io.loadmat(dirfemale)
     word_dictionary = mat['maleSounds']
+    print('run_word_durations male')
 
     frequency = 24414.0625
     word_dictionary2 = word_dictionary[0]

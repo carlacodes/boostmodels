@@ -306,7 +306,6 @@ def get_df_behav(path=None,
         newdata['AM'] = newdata['AM'].astype(int)
         newdata['talker'] = newdata['talker'] - 1
 
-
         # optionvector=[1 3 5];, male optionvector=[2 8 13]
         # only look at v2 pitches from recent experiments
         newdata = newdata[(newdata.pitchoftarg == 1) | (newdata.pitchoftarg == 2) | (newdata.pitchoftarg == 3) | (
@@ -478,8 +477,6 @@ def run_mixed_effects_analysis(ferrets):
     filepath.parent.mkdir(parents=True, exist_ok=True)
     dfuse.to_csv(filepath)
 
-
-
     filepath = Path('D:/dfformixedmodels/dfcat.csv')
     filepath.parent.mkdir(parents=True, exist_ok=True)
     dfcat.to_csv(filepath)
@@ -623,7 +620,7 @@ def runlgbreleasetimes(df_use):
     print(results)
     shap_values = shap.TreeExplainer(xg_reg).shap_values(dfx)
     fig, ax = plt.subplots(figsize=(15, 15))
-    #title kwargs still does nothing so need this workaround for summary plots
+    # title kwargs still does nothing so need this workaround for summary plots
     shap.summary_plot(shap_values, dfx, show=False)
     fig, ax = plt.gcf(), plt.gca()
     plt.title('Ranked list of features over their impact in predicting reaction time')
@@ -633,7 +630,7 @@ def runlgbreleasetimes(df_use):
     labels[11] = 'distance to reward'
     labels[10] = 'target F0'
     labels[9] = 'trial number'
-    labels[8] ='precursor = target F0'
+    labels[8] = 'precursor = target F0'
     labels[7] = 'male talker'
     labels[6] = 'time until target'
     labels[5] = 'target F0 - precursor F0'
@@ -642,7 +639,6 @@ def runlgbreleasetimes(df_use):
     labels[2] = 'past trial was catch'
     labels[1] = 'trial took place in AM'
     labels[0] = 'past trial was correct'
-
 
     ax.set_yticklabels(labels)
 
@@ -810,12 +806,12 @@ def runlgbcorrectresponse(dfx, dfy, paramsinput):
     return xg_reg, ypred, y_test, results, shap_values, X_train, y_train, bal_accuracy
 
 
-def objective(trial, X, y, coeffofweight):
+def objective(trial, X, y):
     param_grid = {
         # "device_type": trial.suggest_categorical("device_type", ['gpu']),
         "colsample_bytree": trial.suggest_float("colsample_bytree", 0.3, 1),
         "alpha": trial.suggest_float("alpha", 1, 20),
-        "is_unbalanced": trial.suggest_categorical("is_unbalanced", [True]),
+        #"is_unbalanced": trial.suggest_categorical("is_unbalanced", [True]),
         "n_estimators": trial.suggest_int("n_estimators", 100, 10000, step=100),
         "learning_rate": trial.suggest_float("learning_rate", 0.001, 0.5),
         "num_leaves": trial.suggest_int("num_leaves", 20, 3000, step=10),
@@ -860,7 +856,7 @@ def objective(trial, X, y, coeffofweight):
 
 def run_optuna_study_correctresp(X, y, coeffofweight):
     study = optuna.create_study(direction="minimize", study_name="LGBM Classifier")
-    func = lambda trial: objective(trial, X, y, coeffofweight)
+    func = lambda trial: objective(trial, X, y)
     study.optimize(func, n_trials=1000)
     print("Number of finished trials: ", len(study.trials))
     print(f"\tBest value of binary log loss: {study.best_value:.5f}")
@@ -870,6 +866,126 @@ def run_optuna_study_correctresp(X, y, coeffofweight):
         print(f"\t\t{key}: {value}")
     return study
 
+def run_optuna_study_falsealarm(dataframe, y):
+    study = optuna.create_study(direction="minimize", study_name="LGBM Classifier")
+    df_to_use = dataframe[
+        ["cosinesim", "pitchofprecur", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
+         "falsealarm", "pastcorrectresp", "pastcatchtrial", "trialNum", "targTimes", ]]
+
+    col = 'falsealarm'
+    X = df_to_use.loc[:, df_to_use.columns != col]
+    X = X.to_numpy()
+    func = lambda trial: objective(trial, X, y)
+    study.optimize(func, n_trials=1000)
+    print("Number of finished trials: ", len(study.trials))
+    print(f"\tBest value of binary log loss: {study.best_value:.5f}")
+    print(f"\tBest params:")
+
+    for key, value in study.best_params.items():
+        print(f"\t\t{key}: {value}")
+    return study
+
+def runlgbfaornotwithoptuna(dataframe, paramsinput):
+    df_to_use = dataframe[
+        ["cosinesim", "pitchofprecur", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
+         "falsealarm", "pastcorrectresp", "pastcatchtrial", "trialNum", "targTimes", ]]
+
+    col = 'falsealarm'
+    dfx = df_to_use.loc[:, df_to_use.columns != col]
+    # remove ferret as possible feature
+
+    X_train, X_test, y_train, y_test = train_test_split(dfx, df_to_use['falsealarm'], test_size=0.2, random_state=42)
+    print(X_train.shape)
+    print(X_test.shape)
+
+    dtrain = lgb.Dataset(X_train, label=y_train)
+    dtest = lgb.Dataset(X_test, label=y_test)
+    params2 = {"n_estimators": 9300,
+               "is_unbalanced": True,
+               "colsample_bytree": 0.8163174226131737,
+               "alpha": 4.971464509571637,
+               "learning_rate": 0.2744671988597753,
+               "num_leaves": 530,
+               "max_depth": 15,
+               "min_data_in_leaf": 400,
+               "lambda_l1": 2,
+               "lambda_l2": 44,
+               "min_gain_to_split": 0.008680941888662716,
+               "bagging_fraction": 0.9,
+               "bagging_freq": 1,
+               "feature_fraction": 0.6000000000000001}
+
+    xg_reg = lgb.LGBMClassifier(objective="binary", random_state=42,
+                                **paramsinput)
+
+    xg_reg.fit(X_train, y_train, eval_metric="cross_entropy_lambda", verbose=1000)
+    ypred = xg_reg.predict_proba(X_test)
+
+    kfold = KFold(n_splits=3)
+    results = cross_val_score(xg_reg, X_test, y_test, scoring='accuracy', cv=kfold)
+    bal_accuracy = cross_val_score(xg_reg, X_test, y_test, scoring='balanced_accuracy', cv=kfold)
+    print("Accuracy: %.2f%%" % (np.mean(results) * 100.0))
+    print(results)
+    print('Balanced Accuracy: %.2f%%' % (np.mean(bal_accuracy) * 100.0))
+
+    shap_values1 = shap.TreeExplainer(xg_reg).shap_values(dfx)
+    shap.summary_plot(shap_values1, dfx)
+    plt.show()
+    shap.dependence_plot("pitchofprecur", shap_values1[0], dfx)  #
+    plt.show()
+    result = permutation_importance(xg_reg, X_test, y_test, n_repeats=10,
+                                    random_state=42, n_jobs=2)
+    sorted_idx = result.importances_mean.argsort()
+
+    fig, ax = plt.subplots(figsize=(15, 15))
+    ax.barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T)
+    ax.set_title("Permutation Importances (test set)")
+    fig.tight_layout()
+    plt.savefig('D:/behavmodelfigs/permutation_importance.png', dpi=500)
+    plt.show()
+    explainer = shap.Explainer(xg_reg, dfx)
+    shap_values2 = explainer(X_train)
+    fig, ax = plt.subplots(figsize=(15, 15))
+    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "intra_trial_roving"])
+    fig.tight_layout()
+    plt.tight_layout()
+    plt.subplots_adjust(left=-10, right=0.5)
+
+    plt.show()
+    shap.plots.scatter(shap_values2[:, "pitchofprecur"], color=shap_values2[:, "talker"])
+    plt.show()
+
+    shap.plots.scatter(shap_values2[:, "pitchofprecur"], color=shap_values2[:, "intra_trial_roving"], show=False)
+    plt.show()
+
+    shap.plots.scatter(shap_values2[:, "intra_trial_roving"], color=shap_values2[:, "talker"])
+    plt.show()
+    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"])
+    plt.show()
+
+    shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "intra_trial_roving"], show=False)
+
+    plt.savefig('D:/behavmodelfigs/cosinesimdepenencyplot.png', dpi=500)
+    plt.show()
+
+    shap.plots.scatter(shap_values2[:, "intra_trial_roving"], color=shap_values2[:, "cosinesim"], show=False)
+    plt.savefig('D:/behavmodelfigs/intratrialrovingcosinecolor.png', dpi=500)
+
+    plt.show()
+
+    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "cosinesim"], show=False)
+    plt.savefig('D:/behavmodelfigs/trialnumcosinecolor.png', dpi=500)
+    plt.show()
+
+    shap.plots.scatter(shap_values2[:, "targTimes"], color=shap_values2[:, "cosinesim"], show=False)
+    plt.savefig('D:/behavmodelfigs/targtimescosinecolor.png', dpi=500)
+    plt.show()
+
+    shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "targTimes"], show=False)
+    plt.savefig('D:/behavmodelfigs/cosinesimtargtimes.png', dpi=500)
+    plt.show()
+
+    return xg_reg, ypred, y_test, results, shap_values1, X_train, y_train, bal_accuracy, shap_values2
 
 def runlgbfaornot(dataframe):
     df_to_use = dataframe[
@@ -904,7 +1020,6 @@ def runlgbfaornot(dataframe):
     xg_reg = lgb.LGBMClassifier(objective="binary", random_state=42,
                                 **params2)
 
-
     xg_reg.fit(X_train, y_train, eval_metric="cross_entropy_lambda", verbose=1000)
     ypred = xg_reg.predict_proba(X_test)
 
@@ -928,7 +1043,7 @@ def runlgbfaornot(dataframe):
     ax.barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T)
     ax.set_title("Permutation Importances (test set)")
     fig.tight_layout()
-    plt.savefig('D:/behavmodelfigs/permutation_importance.png', dpi = 500 )
+    plt.savefig('D:/behavmodelfigs/permutation_importance.png', dpi=500)
     plt.show()
     explainer = shap.Explainer(xg_reg, dfx)
     shap_values2 = explainer(X_train)
@@ -942,45 +1057,56 @@ def runlgbfaornot(dataframe):
     shap.plots.scatter(shap_values2[:, "pitchofprecur"], color=shap_values2[:, "talker"])
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "pitchofprecur"], color=shap_values2[:, "intra_trial_roving"])
+    shap.plots.scatter(shap_values2[:, "pitchofprecur"], color=shap_values2[:, "intra_trial_roving"], show=False)
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "intra_trial_roving"], color=shap_values2[:, "talker"])
     plt.show()
     shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"])
     plt.show()
-    shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "intra_trial_roving"])
+
+    shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "intra_trial_roving"], show=False)
 
     plt.savefig('D:/behavmodelfigs/cosinesimdepenencyplot.png', dpi=500)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "intra_trial_roving"], color=shap_values2[:, "cosinesim"])
+    shap.plots.scatter(shap_values2[:, "intra_trial_roving"], color=shap_values2[:, "cosinesim"], show=False)
     plt.savefig('D:/behavmodelfigs/intratrialrovingcosinecolor.png', dpi=500)
 
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "cosinesim"])
+    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "cosinesim"], show=False)
     plt.savefig('D:/behavmodelfigs/trialnumcosinecolor.png', dpi=500)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "targTimes"], color=shap_values2[:, "cosinesim"])
+    shap.plots.scatter(shap_values2[:, "targTimes"], color=shap_values2[:, "cosinesim"], show=False)
     plt.savefig('D:/behavmodelfigs/targtimescosinecolor.png', dpi=500)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "targTimes"])
+    shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "targTimes"], show=False)
     plt.savefig('D:/behavmodelfigs/cosinesimtargtimes.png', dpi=500)
     plt.show()
 
-
-
     return xg_reg, ypred, y_test, results, shap_values1, X_train, y_train, bal_accuracy, shap_values2
 
+def runfalsealarmpipeline(ferrets):
+    resultingfa_df = behaviouralhelperscg.get_false_alarm_behavdata(ferrets=ferrets, startdate='04-01-2020',
+                                                                    finishdate='01-10-2022')
+    # xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbfaornot(
+    #     resultingfa_df)
+    study = run_optuna_study_falsealarm(resultingfa_df, resultingfa_df['falsealarm'].to_numpy())
+    print(study.best_params)
+    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbfaornotwithoptuna(
+        resultingfa_df, study.best_params)
+    return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
-    resultingfa_df = behaviouralhelperscg.get_false_alarm_behavdata(ferrets=ferrets, startdate='04-01-2020',
-                                                                    finishdate='01-10-2022')
-    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbfaornot(resultingfa_df)
+    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(ferrets)
+
+
+
+
 
 
     # modelreg_reduc, modelregcat_reduc, modelregcat, modelreg, predictedrelease, df_use, dfcat_use, predictedcorrectresp, explainedvar, explainvarreleasetime = run_mixed_effects_analysis(
