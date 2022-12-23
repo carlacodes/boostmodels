@@ -831,7 +831,7 @@ def objective(trial, X, y):
 
     cv = StratifiedKFold(n_splits=3, shuffle=True, random_state=42)
 
-    cv_scores = np.empty(20)
+    cv_scores = np.empty(3)
     for idx, (train_idx, test_idx) in enumerate(cv.split(X, y)):
         X_train, X_test = X[train_idx], X[test_idx]
         y_train, y_test = y[train_idx], y[test_idx]
