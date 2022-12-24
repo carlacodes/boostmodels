@@ -13,6 +13,7 @@ from sklearn.feature_selection import RFE
 from sklearn.svm import SVR
 from sklearn.preprocessing import MinMaxScaler
 from pymer4.models import Lmer
+from pathlib import Path
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import auc
 from sklearn.model_selection import KFold
@@ -811,7 +812,7 @@ def objective(trial, X, y):
         # "device_type": trial.suggest_categorical("device_type", ['gpu']),
         "colsample_bytree": trial.suggest_float("colsample_bytree", 0.3, 1),
         "alpha": trial.suggest_float("alpha", 1, 20),
-        #"is_unbalanced": trial.suggest_categorical("is_unbalanced", [True]),
+        "is_unbalanced": trial.suggest_categorical("is_unbalanced", [True]),
         "n_estimators": trial.suggest_int("n_estimators", 100, 10000, step=100),
         "learning_rate": trial.suggest_float("learning_rate", 0.001, 0.5),
         "num_leaves": trial.suggest_int("num_leaves", 20, 3000, step=10),
@@ -889,6 +890,7 @@ def run_optuna_study_correctresponse(dataframe, y):
     df_to_use = dataframe[
         ["cosinesim", "pitchofprecur", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
          "correctresp", "pastcorrectresp", "pastcatchtrial", "trialNum", "targTimes", ]]
+
 
     col = 'correctesp'
     X = df_to_use.loc[:, df_to_use.columns != col]
@@ -1215,12 +1217,20 @@ def runfalsealarmpipeline(ferrets):
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbfaornotwithoptuna(
         resultingfa_df, study.best_params)
     #np.save('D:/behavmodelfigs/falsealarmoptunaparams2.npy', study.best_params)
+    from pathlib import Path
+    filepath = Path('D:/dfformixedmodels/falsealarmmodel_dfuse.csv')
+    filepath.parent.mkdir(parents=True, exist_ok=True)
+    resultingfa_df.to_csv(filepath)
     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
 def run_correct_responsepipleine(ferrets):
     resultingcr_df = behaviouralhelperscg.get_false_alarm_behavdata(ferrets=ferrets, startdate='04-01-2020',
                                                                         finishdate='01-10-2022')
-    study = run_optuna_study_correctresponse(resultingcr_df, resultingcr_df['correctresponse'].to_numpy())
+
+    filepath = Path('D:/dfformixedmodels/correctresponsemodel_dfuse.csv')
+    filepath.parent.mkdir(parents=True, exist_ok=True)
+    resultingcr_df.to_csv(filepath)
+    study = run_optuna_study_correctresponse(resultingcr_df, resultingcr_df['correctresp'].to_numpy())
     print(study.best_params)
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbcorrectrespornotwithoptuna(
         resultingcr_df, study.best_params)
