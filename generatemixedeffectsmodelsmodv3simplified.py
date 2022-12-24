@@ -151,7 +151,7 @@ def get_df_behav(path=None,
         droplist = np.empty(shape=(0, 0))
         droplistnew = np.empty(shape=(0, 0))
         print(len(newdata['realRelReleaseTimes'].values))
-        correspondcosinelist = []
+        correspondcosinelist = np.empty(shape=(0, 0))
 
         for i in range(1, len(newdata['realRelReleaseTimes'].values)):
             chosenresponseindex = chosenresponse.values[i]
@@ -236,7 +236,7 @@ def get_df_behav(path=None,
                 if pitchoftarg[i] == 13.0:
                     pitchoftarg[i] = 1.0
 
-                if newdata['talker'].values[i] == 0:
+                if newdata['talker'].values[i] == 1:
                     correspondcosinelist.append(cosinesimfemale[int(chosendisttrial[targpos[0] - 1])])
                 else:
                     correspondcosinelist.append(cosinesimmale[int(chosendisttrial[targpos[0] - 1])])
@@ -269,12 +269,14 @@ def get_df_behav(path=None,
         # gradinpitch = gradinpitch[~np.isnan(gradinpitch)]
 
         correctresp = correctresp[~np.isnan(correctresp)]
+        #correspondcosinelist=np.asarray(correspondcosinelist)
+        correspondcosinelist = correspondcosinelist[~np.isnan(correspondcosinelist)]
+
         # pastcorrectresp = pastcorrectresp[~np.isnan(pastcorrectresp)]
 
         # pastcatchtrial = pastcatchtrial[~np.isnan(pastcatchtrial)]
 
         pitchoftarg = np.delete(pitchoftarg, 0)
-        correspondcosinelist = np.delete(correspondcosinelist, 0)
         talkerlist2 = np.delete(talkerlist2, 0)
         stepval = np.delete(stepval, 0)
         pitchofprecur = np.delete(pitchofprecur, 0)
@@ -1231,7 +1233,6 @@ def runfalsealarmpipeline(ferrets):
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbfaornotwithoptuna(
         resultingfa_df, study.best_params)
     #np.save('D:/behavmodelfigs/falsealarmoptunaparams2.npy', study.best_params)
-    from pathlib import Path
     filepath = Path('D:/dfformixedmodels/falsealarmmodel_dfuse.csv')
     filepath.parent.mkdir(parents=True, exist_ok=True)
     resultingfa_df.to_csv(filepath)
