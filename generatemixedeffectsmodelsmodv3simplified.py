@@ -103,6 +103,8 @@ def get_df_behav(path=None,
                                             finishDate=finishdate)
     fs = 24414.062500
     bigdata = pd.DataFrame()
+    cosinesimfemale = np.load('D:/Stimuli/cosinesimvectorfemale.npy')
+    cosinesimmale = np.load('D:/Stimuli/cosinesimvectormale.npy')
     numofferrets = allData['ferret'].unique()
     for ferret in numofferrets:
         print(ferret)
@@ -149,6 +151,7 @@ def get_df_behav(path=None,
         droplist = np.empty(shape=(0, 0))
         droplistnew = np.empty(shape=(0, 0))
         print(len(newdata['realRelReleaseTimes'].values))
+        correspondcosinelist = []
 
         for i in range(1, len(newdata['realRelReleaseTimes'].values)):
             chosenresponseindex = chosenresponse.values[i]
@@ -233,6 +236,12 @@ def get_df_behav(path=None,
                 if pitchoftarg[i] == 13.0:
                     pitchoftarg[i] = 1.0
 
+                if newdata['talker'].values[i] == 0:
+                    correspondcosinelist.append(cosinesimfemale[int(chosendisttrial[targpos[0] - 1])])
+                else:
+                    correspondcosinelist.append(cosinesimmale[int(chosendisttrial[targpos[0] - 1])])
+
+
 
 
             except:
@@ -280,6 +289,7 @@ def get_df_behav(path=None,
         newdata['pitchofprecur'] = pitchofprecur.tolist()
 
         correctresp = np.delete(correctresp, droplist)
+        correspondcosinelist = np.delete(correspondcosinelist, droplist)
         pastcorrectresp = np.delete(pastcorrectresp, droplist)
         pastcatchtrial = np.delete(pastcatchtrial, droplist)
 
@@ -301,6 +311,7 @@ def get_df_behav(path=None,
         newdata['talker'] = talkerlist2.tolist()
         newdata['pastcatchtrial'] = pastcatchtrial.tolist()
         newdata['stepval'] = stepval.tolist()
+        newdata['cosinesim'] = correspondcosinelist.tolist()
         precur_and_targ_same = precur_and_targ_same.astype(int)
         newdata['precur_and_targ_same'] = precur_and_targ_same.tolist()
         newdata['timeToTarget'] = newdata['timeToTarget'] / 24414.0625
@@ -812,7 +823,7 @@ def objective(trial, X, y):
         # "device_type": trial.suggest_categorical("device_type", ['gpu']),
         "colsample_bytree": trial.suggest_float("colsample_bytree", 0.3, 1),
         "alpha": trial.suggest_float("alpha", 1, 20),
-        "is_unbalanced": trial.suggest_categorical("is_unbalanced", [True]),
+        #"is_unbalanced": trial.suggest_categorical("is_unbalanced", [True]),
         "n_estimators": trial.suggest_int("n_estimators", 100, 10000, step=100),
         "learning_rate": trial.suggest_float("learning_rate", 0.001, 0.5),
         "num_leaves": trial.suggest_int("num_leaves", 20, 3000, step=10),
@@ -887,9 +898,9 @@ def run_optuna_study_falsealarm(dataframe, y):
     return study
 def run_optuna_study_correctresponse(dataframe, y):
     study = optuna.create_study(direction="minimize", study_name="LGBM Classifier")
-    df_to_use = dataframe[
-        ["cosinesim", "pitchofprecur", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
-         "correctresp", "pastcorrectresp", "pastcatchtrial", "trialNum", "targTimes", ]]
+    df_to_use =  dataframe[["pitchoftarg", "pitchofprecur", "talker", "side", "precur_and_targ_same",
+    "timeToTarget", "DaysSinceStart", "AM", "cosinesim", "stepval", "pastcorrectresp", "pastcatchtrial", "trialNum", "correctresp"]]
+
 
 
     col = 'correctesp'
@@ -905,9 +916,11 @@ def run_optuna_study_correctresponse(dataframe, y):
         print(f"\t\t{key}: {value}")
     return study
 def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput):
-    df_to_use = dataframe[
-        ["cosinesim", "pitchofprecur", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
-         "correctresp", "pastcorrectresp", "pastcatchtrial", "trialNum", "targTimes", ]]
+    # df_to_use = dataframe[
+    #     ["cosinesim", "pitchofprecur", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
+    #      "correctresp", "pastcorrectresp", "pastcatchtrial", "trialNum", "targTimes", ]]
+    df_to_use = dataframe[["pitchoftarg", "pitchofprecur", "talker", "side", "precur_and_targ_same",
+    "timeToTarget", "DaysSinceStart", "AM", "cosinesim", "stepval", "pastcorrectresp", "pastcatchtrial", "trialNum", "correctresp"]]
 
     col = 'correctresp'
     dfx = df_to_use.loc[:, df_to_use.columns != col]
@@ -1224,8 +1237,9 @@ def runfalsealarmpipeline(ferrets):
     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
 def run_correct_responsepipleine(ferrets):
-    resultingcr_df = behaviouralhelperscg.get_false_alarm_behavdata(ferrets=ferrets, startdate='04-01-2020',
-                                                                        finishdate='01-10-2022')
+    # resultingcr_df = behaviouralhelperscg.get_false_alarm_behavdata(ferrets=ferrets, startdate='04-01-2020',
+    #                                                                     finishdate='01-10-2022')
+    resultingcr_df = get_df_behav(ferrets=ferrets, includefaandmiss=True, startdate='04-01-2020', finishdate='01-10-2022')
 
     filepath = Path('D:/dfformixedmodels/correctresponsemodel_dfuse.csv')
     filepath.parent.mkdir(parents=True, exist_ok=True)
