@@ -830,7 +830,7 @@ def objective(trial, X, y):
         # "device_type": trial.suggest_categorical("device_type", ['gpu']),
         "colsample_bytree": trial.suggest_float("colsample_bytree", 0.3, 1),
         "alpha": trial.suggest_float("alpha", 1, 20),
-        #"is_unbalanced": trial.suggest_categorical("is_unbalanced", [True]),
+        "is_unbalanced": trial.suggest_categorical("is_unbalanced", [True]),
         "n_estimators": trial.suggest_int("n_estimators", 100, 10000, step=100),
         "learning_rate": trial.suggest_float("learning_rate", 0.001, 0.5),
         "num_leaves": trial.suggest_int("num_leaves", 20, 3000, step=10),
