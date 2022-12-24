@@ -63,6 +63,7 @@ class behaviouralhelperscg:
             talkerlist2 = np.empty(len(pitchshiftmat))
 
             falsealarm = np.empty(shape=(0, 0))
+            correctresp = np.empty(shape=(0, 0))
             pastcorrectresp = np.empty(shape=(0, 0))
             pastcatchtrial = np.empty(shape=(0, 0))
             droplist = np.empty(shape=(0, 0))
@@ -101,6 +102,11 @@ class behaviouralhelperscg:
                     falsealarm = np.append(falsealarm, 0)
                 else:
                     falsealarm = np.append(falsealarm, 1)
+                if ((
+                            chosenresponseindex == 0 or chosenresponseindex == 1) and realrelreleasetime >= 0) or chosenresponseindex == 3:
+                    correctresp = np.append(correctresp, 1)
+                else:
+                    correctresp = np.append(correctresp, 0)
 
                 if ((
                             pastresponseindex == 0 or pastresponseindex == 1) and pastrealrelreleasetime >= 0) or pastresponseindex == 3:
@@ -185,6 +191,7 @@ class behaviouralhelperscg:
             pitchoftarg = pitchoftarg.astype(int)
             pitchofprecur = pitchofprecur.astype(int)
             falsealarm = falsealarm[~np.isnan(falsealarm)]
+            correctresp = correctresp[~np.isnan(correctresp)]
 
             pitchoftarg = np.delete(pitchoftarg, 0)
             talkerlist2 = np.delete(talkerlist2, 0)
@@ -214,6 +221,7 @@ class behaviouralhelperscg:
 
             newdata['falsealarm'] = falsealarm.tolist()
             newdata['intra_trial_roving'] = intra_trial_roving.tolist()
+            newdata['correctresp'] = correctresp.tolist()
             newdata['distractor_or_fa'] = distractor_or_fa.tolist()
             newdata['pastcorrectresp'] = pastcorrectresp.tolist()
             newdata['talker'] = talkerlist2.tolist()
