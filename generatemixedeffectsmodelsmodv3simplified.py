@@ -195,7 +195,14 @@ def get_df_behav(path=None,
                 pastcatchtrial = np.append(pastcatchtrial, 1)
             else:
                 pastcatchtrial = np.append(pastcatchtrial, 0)
+
             try:
+                if newdata['talker'].values[i] == 1:
+                    correspondcosinelist = np.append(correspondcosinelist,
+                                                     cosinesimfemale[int(chosendisttrial[targpos[0] - 1])])
+                else:
+                    correspondcosinelist = np.append(correspondcosinelist,
+                                                     cosinesimmale[int(chosendisttrial[targpos[0] - 1])])
                 if chosentrial[targpos[0]] == 8.0:
                     pitchoftarg[i] == 3.0
                 else:
@@ -236,10 +243,7 @@ def get_df_behav(path=None,
                 if pitchoftarg[i] == 13.0:
                     pitchoftarg[i] = 1.0
 
-                if newdata['talker'].values[i] == 1:
-                    correspondcosinelist.append(cosinesimfemale[int(chosendisttrial[targpos[0] - 1])])
-                else:
-                    correspondcosinelist.append(cosinesimmale[int(chosendisttrial[targpos[0] - 1])])
+
 
 
 
@@ -292,7 +296,7 @@ def get_df_behav(path=None,
         newdata['pitchofprecur'] = pitchofprecur.tolist()
 
         correctresp = np.delete(correctresp, droplist)
-        correspondcosinelist = np.delete(correspondcosinelist, droplist)
+        #correspondcosinelist = np.delete(correspondcosinelist, droplist)
         pastcorrectresp = np.delete(pastcorrectresp, droplist)
         pastcatchtrial = np.delete(pastcatchtrial, droplist)
 
