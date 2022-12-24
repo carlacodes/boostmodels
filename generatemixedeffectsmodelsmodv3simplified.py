@@ -91,6 +91,7 @@ def get_df_behav(path=None,
                  output=None,
                  ferrets=None,
                  includefaandmiss=False,
+                 includemissonly=False,
                  startdate=None,
                  finishdate=None):
     if output is None:
@@ -337,6 +338,9 @@ def get_df_behav(path=None,
         if includefaandmiss is True:
             newdata = newdata[
                 (newdata.response == 0) | (newdata.response == 1) | (newdata.response == 7) | (newdata.response == 5)]
+        elif includemissonly is True:
+            newdata = newdata[
+                (newdata.response == 0) | (newdata.response == 1) | (newdata.response == 7) | (newdata.response == 3)]
         else:
             newdata = newdata[newdata.correctresp == 1]
             newdata = newdata[(newdata.catchTrial == 0)]
@@ -830,7 +834,7 @@ def objective(trial, X, y):
         # "device_type": trial.suggest_categorical("device_type", ['gpu']),
         "colsample_bytree": trial.suggest_float("colsample_bytree", 0.3, 1),
         "alpha": trial.suggest_float("alpha", 1, 20),
-        "is_unbalanced": trial.suggest_categorical("is_unbalanced", [True]),
+        #"is_unbalanced": trial.suggest_categorical("is_unbalanced", [True]),
         "n_estimators": trial.suggest_int("n_estimators", 100, 10000, step=100),
         "learning_rate": trial.suggest_float("learning_rate", 0.001, 0.5),
         "num_leaves": trial.suggest_int("num_leaves", 20, 3000, step=10),
@@ -973,7 +977,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput):
     explainer = shap.Explainer(xg_reg, dfx)
     shap_values2 = explainer(X_train)
     fig, ax = plt.subplots(figsize=(15, 15))
-    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "intra_trial_roving"])
+    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "precur_and_targ_same"], ax=ax)
     fig.tight_layout()
     plt.tight_layout()
     plt.subplots_adjust(left=-10, right=0.5)
@@ -982,7 +986,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput):
     shap.plots.scatter(shap_values2[:, "pitchofprecur"], color=shap_values2[:, "talker"])
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "pitchofprecur"], color=shap_values2[:, "intra_trial_roving"], show=False)
+    shap.plots.scatter(shap_values2[:, "pitchofprecur"], color=shap_values2[:, "precur_and_targ_same"], show=False)
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "intra_trial_roving"], color=shap_values2[:, "talker"])
@@ -1245,7 +1249,7 @@ def runfalsealarmpipeline(ferrets):
 def run_correct_responsepipleine(ferrets):
     # resultingcr_df = behaviouralhelperscg.get_false_alarm_behavdata(ferrets=ferrets, startdate='04-01-2020',
     #                                                                     finishdate='01-10-2022')
-    resultingcr_df = get_df_behav(ferrets=ferrets, includefaandmiss=True, startdate='04-01-2020', finishdate='01-10-2022')
+    resultingcr_df = get_df_behav(ferrets=ferrets, includefaandmiss=False,includemissonly=True, startdate='04-01-2020', finishdate='01-10-2022')
 
     filepath = Path('D:/dfformixedmodels/correctresponsemodel_dfuse.csv')
     filepath.parent.mkdir(parents=True, exist_ok=True)
@@ -1259,7 +1263,7 @@ def run_correct_responsepipleine(ferrets):
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
     #xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(ferrets)
-    #TODO: add in the correct response or not function model
+
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = run_correct_responsepipleine(ferrets)
 
 
