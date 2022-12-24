@@ -274,6 +274,7 @@ def get_df_behav(path=None,
         # pastcatchtrial = pastcatchtrial[~np.isnan(pastcatchtrial)]
 
         pitchoftarg = np.delete(pitchoftarg, 0)
+        correspondcosinelist = np.delete(correspondcosinelist, 0)
         talkerlist2 = np.delete(talkerlist2, 0)
         stepval = np.delete(stepval, 0)
         pitchofprecur = np.delete(pitchofprecur, 0)
