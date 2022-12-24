@@ -829,7 +829,7 @@ def objective(trial, X, y):
         ),
     }
 
-    cv = StratifiedKFold(n_splits=3, shuffle=True, random_state=42)
+    cv = KFold(n_splits=3, shuffle=True, random_state=42)
 
     cv_scores = np.empty(3)
     for idx, (train_idx, test_idx) in enumerate(cv.split(X, y)):
@@ -907,7 +907,7 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput):
     xg_reg.fit(X_train, y_train, eval_metric="cross_entropy_lambda", verbose=1000)
     ypred = xg_reg.predict_proba(X_test)
 
-    kfold = StratifiedKFold(n_splits=3, shuffle=True, random_state=42)
+    kfold = KFold(n_splits=3, shuffle=True, random_state=42)
     results = cross_val_score(xg_reg, X_test, y_test, scoring='accuracy', cv=kfold)
     bal_accuracy = cross_val_score(xg_reg, X_test, y_test, scoring='balanced_accuracy', cv=kfold)
     print("Accuracy: %.2f%%" % (np.mean(results) * 100.0))
@@ -1094,10 +1094,20 @@ def runfalsealarmpipeline(ferrets):
     np.save('D:/behavmodelfigs/falsealarmoptunaparams2.npy', study.best_params)
     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
+def run_correct_responsepipleine(ferrets):
+    resultingcr_df = behaviouralhelperscg.get_correct_response_behavdata(ferrets=ferrets, startdate='04-01-2020',
+                                                                        finishdate='01-10-2022')
+    study = run_optuna_study_correctresponse(resultingcr_df, resultingcr_df['correctresponse'].to_numpy())
+    print(study.best_params)
+    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbfaornotwithoptuna(
+        resultingcr_df, study.best_params)
+    np.save('D:/behavmodelfigs/correctresponseoptunaparams2.npy', study.best_params)
+    return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
+
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(ferrets)
-
+    #TODO: add in the correct response or not function model
 
 
 
