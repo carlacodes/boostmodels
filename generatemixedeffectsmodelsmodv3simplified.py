@@ -884,6 +884,123 @@ def run_optuna_study_falsealarm(dataframe, y):
     for key, value in study.best_params.items():
         print(f"\t\t{key}: {value}")
     return study
+def run_optuna_study_correctresponse(dataframe, y):
+    study = optuna.create_study(direction="minimize", study_name="LGBM Classifier")
+    df_to_use = dataframe[
+        ["cosinesim", "pitchofprecur", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
+         "correctresp", "pastcorrectresp", "pastcatchtrial", "trialNum", "targTimes", ]]
+
+    col = 'correctesp'
+    X = df_to_use.loc[:, df_to_use.columns != col]
+    X = X.to_numpy()
+    func = lambda trial: objective(trial, X, y)
+    study.optimize(func, n_trials=1000)
+    print("Number of finished trials: ", len(study.trials))
+    print(f"\tBest value of binary log loss: {study.best_value:.5f}")
+    print(f"\tBest params:")
+
+    for key, value in study.best_params.items():
+        print(f"\t\t{key}: {value}")
+    return study
+def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput):
+    df_to_use = dataframe[
+        ["cosinesim", "pitchofprecur", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
+         "correctresp", "pastcorrectresp", "pastcatchtrial", "trialNum", "targTimes", ]]
+
+    col = 'correctresp'
+    dfx = df_to_use.loc[:, df_to_use.columns != col]
+    # remove ferret as possible feature
+
+    X_train, X_test, y_train, y_test = train_test_split(dfx, df_to_use['correctresp'], test_size=0.2, random_state=42)
+    print(X_train.shape)
+    print(X_test.shape)
+
+    # dtrain = lgb.Dataset(X_train, label=y_train)
+    # dtest = lgb.Dataset(X_test, label=y_test)
+
+    xg_reg = lgb.LGBMClassifier(objective="binary", random_state=42,
+                                **paramsinput)
+
+    xg_reg.fit(X_train, y_train, eval_metric="cross_entropy_lambda", verbose=1000)
+    ypred = xg_reg.predict_proba(X_test)
+
+    kfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+    results = cross_val_score(xg_reg, X_test, y_test, scoring='accuracy', cv=kfold)
+    bal_accuracy = cross_val_score(xg_reg, X_test, y_test, scoring='balanced_accuracy', cv=kfold)
+    print("Accuracy: %.2f%%" % (np.mean(results) * 100.0))
+    print(results)
+    print('Balanced Accuracy: %.2f%%' % (np.mean(bal_accuracy) * 100.0))
+
+    shap_values1 = shap.TreeExplainer(xg_reg).shap_values(dfx)
+    shap.summary_plot(shap_values1, dfx, show=False)
+    plt.savefig('D:/behavmodelfigs/correctrespmodel/correctresponsemodelrankedfeatures.png', dpi=500)
+
+    plt.show()
+    shap.dependence_plot("pitchofprecur", shap_values1[0], dfx)  #
+    plt.show()
+    result = permutation_importance(xg_reg, X_test, y_test, n_repeats=10,
+                                    random_state=42, n_jobs=2)
+    sorted_idx = result.importances_mean.argsort()
+
+    fig, ax = plt.subplots(figsize=(15, 15))
+    ax.barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T)
+    ax.set_title("Permutation Importances (test set)")
+    fig.tight_layout()
+    plt.savefig('D:/behavmodelfigs/permutation_importance.png', dpi=500)
+    plt.show()
+    explainer = shap.Explainer(xg_reg, dfx)
+    shap_values2 = explainer(X_train)
+    fig, ax = plt.subplots(figsize=(15, 15))
+    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "intra_trial_roving"])
+    fig.tight_layout()
+    plt.tight_layout()
+    plt.subplots_adjust(left=-10, right=0.5)
+
+    plt.show()
+    shap.plots.scatter(shap_values2[:, "pitchofprecur"], color=shap_values2[:, "talker"])
+    plt.show()
+
+    shap.plots.scatter(shap_values2[:, "pitchofprecur"], color=shap_values2[:, "intra_trial_roving"], show=False)
+    plt.show()
+
+    shap.plots.scatter(shap_values2[:, "intra_trial_roving"], color=shap_values2[:, "talker"])
+    plt.show()
+    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"])
+    plt.show()
+
+    shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "intra_trial_roving"], show=False)
+    plt.title('Cosine similarity vs. SHAP value impact')
+
+    plt.savefig('D:/behavmodelfigs/correctrespmodel/cosinesimdepenencyplot.png', dpi=500)
+    plt.show()
+
+    shap.plots.scatter(shap_values2[:, "intra_trial_roving"], color=shap_values2[:, "cosinesim"], show=False)
+    plt.savefig('D:/behavmodelfigs/correctrespmodel/intratrialrovingcosinecolor.png', dpi=500)
+    plt.title('Intra trial roving versus SHAP value impact')
+
+    plt.show()
+
+    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "cosinesim"], show=False)
+    plt.savefig('D:/behavmodelfigs/correctrespmodel/trialnumcosinecolor.png', dpi=500)
+    plt.show()
+
+    shap.plots.scatter(shap_values2[:, "targTimes"], color=shap_values2[:, "cosinesim"], show=False)
+    plt.title('Target Times coloured by Cosine Similarity vs Their Impact on the SHAP value')
+    plt.savefig('D:/behavmodelfigs/correctrespmodel/targtimescosinecolor.png', dpi=500)
+    plt.show()
+
+    shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "targTimes"], show=False)
+    plt.title('Cosine Similarity as a function of SHAP values, coloured by targTimes')
+    plt.savefig('D:/behavmodelfigs/correctrespmodel/cosinesimtargtimes.png', dpi=500)
+    plt.show()
+    np.save('D:/behavmodelfigs/correctrespponseoptunaparams_strat5kfold.npy', paramsinput)
+
+    shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "talker"], show=False)
+    plt.title('Cosine Similarity as a function of SHAP values, coloured by talker')
+    plt.savefig('D:/behavmodelfigs/correctrespmodel/cosinesimcolouredtalkers.png', dpi=500)
+    plt.show()
+
+    return xg_reg, ypred, y_test, results, shap_values1, X_train, y_train, bal_accuracy, shap_values2
 
 def runlgbfaornotwithoptuna(dataframe, paramsinput):
     df_to_use = dataframe[
@@ -1101,19 +1218,20 @@ def runfalsealarmpipeline(ferrets):
     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
 def run_correct_responsepipleine(ferrets):
-    resultingcr_df = behaviouralhelperscg.get_correct_response_behavdata(ferrets=ferrets, startdate='04-01-2020',
+    resultingcr_df = behaviouralhelperscg.get_false_alarm_behavdata(ferrets=ferrets, startdate='04-01-2020',
                                                                         finishdate='01-10-2022')
     study = run_optuna_study_correctresponse(resultingcr_df, resultingcr_df['correctresponse'].to_numpy())
     print(study.best_params)
-    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbfaornotwithoptuna(
+    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbcorrectrespornotwithoptuna(
         resultingcr_df, study.best_params)
-    np.save('D:/behavmodelfigs/correctresponseoptunaparams2.npy', study.best_params)
     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
-    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(ferrets)
+    #xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(ferrets)
     #TODO: add in the correct response or not function model
+    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = run_correct_responsepipleine(ferrets)
+
 
 
 
