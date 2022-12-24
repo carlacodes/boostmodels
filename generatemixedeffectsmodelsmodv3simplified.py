@@ -829,9 +829,9 @@ def objective(trial, X, y):
         ),
     }
 
-    cv = KFold(n_splits=3, shuffle=True, random_state=42)
+    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 
-    cv_scores = np.empty(3)
+    cv_scores = np.empty(5)
     for idx, (train_idx, test_idx) in enumerate(cv.split(X, y)):
         X_train, X_test = X[train_idx], X[test_idx]
         y_train, y_test = y[train_idx], y[test_idx]
@@ -907,7 +907,7 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput):
     xg_reg.fit(X_train, y_train, eval_metric="cross_entropy_lambda", verbose=1000)
     ypred = xg_reg.predict_proba(X_test)
 
-    kfold = KFold(n_splits=3, shuffle=True, random_state=42)
+    kfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
     results = cross_val_score(xg_reg, X_test, y_test, scoring='accuracy', cv=kfold)
     bal_accuracy = cross_val_score(xg_reg, X_test, y_test, scoring='balanced_accuracy', cv=kfold)
     print("Accuracy: %.2f%%" % (np.mean(results) * 100.0))
@@ -973,6 +973,12 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput):
     shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "targTimes"], show=False)
     plt.title('Cosine Similarity as a function of SHAP values, coloured by targTimes')
     plt.savefig('D:/behavmodelfigs/cosinesimtargtimes.png', dpi=500)
+    plt.show()
+    np.save('D:/behavmodelfigs/falsealarmoptunaparams3_strat5kfold.npy', paramsinput)
+
+    shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "talker"], show=False)
+    plt.title('Cosine Similarity as a function of SHAP values, coloured by talker')
+    plt.savefig('D:/behavmodelfigs/cosinesimcolouredtalkers.png', dpi=500)
     plt.show()
 
     return xg_reg, ypred, y_test, results, shap_values1, X_train, y_train, bal_accuracy, shap_values2
@@ -1091,7 +1097,7 @@ def runfalsealarmpipeline(ferrets):
     print(study.best_params)
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbfaornotwithoptuna(
         resultingfa_df, study.best_params)
-    np.save('D:/behavmodelfigs/falsealarmoptunaparams2.npy', study.best_params)
+    #np.save('D:/behavmodelfigs/falsealarmoptunaparams2.npy', study.best_params)
     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
 def run_correct_responsepipleine(ferrets):
