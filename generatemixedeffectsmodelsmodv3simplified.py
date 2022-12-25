@@ -833,7 +833,7 @@ def objective(trial, X, y):
         # "device_type": trial.suggest_categorical("device_type", ['gpu']),
         "colsample_bytree": trial.suggest_float("colsample_bytree", 0.3, 1),
         "alpha": trial.suggest_float("alpha", 1, 20),
-        #"is_unbalanced": trial.suggest_categorical("is_unbalanced", [True]),
+        "is_unbalanced": trial.suggest_categorical("is_unbalanced", [True]),
         "n_estimators": trial.suggest_int("n_estimators", 100, 10000, step=100),
         "learning_rate": trial.suggest_float("learning_rate", 0.001, 0.5),
         "num_leaves": trial.suggest_int("num_leaves", 20, 3000, step=10),
@@ -1018,7 +1018,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput):
     plt.title('Cosine Similarity as a function of SHAP values, coloured by targTimes')
     plt.savefig('D:/behavmodelfigs/correctrespmodel/cosinesimtargtimes.png', dpi=500)
     plt.show()
-    np.save('D:/behavmodelfigs/correctrespponseoptunaparams3_strat5kfold.npy', paramsinput)
+    np.save('D:/behavmodelfigs/correctrespponseoptunaparams4_strat5kfold.npy', paramsinput)
 
     shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "talker"], show=False)
     plt.title('Cosine Similarity as a function of SHAP values, coloured by talker')
@@ -1233,6 +1233,9 @@ def runlgbfaornot(dataframe):
 def runfalsealarmpipeline(ferrets):
     resultingfa_df = behaviouralhelperscg.get_false_alarm_behavdata(ferrets=ferrets, startdate='04-01-2020',
                                                                     finishdate='01-10-2022')
+    filepath = Path('D:/dfformixedmodels/falsealarmmodel_dfuse.csv')
+    filepath.parent.mkdir(parents=True, exist_ok=True)
+    resultingfa_df.to_csv(filepath)
     # xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbfaornot(
     #     resultingfa_df)
     study = run_optuna_study_falsealarm(resultingfa_df, resultingfa_df['falsealarm'].to_numpy())
@@ -1240,9 +1243,7 @@ def runfalsealarmpipeline(ferrets):
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbfaornotwithoptuna(
         resultingfa_df, study.best_params)
     #np.save('D:/behavmodelfigs/falsealarmoptunaparams2.npy', study.best_params)
-    filepath = Path('D:/dfformixedmodels/falsealarmmodel_dfuse.csv')
-    filepath.parent.mkdir(parents=True, exist_ok=True)
-    resultingfa_df.to_csv(filepath)
+
     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
 def run_correct_responsepipleine(ferrets):
@@ -1261,9 +1262,9 @@ def run_correct_responsepipleine(ferrets):
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
-    #xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(ferrets)
+    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(ferrets)
 
-    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = run_correct_responsepipleine(ferrets)
+    #xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = run_correct_responsepipleine(ferrets)
 
 
 
