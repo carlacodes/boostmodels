@@ -264,7 +264,6 @@ def get_df_behav(path=None,
                      inplace=True)
         newdata.drop(droplistnew, axis=0, inplace=True)
 
-        # TODO: CHECK IF DATA IS EXTRACTED SEQUENTIALLY SO TRIAL NUMS ARE CONCATENATED CORRECTLY
         droplist = [int(x) for x in droplist]  # drop corrupted metdata trials
 
         # pitchoftarg = pitchoftarg[~np.isnan(pitchoftarg)]
@@ -910,7 +909,7 @@ def run_optuna_study_falsealarm(dataframe, y):
 def run_optuna_study_correctresponse(dataframe, y):
     study = optuna.create_study(direction="minimize", study_name="LGBM Classifier")
     df_to_use =  dataframe[["pitchoftarg", "pitchofprecur", "talker", "side", "precur_and_targ_same",
-    "timeToTarget", "DaysSinceStart", "AM", "cosinesim", "stepval", "pastcorrectresp", "pastcatchtrial", "trialNum", "correctresp"]]
+    "targTimes", "DaysSinceStart", "AM", "cosinesim", "stepval", "pastcorrectresp", "pastcatchtrial", "trialNum", "correctresp"]]
 
 
 
@@ -931,7 +930,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput):
     #     ["cosinesim", "pitchofprecur", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
     #      "correctresp", "pastcorrectresp", "pastcatchtrial", "trialNum", "targTimes", ]]
     df_to_use = dataframe[["pitchoftarg", "pitchofprecur", "talker", "side", "precur_and_targ_same",
-    "timeToTarget", "DaysSinceStart", "AM", "cosinesim", "stepval", "pastcorrectresp", "pastcatchtrial", "trialNum", "correctresp"]]
+    "targTimes", "DaysSinceStart", "AM", "cosinesim", "stepval", "pastcorrectresp", "pastcatchtrial", "trialNum", "correctresp"]]
 
     col = 'correctresp'
     dfx = df_to_use.loc[:, df_to_use.columns != col]
@@ -989,18 +988,18 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput):
     shap.plots.scatter(shap_values2[:, "pitchofprecur"], color=shap_values2[:, "precur_and_targ_same"], show=False)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "intra_trial_roving"], color=shap_values2[:, "talker"])
+    shap.plots.scatter(shap_values2[:, "precur_and_targ_same"], color=shap_values2[:, "talker"])
     plt.show()
     shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"])
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "intra_trial_roving"], show=False)
+    shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "precur_and_targ_same"], show=False)
     plt.title('Cosine similarity vs. SHAP value impact')
 
     plt.savefig('D:/behavmodelfigs/correctrespmodel/cosinesimdepenencyplot.png', dpi=500)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "intra_trial_roving"], color=shap_values2[:, "cosinesim"], show=False)
+    shap.plots.scatter(shap_values2[:, "precur_and_targ_same"], color=shap_values2[:, "cosinesim"], show=False)
     plt.savefig('D:/behavmodelfigs/correctrespmodel/intratrialrovingcosinecolor.png', dpi=500)
     plt.title('Intra trial roving versus SHAP value impact')
 
@@ -1019,7 +1018,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput):
     plt.title('Cosine Similarity as a function of SHAP values, coloured by targTimes')
     plt.savefig('D:/behavmodelfigs/correctrespmodel/cosinesimtargtimes.png', dpi=500)
     plt.show()
-    np.save('D:/behavmodelfigs/correctrespponseoptunaparams_strat5kfold.npy', paramsinput)
+    np.save('D:/behavmodelfigs/correctrespponseoptunaparams3_strat5kfold.npy', paramsinput)
 
     shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "talker"], show=False)
     plt.title('Cosine Similarity as a function of SHAP values, coloured by talker')
