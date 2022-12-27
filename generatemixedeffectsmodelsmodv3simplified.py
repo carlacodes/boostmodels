@@ -24,7 +24,7 @@ import optuna
 from optuna.integration import LightGBMPruningCallback
 from sklearn.metrics import log_loss
 from sklearn.metrics import balanced_accuracy_score
-from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import StratifiedKFold, TimeSeriesSplit
 
 scaler = MinMaxScaler()
 import os
@@ -851,7 +851,8 @@ def objective(trial, X, y):
         ),
     }
 
-    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+    #cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+    cv =TimeSeriesSplit(n_splits=5)
 
     cv_scores = np.empty(5)
     for idx, (train_idx, test_idx) in enumerate(cv.split(X, y)):
@@ -891,7 +892,7 @@ def run_optuna_study_correctresp(X, y, coeffofweight):
 def run_optuna_study_falsealarm(dataframe, y):
     study = optuna.create_study(direction="minimize", study_name="LGBM Classifier")
     df_to_use = dataframe[
-        ["cosinesim", "pitchofprecur", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
+        ["cosinesim", "dates", "pitchofprecur", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
          "falsealarm", "pastcorrectresp", "pastcatchtrial", "trialNum", "targTimes", ]]
 
     col = 'falsealarm'
@@ -908,7 +909,7 @@ def run_optuna_study_falsealarm(dataframe, y):
     return study
 def run_optuna_study_correctresponse(dataframe, y):
     study = optuna.create_study(direction="minimize", study_name="LGBM Classifier")
-    df_to_use =  dataframe[["pitchoftarg", "pitchofprecur", "talker", "side", "precur_and_targ_same",
+    df_to_use =  dataframe[["pitchoftarg", "pitchofprecur", "talker", "side", "precur_and_targ_same","dates",
     "targTimes", "DaysSinceStart", "AM", "cosinesim", "stepval", "pastcorrectresp", "pastcatchtrial", "trialNum", "correctresp"]]
 
 
@@ -1018,7 +1019,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput):
     plt.title('Cosine Similarity as a function of SHAP values, coloured by targTimes')
     plt.savefig('D:/behavmodelfigs/correctrespmodel/cosinesimtargtimes.png', dpi=500)
     plt.show()
-    np.save('D:/behavmodelfigs/correctrespponseoptunaparams4_strat5kfold.npy', paramsinput)
+    np.save('D:/behavmodelfigs/correctrespponseoptunaparams1_timeseriessplit5fold.npy', paramsinput)
 
     shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "talker"], show=False)
     plt.title('Cosine Similarity as a function of SHAP values, coloured by talker')
@@ -1029,7 +1030,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput):
 
 def runlgbfaornotwithoptuna(dataframe, paramsinput):
     df_to_use = dataframe[
-        ["cosinesim", "pitchofprecur", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
+        ["cosinesim", "dates", "pitchofprecur", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
          "falsealarm", "pastcorrectresp", "pastcatchtrial", "trialNum", "targTimes", ]]
 
     col = 'falsealarm'
@@ -1050,8 +1051,9 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput):
     ypred = xg_reg.predict_proba(X_test)
 
     kfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-    results = cross_val_score(xg_reg, X_test, y_test, scoring='accuracy', cv=kfold)
-    bal_accuracy = cross_val_score(xg_reg, X_test, y_test, scoring='balanced_accuracy', cv=kfold)
+    timesplit = TimeSeriesSplit(n_splits=5)
+    results = cross_val_score(xg_reg, X_test, y_test, scoring='accuracy', cv=timesplit)
+    bal_accuracy = cross_val_score(xg_reg, X_test, y_test, scoring='balanced_accuracy', cv=timesplit)
     print("Accuracy: %.2f%%" % (np.mean(results) * 100.0))
     print(results)
     print('Balanced Accuracy: %.2f%%' % (np.mean(bal_accuracy) * 100.0))
@@ -1092,14 +1094,14 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput):
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "intra_trial_roving"], show=False)
-    plt.title('Cosine similarity vs. SHAP value impact')
+    plt.title('False Alarm Model - cosine similarity vs. SHAP value impact')
 
     plt.savefig('D:/behavmodelfigs/cosinesimdepenencyplot.png', dpi=500)
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "intra_trial_roving"], color=shap_values2[:, "cosinesim"], show=False)
     plt.savefig('D:/behavmodelfigs/intratrialrovingcosinecolor.png', dpi=500)
-    plt.title('Intra trial roving versus SHAP value impact')
+    plt.title('False Alarm Model -Intra trial roving versus SHAP value impact')
 
     plt.show()
 
@@ -1108,18 +1110,18 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput):
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "targTimes"], color=shap_values2[:, "cosinesim"], show=False)
-    plt.title('Target Times coloured by Cosine Similarity vs Their Impact on the SHAP value')
+    plt.title('False Alarm Model - Target Times coloured by Cosine Similarity vs Their Impact on the SHAP value')
     plt.savefig('D:/behavmodelfigs/targtimescosinecolor.png', dpi=500)
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "targTimes"], show=False)
-    plt.title('Cosine Similarity as a function of SHAP values, coloured by targTimes')
+    plt.title('False Alarm Model - Cosine Similarity as a function of SHAP values, coloured by targTimes')
     plt.savefig('D:/behavmodelfigs/cosinesimtargtimes.png', dpi=500)
     plt.show()
-    np.save('D:/behavmodelfigs/falsealarmoptunaparams3_strat5kfold.npy', paramsinput)
+    np.save('D:/behavmodelfigs/falsealarmoptunaparams1_timeseriesfold.npy', paramsinput)
 
     shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "talker"], show=False)
-    plt.title('Cosine Similarity as a function of SHAP values, coloured by talker')
+    plt.title('False Alarm Model - Cosine Similarity as a function of SHAP values, coloured by talker')
     plt.savefig('D:/behavmodelfigs/cosinesimcolouredtalkers.png', dpi=500)
     plt.show()
 
@@ -1235,6 +1237,10 @@ def runfalsealarmpipeline(ferrets):
                                                                     finishdate='01-10-2022')
     filepath = Path('D:/dfformixedmodels/falsealarmmodel_dfuse.csv')
     filepath.parent.mkdir(parents=True, exist_ok=True)
+    from operator import itemgetter
+
+    resultingfa_df.sort(key=itemgetter('dates'))
+
     resultingfa_df.to_csv(filepath)
     # xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbfaornot(
     #     resultingfa_df)
