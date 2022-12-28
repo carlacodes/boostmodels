@@ -1092,14 +1092,14 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput):
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "intra_trial_roving"], show=False)
-    plt.title('Cosine similarity vs. SHAP value impact')
+    plt.title('False alarm model - Cosine similarity vs. SHAP value impact')
 
     plt.savefig('D:/behavmodelfigs/cosinesimdepenencyplot.png', dpi=500)
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "intra_trial_roving"], color=shap_values2[:, "cosinesim"], show=False)
     plt.savefig('D:/behavmodelfigs/intratrialrovingcosinecolor.png', dpi=500)
-    plt.title('Intra trial roving versus SHAP value impact')
+    plt.title('False alarm model - Intra trial roving versus SHAP value impact')
 
     plt.show()
 
@@ -1108,7 +1108,7 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput):
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "targTimes"], color=shap_values2[:, "cosinesim"], show=False)
-    plt.title('Target Times coloured by Cosine Similarity vs Their Impact on the SHAP value')
+    plt.title('False alarm model - Target Times coloured by Cosine Similarity vs Their Impact on the SHAP value')
     plt.savefig('D:/behavmodelfigs/targtimescosinecolor.png', dpi=500)
     plt.show()
 
@@ -1119,7 +1119,7 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput):
     np.save('D:/behavmodelfigs/falsealarmoptunaparams3_strat5kfold.npy', paramsinput)
 
     shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "talker"], show=False)
-    plt.title('Cosine Similarity as a function of SHAP values, coloured by talker')
+    plt.title('False alarm model - cosine Similarity as a function of SHAP values, coloured by talker')
     plt.savefig('D:/behavmodelfigs/cosinesimcolouredtalkers.png', dpi=500)
     plt.show()
 
@@ -1239,10 +1239,12 @@ def runfalsealarmpipeline(ferrets):
     resultingfa_df.to_csv(filepath)
     # xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbfaornot(
     #     resultingfa_df)
-    study = run_optuna_study_falsealarm(resultingfa_df, resultingfa_df['falsealarm'].to_numpy())
-    print(study.best_params)
+    # study = run_optuna_study_falsealarm(resultingfa_df, resultingfa_df['falsealarm'].to_numpy())
+    # print(study.best_params)
+    best_params = np.load('D:/behavmodelfigs/falsealarmoptunaparams3_strat5kfold.npy', allow_pickle=True).item()
+
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbfaornotwithoptuna(
-        resultingfa_df, study.best_params)
+        resultingfa_df, best_params)
     #np.save('D:/behavmodelfigs/falsealarmoptunaparams2.npy', study.best_params)
 
     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
@@ -1257,16 +1259,16 @@ def run_correct_responsepipleine(ferrets):
     resultingcr_df.to_csv(filepath)
     # study = run_optuna_study_correctresponse(resultingcr_df, resultingcr_df['correctresp'].to_numpy())
     # print(study.best_params)
-    best_params = np.load('D:/behavmodelfigs/correctrespponseoptunaparams4_strat5kfold.npy')
+    best_params = np.load('D:/behavmodelfigs/correctrespponseoptunaparams4_strat5kfold.npy', allow_pickle=True).item()
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbcorrectrespornotwithoptuna(
         resultingcr_df, best_params)
     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
-    #xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(ferrets)
+    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(ferrets)
 
-    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = run_correct_responsepipleine(ferrets)
+    #xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = run_correct_responsepipleine(ferrets)
 
 
 
