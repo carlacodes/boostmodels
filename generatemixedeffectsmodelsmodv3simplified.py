@@ -956,12 +956,15 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput):
     print(results)
     print('Balanced Accuracy: %.2f%%' % (np.mean(bal_accuracy) * 100.0))
 
-    shap_values1 = shap.TreeExplainer(xg_reg).shap_values(dfx)
-    shap.summary_plot(shap_values1, dfx, show=False)
+    shap_values1 = shap.TreeExplainer(xg_reg).shap_values(X_train)
+    fig, ax = plt.subplots(figsize=(10, 65))
+    shap.summary_plot(shap_values1, X_train, show=False)
+    plt.title('Ranked list of features over their \n impact in predicting a correct response', fontsize=18)
+    fig.tight_layout()
     plt.savefig('D:/behavmodelfigs/correctrespmodel/correctresponsemodelrankedfeatures.png', dpi=500)
 
     plt.show()
-    shap.dependence_plot("pitchofprecur", shap_values1[0], dfx)  #
+    shap.dependence_plot("pitchofprecur", shap_values1[0], X_train)  #
     plt.show()
     result = permutation_importance(xg_reg, X_test, y_test, n_repeats=10,
                                     random_state=42, n_jobs=2)
@@ -973,7 +976,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput):
     fig.tight_layout()
     plt.savefig('D:/behavmodelfigs/permutation_importance.png', dpi=500)
     plt.show()
-    explainer = shap.Explainer(xg_reg, dfx)
+    explainer = shap.Explainer(xg_reg, X_train)
     shap_values2 = explainer(X_train)
     fig, ax = plt.subplots(figsize=(15, 15))
     shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "precur_and_targ_same"], ax=ax)
@@ -1056,10 +1059,15 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput):
     print(results)
     print('Balanced Accuracy: %.2f%%' % (np.mean(bal_accuracy) * 100.0))
 
-    shap_values1 = shap.TreeExplainer(xg_reg).shap_values(dfx)
-    shap.summary_plot(shap_values1, dfx)
+    shap_values1 = shap.TreeExplainer(xg_reg).shap_values(X_train)
+    fig, ax = plt.subplots(figsize=(15, 65))
+    shap.summary_plot(shap_values1, X_train, show=False)
+    plt.title('Ranked list of features over their \n impact in predicting a false alarm', fontsize=18)
+    fig.tight_layout()
+    plt.savefig('D:/behavmodelfigs/ranked_features_falsealarmmodel.png', dpi=500)
     plt.show()
-    shap.dependence_plot("pitchofprecur", shap_values1[0], dfx)  #
+
+    shap.dependence_plot("pitchofprecur", shap_values1[0], X_train)  #
     plt.show()
     result = permutation_importance(xg_reg, X_test, y_test, n_repeats=10,
                                     random_state=42, n_jobs=2)
@@ -1109,6 +1117,14 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput):
     plt.savefig('D:/behavmodelfigs/trialnumcosinecolor.png', dpi=500)
     plt.show()
 
+    shap.plots.scatter(shap_values2[:, "pitchofprecur"], color=shap_values2[:, "targTimes"], show=False)
+    plt.ylabel('SHAP value', fontsize=10)
+    plt.title('False alarm model - pitch of the \n precursor word versus SHAP value impact', fontsize = 18)
+    plt.ylabel('SHAP value', fontsize=16)
+    plt.xlabel('Pitch of precursor word', fontsize=16)
+    plt.savefig('D:/behavmodelfigs/pitchofprecurtargtimes.png', dpi=500)
+    plt.show()
+
 
     shap.plots.scatter(shap_values2[:, "targTimes"], color=shap_values2[:, "cosinesim"], show=False)
     plt.title('False alarm model - Target Times coloured by Cosine Similarity vs Their Impact on the SHAP value')
@@ -1116,6 +1132,18 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput):
     plt.savefig('D:/behavmodelfigs/targtimescosinecolor.png', dpi=500)
     plt.show()
 
+    shap.plots.scatter(shap_values2[:, "targTimes"], color=shap_values2[:, "trialNum"], show=False)
+    plt.title('False alarm model - Target times \n coloured by trial number vs their SHAP value', fontsize = 18)
+    plt.ylabel('SHAP value', fontsize=16)
+    plt.xlabel('Target times', fontsize=16)
+    plt.savefig('D:/behavmodelfigs/targtimestrialnum.png', dpi=500)
+    plt.show()
+    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "targTimes"], show=False)
+    plt.title('False alarm model - Trial number \n coloured by target times vs their SHAP value', fontsize = 18)
+    plt.ylabel('SHAP value', fontsize=16)
+    plt.xlabel('Trial number', fontsize=16)
+    plt.savefig('D:/behavmodelfigs/trialnumbercolortargtimes.png', dpi=500)
+    plt.show()
     shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "targTimes"], show=False)
     plt.title('Cosine Similarity as a function of SHAP values, coloured by targTimes')
     plt.ylabel('SHAP value', fontsize=10)
@@ -1287,9 +1315,9 @@ def run_correct_responsepipleine(ferrets):
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
-    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(ferrets)
+    #xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(ferrets)
 
-    # xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = run_correct_responsepipleine(ferrets)
+    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = run_correct_responsepipleine(ferrets)
 
 
 
