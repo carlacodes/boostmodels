@@ -1169,7 +1169,12 @@ def runlgbfaornot(dataframe):
     print('Balanced Accuracy: %.2f%%' % (np.mean(bal_accuracy) * 100.0))
 
     shap_values1 = shap.TreeExplainer(xg_reg).shap_values(dfx)
-    shap.summary_plot(shap_values1, dfx)
+    fig, ax = plt.subplots(figsize=(15, 15))
+    shap.summary_plot(shap_values1, dfx, show = False)
+    plt.title('Ranked list of features over their impact in predicting a false alarm')
+    fig.tight_layout()
+    plt.savefig('D:/behavmodelfigs/ranked_features.png', dpi=500)
+
     plt.show()
     shap.dependence_plot("pitchofprecur", shap_values1[0], dfx)  #
     plt.show()
@@ -1200,11 +1205,17 @@ def runlgbfaornot(dataframe):
 
     shap.plots.scatter(shap_values2[:, "intra_trial_roving"], color=shap_values2[:, "talker"])
     plt.show()
-    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"])
+
+    fig, ax = plt.subplots(figsize=(15, 15))
+    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"], show=False)
+    plt.title('False alarm model - trial number as a function of SHAP values, coloured by talker')
+    fig.tight_layout()
     plt.show()
 
+    fig, ax = plt.subplots(figsize=(15, 15))
     shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "intra_trial_roving"], show=False)
-    plt.title('Cosine Similarity and its effect on the SHAP value')
+    plt.title('False alarm model - SHAP values as a function of cosine similarity \n, coloured by intra trial roving')
+    fig.tight_layout()
     plt.savefig('D:/behavmodelfigs/cosinesimdepenencyplot.png', dpi=500)
     plt.show()
 
@@ -1212,14 +1223,17 @@ def runlgbfaornot(dataframe):
     plt.savefig('D:/behavmodelfigs/intratrialrovingcosinecolor.png', dpi=500)
 
     plt.show()
-
-    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "cosinesim"], show=False)
+    fig,ax = plt.subplots(figsize=(15, 15))
+    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "pitchoftarg"], show=False)
+    plt.title('False alarm model - trial number as a function of SHAP values, coloured by pitch of target')
+    fig.tight_layout()
     plt.savefig('D:/behavmodelfigs/trialnumcosinecolor.png', dpi=500)
-
     plt.show()
 
+    fig, ax = plt.subplots(figsize=(18, 15))
     shap.plots.scatter(shap_values2[:, "targTimes"], color=shap_values2[:, "cosinesim"], show=False)
-    plt.title('targTimes vs cosine similarity')
+    plt.title('shap values for FA model as a function of target times, coloured by cosine similarity')
+    fig.tight_layout()
     plt.savefig('D:/behavmodelfigs/targtimescosinecolor.png', dpi=500)
     plt.show()
 
@@ -1268,7 +1282,7 @@ if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(ferrets)
 
-    #xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = run_correct_responsepipleine(ferrets)
+    # xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = run_correct_responsepipleine(ferrets)
 
 
 
