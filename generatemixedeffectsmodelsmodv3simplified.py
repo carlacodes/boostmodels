@@ -1113,7 +1113,6 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput):
     shap.plots.scatter(shap_values2[:, "targTimes"], color=shap_values2[:, "cosinesim"], show=False)
     plt.title('False alarm model - Target Times coloured by Cosine Similarity vs Their Impact on the SHAP value')
     plt.ylabel('SHAP value', fontsize=10)
-
     plt.savefig('D:/behavmodelfigs/targtimescosinecolor.png', dpi=500)
     plt.show()
 
