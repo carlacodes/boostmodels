@@ -1093,7 +1093,7 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput):
 
     shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "intra_trial_roving"], show=False)
     plt.title('False alarm model - Cosine similarity vs. SHAP value impact')
-
+    plt.ylabel('SHAP value', fontsize=10)
     plt.savefig('D:/behavmodelfigs/cosinesimdepenencyplot.png', dpi=500)
     plt.show()
 
@@ -1107,19 +1107,25 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput):
     plt.savefig('D:/behavmodelfigs/trialnumcosinecolor.png', dpi=500)
     plt.show()
 
+
     shap.plots.scatter(shap_values2[:, "targTimes"], color=shap_values2[:, "cosinesim"], show=False)
     plt.title('False alarm model - Target Times coloured by Cosine Similarity vs Their Impact on the SHAP value')
+    plt.ylabel('SHAP value', fontsize=10)
+
     plt.savefig('D:/behavmodelfigs/targtimescosinecolor.png', dpi=500)
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "targTimes"], show=False)
     plt.title('Cosine Similarity as a function of SHAP values, coloured by targTimes')
+    plt.ylabel('SHAP value', fontsize=10)
     plt.savefig('D:/behavmodelfigs/cosinesimtargtimes.png', dpi=500)
     plt.show()
-    np.save('D:/behavmodelfigs/falsealarmoptunaparams3_strat5kfold.npy', paramsinput)
-
+    #np.save('D:/behavmodelfigs/falsealarmoptunaparams3_strat5kfold.npy', paramsinput)
+    fig, ax = plt.subplots(figsize=(15, 15))
     shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "talker"], show=False)
-    plt.title('False alarm model - cosine Similarity as a function of SHAP values, coloured by talker')
+    plt.title('False alarm model - cosine similarity  \n as a function of SHAP values, coloured by talker')
+    plt.ylabel('SHAP value corresponding to cosine sim.', fontsize=10)
+    fig.tight_layout()
     plt.savefig('D:/behavmodelfigs/cosinesimcolouredtalkers.png', dpi=500)
     plt.show()
 
