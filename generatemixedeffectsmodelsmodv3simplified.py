@@ -1098,12 +1098,14 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput):
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "intra_trial_roving"], color=shap_values2[:, "cosinesim"], show=False)
-    plt.savefig('D:/behavmodelfigs/intratrialrovingcosinecolor.png', dpi=500)
     plt.title('False alarm model - Intra trial roving versus SHAP value impact')
-
+    plt.ylabel('SHAP value', fontsize=10)
+    plt.savefig('D:/behavmodelfigs/intratrialrovingcosinecolor.png', dpi=500)
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "cosinesim"], show=False)
+    plt.ylabel('SHAP value', fontsize=10)
+    plt.title('False alarm model - Trial number versus SHAP value impact')
     plt.savefig('D:/behavmodelfigs/trialnumcosinecolor.png', dpi=500)
     plt.show()
 
