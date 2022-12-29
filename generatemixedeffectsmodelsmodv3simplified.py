@@ -993,32 +993,39 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput):
 
     shap.plots.scatter(shap_values2[:, "precur_and_targ_same"], color=shap_values2[:, "talker"])
     plt.show()
-    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"])
+    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"], show = False)
+    plt.title('trial number \n vs. SHAP value impact')
+    plt.ylabel('SHAP value', fontsize=18)
+    plt.savefig('D:/behavmodelfigs/correctrespmodel/trialnumdepenencyplot.png', dpi=500)
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "precur_and_targ_same"], show=False)
-    plt.title('Cosine similarity vs. SHAP value impact')
-
+    plt.title('Cosine similarity \n vs. SHAP value impact')
+    plt.ylabel('SHAP value',  fontsize=18)
     plt.savefig('D:/behavmodelfigs/correctrespmodel/cosinesimdepenencyplot.png', dpi=500)
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "precur_and_targ_same"], color=shap_values2[:, "cosinesim"], show=False)
-    plt.savefig('D:/behavmodelfigs/correctrespmodel/intratrialrovingcosinecolor.png', dpi=500)
-    plt.title('Intra trial roving versus SHAP value impact')
 
+    plt.title('Intra trial roving \n versus SHAP value impact', fontsize=18)
+    plt.ylabel('SHAP value', fontsize=18)
+    plt.savefig('D:/behavmodelfigs/correctrespmodel/intratrialrovingcosinecolor.png', dpi=500)
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "cosinesim"], show=False)
+    plt.title('Trial number versus SHAP value impact')
+    plt.ylabel('SHAP value', fontsize=18)
     plt.savefig('D:/behavmodelfigs/correctrespmodel/trialnumcosinecolor.png', dpi=500)
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "targTimes"], color=shap_values2[:, "cosinesim"], show=False)
     plt.title('Target Times coloured by Cosine Similarity vs Their Impact on the SHAP value')
+    plt.ylabel('SHAP value')
     plt.savefig('D:/behavmodelfigs/correctrespmodel/targtimescosinecolor.png', dpi=500)
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "targTimes"], show=False)
-    plt.title('Cosine Similarity as a function of SHAP values, coloured by targTimes')
+    plt.title('Cosine Similarity as a function \n of SHAP values coloured by targTimes')
     plt.savefig('D:/behavmodelfigs/correctrespmodel/cosinesimtargtimes.png', dpi=500)
     plt.show()
     np.save('D:/behavmodelfigs/correctrespponseoptunaparams4_strat5kfold.npy', paramsinput)
