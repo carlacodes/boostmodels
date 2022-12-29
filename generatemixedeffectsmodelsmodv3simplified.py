@@ -1020,7 +1020,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput):
 
     shap.plots.scatter(shap_values2[:, "targTimes"], color=shap_values2[:, "cosinesim"], show=False)
     plt.title('Target Times coloured by Cosine Similarity vs Their Impact on the SHAP value')
-    plt.ylabel('SHAP value')
+    plt.ylabel('SHAP value', fontsize=18)
     plt.savefig('D:/behavmodelfigs/correctrespmodel/targtimescosinecolor.png', dpi=500)
     plt.show()
 
