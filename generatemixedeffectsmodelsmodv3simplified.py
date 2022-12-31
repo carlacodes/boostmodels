@@ -1012,16 +1012,18 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput):
     plt.savefig('D:/behavmodelfigs/correctrespmodel/intratrialrovingcosinecolor.png', dpi=500)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "cosinesim"], show=False)
-    plt.title('Trial number versus SHAP value impact')
+    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "targTimes"], show=False)
+    plt.title('CR model - Trial number versus SHAP value, \n colored by target presentation time', fontsize=18)
     plt.ylabel('SHAP value', fontsize=18)
-    plt.savefig('D:/behavmodelfigs/correctrespmodel/trialnumcosinecolor.png', dpi=500)
+    plt.xlabel('Trial number', fontsize=15)
+    plt.savefig('D:/behavmodelfigs/correctrespmodel/trialnumtargtimecolor.png', dpi=500)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "targTimes"], color=shap_values2[:, "cosinesim"], show=False)
-    plt.title('Target Times coloured by Cosine Similarity vs Their Impact on the SHAP value')
+    shap.plots.scatter(shap_values2[:, "targTimes"], color=shap_values2[:, "trialNum"], show=False)
+    plt.title('CR model - Target times versus SHAP value, \n colored by trial number', fontsize=18)
     plt.ylabel('SHAP value', fontsize=18)
-    plt.savefig('D:/behavmodelfigs/correctrespmodel/targtimescosinecolor.png', dpi=500)
+    plt.xlabel('Target presentation time', fontsize=15)
+    plt.savefig('D:/behavmodelfigs/correctrespmodel/targtimestrialnumcolor.png', dpi=500)
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "targTimes"], show=False)
@@ -1030,9 +1032,26 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput):
     plt.show()
     np.save('D:/behavmodelfigs/correctrespponseoptunaparams4_strat5kfold.npy', paramsinput)
 
-    shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "talker"], show=False)
-    plt.title('Cosine Similarity as a function of SHAP values, coloured by talker')
+    shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "pitchoftarg"], show=False)
+    plt.title('Cosine similarity as a function \n of SHAP values, coloured by the target pitch', fontsize = 18)
+    plt.ylabel('SHAP value', fontsize=18)
     plt.savefig('D:/behavmodelfigs/correctrespmodel/cosinesimcolouredtalkers.png', dpi=500)
+    plt.show()
+    fig, ax = plt.subplots(figsize=(15, 35))
+    shap.plots.scatter(shap_values2[:, "side"], color=shap_values2[:, "trialNum"], show=False)
+    plt.title('SHAP values as a function of the side of the audio, \n coloured by the trial number', fontsize = 18)
+    plt.ylabel('SHAP value', fontsize=18)
+    plt.xticks([0, 1], ['Left', 'Right'], fontsize=18)
+    plt.savefig('D:/behavmodelfigs/correctrespmodel/sidetrialnumbercolor.png', dpi=500)
+    plt.show()
+
+    fig, ax = plt.subplots(figsize=(15, 55))
+    shap.plots.scatter(shap_values2[:, "pitchoftarg"], color=shap_values2[:, "targTimes"], show=False)
+    plt.title('SHAP values as a function of the pitch of the target, \n coloured by the target presentation time', fontsize = 18)
+    plt.ylabel('SHAP value', fontsize=18)
+    plt.xlabel('Pitch of target', fontsize=12)
+    plt.xticks([1,2,3,4,5], ['109 Hz', '124 Hz', '144 Hz', '191 Hz', '251 Hz'], fontsize=18)
+    plt.savefig('D:/behavmodelfigs/correctrespmodel/pitchoftargcolouredbytargtimes.png', dpi=500)
     plt.show()
 
     return xg_reg, ypred, y_test, results, shap_values1, X_train, y_train, bal_accuracy, shap_values2
@@ -1322,9 +1341,9 @@ def run_correct_responsepipleine(ferrets):
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
-    #xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(ferrets)
+    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(ferrets)
 
-    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = run_correct_responsepipleine(ferrets)
+    # xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = run_correct_responsepipleine(ferrets)
 
 
 
