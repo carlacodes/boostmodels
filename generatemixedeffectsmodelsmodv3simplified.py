@@ -1175,7 +1175,7 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput):
     plt.ylabel('SHAP value', fontsize=10)
     plt.savefig('D:/behavmodelfigs/cosinesimtargtimes.png', dpi=500)
     plt.show()
-    #np.save('D:/behavmodelfigs/falsealarmoptunaparams3_strat5kfold.npy', paramsinput)
+    np.save('D:/behavmodelfigs/falsealarmoptunaparams_improveddf_strat5kfold.npy', paramsinput)
     fig, ax = plt.subplots(figsize=(15, 15))
     shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "talker"], show=False)
     plt.title('False alarm model - cosine similarity  \n as a function of SHAP values, coloured by talker')
@@ -1314,12 +1314,12 @@ def runfalsealarmpipeline(ferrets):
     resultingfa_df.to_csv(filepath)
     # xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbfaornot(
     #     resultingfa_df)
-    # study = run_optuna_study_falsealarm(resultingfa_df, resultingfa_df['falsealarm'].to_numpy())
-    # print(study.best_params)
-    best_params = np.load('D:/behavmodelfigs/falsealarmoptunaparams3_strat5kfold.npy', allow_pickle=True).item()
+    study = run_optuna_study_falsealarm(resultingfa_df, resultingfa_df['falsealarm'].to_numpy())
+    print(study.best_params)
+    #best_params = np.load('D:/behavmodelfigs/falsealarmoptunaparams3_strat5kfold.npy', allow_pickle=True).item()
 
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbfaornotwithoptuna(
-        resultingfa_df, best_params)
+        resultingfa_df, study.best_params)
     #np.save('D:/behavmodelfigs/falsealarmoptunaparams2.npy', study.best_params)
 
     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
