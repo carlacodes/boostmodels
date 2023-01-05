@@ -572,7 +572,7 @@ def runxgboostreleasetimes(df_use):
     #             "realRelReleaseTimes", "ferret", "stepval"]]
 
     X_train, X_test, y_train, y_test = train_test_split(dfx, df_use['realRelReleaseTimes'], test_size=0.2,
-                                                        random_state=42)
+                                                        random_state=123)
 
     dtrain = xgb.DMatrix(X_train, label=y_train, enable_categorical=True)
     dtest = xgb.DMatrix(X_test, label=y_test, enable_categorical=True)
@@ -592,7 +592,7 @@ def runxgboostreleasetimes(df_use):
     xgb.plot_importance(xg_reg)
     plt.show()
 
-    kfold = KFold(n_splits=3, shuffle=True, random_state=42)
+    kfold = KFold(n_splits=3, shuffle=True, random_state=123)
     results = cross_val_score(xg_reg, X_train, y_train, scoring='neg_mean_squared_error', cv=kfold)
 
     mse = mean_squared_error(ypred, y_test)
@@ -613,7 +613,7 @@ def runlgbreleasetimes(df_use):
     dfx = dfx.loc[:, dfx.columns != col]
 
     X_train, X_test, y_train, y_test = train_test_split(dfx, df_use['realRelReleaseTimes'], test_size=0.2,
-                                                        random_state=42)
+                                                        random_state=123)
 
     dtrain = lgb.Dataset(X_train, label=y_train)
     dtest = lgb.Dataset(X_test, label=y_test)
@@ -730,7 +730,7 @@ def runlgbcorrectresponse(dfx, dfy, paramsinput):
     # # dfx = dfx.loc[:, dfx.columns != col]
     # dfx, dfy = balanced_subsample(dfx, dfcat_use['correctresp'], 0.5)
 
-    X_train, X_test, y_train, y_test = train_test_split(dfx, dfy, test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(dfx, dfy, test_size=0.2, random_state=123)
     print(X_train.shape)
     print(X_test.shape)
 
@@ -769,7 +769,7 @@ def runlgbcorrectresponse(dfx, dfy, paramsinput):
     # bagging_fraction: 0.9
     # bagging_freq: 1
     # feature_fraction: 0.6000000000000001
-    xg_reg = lgb.LGBMClassifier(objective="binary", random_state=42,
+    xg_reg = lgb.LGBMClassifier(objective="binary", random_state=123,
                                 **paramsinput)  # colsample_bytree=0.4398528259745191, alpha=14.412788226345182,
     # n_estimators=10000, learning_rate=params2['learning_rate'],
     # num_leaves=params2['num_leaves'], max_depth=params2['max_depth'],
@@ -783,7 +783,7 @@ def runlgbcorrectresponse(dfx, dfy, paramsinput):
     # lgb.plot_importance(xg_reg)
     # plt.show()
 
-    kfold = KFold(n_splits=10, shuffle=True, random_state=42)
+    kfold = KFold(n_splits=10, shuffle=True, random_state=123)
     results = cross_val_score(xg_reg, X_test, y_test, scoring='accuracy', cv=kfold)
     bal_accuracy = cross_val_score(xg_reg, X_test, y_test, scoring='balanced_accuracy', cv=kfold)
     print("Accuracy: %.2f%%" % (np.mean(results) * 100.0))
@@ -796,7 +796,7 @@ def runlgbcorrectresponse(dfx, dfy, paramsinput):
     shap.dependence_plot("pitchoftarg", shap_values[0], dfx)  #
     plt.show()
     result = permutation_importance(xg_reg, X_test, y_test, n_repeats=10,
-                                    random_state=42, n_jobs=2)
+                                    random_state=123, n_jobs=2)
     sorted_idx = result.importances_mean.argsort()
 
     fig, ax = plt.subplots(figsize=(15, 15))
@@ -851,14 +851,14 @@ def objective(trial, X, y):
         ),
     }
 
-    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=123)
 
     cv_scores = np.empty(5)
     for idx, (train_idx, test_idx) in enumerate(cv.split(X, y)):
         X_train, X_test = X[train_idx], X[test_idx]
         y_train, y_test = y[train_idx], y[test_idx]
 
-        model = lgb.LGBMClassifier(objective="binary", random_state=42, **param_grid)
+        model = lgb.LGBMClassifier(objective="binary", random_state=123, **param_grid)
         model.fit(
             X_train,
             y_train,
@@ -936,20 +936,20 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput):
     dfx = df_to_use.loc[:, df_to_use.columns != col]
     # remove ferret as possible feature
 
-    X_train, X_test, y_train, y_test = train_test_split(dfx, df_to_use['correctresp'], test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(dfx, df_to_use['correctresp'], test_size=0.2, random_state=123)
     print(X_train.shape)
     print(X_test.shape)
 
     # dtrain = lgb.Dataset(X_train, label=y_train)
     # dtest = lgb.Dataset(X_test, label=y_test)
 
-    xg_reg = lgb.LGBMClassifier(objective="binary", random_state=42,
+    xg_reg = lgb.LGBMClassifier(objective="binary", random_state=123,
                                 **paramsinput)
 
     xg_reg.fit(X_train, y_train, eval_metric="cross_entropy_lambda", verbose=1000)
     ypred = xg_reg.predict_proba(X_test)
 
-    kfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+    kfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=123)
     results = cross_val_score(xg_reg, X_test, y_test, scoring='accuracy', cv=kfold)
     bal_accuracy = cross_val_score(xg_reg, X_test, y_test, scoring='balanced_accuracy', cv=kfold)
     print("Accuracy: %.2f%%" % (np.mean(results) * 100.0))
@@ -967,7 +967,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput):
     shap.dependence_plot("pitchofprecur", shap_values1[0], X_train)  #
     plt.show()
     result = permutation_importance(xg_reg, X_test, y_test, n_repeats=10,
-                                    random_state=42, n_jobs=2)
+                                    random_state=123, n_jobs=2)
     sorted_idx = result.importances_mean.argsort()
 
     fig, ax = plt.subplots(figsize=(15, 15))
@@ -1065,20 +1065,20 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput):
     dfx = df_to_use.loc[:, df_to_use.columns != col]
     # remove ferret as possible feature
 
-    X_train, X_test, y_train, y_test = train_test_split(dfx, df_to_use['falsealarm'], test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(dfx, df_to_use['falsealarm'], test_size=0.2, random_state=123)
     print(X_train.shape)
     print(X_test.shape)
 
     # dtrain = lgb.Dataset(X_train, label=y_train)
     # dtest = lgb.Dataset(X_test, label=y_test)
 
-    xg_reg = lgb.LGBMClassifier(objective="binary", random_state=42,
+    xg_reg = lgb.LGBMClassifier(objective="binary", random_state=123,
                                 **paramsinput)
 
     xg_reg.fit(X_train, y_train, eval_metric="cross_entropy_lambda", verbose=1000)
     ypred = xg_reg.predict_proba(X_test)
 
-    kfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+    kfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=123)
     results = cross_val_score(xg_reg, X_test, y_test, scoring='accuracy', cv=kfold)
     bal_accuracy = cross_val_score(xg_reg, X_test, y_test, scoring='balanced_accuracy', cv=kfold)
     print("Accuracy: %.2f%%" % (np.mean(results) * 100.0))
@@ -1096,7 +1096,7 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput):
     shap.dependence_plot("pitchofprecur", shap_values1[0], X_train)  #
     plt.show()
     result = permutation_importance(xg_reg, X_test, y_test, n_repeats=10,
-                                    random_state=42, n_jobs=2)
+                                    random_state=123, n_jobs=2)
     sorted_idx = result.importances_mean.argsort()
 
     fig, ax = plt.subplots(figsize=(15, 15))
@@ -1175,7 +1175,7 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput):
     plt.ylabel('SHAP value', fontsize=10)
     plt.savefig('D:/behavmodelfigs/cosinesimtargtimes.png', dpi=500)
     plt.show()
-    np.save('D:/behavmodelfigs/falsealarmoptunaparams_improveddf_strat5kfold.npy', paramsinput)
+    np.save('D:/behavmodelfigs/falsealarmoptunaparams_improveddf3_strat5kfold.npy', paramsinput)
     fig, ax = plt.subplots(figsize=(15, 15))
     shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "talker"], show=False)
     plt.title('False alarm model - cosine similarity  \n as a function of SHAP values, coloured by talker')
@@ -1195,7 +1195,7 @@ def runlgbfaornot(dataframe):
     dfx = df_to_use.loc[:, df_to_use.columns != col]
     # remove ferret as possible feature
 
-    X_train, X_test, y_train, y_test = train_test_split(dfx, df_to_use['falsealarm'], test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(dfx, df_to_use['falsealarm'], test_size=0.2, random_state=123)
     print(X_train.shape)
     print(X_test.shape)
 
@@ -1216,13 +1216,13 @@ def runlgbfaornot(dataframe):
                "bagging_freq": 1,
                "feature_fraction": 0.6000000000000001}
 
-    xg_reg = lgb.LGBMClassifier(objective="binary", random_state=42,
+    xg_reg = lgb.LGBMClassifier(objective="binary", random_state=123,
                                 **params2)
 
     xg_reg.fit(X_train, y_train, eval_metric="cross_entropy_lambda", verbose=1000)
     ypred = xg_reg.predict_proba(X_test)
 
-    kfold = KFold(n_splits=3, shuffle=True, random_state=42)
+    kfold = KFold(n_splits=3, shuffle=True, random_state=123)
     results = cross_val_score(xg_reg, X_test, y_test, scoring='accuracy', cv=kfold)
     bal_accuracy = cross_val_score(xg_reg, X_test, y_test, scoring='balanced_accuracy', cv=kfold)
     print("Accuracy: %.2f%%" % (np.mean(results) * 100.0))
@@ -1240,7 +1240,7 @@ def runlgbfaornot(dataframe):
     shap.dependence_plot("pitchofprecur", shap_values1[0], dfx)  #
     plt.show()
     result = permutation_importance(xg_reg, X_test, y_test, n_repeats=10,
-                                    random_state=42, n_jobs=2)
+                                    random_state=123, n_jobs=2)
     sorted_idx = result.importances_mean.argsort()
 
     fig, ax = plt.subplots(figsize=(15, 15))
