@@ -499,18 +499,29 @@ class behaviouralhelperscg:
             newdata = newdata[(newdata.catchTrial == 0)]  # | (allData.response == 7)
 
             emptydistracotrindexdict_categorical = dict.fromkeys(range(1,56))
+            dataframeversion = pd.DataFrame.from_dict(emptydistracotrindexdict_categorical, orient='index')
             for i in range(0, len(newdata)):
                 #now declare function to get the distractor indices that th eanimal fa-ed to or the correct distractor
                 if newdata['distractor_or_fa'].values[i] in emptydistracotrindexdict_categorical:
                     print("Exists")
                     exception_key = newdata['distractor_or_fa'].values[i]
-                    new_entry = None
+                    new_entry = float('nan')
+                    if i == 0:
 
-                    for key, value in emptydistracotrindexdict_categorical.items():
-                        if key == exception_key:
-                            emptydistracotrindexdict_categorical[key] = value
-                        else:
-                            emptydistracotrindexdict_categorical[key] = value + [new_entry]
+                        emptydistracotrindexdict_categorical[newdata['distractor_or_fa'].values[i]]= 1
+
+                        for key, value in emptydistracotrindexdict_categorical.items():
+                            if key == exception_key:
+                                emptydistracotrindexdict_categorical[key] = value
+                            else:
+                                emptydistracotrindexdict_categorical[key] = new_entry
+                    else:
+
+                        for key, value in emptydistracotrindexdict_categorical.items():
+                            if key == exception_key:
+                                emptydistracotrindexdict_categorical[key] = [value, 1]
+                            else:
+                                emptydistracotrindexdict_categorical[key] = [value, new_entry]
 
                 else:
                     print("Does not exist")
