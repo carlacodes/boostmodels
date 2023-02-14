@@ -1,6 +1,10 @@
 ## Mixed effect models repo for behavioural animal data
 work in progress for models I'm working on now to characterise main features of animal rxn time and correct response data across animal subjhects.
 n.b. pymer4 DOES NOT WORK in python 3.10, downgrade to python 3.9 <br>
+
+
+Update 14/02/2023: please ignore most of the code relating to pymer; currently I'm using LightGBM with the SHAP package to do most of my modelling of behavioural data.
+<br>
 I find that using pymer4 gives the most complex models, but also the most interpretable results. <br>
 I'm using the pymer4 package in python to fit mixed effect models to behavioural data, but statsmodels and pysr3 also works,
 but I can't figure out how to mark categorical variables in these two packages. For pymer4, I recommend using the OLD optimizer. <br>
