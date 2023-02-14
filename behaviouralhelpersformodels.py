@@ -329,7 +329,7 @@ class behaviouralhelperscg:
                 current_dist_list=[]
                 current_dur=[]
                 for i in range(0, len(current_dDurs)):
-                  current_dur = np.sum(current_dDurs[0:i])
+                  current_dur = np.sum(current_dDurs[0:i-1])
                   print(current_dur)
                   print(i)
 
