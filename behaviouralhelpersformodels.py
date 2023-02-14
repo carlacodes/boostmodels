@@ -536,26 +536,37 @@ class behaviouralhelperscg:
                         for key, value in emptydistracotrindexdict_categorical.items():
                             if key == exception_key:
                                 emptydistracotrindexdict_categorical[key] = value
+                                newdata[key] = value
+
                             else:
                                 emptydistracotrindexdict_categorical[key] = new_entry
+                                newdata[key] = new_entry
                     else:
 
                         for key, value in emptydistracotrindexdict_categorical.items():
                             if key == exception_key:
                                 current = emptydistracotrindexdict_categorical[key]
-                                combined = np.concatenate((current, [float(1)]), axis=None)
+                                combined = np.concatenate((current, [float(newdata['centreRelease'].values[i])]), axis=None)
                                 emptydistracotrindexdict_categorical[key] = combined
+                                newdata[key] = combined
                             else:
                                 current = emptydistracotrindexdict_categorical[key]
                                 combined = np.concatenate((current, [float('nan')]), axis=None)
                                 emptydistracotrindexdict_categorical[key] = combined
+                                newdata[key] = combined
+
 
                 else:
                     print("Does not exist")
 
             #convert to dataframe
-
-            dataframeversion = pd.DataFrame.from_dict(emptydistracotrindexdict_categorical)
-            newdata = newdata.append(emptydistracotrindexdict_categorical, ignore_index=True)
+            #
+            # dataframeversion = pd.DataFrame.from_dict(emptydistracotrindexdict_categorical, orient='index')
+            # dataframeversion2 = pd.DataFrame(emptydistracotrindexdict_categorical, index=[0])
+            # dataframeversion = dataframeversion.transpose()
+            #
+            # df = pd.DataFrame(emptydistracotrindexdict_categorical, columns=(range(1,56)))
+            # newdata2 = newdata.append(dataframeversion)
+            # newdata['distindex'] = emptydistracotrindexdict_categorical
             bigdata = bigdata.append(newdata)
         return bigdata
