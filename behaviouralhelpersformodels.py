@@ -311,6 +311,8 @@ class behaviouralhelperscg:
             correctresp = np.empty(shape=(0, 0))
             pastcorrectresp = np.empty(shape=(0, 0))
             pastcatchtrial = np.empty(shape=(0, 0))
+            newdata = newdata[
+                (newdata.response == 1) | (newdata.response == 0) | (newdata.response == 5) ] #remove all misses
 
 
             for i in range(1, len(newdata['realRelReleaseTimes'].values)):
