@@ -476,6 +476,7 @@ class behaviouralhelperscg:
             #distractor_or_fa = np.delete(distractor_or_fa, 0)
             stepval = np.delete(stepval, 0)
             pitchofprecur = np.delete(pitchofprecur, 0)
+            control_trial = np.delete(control_trial, 0)
             intra_trial_roving = np.delete(intra_trial_roving, 0)
 
 
@@ -489,6 +490,7 @@ class behaviouralhelperscg:
 
 
             newdata['falsealarm'] = falsealarm.tolist()
+            newdata['control_trial'] = control_trial.tolist()
             newdata['intra_trial_roving'] = intra_trial_roving.tolist()
             newdata['correctresp'] = correctresp.tolist()
             newdata['distractor_or_fa'] = distractor_or_fa
