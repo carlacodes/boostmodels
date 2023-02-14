@@ -321,6 +321,18 @@ class behaviouralhelperscg:
                 pastrealrelreleasetime = realrelreleasetimelist.values[i - 1]
                 pastresponseindex = chosenresponse.values[(i - 1)]
 
+                current_dDurs = newdata['dDurs'].values[i]/24414.062500
+                current_releasetime = newdata['centreRelease'].values[i]
+                curr_dur_list = []
+                current_dist_list=[]
+                current_dur=[]
+                for i in range(0, len(current_dDurs)):
+                  current_dur = np.sum(current_dDurs[0:i])
+                  while current_dur <= current_releasetime:
+                    curr_dur_list.append(current_dur)
+                    current_dist_list.append(distractors.values[i])
+
+
 
                 chosentrial = pitchshiftmat.values[i]
                 is_all_zero = np.all((chosentrial == 0))
@@ -372,7 +384,7 @@ class behaviouralhelperscg:
                     pastcatchtrial = np.append(pastcatchtrial, 0)
                 try:
                     targpos = np.where(chosendisttrial == 1)
-                    distractor_or_fa[i] = chosendisttrial[targpos[0]]
+                    #distractor_or_fa[i] = chosendisttrial[targpos[0]]
 
                     if chosentrial[targpos[0]] == 8.0:
                         pitchoftarg[i] == 3.0
@@ -486,17 +498,17 @@ class behaviouralhelperscg:
                     correspondcosinelist.append(cosinesimmale[int(distinds[i])])
             newdata['cosinesim'] = correspondcosinelist
 
-            newdata = newdata[(newdata.pitchoftarg == 1) | (newdata.pitchoftarg == 2) | (newdata.pitchoftarg == 3) | (
-                    newdata.pitchoftarg == 4) | (newdata.pitchoftarg == 5)]
-            newdata = newdata[
-                (newdata.pitchofprecur == 1) | (newdata.pitchofprecur == 2) | (newdata.pitchofprecur == 3) | (
-                        newdata.pitchofprecur == 4) | (newdata.pitchofprecur == 5)]
-            newdata = newdata[
-                (newdata.response == 1) | (newdata.response == 0) | (newdata.response == 5) ] #remove all misses
+            # newdata = newdata[(newdata.pitchoftarg == 1) | (newdata.pitchoftarg == 2) | (newdata.pitchoftarg == 3) | (
+            #         newdata.pitchoftarg == 4) | (newdata.pitchoftarg == 5)]
+            # newdata = newdata[
+            #     (newdata.pitchofprecur == 1) | (newdata.pitchofprecur == 2) | (newdata.pitchofprecur == 3) | (
+            #             newdata.pitchofprecur == 4) | (newdata.pitchofprecur == 5)]
+            # newdata = newdata[
+            #     (newdata.response == 1) | (newdata.response == 0) | (newdata.response == 5) ] #remove all misses
 
             newdata = newdata[(newdata.correctionTrial == 0)]  # | (allData.response == 7)
             newdata = newdata[(newdata.currAtten == 0)]  # | (allData.response == 7)
-            newdata = newdata[(newdata.catchTrial == 0)]  # | (allData.response == 7)
+            #newdata = newdata[(newdata.catchTrial == 0)]  # | (allData.response == 7)
 
             emptydistracotrindexdict_categorical = dict.fromkeys(range(1,56))
             dataframeversion = pd.DataFrame.from_dict(emptydistracotrindexdict_categorical, orient='index')
