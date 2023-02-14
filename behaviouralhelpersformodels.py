@@ -305,7 +305,7 @@ class behaviouralhelperscg:
             pitchoftarg = np.empty(len(pitchshiftmat))
             pitchofprecur = np.empty(len(pitchshiftmat))
             stepval = np.empty(len(pitchshiftmat))
-            distractor_or_fa = np.empty(len(pitchshiftmat))
+            distractor_or_fa =[]
             intra_trial_roving = np.empty(len(pitchshiftmat))
             control_trial = np.empty(len(pitchshiftmat))
 
@@ -344,9 +344,9 @@ class behaviouralhelperscg:
 
                 print('current dist list', current_dist_list)
                 try:
-                    distractor_or_fa[i] = current_dist_list[-1]
+                    distractor_or_fa.append(current_dist_list[-1])
                 except:
-                    distractor_or_fa[i] = current_distractors[0]
+                    distractor_or_fa.append( current_distractors[0])
 
 
 
@@ -514,14 +514,6 @@ class behaviouralhelperscg:
                     correspondcosinelist.append(cosinesimmale[int(distinds[i])])
             newdata['cosinesim'] = correspondcosinelist
 
-            # newdata = newdata[(newdata.pitchoftarg == 1) | (newdata.pitchoftarg == 2) | (newdata.pitchoftarg == 3) | (
-            #         newdata.pitchoftarg == 4) | (newdata.pitchoftarg == 5)]
-            # newdata = newdata[
-            #     (newdata.pitchofprecur == 1) | (newdata.pitchofprecur == 2) | (newdata.pitchofprecur == 3) | (
-            #             newdata.pitchofprecur == 4) | (newdata.pitchofprecur == 5)]
-            # newdata = newdata[
-            #     (newdata.response == 1) | (newdata.response == 0) | (newdata.response == 5) ] #remove all misses
-
             newdata = newdata[(newdata.correctionTrial == 0)]  # | (allData.response == 7)
             newdata = newdata[(newdata.currAtten == 0)]  # | (allData.response == 7)
 
@@ -533,7 +525,7 @@ class behaviouralhelperscg:
                 #now declare function to get the distractor indices that th eanimal fa-ed to or the correct distractor
                 if newdata['distractor_or_fa'].values[i] in emptydistracotrindexdict_categorical:
                     print("Exists")
-                    exception_key = str(newdata['distractor_or_fa'].values[i])
+                    exception_key = str(int(newdata['distractor_or_fa'].values[i]))
                     if exception_key != 1:
                         print('nonone distracotr key =', i)
                     new_entry = float('nan')
