@@ -529,6 +529,7 @@ class behaviouralhelperscg:
                     if exception_key != 1:
                         print('nonone distracotr key =', i)
                     new_entry = float('nan')
+                    combined = np.array([])
                     if i == 0:
 
                         emptydistracotrindexdict_categorical[newdata['distractor_or_fa'].values[i]] = newdata['centreRelease'].values[i]
@@ -536,11 +537,11 @@ class behaviouralhelperscg:
                         for key, value in emptydistracotrindexdict_categorical.items():
                             if key == exception_key:
                                 emptydistracotrindexdict_categorical[key] = value
-                                newdata[key] = value
+                                emptydistracotrindexdict_categorical[key] = value
 
                             else:
                                 emptydistracotrindexdict_categorical[key] = new_entry
-                                newdata[key] = new_entry
+                                emptydistracotrindexdict_categorical[key] = new_entry
                     else:
 
                         for key, value in emptydistracotrindexdict_categorical.items():
@@ -548,16 +549,16 @@ class behaviouralhelperscg:
                                 current = emptydistracotrindexdict_categorical[key]
                                 combined = np.concatenate((current, [float(newdata['centreRelease'].values[i])]), axis=None)
                                 emptydistracotrindexdict_categorical[key] = combined
-                                newdata[key] = combined
                             else:
                                 current = emptydistracotrindexdict_categorical[key]
                                 combined = np.concatenate((current, [float('nan')]), axis=None)
                                 emptydistracotrindexdict_categorical[key] = combined
-                                newdata[key] = combined
 
 
                 else:
                     print("Does not exist")
+            for keyh in emptydistracotrindexdict_categorical:
+                newdata[keyh] = emptydistracotrindexdict_categorical[keyh]
 
             #convert to dataframe
             #
