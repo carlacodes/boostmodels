@@ -322,7 +322,7 @@ class behaviouralhelperscg:
                 realrelreleasetime = realrelreleasetimelist.values[i]
                 pastrealrelreleasetime = realrelreleasetimelist.values[i - 1]
                 pastresponseindex = chosenresponse.values[(i - 1)]
-
+                current_distractors = distractors.values[i]
                 current_dDurs = newdata['dDurs'].values[i]/24414.062500
                 current_releasetime = newdata['centreRelease'].values[i]
                 curr_dur_list = []
@@ -330,10 +330,18 @@ class behaviouralhelperscg:
                 current_dur=[]
                 for i in range(0, len(current_dDurs)):
                   current_dur = np.sum(current_dDurs[0:i])
-                  while current_dur <= current_releasetime:
+                  print(current_dur)
+                  print(i)
+
+                  if current_dur <= current_releasetime:
                     print('current dur', current_dur)
                     curr_dur_list.append(current_dur)
-                    current_dist_list.append(distractors.values[i])
+                    current_dist_list.append(current_distractors[i])
+                  else:
+                      break
+
+                print('current dist list', current_dist_list)
+
 
 
 
