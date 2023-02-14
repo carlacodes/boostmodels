@@ -279,7 +279,6 @@ class behaviouralhelperscg:
         numofferrets = allData['ferret'].unique()
         for ferret in numofferrets:
             print(ferret)
-            # newdata = allData.iloc(allData['ferret'] == ferret)
             newdata = allData[allData['ferret'] == ferret]
             newdata['targTimes'] = newdata['timeToTarget'] / fs
 
@@ -296,7 +295,6 @@ class behaviouralhelperscg:
             talkermat = pd.Series(talkermat, index=talkermat.keys())
 
             pitchshiftmat = newdata['PitchShiftMat']
-
             precursorlist = newdata['distractors']
             catchtriallist = newdata['catchTrial']
             chosenresponse = newdata['response']
@@ -305,17 +303,15 @@ class behaviouralhelperscg:
             pitchofprecur = np.empty(len(pitchshiftmat))
             stepval = np.empty(len(pitchshiftmat))
             distractor_or_fa = np.empty(len(pitchshiftmat))
-
-
             intra_trial_roving = np.empty(len(pitchshiftmat))
-            talkerlist2 = np.empty(len(pitchshiftmat))
+            control_trial = np.empty(len(pitchshiftmat))
 
+            talkerlist2 = np.empty(len(pitchshiftmat))
             falsealarm = np.empty(shape=(0, 0))
             correctresp = np.empty(shape=(0, 0))
             pastcorrectresp = np.empty(shape=(0, 0))
             pastcatchtrial = np.empty(shape=(0, 0))
-            droplist = np.empty(shape=(0, 0))
-            droplistnew = np.empty(shape=(0, 0))
+
 
             for i in range(1, len(newdata['realRelReleaseTimes'].values)):
                 chosenresponseindex = chosenresponse.values[i]
@@ -325,8 +321,16 @@ class behaviouralhelperscg:
                 pastrealrelreleasetime = realrelreleasetimelist.values[i - 1]
                 pastresponseindex = chosenresponse.values[(i - 1)]
 
+
                 chosentrial = pitchshiftmat.values[i]
                 is_all_zero = np.all((chosentrial == 0))
+
+
+                if is_all_zero:
+                    control_trial[i]  = 1
+                else:
+                    control_trial[i]  = 0
+
                 if isinstance(chosentrial, float) or is_all_zero:
                     chosentrial = talkermat.values[i].astype(int)
                     intra_trial_roving[i] = 0
@@ -467,7 +471,7 @@ class behaviouralhelperscg:
             newdata['timeToTarget'] = newdata['timeToTarget'] / 24414.0625
             newdata['AM'] = newdata['AM'].astype(int)
             newdata['talker'] = newdata['talker'] - 1
-            newdata = newdata[newdata['distractor_or_fa'].values<=57]
+            newdata = newdata[newdata['distractor_or_fa'].values <= 57]
 
             cosinesimfemale = np.load('D:/Stimuli/cosinesimvectorfemale.npy')
             cosinesimmale = np.load('D:/Stimuli/cosinesimvectormale.npy')
