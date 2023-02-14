@@ -505,10 +505,12 @@ class behaviouralhelperscg:
                 if newdata['distractor_or_fa'].values[i] in emptydistracotrindexdict_categorical:
                     print("Exists")
                     exception_key = newdata['distractor_or_fa'].values[i]
+                    if exception_key != 1:
+                        print('nonone distracotr key =', i)
                     new_entry = float('nan')
                     if i == 0:
 
-                        emptydistracotrindexdict_categorical[newdata['distractor_or_fa'].values[i]]= 1
+                        emptydistracotrindexdict_categorical[newdata['distractor_or_fa'].values[i]] = 1
 
                         for key, value in emptydistracotrindexdict_categorical.items():
                             if key == exception_key:
@@ -519,9 +521,13 @@ class behaviouralhelperscg:
 
                         for key, value in emptydistracotrindexdict_categorical.items():
                             if key == exception_key:
-                                emptydistracotrindexdict_categorical[key] = [value, 1]
+                                current = emptydistracotrindexdict_categorical[key]
+                                combined = np.concatenate((current, [float(1)]), axis=None)
+                                emptydistracotrindexdict_categorical[key] = combined
                             else:
-                                emptydistracotrindexdict_categorical[key] = [value, new_entry]
+                                current = emptydistracotrindexdict_categorical[key]
+                                combined = np.concatenate((current, [float('nan')]), axis=None)
+                                emptydistracotrindexdict_categorical[key] = combined
 
                 else:
                     print("Does not exist")
