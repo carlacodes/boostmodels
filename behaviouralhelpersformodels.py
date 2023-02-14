@@ -473,7 +473,7 @@ class behaviouralhelperscg:
 
             pitchoftarg = np.delete(pitchoftarg, 0)
             talkerlist2 = np.delete(talkerlist2, 0)
-            distractor_or_fa = np.delete(distractor_or_fa, 0)
+            #distractor_or_fa = np.delete(distractor_or_fa, 0)
             stepval = np.delete(stepval, 0)
             pitchofprecur = np.delete(pitchofprecur, 0)
             intra_trial_roving = np.delete(intra_trial_roving, 0)
@@ -523,7 +523,7 @@ class behaviouralhelperscg:
             dataframeversion = pd.DataFrame.from_dict(emptydistracotrindexdict_categorical, orient='index')
             for i in range(0, len(newdata)):
                 #now declare function to get the distractor indices that th eanimal fa-ed to or the correct distractor
-                if newdata['distractor_or_fa'].values[i] in emptydistracotrindexdict_categorical:
+                if str(int(newdata['distractor_or_fa'].values[i])) in emptydistracotrindexdict_categorical:
                     print("Exists")
                     exception_key = str(int(newdata['distractor_or_fa'].values[i]))
                     if exception_key != 1:
