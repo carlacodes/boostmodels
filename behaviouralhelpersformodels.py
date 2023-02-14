@@ -281,7 +281,6 @@ class behaviouralhelperscg:
             print(ferret)
             # newdata = allData.iloc(allData['ferret'] == ferret)
             newdata = allData[allData['ferret'] == ferret]
-            # newdata = allData['absentTime'][0]
             newdata['targTimes'] = newdata['timeToTarget'] / fs
 
             newdata['centreRelease'] = newdata['lickRelease'] - newdata['startTrialLick']
@@ -306,11 +305,8 @@ class behaviouralhelperscg:
             pitchofprecur = np.empty(len(pitchshiftmat))
             stepval = np.empty(len(pitchshiftmat))
             distractor_or_fa = np.empty(len(pitchshiftmat))
-            gradinpitch = np.empty(len(pitchshiftmat))
-            gradinpitchprecur = np.empty(len(pitchshiftmat))
-            timetotarglist = np.empty(len(pitchshiftmat))
 
-            precur_and_targ_same = np.empty(len(pitchshiftmat))
+
             intra_trial_roving = np.empty(len(pitchshiftmat))
             talkerlist2 = np.empty(len(pitchshiftmat))
 
@@ -437,8 +433,6 @@ class behaviouralhelperscg:
             newdata.drop(index=newdata.index[0],
                          axis=0,
                          inplace=True)
-            #newdata.drop(droplistnew, axis=0, inplace=True)
-            droplist = [int(x) for x in droplist]  # drop corrupted metdata trials
 
             pitchoftarg = pitchoftarg.astype(int)
             pitchofprecur = pitchofprecur.astype(int)
@@ -453,18 +447,9 @@ class behaviouralhelperscg:
             intra_trial_roving = np.delete(intra_trial_roving, 0)
 
 
-            # pitchoftarg = np.delete(pitchoftarg, droplist)
-            # talkerlist2 = np.delete(talkerlist2, droplist)
-            # stepval = np.delete(stepval, droplist)
-
             newdata['pitchoftarg'] = pitchoftarg.tolist()
 
-            # pitchofprecur = np.delete(pitchofprecur, droplist)
             newdata['pitchofprecur'] = pitchofprecur.tolist()
-
-            # falsealarm = np.delete(falsealarm, droplist)
-            # pastcorrectresp = np.delete(pastcorrectresp, droplist)
-            # pastcatchtrial = np.delete(pastcatchtrial, droplist)
 
             falsealarm = falsealarm.astype(int)
             pastcatchtrial = pastcatchtrial.astype(int)
