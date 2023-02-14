@@ -344,7 +344,7 @@ class behaviouralhelperscg:
 
                 print('current dist list', current_dist_list)
                 try:
-                    distractor_or_fa[i] =current_dist_list[-1]
+                    distractor_or_fa[i] = current_dist_list[-1]
                 except:
                     distractor_or_fa[i] = current_distractors[0]
 
@@ -402,7 +402,6 @@ class behaviouralhelperscg:
                     pastcatchtrial = np.append(pastcatchtrial, 0)
                 try:
                     targpos = np.where(chosendisttrial == 1)
-                    #distractor_or_fa[i] = chosendisttrial[targpos[0]]
 
                     if chosentrial[targpos[0]] == 8.0:
                         pitchoftarg[i] == 3.0
@@ -525,21 +524,22 @@ class behaviouralhelperscg:
 
             newdata = newdata[(newdata.correctionTrial == 0)]  # | (allData.response == 7)
             newdata = newdata[(newdata.currAtten == 0)]  # | (allData.response == 7)
-            #newdata = newdata[(newdata.catchTrial == 0)]  # | (allData.response == 7)
 
-            emptydistracotrindexdict_categorical = dict.fromkeys(range(1,56))
+            emptydistracotrindexdict_categorical = dict.fromkeys((range(1,56)))
+            emptydistracotrindexdict_categorical = {str(k): str(v) for k, v in emptydistracotrindexdict_categorical.items()}
+
             dataframeversion = pd.DataFrame.from_dict(emptydistracotrindexdict_categorical, orient='index')
             for i in range(0, len(newdata)):
                 #now declare function to get the distractor indices that th eanimal fa-ed to or the correct distractor
                 if newdata['distractor_or_fa'].values[i] in emptydistracotrindexdict_categorical:
                     print("Exists")
-                    exception_key = newdata['distractor_or_fa'].values[i]
+                    exception_key = str(newdata['distractor_or_fa'].values[i])
                     if exception_key != 1:
                         print('nonone distracotr key =', i)
                     new_entry = float('nan')
                     if i == 0:
 
-                        emptydistracotrindexdict_categorical[newdata['distractor_or_fa'].values[i]] = 1
+                        emptydistracotrindexdict_categorical[newdata['distractor_or_fa'].values[i]] = newdata['centreRelease'].values[i]
 
                         for key, value in emptydistracotrindexdict_categorical.items():
                             if key == exception_key:
@@ -562,6 +562,7 @@ class behaviouralhelperscg:
                     print("Does not exist")
 
             #convert to dataframe
+
             dataframeversion = pd.DataFrame.from_dict(emptydistracotrindexdict_categorical)
             newdata = newdata.append(emptydistracotrindexdict_categorical, ignore_index=True)
             bigdata = bigdata.append(newdata)
