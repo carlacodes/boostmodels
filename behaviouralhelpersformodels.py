@@ -491,7 +491,7 @@ class behaviouralhelperscg:
             newdata['falsealarm'] = falsealarm.tolist()
             newdata['intra_trial_roving'] = intra_trial_roving.tolist()
             newdata['correctresp'] = correctresp.tolist()
-            newdata['distractor_or_fa'] = distractor_or_fa.tolist()
+            newdata['distractor_or_fa'] = distractor_or_fa
             newdata['pastcorrectresp'] = pastcorrectresp.tolist()
             newdata['talker'] = talkerlist2.tolist()
             newdata['pastcatchtrial'] = pastcatchtrial.tolist()
