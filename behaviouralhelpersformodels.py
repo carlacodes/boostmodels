@@ -331,6 +331,7 @@ class behaviouralhelperscg:
                 for i in range(0, len(current_dDurs)):
                   current_dur = np.sum(current_dDurs[0:i])
                   while current_dur <= current_releasetime:
+                    print('current dur', current_dur)
                     curr_dur_list.append(current_dur)
                     current_dist_list.append(distractors.values[i])
 
