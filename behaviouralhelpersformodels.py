@@ -561,6 +561,8 @@ class behaviouralhelperscg:
                 else:
                     print("Does not exist")
 
-
+            #convert to dataframe
+            dataframeversion = pd.DataFrame.from_dict(emptydistracotrindexdict_categorical)
+            newdata = newdata.append(emptydistracotrindexdict_categorical, ignore_index=True)
             bigdata = bigdata.append(newdata)
         return bigdata
