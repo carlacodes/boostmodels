@@ -279,7 +279,10 @@ class behaviouralhelperscg:
         numofferrets = allData['ferret'].unique()
         for ferret in numofferrets:
             print(ferret)
+
             newdata = allData[allData['ferret'] == ferret]
+            newdata = newdata[
+                (newdata.response == 1) | (newdata.response == 0) | (newdata.response == 5) ] #remove all misses
             newdata['targTimes'] = newdata['timeToTarget'] / fs
 
             newdata['centreRelease'] = newdata['lickRelease'] - newdata['startTrialLick']
@@ -311,8 +314,7 @@ class behaviouralhelperscg:
             correctresp = np.empty(shape=(0, 0))
             pastcorrectresp = np.empty(shape=(0, 0))
             pastcatchtrial = np.empty(shape=(0, 0))
-            newdata = newdata[
-                (newdata.response == 1) | (newdata.response == 0) | (newdata.response == 5) ] #remove all misses
+
 
 
             for i in range(1, len(newdata['realRelReleaseTimes'].values)):
@@ -328,8 +330,8 @@ class behaviouralhelperscg:
                 curr_dur_list = []
                 current_dist_list=[]
                 current_dur=[]
-                for i in range(0, len(current_dDurs)):
-                  current_dur = np.sum(current_dDurs[0:i-1])
+                for i in range(0, len(current_distractors)):
+                  current_dur = np.sum(current_dDurs[0:(i + 1)])
                   print(current_dur)
                   print(i)
 
@@ -341,6 +343,11 @@ class behaviouralhelperscg:
                       break
 
                 print('current dist list', current_dist_list)
+                try:
+                    distractor_or_fa[i] =current_dist_list[-1]
+                except:
+                    distractor_or_fa[i] = current_distractors[0]
+
 
 
 
@@ -455,7 +462,6 @@ class behaviouralhelperscg:
 
                     if pitchoftarg[i] == 13.0:
                         pitchoftarg[i] = 1.0
-                    distractor_or_fa[i] = chosendisttrial[-1]
                     continue
             newdata.drop(index=newdata.index[0],
                          axis=0,
