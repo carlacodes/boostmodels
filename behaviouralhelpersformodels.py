@@ -517,31 +517,24 @@ class behaviouralhelperscg:
             newdata = newdata[(newdata.correctionTrial == 0)]  # | (allData.response == 7)
             newdata = newdata[(newdata.currAtten == 0)]  # | (allData.response == 7)
 
-            emptydistracotrindexdict_categorical = dict.fromkeys((range(1,56)))
+            emptydistracotrindexdict_categorical = dict.fromkeys((range(1,58)))
             emptydistracotrindexdict_categorical = {str(k): str(v) for k, v in emptydistracotrindexdict_categorical.items()}
 
             dataframeversion = pd.DataFrame.from_dict(emptydistracotrindexdict_categorical, orient='index')
             for i in range(0, len(newdata)):
                 #now declare function to get the distractor indices that th eanimal fa-ed to or the correct distractor
                 if str(int(newdata['distractor_or_fa'].values[i])) in emptydistracotrindexdict_categorical:
-                    print("Exists")
                     exception_key = str(int(newdata['distractor_or_fa'].values[i]))
-                    if exception_key != 1:
-                        print('nonone distracotr key =', i)
-                    new_entry = float('nan')
-                    combined = np.array([])
+                    # if exception_key != 1:
+                    #     print('nonone distracotr key =', i)
+                    #combined = np.array([])
                     if i == 0:
-
-                        emptydistracotrindexdict_categorical[newdata['distractor_or_fa'].values[i]] = newdata['centreRelease'].values[i]
-
+                        #emptydistracotrindexdict_categorical[newdata['distractor_or_fa'].values[i]] = newdata['centreRelease'].values[i]
                         for key, value in emptydistracotrindexdict_categorical.items():
                             if key == exception_key:
-                                emptydistracotrindexdict_categorical[key] = value
-                                emptydistracotrindexdict_categorical[key] = value
-
+                                emptydistracotrindexdict_categorical[key] = float(newdata['centreRelease'].values[i])
                             else:
-                                emptydistracotrindexdict_categorical[key] = new_entry
-                                emptydistracotrindexdict_categorical[key] = new_entry
+                                emptydistracotrindexdict_categorical[key] = float('nan')
                     else:
 
                         for key, value in emptydistracotrindexdict_categorical.items():
@@ -557,8 +550,10 @@ class behaviouralhelperscg:
 
                 else:
                     print("Does not exist")
+                    print(str(int(newdata['distractor_or_fa'].values[i])))
             for keyh in emptydistracotrindexdict_categorical:
-                newdata[keyh] = emptydistracotrindexdict_categorical[keyh]
+                selectedcol =  emptydistracotrindexdict_categorical[keyh]
+                newdata[keyh] = selectedcol
 
             #convert to dataframe
             #
