@@ -1342,7 +1342,7 @@ def run_correct_responsepipleine(ferrets):
 def run_reaction_time_fa_pipleine(ferrets):
     resultingdf = behaviouralhelperscg.get_reactiontime_data(ferrets=ferrets, startdate='04-01-2020', finishdate='01-10-2022')
     df_use = resultingdf.loc[:, resultingdf.columns != 'ferret']
-    df_use = df_use[df_use['control_trial'] == 1]
+    #df_use = df_use[df_use['control_trial'] == 1]
     #df_use = df_use.loc[:, df_use.columns != 'trialNum']
     df_use = df_use.loc[:, df_use.columns != 'targTimes']
     df_use = df_use.loc[:, df_use.columns != 'stepval']
@@ -1358,8 +1358,8 @@ def run_reaction_time_fa_pipleine(ferrets):
     col = 'ferret'
     col2=['target', 'startResponseTime', 'distractors', 'recBlock', 'lickRelease2', 'lickReleaseCount', 'PitchShiftMat', 'attenOrder', 'dDurs', 'tempAttens', 'currAttenList', 'attenList', 'fName', 'Level', 'dates', 'ferretname', 'noiseType', 'noiseFile']
     dfx = dfx.loc[:, dfx.columns != col]
-    for name in col2:
-        dfx = dfx.loc[:, dfx.columns != name]
+    # for name in col2:
+    #     dfx = dfx.loc[:, dfx.columns != name]
     for column in dfx.columns:
         if column == 'AM' or column == 'side':
             pass
@@ -1386,7 +1386,7 @@ def run_reaction_time_fa_pipleine(ferrets):
     param['eval_metric'] = 'auc'
     evallist = [(dtrain, 'train'), (dtest, 'eval')]
     # bst = xgb.train(param, dtrain, num_round, evallist)
-    xg_reg = lgb.LGBMRegressor(colsample_bytree=0.3, learning_rate=0.01,
+    xg_reg = lgb.LGBMRegressor(colsample_bytree=0.3, learning_rate=0.1,
                                max_depth=10, alpha=10, n_estimators=10, verbose=1)
 
     xg_reg.fit(X_train, y_train, eval_metric='neg_mean_squared_error', verbose=1)
