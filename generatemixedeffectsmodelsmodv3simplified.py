@@ -1342,7 +1342,7 @@ def run_correct_responsepipleine(ferrets):
 def run_reaction_time_fa_pipleine(ferrets):
     resultingdf = behaviouralhelperscg.get_reactiontime_data(ferrets=ferrets, startdate='04-01-2020', finishdate='01-10-2022')
     df_use = resultingdf.loc[:, resultingdf.columns != 'ferret']
-    df_use = df_use[df_use['conntrol_trial'] == 1]
+    df_use = df_use[df_use['control_trial'] == 1]
     #df_use = df_use.loc[:, df_use.columns != 'trialNum']
     df_use = df_use.loc[:, df_use.columns != 'targTimes']
     df_use = df_use.loc[:, df_use.columns != 'stepval']
@@ -1356,7 +1356,10 @@ def run_reaction_time_fa_pipleine(ferrets):
     dfx = df_use.loc[:, df_use.columns != col]
     # remove ferret as possible feature
     col = 'ferret'
+    col2=['target, startResponseTime, distractors, recBlock, lickRelease2, lickReleaseCount, PitchShiftMat, attenOrder, dDurs, tempAttens, currAttenList, attenList, fName, Level, dates, ferretname, noiseType, noiseFile']
     dfx = dfx.loc[:, dfx.columns != col]
+    dfx = dfx.loc[:, dfx.columns != col2]
+
 
     X_train, X_test, y_train, y_test = train_test_split(dfx, df_use['centreRelease'], test_size=0.2,
                                                         random_state=123)
