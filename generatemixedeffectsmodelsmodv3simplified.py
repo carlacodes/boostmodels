@@ -1389,11 +1389,18 @@ def run_reaction_time_fa_pipleine(ferrets):
     xg_reg = lgb.LGBMRegressor(colsample_bytree=0.3, learning_rate=0.1,
                                max_depth=10, alpha=10, n_estimators=10, verbose=1)
 
+
     xg_reg.fit(X_train, y_train, eval_metric='neg_mean_squared_error', verbose=1)
     ypred = xg_reg.predict(X_test)
     lgb.plot_importance(xg_reg)
     plt.title('feature importances for the LGBM Correct Release Times model')
     plt.show()
+    kfold = KFold(n_splits=10)
+    results = cross_val_score(xg_reg, X_train, y_train, scoring='neg_mean_squared_error', cv=kfold)
+    mse_test = mean_squared_error(ypred, y_test)
+    print('mse test: ', mse_test)
+    print('mse train: ', results.mean())
+
     return resultingdf
 
 if __name__ == '__main__':
