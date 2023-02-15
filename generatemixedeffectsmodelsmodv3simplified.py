@@ -1356,9 +1356,23 @@ def run_reaction_time_fa_pipleine(ferrets):
     dfx = df_use.loc[:, df_use.columns != col]
     # remove ferret as possible feature
     col = 'ferret'
-    col2=['target, startResponseTime, distractors, recBlock, lickRelease2, lickReleaseCount, PitchShiftMat, attenOrder, dDurs, tempAttens, currAttenList, attenList, fName, Level, dates, ferretname, noiseType, noiseFile']
+    col2=['target', 'startResponseTime', 'distractors', 'recBlock', 'lickRelease2', 'lickReleaseCount', 'PitchShiftMat', 'attenOrder', 'dDurs', 'tempAttens', 'currAttenList', 'attenList', 'fName', 'Level', 'dates', 'ferretname', 'noiseType', 'noiseFile']
     dfx = dfx.loc[:, dfx.columns != col]
-    dfx = dfx.loc[:, dfx.columns != col2]
+    for name in col2:
+        dfx = dfx.loc[:, dfx.columns != name]
+    for column in dfx.columns:
+        if column == 'AM' or column == 'side':
+            pass
+        elif column.isnumeric()==False:
+            dfx = dfx.loc[:, dfx.columns != column]
+        elif column.isnumeric():
+            pass
+
+
+
+
+
+
 
 
     X_train, X_test, y_train, y_test = train_test_split(dfx, df_use['centreRelease'], test_size=0.2,
@@ -1372,7 +1386,7 @@ def run_reaction_time_fa_pipleine(ferrets):
     param['eval_metric'] = 'auc'
     evallist = [(dtrain, 'train'), (dtest, 'eval')]
     # bst = xgb.train(param, dtrain, num_round, evallist)
-    xg_reg = lgb.LGBMRegressor(colsample_bytree=0.3, learning_rate=0.1,
+    xg_reg = lgb.LGBMRegressor(colsample_bytree=0.3, learning_rate=0.01,
                                max_depth=10, alpha=10, n_estimators=10, verbose=1)
 
     xg_reg.fit(X_train, y_train, eval_metric='neg_mean_squared_error', verbose=1)
