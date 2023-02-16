@@ -357,9 +357,9 @@ class behaviouralhelperscg:
 
 
                 if is_all_zero:
-                    control_trial[i] = 1
+                    control_trial.append(0)
                 else:
-                    control_trial[i]  = 0
+                    control_trial.append(1)
 
                 if isinstance(chosentrial, float) or is_all_zero:
                     chosentrial = talkermat.values[i].astype(int)
