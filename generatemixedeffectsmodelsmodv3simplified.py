@@ -305,11 +305,7 @@ def get_df_behav(path=None,
         correctresp = correctresp.astype(int)
         pastcatchtrial = pastcatchtrial.astype(int)
         pastcorrectresp = pastcorrectresp.astype(int)
-        # pitchoftarg[pitchoftarg == 1] = 4
-        # pitchoftarg[pitchoftarg == 13] = 1
-        #
-        # pitchofprecur[pitchofprecur == 1] = 4
-        # pitchofprecur[pitchofprecur == 13] = 1
+
 
         newdata['correctresp'] = correctresp.tolist()
         # print(len(pastcorrectresp))
