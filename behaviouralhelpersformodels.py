@@ -306,7 +306,7 @@ class behaviouralhelperscg:
             pitchofprecur = np.empty(len(pitchshiftmat))
             stepval = np.empty(len(pitchshiftmat))
             distractor_or_fa =[]
-            intra_trial_roving = np.empty(len(pitchshiftmat))
+            intra_trial_roving = []
             control_trial = []
 
             talkerlist2 = np.empty(len(pitchshiftmat))
@@ -363,9 +363,9 @@ class behaviouralhelperscg:
 
                 if isinstance(chosentrial, float) or is_all_zero:
                     chosentrial = talkermat.values[i].astype(int)
-                    intra_trial_roving[i] = 0
+                    intra_trial_roving.append(0)
                 else:
-                    intra_trial_roving[i] = 1
+                    intra_trial_roving.append(1)
 
                 chosendisttrial = precursorlist.values[i]
                 chosentalker = talkerlist.values[i]
