@@ -500,7 +500,7 @@ class behaviouralhelperscg:
             newdata['stepval'] = stepval.tolist()
             newdata['timeToTarget'] = newdata['timeToTarget'] / 24414.0625
             newdata['AM'] = newdata['AM'].astype(int)
-            newdata['talker'] = newdata['talker'] - 1
+            newdata['talker'] = newdata['talker']
             newdata = newdata[newdata['distractor_or_fa'].values <= 57]
 
             cosinesimfemale = np.load('D:/Stimuli/cosinesimvectorfemale.npy')

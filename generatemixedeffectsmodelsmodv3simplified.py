@@ -1373,10 +1373,6 @@ def run_reaction_time_fa_pipleine(ferrets):
 
 
 
-
-
-
-
     X_train, X_test, y_train, y_test = train_test_split(dfx, df_use['centreRelease'], test_size=0.2,
                                                         random_state=123)
 
