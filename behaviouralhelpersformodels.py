@@ -357,7 +357,7 @@ class behaviouralhelperscg:
 
 
                 if is_all_zero:
-                    control_trial[i]  = 1
+                    control_trial[i] = 1
                 else:
                     control_trial[i]  = 0
 

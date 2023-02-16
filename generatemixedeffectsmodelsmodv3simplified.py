@@ -1343,6 +1343,8 @@ def run_reaction_time_fa_pipleine(ferrets):
     resultingdf = behaviouralhelperscg.get_reactiontime_data(ferrets=ferrets, startdate='04-01-2020', finishdate='01-10-2022')
     df_use = resultingdf.loc[:, resultingdf.columns != 'ferret']
     #df_use = df_use[df_use['control_trial'] == 1]
+    df_use = df_use.loc[df_use['intra_trial_roving'] == 0]
+    df_use = df_use.loc[df_use['talker'] == 1]
     #df_use = df_use.loc[:, df_use.columns != 'trialNum']
     df_use = df_use.loc[:, df_use.columns != 'targTimes']
     df_use = df_use.loc[:, df_use.columns != 'stepval']
