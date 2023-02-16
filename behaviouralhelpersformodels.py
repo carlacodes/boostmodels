@@ -59,7 +59,7 @@ class behaviouralhelperscg:
             timetotarglist = np.empty(len(pitchshiftmat))
 
             precur_and_targ_same = np.empty(len(pitchshiftmat))
-            intra_trial_roving = np.empty(len(pitchshiftmat))
+            intra_trial_roving = []
             talkerlist2 = np.empty(len(pitchshiftmat))
 
             falsealarm = np.empty(shape=(0, 0))
@@ -307,7 +307,7 @@ class behaviouralhelperscg:
             stepval = np.empty(len(pitchshiftmat))
             distractor_or_fa =[]
             intra_trial_roving = np.empty(len(pitchshiftmat))
-            control_trial = np.empty(len(pitchshiftmat))
+            control_trial = []
 
             talkerlist2 = np.empty(len(pitchshiftmat))
             falsealarm = np.empty(shape=(0, 0))
