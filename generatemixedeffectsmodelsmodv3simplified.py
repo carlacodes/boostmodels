@@ -1340,7 +1340,7 @@ def run_reaction_time_fa_pipleine(ferrets):
     df_use = resultingdf.loc[:, resultingdf.columns != 'ferret']
     #df_use = df_use[df_use['control_trial'] == 1]
     df_use = df_use.loc[df_use['intra_trial_roving'] == 0]
-    #df_use = df_use.loc[df_use['talker'] == 1]
+    df_use = df_use.loc[df_use['talker'] == 1]
     #df_use = df_use.loc[:, df_use.columns != 'trialNum']
     df_use = df_use.loc[:, df_use.columns != 'targTimes']
     df_use = df_use.loc[:, df_use.columns != 'stepval']
@@ -1387,13 +1387,21 @@ def run_reaction_time_fa_pipleine(ferrets):
     xg_reg.fit(X_train, y_train, eval_metric='neg_mean_squared_error', verbose=1)
     ypred = xg_reg.predict(X_test)
     lgb.plot_importance(xg_reg)
-    plt.title('feature importances for the LGBM Correct Release Times model')
+    plt.title('feature importances for the LGBM release times model (both hits and false alarms)')
     plt.show()
     kfold = KFold(n_splits=10)
     results = cross_val_score(xg_reg, X_train, y_train, scoring='neg_mean_squared_error', cv=kfold)
     mse_test = mean_squared_error(ypred, y_test)
     print('mse test: ', mse_test)
     print('mse train: ', results.mean())
+
+    shap_values1 = shap.TreeExplainer(xg_reg).shap_values(X_train)
+    fig, ax = plt.subplots(figsize=(15, 65))
+    shap.summary_plot(shap_values1, X_train, show=False)
+    plt.title('Ranked list of features over their \n impact in predicting reaction time, female talker', fontsize=18)
+    fig.tight_layout()
+    plt.savefig('D:/behavmodelfigs/ranked_features_falsealarmmodel.png', dpi=500)
+    plt.show()
 
     return resultingdf
 
