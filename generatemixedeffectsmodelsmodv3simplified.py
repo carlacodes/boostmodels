@@ -1400,7 +1400,61 @@ def run_reaction_time_fa_pipleine(ferrets):
     shap.summary_plot(shap_values1, X_train, show=False)
     plt.title('Ranked list of features over their \n impact in predicting reaction time, female talker', fontsize=18)
     fig.tight_layout()
-    plt.savefig('D:/behavmodelfigs/ranked_features_falsealarmmodel.png', dpi=500)
+    plt.savefig('D:/behavmodelfigs/ranked_features_rxntimealarmhitmodel.png', dpi=500)
+    plt.show()
+
+    return resultingdf
+def run_reaction_time_fa_pipleine_male(ferrets):
+    resultingdf = behaviouralhelperscg.get_reactiontime_data(ferrets=ferrets, startdate='04-01-2020', finishdate='01-10-2022')
+    df_use = resultingdf.loc[:, resultingdf.columns != 'ferret']
+    df_use = df_use.loc[df_use['intra_trial_roving'] == 0]
+    df_use = df_use.loc[df_use['talker'] == 2]
+    df_use = df_use.loc[:, df_use.columns != 'targTimes']
+    df_use = df_use.loc[:, df_use.columns != 'stepval']
+    df_use = df_use.loc[:, df_use.columns != 'distractor_or_fa']
+    df_use = df_use.loc[:, df_use.columns != 'realRelReleaseTimes']
+
+    col = 'centreRelease'
+    dfx = df_use.loc[:, df_use.columns != col]
+    col = 'ferret'
+    col2=['target', 'startResponseTime', 'distractors', 'recBlock', 'lickRelease2', 'lickReleaseCount', 'PitchShiftMat', 'attenOrder', 'dDurs', 'tempAttens', 'currAttenList', 'attenList', 'fName', 'Level', 'dates', 'ferretname', 'noiseType', 'noiseFile']
+    dfx = dfx.loc[:, dfx.columns != col]
+
+    for column in dfx.columns:
+        if column == 'AM' or column == 'side':
+            pass
+        elif column.isnumeric()==False:
+            dfx = dfx.loc[:, dfx.columns != column]
+        elif column.isnumeric():
+            pass
+
+    X_train, X_test, y_train, y_test = train_test_split(dfx, df_use['centreRelease'], test_size=0.2,
+                                                        random_state=123)
+
+    param = {'max_depth': 2, 'eta': 1, 'objective': 'reg:squarederror'}
+    param['nthread'] = 4
+    param['eval_metric'] = 'auc'
+    xg_reg = lgb.LGBMRegressor(colsample_bytree=0.3, learning_rate=0.1,
+                               max_depth=10, alpha=10, n_estimators=10, verbose=1)
+
+
+    xg_reg.fit(X_train, y_train, eval_metric='neg_mean_squared_error', verbose=1)
+    ypred = xg_reg.predict(X_test)
+    lgb.plot_importance(xg_reg)
+    plt.title('feature importances for the LGBM release times model (both hits and false alarms)')
+    plt.show()
+    kfold = KFold(n_splits=10)
+    results = cross_val_score(xg_reg, X_train, y_train, scoring='neg_mean_squared_error', cv=kfold)
+    mse_test = mean_squared_error(ypred, y_test)
+    print('mse test: ', mse_test)
+    print('mse train: ', results.mean())
+
+    shap_values1 = shap.TreeExplainer(xg_reg).shap_values(X_train)
+    fig, ax = plt.subplots(figsize=(15, 65))
+    shap.summary_plot(shap_values1, X_train, show=False)
+    plt.title('Ranked list of features over their \n impact in predicting reaction time, female talker', fontsize=18)
+    fig.tight_layout()
+    plt.savefig('D:/behavmodelfigs/ranked_features_rxntimealarmhitmodel_male.png', dpi=500)
     plt.show()
 
     return resultingdf
@@ -1409,6 +1463,8 @@ if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
 
     test_df = run_reaction_time_fa_pipleine(ferrets)
+
+    test_df2 = run_reaction_time_fa_pipleine_male(ferrets)
 
     #xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(ferrets)
 
