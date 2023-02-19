@@ -1338,12 +1338,12 @@ def run_correct_responsepipleine(ferrets):
 def run_reaction_time_fa_pipleine(ferrets):
     resultingdf = behaviouralhelperscg.get_reactiontime_data(ferrets=ferrets, startdate='04-01-2020', finishdate='01-10-2022')
     df_use = resultingdf.loc[:, resultingdf.columns != 'ferret']
-    #df_use = df_use[df_use['control_trial'] == 1]
     df_use = df_use.loc[df_use['intra_trial_roving'] == 0]
     df_use = df_use.loc[df_use['talker'] == 1]
-    #df_use = df_use.loc[:, df_use.columns != 'trialNum']
     df_use = df_use.loc[:, df_use.columns != 'targTimes']
     df_use = df_use.loc[:, df_use.columns != 'stepval']
+    df_use = df_use.loc[:, df_use.columns != 'side']
+    df_use = df_use.loc[:, df_use.columns != 'AM']
     df_use = df_use.loc[:, df_use.columns != 'distractor_or_fa']
 
     df_use = df_use.loc[:, df_use.columns != 'realRelReleaseTimes']
@@ -1411,6 +1411,10 @@ def run_reaction_time_fa_pipleine_male(ferrets):
     df_use = df_use.loc[df_use['talker'] == 2]
     df_use = df_use.loc[:, df_use.columns != 'targTimes']
     df_use = df_use.loc[:, df_use.columns != 'stepval']
+    df_use = df_use.loc[:, df_use.columns != 'side']
+    df_use = df_use.loc[:, df_use.columns != 'AM']
+
+
     df_use = df_use.loc[:, df_use.columns != 'distractor_or_fa']
     df_use = df_use.loc[:, df_use.columns != 'realRelReleaseTimes']
 
@@ -1452,7 +1456,7 @@ def run_reaction_time_fa_pipleine_male(ferrets):
     shap_values1 = shap.TreeExplainer(xg_reg).shap_values(X_train)
     fig, ax = plt.subplots(figsize=(15, 65))
     shap.summary_plot(shap_values1, X_train, show=False)
-    plt.title('Ranked list of features over their \n impact in predicting reaction time, female talker', fontsize=18)
+    plt.title('Ranked list of features over their \n impact in predicting reaction time, male talker', fontsize=18)
     fig.tight_layout()
     plt.savefig('D:/behavmodelfigs/ranked_features_rxntimealarmhitmodel_male.png', dpi=500)
     plt.show()
