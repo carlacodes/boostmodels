@@ -342,7 +342,7 @@ class behaviouralhelperscg:
                   else:
                       break
 
-                print('current dist list', current_dist_list)
+                #print('current dist list', current_dist_list)
                 try:
                     distractor_or_fa.append(current_dist_list[-1])
                 except:

@@ -1392,8 +1392,8 @@ def run_reaction_time_fa_pipleine(ferrets):
     kfold = KFold(n_splits=10)
     results = cross_val_score(xg_reg, X_train, y_train, scoring='neg_mean_squared_error', cv=kfold)
     mse_test = mean_squared_error(ypred, y_test)
-    print('mse test: ', mse_test)
-    print('mse train: ', results.mean())
+    print('mse test for female talker model: ', mse_test)
+    print('mse train for female talker model: ', results.mean())
 
     shap_values1 = shap.TreeExplainer(xg_reg).shap_values(X_train)
     fig, ax = plt.subplots(figsize=(15, 65))
