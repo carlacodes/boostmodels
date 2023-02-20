@@ -1476,7 +1476,10 @@ def plot_correct_response_byside(ferrets):
     df_right = df_use.loc[df_use['side'] == 1]
     ax, fig = plt.subplots()
     plt.bar(['left', 'right'], [df_left['correct'].mean(), df_right['correct'].mean()])
-    plt.title('Proportion of correct responses by side registered by sensors, irrespective of talker and ferret')
+    plt.title('Proportion of correct responses by side registered by sensors, \n irrespective of talker and ferret')
+    plt.ylabel('proportion of correct responses')
+    plt.savefig('D:/behavmodelfigs/proportion_correct_responses_by_side.png', dpi=500)
+
     plt.show()
     df_left_by_ferret = {}
     df_right_by_ferret = {}
@@ -1492,7 +1495,10 @@ def plot_correct_response_byside(ferrets):
 
     ax, fig = plt.subplots()
     plt.bar(['left - zola', 'right - zola', 'left - cru', 'right - cru', 'left - tina', 'right-tina', 'left - mac', 'right-mac'], [df_left_by_ferret[0]['correct'].mean(), df_right_by_ferret[0]['correct'].mean(), df_left_by_ferret[1]['correct'].mean(), df_right_by_ferret[1]['correct'].mean(), df_left_by_ferret[2]['correct'].mean(), df_right_by_ferret[2]['correct'].mean(), df_left_by_ferret[3]['correct'].mean(), df_right_by_ferret[3]['correct'].mean()])
-    plt.title('Proportion of correct responses by side registered by sensors, irrespective of talker and ferret')
+    plt.title('Proportion of correct responses by side registered by sensors, \n  irrespective of talker, by ferret ID')
+    plt.xticks(rotation=45)  # rotate the x axis labels
+    plt.ylabel('proportion of correct responses')
+    plt.savefig('D:/behavmodelfigs/proportion_correct_responses_by_side_by_ferret.png', dpi=500)
     plt.show()
     return df_left, df_right
 
