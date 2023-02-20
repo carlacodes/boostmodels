@@ -1463,8 +1463,40 @@ def run_reaction_time_fa_pipleine_male(ferrets):
 
     return resultingdf
 
+
+def plot_correct_response_byside(ferrets):
+    resultingdf = behaviouralhelperscg.get_reactiontime_data(ferrets=ferrets, startdate='04-01-2020', finishdate='01-10-2022')
+    #df_use = resultingdf.loc[:, resultingdf.columns != 'ferret']
+    df_use = df_use.loc[df_use['intra_trial_roving'] == 0]
+    #plot the proportion of correct responses by side
+
+    df_left = df_use.loc[df_use['side'] == 0]
+    df_right = df_use.loc[df_use['side'] == 1]
+    ax, fig = plt.subplots()
+    plt.bar(['left', 'right'], [df_left['correct'].mean(), df_right['correct'].mean()])
+    plt.title('Proportion of correct responses by side registered by sensors, irrespective of talker and ferret')
+    plt.show()
+
+    #now plot by ferret ID
+    ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
+    for ferret in ferrets:
+
+        df_left_test = df_use.loc[df_use['side'] == 0]
+        df_right_test = df_use.loc[df_use['side'] == 1]
+        df_left[ferret] = df_left_test['ferret'] == ferret
+        df_right[ferret] = df_right_test['ferret'] == ferret
+
+    ax, fig = plt.subplots()
+    plt.bar(['left', 'right'], [df_left['F1702_Zola']['correct'].mean(), df_right['F1702_Zola']['correct'].mean()])
+    plt.title('Proportion of correct responses by side registered by sensors, irrespective of talker and ferret')
+    plt.show()
+    return df_left, df_right
+
+
+
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
+    df_left, df_right = plot_correct_response_byside(ferrets)
 
     test_df = run_reaction_time_fa_pipleine(ferrets)
 
