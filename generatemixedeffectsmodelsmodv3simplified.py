@@ -1504,10 +1504,29 @@ def plot_correct_response_byside(ferrets):
     plt.show()
     return df_left, df_right
 
+def plot_reaction_times(ferrets):
+    #plot the reaction times by animal
+    resultingdf = behaviouralhelperscg.get_reactiontime_data(ferrets=ferrets, startdate='04-01-2020', finishdate='01-10-2022')
+    #df_use = resultingdf.loc[:, resultingdf.columns != 'ferret']
+    df_use = resultingdf
+    # df_use = df_use.loc[df_use['intra_trial_roving'] == 0]
+    # df_use = df_use.loc[df_use['correct'] == 1]
+    # df_use = df_use.loc[df_use['side'] == 0]
+    df_left_by_ferret = {}
+    df_by_feret = {}
 
+    # now plot by ferret ID
+    ferrets = [0, 1, 2, 3]
+    for ferret in ferrets:
+        df_by_feret[ferret] = resultingdf.loc[resultingdf['ferret'] == ferret]
+    return df_by_feret
+
+    #
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
+    df_by_ferretdict = plot_reaction_times(ferrets)
+
     df_left, df_right = plot_correct_response_byside(ferrets)
 
     test_df = run_reaction_time_fa_pipleine(ferrets)
