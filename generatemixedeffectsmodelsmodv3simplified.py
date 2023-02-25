@@ -1514,12 +1514,32 @@ def plot_reaction_times(ferrets):
     # df_use = df_use.loc[df_use['correct'] == 1]
     # df_use = df_use.loc[df_use['side'] == 0]
     df_left_by_ferret = {}
+    df_female = df_use.loc[df_use['talker'] == 1]
+    df_female_control = df_female.loc[df_female['intra_trial_roving'] == 0]
+
+
+    df_female = df_use.loc[df_use['talker'] == 1]
+    df_female_rove = df_female.loc[df_female['intra_trial_roving'] == 1]
+
+
+    df_male = df_use.loc[df_use['talker'] == 2]
+    df_male_control = df_male.loc[df_male['intra_trial_roving'] == 0]
+    df_male_rove = df_male.loc[df_male['intra_trial_roving'] == 1]
 
     #now plot generally by all ferrets
     ax, fig = plt.subplots(figsize=(10, 12))
     sns.distplot(df_use['realRelReleaseTimes'], hist=True, kde=False, color='blue',
                  hist_kws={'edgecolor': 'black'})
+    plt.title('Distribution of reaction times, \n irrespective of talker and ferret', fontsize = 15)
     plt.show()
+
+    #now plot by talker, showing reaction times
+    ax, fig = plt.subplots(figsize=(10, 12))
+    sns.displot(df_female_control['realRelReleaseTimes'], hist=True, kde=False, color='blue', label = 'female talker reaction times, control F0')
+    sns.displot()
+
+    ferrets = [0,1,2,3]
+
     df_by_ferret = {}
 
     # now plot by ferret ID
