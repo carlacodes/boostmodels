@@ -1535,9 +1535,10 @@ def plot_reaction_times(ferrets):
 
     #now plot by talker, showing reaction times
     ax, fig = plt.subplots(figsize=(10, 12))
-    sns.displot(df_female_control['realRelReleaseTimes'], hist=True, kde=False, color='blue', label = 'female talker reaction times, control F0')
-    sns.displot()
-
+    sns.displot(df_female_control['realRelReleaseTimes'], hist=True, kde=False, color='blue', ax=ax, label = 'female talker reaction times, control F0')
+    sns.displot(df_female_rove['realRelReleaseTimes'], hist = True, color = 'red',ax=ax, label ='female talker reaction times, roving F0')
+    plt.title('Reaction times for the female talker, \n irrespective of ferret', fontsize = 15)
+    plt.show
     ferrets = [0,1,2,3]
 
     df_by_ferret = {}
