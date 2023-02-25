@@ -1551,11 +1551,30 @@ def plot_reaction_times(ferrets):
 
 
     df_by_ferret = {}
+    df_by_ferret_f_control={}
+    df_by_ferret_f_rove={}
+    df_by_ferret_m_control={}
+    df_by_ferret_m_rove={}
 
     # now plot by ferret ID
     ferrets = [0, 1, 2, 3]
     for ferret in ferrets:
-        df_by_ferret[ferret] = resultingdf.loc[resultingdf['ferret'] == ferret]
+        df_by_ferret_f_control[ferret] = df_female_control.loc[df_female_control['ferret'] == ferret]
+        df_by_ferret_f_rove[ferret] = df_female_rove.loc[df_female_rove['ferret'] == ferret]
+        df_by_ferret_m_control[ferret] = df_male_rove.loc[df_male_rove['ferret'] == ferret]
+        df_by_ferret_m_rove[ferret] = df_male_control.loc[df_male_control['ferret'] == ferret]
+    ferret_labels = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
+    for ferret in ferrets:
+        sns.distplot(df_by_ferret_f_control[ferret]['realRelReleaseTimes'], color='blue', label='control F0, female')
+        sns.distplot(df_by_ferret_f_rove[ferret]['realRelReleaseTimes'], color='red', label='roved F0, female')
+        sns.distplot(df_by_ferret_m_control[ferret]['realRelReleaseTimes'], color = 'green', label='control F0, male')
+        sns.distplot(df_by_ferret_m_rove[ferret]['realRelReleaseTimes'], color = 'orange', label='roved F0, male')
+        plt.title('Reaction times for ferret ID ' + str(ferret_labels), fontsize = 15)
+        plt.legend(fontsize = 10)
+        plt.xlabel('reaction time relative to target presentation (s)', fontsize = 13)
+        plt.show()
+
+
     return df_by_ferret
 
     #
