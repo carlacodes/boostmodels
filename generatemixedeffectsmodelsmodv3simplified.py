@@ -2,6 +2,7 @@ import sklearn.metrics
 from rpy2.robjects import pandas2ri
 from rpy2.robjects.conversion import localconverter
 import instruments
+import seaborn as sns
 from instruments.io.BehaviourIO import BehaviourDataSet, WeekBehaviourDataSet
 from sklearn.inspection import permutation_importance
 from instruments.config import behaviouralDataPath, behaviourOutput
@@ -1513,13 +1514,19 @@ def plot_reaction_times(ferrets):
     # df_use = df_use.loc[df_use['correct'] == 1]
     # df_use = df_use.loc[df_use['side'] == 0]
     df_left_by_ferret = {}
-    df_by_feret = {}
+
+    #now plot generally by all ferrets
+    ax, fig = plt.subplots(figsize=(10, 12))
+    sns.distplot(df_use['realRelReleaseTimes'], hist=True, kde=False, color='blue',
+                 hist_kws={'edgecolor': 'black'})
+    plt.show()
+    df_by_ferret = {}
 
     # now plot by ferret ID
     ferrets = [0, 1, 2, 3]
     for ferret in ferrets:
-        df_by_feret[ferret] = resultingdf.loc[resultingdf['ferret'] == ferret]
-    return df_by_feret
+        df_by_ferret[ferret] = resultingdf.loc[resultingdf['ferret'] == ferret]
+    return df_by_ferret
 
     #
 
