@@ -1569,7 +1569,7 @@ def plot_reaction_times(ferrets):
         sns.distplot(df_by_ferret_f_rove[ferret]['realRelReleaseTimes'], color='red', label='roved F0, female')
         sns.distplot(df_by_ferret_m_control[ferret]['realRelReleaseTimes'], color = 'green', label='control F0, male')
         sns.distplot(df_by_ferret_m_rove[ferret]['realRelReleaseTimes'], color = 'orange', label='roved F0, male')
-        plt.title('Reaction times for ferret ID ' + str(ferret_labels), fontsize = 15)
+        plt.title('Reaction times for ferret ID ' + str(ferret_labels[ferret]), fontsize = 15)
         plt.legend(fontsize = 10)
         plt.xlabel('reaction time relative to target presentation (s)', fontsize = 13)
         plt.show()
