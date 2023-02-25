@@ -1534,9 +1534,17 @@ def plot_reaction_times(ferrets):
     plt.show()
 
     #now plot by talker, showing reaction times
-    sns.distplot(df_female_control['realRelReleaseTimes'],color='blue', label = 'female talker reaction times, control F0')
-    sns.distplot(df_female_rove['realRelReleaseTimes'], color = 'red',label ='female talker reaction times, roving F0')
+    sns.distplot(df_female_control['realRelReleaseTimes'],color='blue', label = 'control F0')
+    sns.distplot(df_female_rove['realRelReleaseTimes'], color = 'red',label ='roved F0')
     plt.title('Reaction times for the female talker, \n irrespective of ferret',  fontsize = 15)
+    plt.legend(fontsize = 10)
+    plt.xlabel('reaction time relative to target presentation (s)', fontsize = 13)
+    plt.show()
+
+
+    sns.distplot(df_male_control['realRelReleaseTimes'],color='green', label = 'control F0')
+    sns.distplot(df_male_rove['realRelReleaseTimes'], color = 'orange',label ='roved F0')
+    plt.title('Reaction times for the male talker, \n irrespective of ferret',  fontsize = 15)
     plt.legend(fontsize = 10)
     plt.xlabel('reaction time relative to target presentation (s)', fontsize = 13)
     plt.show()
