@@ -260,11 +260,8 @@ def get_df_behav(path=None,
 
         droplist = [int(x) for x in droplist]  # drop corrupted metdata trials
 
-        # pitchoftarg = pitchoftarg[~np.isnan(pitchoftarg)]
         pitchoftarg = pitchoftarg.astype(int)
-        # pitchofprecur = pitchofprecur[~np.isnan(pitchofprecur)]
         pitchofprecur = pitchofprecur.astype(int)
-        # gradinpitch = gradinpitch[~np.isnan(gradinpitch)]
 
         correctresp = correctresp[~np.isnan(correctresp)]
         correspondcosinelist = correspondcosinelist[~np.isnan(correspondcosinelist)]
@@ -286,7 +283,6 @@ def get_df_behav(path=None,
         newdata['pitchofprecur'] = pitchofprecur.tolist()
 
         correctresp = np.delete(correctresp, droplist)
-        #correspondcosinelist = np.delete(correspondcosinelist, droplist)
         pastcorrectresp = np.delete(pastcorrectresp, droplist)
         pastcatchtrial = np.delete(pastcatchtrial, droplist)
 
@@ -298,8 +294,6 @@ def get_df_behav(path=None,
 
 
         newdata['correctresp'] = correctresp.tolist()
-        # print(len(pastcorrectresp))
-        # print(len(correctresp))
         newdata['pastcorrectresp'] = pastcorrectresp.tolist()
         newdata['talker'] = talkerlist2.tolist()
         newdata['pastcatchtrial'] = pastcatchtrial.tolist()
@@ -311,7 +305,7 @@ def get_df_behav(path=None,
         newdata['AM'] = newdata['AM'].astype(int)
         newdata['talker'] = newdata['talker'] - 1
 
-        # optionvector=[1 3 5];, male optionvector=[2 8 13]
+
         # only look at v2 pitches from recent experiments
         newdata = newdata[(newdata.pitchoftarg == 1) | (newdata.pitchoftarg == 2) | (newdata.pitchoftarg == 3) | (
                 newdata.pitchoftarg == 4) | (newdata.pitchoftarg == 5)]
@@ -329,8 +323,6 @@ def get_df_behav(path=None,
         else:
             newdata = newdata[newdata.correctresp == 1]
             newdata = newdata[(newdata.catchTrial == 0)]
-        # if includefaandmiss is False:
-        #     newdata = newdata[(newdata.correctresp == 1)]
         bigdata = bigdata.append(newdata)
     return bigdata
 
