@@ -569,10 +569,11 @@ def runlgbreleasetimes(df_use):
     shap.summary_plot(shap_values, dfx, show=False)
     fig, ax = plt.gcf(), plt.gca()
     plt.title('Ranked list of features over their impact in predicting reaction time')
+    plt.xlabel('SHAP value (impact on model output) on reaction time')
 
     labels = [item.get_text() for item in ax.get_yticklabels()]
     print(labels)
-    labels[11] = 'distance to reward'
+    labels[11] = 'distance to sensor'
     labels[10] = 'target F0'
     labels[9] = 'trial number'
     labels[8] = 'precursor = target F0'
@@ -588,8 +589,8 @@ def runlgbreleasetimes(df_use):
     ax.set_yticklabels(labels)
 
     plt.show()
+
     shap.dependence_plot("timeToTarget", shap_values, dfx)  #
-    plt.show()
 
     explainer = shap.Explainer(xg_reg, dfx)
     shap_values2 = explainer(dfx)
