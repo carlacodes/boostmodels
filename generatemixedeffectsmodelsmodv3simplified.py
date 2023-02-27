@@ -388,17 +388,14 @@ def run_mixed_effects_analysis(ferrets):
     labels = [item.get_text() for item in ax.get_yticklabels()]
 
     plt.show()
-    fig, ax = plt.subplots()
 
     ax = modelreg.plot_summary()
     plt.title('Model Summary of Coefficients for Relative Release Times for Correct Responses')
     ax.set_yticklabels(labels)
-
     plt.show()
     # 1 is 191, 2 is 124, 3 is 144hz female, 5 is 251, 8 is 144hz male, 13 is109hz male
     # pitchof targ 1 is 124hz male, pitchoftarg4 is 109Hz Male
 
-    fig, ax = plt.subplots()
 
     ax = modelregcat_reduc.plot_summary()
     plt.title('Model Summary of Coefficients for P(Correct Responses)')
@@ -424,7 +421,6 @@ def run_mixed_effects_analysis(ferrets):
     plt.gca().get_yticklabels()[8].set_color("blue")
     plt.show()
 
-    fig, ax = plt.subplots()
 
     ax = modelreg_reduc.plot_summary()
 
@@ -440,8 +436,8 @@ def run_mixed_effects_analysis(ferrets):
     labels[7] = 'neg. step in F0 \n b/t precursor and talker'
     labels[8] = 'time to target'
     labels[9] = 'talker corr. with stepval'
-
     ax.set_yticklabels(labels, fontsize=10)
+
     plt.gca().get_yticklabels()[0].set_color("blue")
     plt.gca().get_yticklabels()[2].set_color("blue")
     plt.gca().get_yticklabels()[3].set_color("blue")
@@ -459,9 +455,7 @@ def run_mixed_effects_analysis(ferrets):
     ##the marginal R2 encompassing variance explained by only the fixed effects, and the conditional R2 comprising variance explained by both
     # fixed and random effects i.e. the variance explained by the whole model
     print(explainvarreleasetime)
-    #    data_from_ferret = dfuse.
-    #
-    #    [[dfuse['pitchoftarg'] == 1 | dfuse['pitchoftarg'] == 2]]
+
     data_from_ferret = dfuse[(dfuse['pitchoftarg'] == 1) | (dfuse['pitchoftarg'] == 13)]
     data_from_ferret.isnull().values.any()
     predictedrelease = rstats.predict(modelreg_reduc.model_obj, type='response')
@@ -487,12 +481,6 @@ def run_mixed_effects_analysis(ferrets):
 
     filepath = Path('D:/dfformixedmodels/dfcat_use.csv')
     dfcat_use.to_csv(filepath)
-
-    # dfuse.to_csv('dfuse.csv', sep=',', path_or_buf=os.PathLike['D:/dfformixedmodels/'])
-    # dfcat_use.to_csv('dfcat_use.csv', path_or_buf=os.path.normpath(p))
-    # df.to_csv('df.csv', path_or_buf=os.path.normpath(p))
-    # dfcat.to_csv('dfcat.csv', path_or_buf=os.path.normpath(p))
-
     return modelreg_reduc, modelregcat_reduc, modelregcat, modelreg, predictedrelease, dfuse, dfcat_use, predictedcorrectresp, explainedvar, explainvarreleasetime
 
 
@@ -545,26 +533,18 @@ def runxgboostreleasetimes(df_use):
     dfx['DaysSinceStart'] = dfx['DaysSinceStart'].astype('category')
     dfx['precur_and_targ_same'] = dfx['precur_and_targ_same'].astype('category')
 
-    # dfuse = df[["pitchoftarg", "pitchofprecur", "talker", "side", "precur_and_targ_same",
-    #             "timeToTarget", "DaysSinceStart", "AM",
-    #             "realRelReleaseTimes", "ferret", "stepval"]]
 
     X_train, X_test, y_train, y_test = train_test_split(dfx, df_use['realRelReleaseTimes'], test_size=0.2,
                                                         random_state=123)
-
     dtrain = xgb.DMatrix(X_train, label=y_train, enable_categorical=True)
     dtest = xgb.DMatrix(X_test, label=y_test, enable_categorical=True)
 
     param = {'max_depth': 2, 'eta': 1, 'objective': 'reg:squarederror'}
     param['nthread'] = 4
     param['eval_metric'] = 'auc'
-    evallist = [(dtrain, 'train'), (dtest, 'eval')]
-
-    # bst = xgb.train(param, dtrain, num_round, evallist)
     xg_reg = xgb.XGBRegressor(tree_method='gpu_hist', objective='reg:squarederror', colsample_bytree=0.3,
                               learning_rate=0.1,
                               max_depth=10, alpha=10, n_estimators=10, enable_categorical=True)
-
     xg_reg.fit(X_train, y_train)
     ypred = xg_reg.predict(X_test)
     xgb.plot_importance(xg_reg)
