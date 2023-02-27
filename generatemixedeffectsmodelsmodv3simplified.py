@@ -640,7 +640,6 @@ def runlgbreleasetimes(df_use):
     plt.show()
     shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"],
                        title='Correct Responses - Reaction Time Model SHAP response \n vs. trial number')
-
     plt.show()
 
     return xg_reg, ypred, y_test, results
@@ -679,14 +678,6 @@ def balanced_subsample(x, y, subsample_size=1.0):
 
 
 def runlgbcorrectresponse(dfx, dfy, paramsinput):
-    # col = 'correctresp'
-    # dfx = dfcat_use.loc[:, dfcat_use.columns != col]
-    # # remove ferret as possible feature
-    # col = 'ferret'
-    # dfx = dfx.loc[:, dfx.columns != col]
-    # # col = 'pitchofprecur'
-    # # dfx = dfx.loc[:, dfx.columns != col]
-    # dfx, dfy = balanced_subsample(dfx, dfcat_use['correctresp'], 0.5)
 
     X_train, X_test, y_train, y_test = train_test_split(dfx, dfy, test_size=0.2, random_state=123)
     print(X_train.shape)
