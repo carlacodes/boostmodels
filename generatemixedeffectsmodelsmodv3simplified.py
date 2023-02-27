@@ -44,11 +44,6 @@ def cli_reaction_time(path=None,
     if path is None:
         path = behaviouralDataPath
 
-    #    if ferrets is not None:
-    #        ferrets = [ferrets]
-    #    else:
-    #        ferrets = [ferret for ferret in next(os.walk(db_path))[1] if ferret.startswith('F')]
-
     dataSet = BehaviourDataSet(filepath=path,
                                startDate=startdate,
                                finishDate=finishdate,
@@ -87,10 +82,7 @@ def get_df_behav(path=None,
     cosinesimmale = np.load('D:/Stimuli/cosinesimvectormale.npy')
     numofferrets = allData['ferret'].unique()
     for ferret in numofferrets:
-        print(ferret)
-        # newdata = allData.iloc(allData['ferret'] == ferret)
         newdata = allData[allData['ferret'] == ferret]
-        # newdata = allData['absentTime'][0]
         newdata['targTimes'] = newdata['timeToTarget'] / fs
 
         newdata['centreRelease'] = newdata['lickRelease'] - newdata['startTrialLick']
@@ -106,11 +98,6 @@ def get_df_behav(path=None,
         talkermat = pd.Series(talkermat, index=talkermat.keys())
 
         pitchshiftmat = newdata['PitchShiftMat']
-        # if len(pitchshiftmat) == 0:
-        #     pitchshiftmat = talkermat  # make array equivalent to size of pitch shift mat just like talker [3,3,3,3] # if this is inter trial roving then talker is the pitch shift
-
-        # except:
-        #     pitchshiftmat = talkermat  # make array equivalent to size of pitch shift mat just like talker [3,3,3,3] # if this is inter trial roving then talker is the pitch shift
         precursorlist = newdata['distractors']
         catchtriallist = newdata['catchTrial']
         chosenresponse = newdata['response']
