@@ -732,6 +732,7 @@ def runlgbcorrectresponse(dfx, dfy, paramsinput):
     shap_values = shap.TreeExplainer(xg_reg).shap_values(dfx)
     shap.summary_plot(shap_values, dfx)
     plt.show()
+
     shap.dependence_plot("pitchoftarg", shap_values[0], dfx)  #
     plt.show()
     result = permutation_importance(xg_reg, X_test, y_test, n_repeats=10,
@@ -751,8 +752,8 @@ def runlgbcorrectresponse(dfx, dfy, paramsinput):
     fig.tight_layout()
     plt.tight_layout()
     plt.subplots_adjust(left=-10, right=0.5)
-
     plt.show()
+
     shap.plots.scatter(shap_values2[:, "pitchoftarg"], color=shap_values2[:, "talker"])
     plt.show()
 
@@ -761,6 +762,7 @@ def runlgbcorrectresponse(dfx, dfy, paramsinput):
 
     shap.plots.scatter(shap_values2[:, "precur_and_targ_same"], color=shap_values2[:, "talker"])
     plt.show()
+
     shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"])
     plt.show()
 
