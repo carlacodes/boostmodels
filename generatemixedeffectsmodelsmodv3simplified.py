@@ -685,11 +685,6 @@ def runlgbcorrectresponse(dfx, dfy, paramsinput):
 
     dtrain = lgb.Dataset(X_train, label=y_train)
     dtest = lgb.Dataset(X_test, label=y_test)
-
-    # param = {'max_depth': 2, 'eta': 1, 'objective': 'reg:squarederror'}
-    # param['nthread'] = 4
-    # param['eval_metric'] = 'auc'
-    evallist = [(dtrain, 'train'), (dtest, 'eval')]
     params2 = {"n_estimators": 9300,
                "scale_pos_weight": 0.3,
                "colsample_bytree": 0.8163174226131737,
@@ -720,12 +715,7 @@ def runlgbcorrectresponse(dfx, dfy, paramsinput):
     # feature_fraction: 0.6000000000000001
     xg_reg = lgb.LGBMClassifier(objective="binary", random_state=123,
                                 **paramsinput)  # colsample_bytree=0.4398528259745191, alpha=14.412788226345182,
-    # n_estimators=10000, learning_rate=params2['learning_rate'],
-    # num_leaves=params2['num_leaves'], max_depth=params2['max_depth'],
-    # min_data_in_leaf=params2['min_data_in_leaf'], lambda_l1=params2['lambda_l1'],
-    # lambda_l2=params2['lambda_l2'], min_gain_to_split=params2['min_gain_to_split'],
-    # bagging_fraction=params2['bagging_fraction'], bagging_freq=params2['bagging_freq'],
-    # feature_fraction=params2['feature_fraction']
+
 
     xg_reg.fit(X_train, y_train, eval_metric="cross_entropy_lambda", verbose=1000)
     ypred = xg_reg.predict_proba(X_test)
