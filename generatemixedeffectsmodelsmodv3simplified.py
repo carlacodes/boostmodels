@@ -812,7 +812,6 @@ def objective(trial, X, y):
         )
         preds = model.predict_proba(X_test)
         cv_scores[idx] = sklearn.metrics.log_loss(y_test, preds)
-        # cv_scores2[idx] = balanced_accuracy_score(y_test, preds)
 
     return np.mean(cv_scores)
 
@@ -867,22 +866,15 @@ def run_optuna_study_correctresponse(dataframe, y):
         print(f"\t\t{key}: {value}")
     return study
 def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput):
-    # df_to_use = dataframe[
-    #     ["cosinesim", "pitchofprecur", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
-    #      "correctresp", "pastcorrectresp", "pastcatchtrial", "trialNum", "targTimes", ]]
     df_to_use = dataframe[["pitchoftarg", "pitchofprecur", "talker", "side", "precur_and_targ_same",
     "targTimes", "DaysSinceStart", "AM", "cosinesim", "stepval", "pastcorrectresp", "pastcatchtrial", "trialNum", "correctresp"]]
 
     col = 'correctresp'
     dfx = df_to_use.loc[:, df_to_use.columns != col]
-    # remove ferret as possible feature
 
     X_train, X_test, y_train, y_test = train_test_split(dfx, df_to_use['correctresp'], test_size=0.2, random_state=123)
     print(X_train.shape)
     print(X_test.shape)
-
-    # dtrain = lgb.Dataset(X_train, label=y_train)
-    # dtest = lgb.Dataset(X_test, label=y_test)
 
     xg_reg = lgb.LGBMClassifier(objective="binary", random_state=123,
                                 **paramsinput)
@@ -921,7 +913,6 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput):
     shap_values2 = explainer(X_train)
     fig, ax = plt.subplots(figsize=(15, 15))
     shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "precur_and_targ_same"], ax=ax)
-    fig.tight_layout()
     plt.tight_layout()
     plt.subplots_adjust(left=-10, right=0.5)
 
