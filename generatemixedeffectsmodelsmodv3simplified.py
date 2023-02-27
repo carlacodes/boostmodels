@@ -246,20 +246,13 @@ def get_df_behav(path=None,
                     pitchoftarg[i] = 1.0
 
 
-
-
-
-
             except:
-                # print(len(newdata))
                 indexdrop = newdata.iloc[i].name
                 droplist = np.append(droplist, i - 1)
-                ##arrays START AT 0, but the index starts at 1, so the index is 1 less than the array
+                #arrays START AT 0, but the index starts at 1, so the index is 1 less than the array
                 droplistnew = np.append(droplistnew, indexdrop)
                 continue
-        # newdata.drop(0, axis=0, inplace=True)  # drop first trial for each animal
-        # accidentally dropping all catch trials?
-        ##TODO: CHECK THIS
+
         newdata.drop(index=newdata.index[0],
                      axis=0,
                      inplace=True)
@@ -274,12 +267,8 @@ def get_df_behav(path=None,
         # gradinpitch = gradinpitch[~np.isnan(gradinpitch)]
 
         correctresp = correctresp[~np.isnan(correctresp)]
-        #correspondcosinelist=np.asarray(correspondcosinelist)
         correspondcosinelist = correspondcosinelist[~np.isnan(correspondcosinelist)]
 
-        # pastcorrectresp = pastcorrectresp[~np.isnan(pastcorrectresp)]
-
-        # pastcatchtrial = pastcatchtrial[~np.isnan(pastcatchtrial)]
 
         pitchoftarg = np.delete(pitchoftarg, 0)
         talkerlist2 = np.delete(talkerlist2, 0)
