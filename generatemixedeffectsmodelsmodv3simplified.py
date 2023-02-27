@@ -1467,7 +1467,6 @@ def run_reaction_time_fa_pipleine_male(ferrets):
 
 def plot_correct_response_byside(ferrets):
     resultingdf = behaviouralhelperscg.get_reactiontime_data(ferrets=ferrets, startdate='04-01-2020', finishdate='01-10-2022')
-    #df_use = resultingdf.loc[:, resultingdf.columns != 'ferret']
     df_use = resultingdf
     df_use = df_use.loc[df_use['intra_trial_roving'] == 0]
 
