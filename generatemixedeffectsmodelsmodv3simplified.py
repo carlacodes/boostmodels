@@ -1,50 +1,28 @@
 import sklearn.metrics
 from rpy2.robjects import pandas2ri
-from rpy2.robjects.conversion import localconverter
-import instruments
 import seaborn as sns
 from instruments.io.BehaviourIO import BehaviourDataSet, WeekBehaviourDataSet
 from sklearn.inspection import permutation_importance
-from instruments.config import behaviouralDataPath, behaviourOutput
 from instruments.behaviouralAnalysis import createWeekBehaviourFigs, reactionTimeAnalysis  # outputbehaviordf
-import math
-from time import time
-from pymer4.models import Lmer
-from sklearn.feature_selection import RFE
-from sklearn.svm import SVR
 from sklearn.preprocessing import MinMaxScaler
 from pymer4.models import Lmer
 from pathlib import Path
 from sklearn.metrics import mean_squared_error
-from sklearn.metrics import auc
 from sklearn.model_selection import KFold
 from sklearn.model_selection import cross_val_score
 import shap
 import lightgbm as lgb
 import optuna
 from optuna.integration import LightGBMPruningCallback
-from sklearn.metrics import log_loss
-from sklearn.metrics import balanced_accuracy_score
 from sklearn.model_selection import StratifiedKFold
-
 scaler = MinMaxScaler()
 import os
 import xgboost as xgb
 import matplotlib.pyplot as plt
-from instruments.helpers.extract_helpers import extractAllFerretData
-import pandas as pd
-import numpy as np
 import rpy2.robjects.numpy2ri
-import pandas as pd
 import sklearn
 from sklearn.model_selection import train_test_split
 from behaviouralhelpersformodels import *
-import rpy2.robjects as ro
-from rpy2.robjects.packages import importr
-from rpy2.robjects import pandas2ri
-
-from rpy2.robjects.conversion import localconverter
-
 rpy2.robjects.numpy2ri.activate()
 from rpy2.robjects.packages import importr
 
