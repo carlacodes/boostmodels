@@ -150,6 +150,7 @@ def calc_cosine_acrossdata(data, pos):
             #take the fft
             otherword = np.fft.fft(otherword)
         cosinesim = calc_cosine_similarity(word, otherword)
+        cosinesim = np.real(cosinesim)
         print(cosinesim)
         if i == 0:
             cosinesimvector = cosinesim
