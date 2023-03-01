@@ -226,8 +226,8 @@ class behaviouralhelperscg:
             cosinesimfemale = np.load('D:/Stimuli/cosinesimvectorfemale.npy')
             cosinesimmale = np.load('D:/Stimuli/cosinesimvectormale.npy')
 
-            temporalsimfemale = np.load('D:/Stimuli/temporalsimvectorfemale.npy')
-            temporalsimmale = np.load('D:/Stimuli/temporalsimvectormale.npy')
+            temporalsimfemale = np.load('D:/Stimuli/temporalcorrfemale.npy')
+            temporalsimmale = np.load('D:/Stimuli/temporalcorrmale.npy')
 
             distinds = newdata['distractor_or_fa'].values
             distinds = distinds-1;
