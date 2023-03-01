@@ -185,7 +185,6 @@ class behaviouralhelperscg:
             newdata.drop(index=newdata.index[0],
                          axis=0,
                          inplace=True)
-            #newdata.drop(droplistnew, axis=0, inplace=True)
             droplist = [int(x) for x in droplist]  # drop corrupted metdata trials
 
             pitchoftarg = pitchoftarg.astype(int)
@@ -200,19 +199,10 @@ class behaviouralhelperscg:
             pitchofprecur = np.delete(pitchofprecur, 0)
             intra_trial_roving = np.delete(intra_trial_roving, 0)
 
-
-            # pitchoftarg = np.delete(pitchoftarg, droplist)
-            # talkerlist2 = np.delete(talkerlist2, droplist)
-            # stepval = np.delete(stepval, droplist)
-
             newdata['pitchoftarg'] = pitchoftarg.tolist()
 
             # pitchofprecur = np.delete(pitchofprecur, droplist)
             newdata['pitchofprecur'] = pitchofprecur.tolist()
-
-            # falsealarm = np.delete(falsealarm, droplist)
-            # pastcorrectresp = np.delete(pastcorrectresp, droplist)
-            # pastcatchtrial = np.delete(pastcatchtrial, droplist)
 
             falsealarm = falsealarm.astype(int)
             pastcatchtrial = pastcatchtrial.astype(int)
@@ -235,24 +225,28 @@ class behaviouralhelperscg:
             cosinesimfemale = np.load('D:/Stimuli/cosinesimvectorfemale.npy')
             cosinesimmale = np.load('D:/Stimuli/cosinesimvectormale.npy')
 
+            temporalsimfemale = np.load('D:/Stimuli/temporalsimvectorfemale.npy')
+            temporalsimmale = np.load('D:/Stimuli/temporalsimvectormale.npy')
+
             distinds = newdata['distractor_or_fa'].values
             distinds = distinds-1;
             correspondcosinelist = []
+            correspondtempsimlist = []
             for i in range(len(distinds)):
                 if newdata['talker'].values[i] == 0:
                     correspondcosinelist.append(cosinesimfemale[int(distinds[i])])
+                    correspondtempsimlist.append(temporalsimfemale[int(distinds[i])])
                 else:
                     correspondcosinelist.append(cosinesimmale[int(distinds[i])])
+                    correspondtempsimlist.append(temporalsimmale[int(distinds[i])])
             newdata['cosinesim'] = correspondcosinelist
+            newdata['temporalsim'] = correspondtempsimlist
 
             newdata = newdata[(newdata.pitchoftarg == 1) | (newdata.pitchoftarg == 2) | (newdata.pitchoftarg == 3) | (
                     newdata.pitchoftarg == 4) | (newdata.pitchoftarg == 5)]
             newdata = newdata[
                 (newdata.pitchofprecur == 1) | (newdata.pitchofprecur == 2) | (newdata.pitchofprecur == 3) | (
                         newdata.pitchofprecur == 4) | (newdata.pitchofprecur == 5)]
-            # newdata = newdata[
-            #     (newdata.response == 1) | (newdata.response == 0) | (newdata.response == 5) | (
-            #             newdata.pitchofprecur == 4) | (newdata.pitchofprecur == 5)]
 
             newdata = newdata[(newdata.correctionTrial == 0)]  # | (allData.response == 7)
             newdata = newdata[(newdata.currAtten == 0)]  # | (allData.response == 7)
