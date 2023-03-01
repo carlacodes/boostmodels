@@ -962,13 +962,9 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput):
     col = 'falsealarm'
     dfx = df_to_use.loc[:, df_to_use.columns != col]
     # remove ferret as possible feature
-
     X_train, X_test, y_train, y_test = train_test_split(dfx, df_to_use['falsealarm'], test_size=0.2, random_state=123)
     print(X_train.shape)
     print(X_test.shape)
-
-    # dtrain = lgb.Dataset(X_train, label=y_train)
-    # dtest = lgb.Dataset(X_test, label=y_test)
 
     xg_reg = lgb.LGBMClassifier(objective="binary", random_state=123,
                                 **paramsinput)
@@ -1210,8 +1206,6 @@ def runfalsealarmpipeline(ferrets):
     filepath.parent.mkdir(parents=True, exist_ok=True)
 
     resultingfa_df.to_csv(filepath)
-    # xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbfaornot(
-    #     resultingfa_df)
     study = run_optuna_study_falsealarm(resultingfa_df, resultingfa_df['falsealarm'].to_numpy())
     print(study.best_params)
     #best_params = np.load('D:/behavmodelfigs/falsealarmoptunaparams3_strat5kfold.npy', allow_pickle=True).item()
@@ -1223,21 +1217,17 @@ def runfalsealarmpipeline(ferrets):
     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
 def run_correct_responsepipleine(ferrets):
-    # resultingcr_df = behaviouralhelperscg.get_false_alarm_behavdata(ferrets=ferrets, startdate='04-01-2020',
-    #                                                                     finishdate='01-10-2022')
     resultingcr_df = get_df_behav(ferrets=ferrets, includefaandmiss=False,includemissonly=True, startdate='04-01-2020', finishdate='01-10-2022')
-
     filepath = Path('D:/dfformixedmodels/correctresponsemodel_dfuse.csv')
     filepath.parent.mkdir(parents=True, exist_ok=True)
     resultingcr_df.to_csv(filepath)
-    # study = run_optuna_study_correctresponse(resultingcr_df, resultingcr_df['correctresp'].to_numpy())
-    # print(study.best_params)
+
     best_params = np.load('D:/behavmodelfigs/correctrespponseoptunaparams4_strat5kfold.npy', allow_pickle=True).item()
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbcorrectrespornotwithoptuna(
         resultingcr_df, best_params)
     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
-def run_reaction_time_fa_pipleine(ferrets):
+def run_reaction_time_fa_pipleine_female(ferrets):
     resultingdf = behaviouralhelperscg.get_reactiontime_data(ferrets=ferrets, startdate='04-01-2020', finishdate='01-10-2022')
     df_use = resultingdf.loc[:, resultingdf.columns != 'ferret']
     df_use = df_use.loc[df_use['intra_trial_roving'] == 0]
@@ -1408,11 +1398,8 @@ def plot_correct_response_byside(ferrets):
 def plot_reaction_times(ferrets):
     #plot the reaction times by animal
     resultingdf = behaviouralhelperscg.get_reactiontime_data(ferrets=ferrets, startdate='04-01-2020', finishdate='01-10-2022')
-    #df_use = resultingdf.loc[:, resultingdf.columns != 'ferret']
     df_use = resultingdf
-    # df_use = df_use.loc[df_use['intra_trial_roving'] == 0]
-    # df_use = df_use.loc[df_use['correct'] == 1]
-    # df_use = df_use.loc[df_use['side'] == 0]
+
     df_left_by_ferret = {}
     df_female = df_use.loc[df_use['talker'] == 1]
     df_female_control = df_female.loc[df_female['intra_trial_roving'] == 0]

@@ -4,6 +4,8 @@ import os
 import sys
 import scipy
 import scipy.io
+import numpy as np
+from scipy.signal import resample
 import argparse
 from scipy import spatial
 
@@ -72,6 +74,44 @@ def scaledata(datain, minval, maxval):
     return dataout
 
 
+
+
+def calc_temporal_sim(data, pos):
+    """ calculate temporal similarity between word and all other words in the audio file"""
+    # data is a vector of audio samples
+    # pos is the position of the word in the audio file
+    # returns the cosine similarity between the word and the audio file
+    # get word
+    word = data[pos]
+    word = np.reshape(word, (1, len(word)))
+    word = np.squeeze(word)
+    zeros_array = np.zeros((round(24414.0625 * 0.08)))
+    word = np.concatenate((word, zeros_array), axis=0)
+    word = scaledata(word, -7797, 7797)
+
+    # get cosine similarity
+    for i in range(0, len(data)):
+        otherword = data[i]
+        otherword = np.squeeze(otherword)
+        otherword = np.concatenate((otherword, zeros_array), axis=0)
+        otherword = scaledata(otherword, -7797, 7797)
+        #take the hanning window to downsample
+        window_word = np.hanning(len(word))
+        window_word_other = np.hanning(len(otherword))
+        x_win = word * window_word
+        x_win_other = otherword * window_word_other
+        word_downsampled = resample(x_win, 1000)
+        otherword_downsampled = resample(x_win_other, 1000)
+
+        corr = np.correlate(word_downsampled, otherword_downsampled, mode='same')
+        # Compute the temporal similarity as the maximum value of the cross-correlation
+        similarity = np.max(corr)
+        if i == 0:
+            corrvector = similarity
+        else:
+            corrvector = np.append(corrvector, similarity)
+    return corrvector
+
 def calc_cosine_acrossdata(data, pos):
     """ calculate cosine similarity between word and all other words in the audio file"""
     # data is a vector of audio samples
@@ -111,8 +151,6 @@ def calc_cosine_acrossdata(data, pos):
             cosinesimvector = cosinesim
         else:
             cosinesimvector = np.append(cosinesimvector, cosinesim)
-
-
     return cosinesimvector
     # data is a vector of audio samples
     # fs is the sampling frequency in Hz
