@@ -73,6 +73,7 @@ def scaledata(datain, minval, maxval):
 
 
 def calc_cosine_acrossdata(data, pos):
+    """ calculate cosine similarity between word and all other words in the audio file"""
     # data is a vector of audio samples
     # pos is the position of the word in the audio file
     # returns the cosine similarity between the word and the audio file
