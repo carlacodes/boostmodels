@@ -225,7 +225,6 @@ class behaviouralhelperscg:
 
             cosinesimfemale = np.load('D:/Stimuli/cosinesimvectorfemale.npy')
             cosinesimmale = np.load('D:/Stimuli/cosinesimvectormale.npy')
-
             temporalsimfemale = np.load('D:/Stimuli/temporalcorrfemale.npy')
             temporalsimmale = np.load('D:/Stimuli/temporalcorrmale.npy')
 
