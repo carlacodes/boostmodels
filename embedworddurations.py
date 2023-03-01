@@ -100,10 +100,14 @@ def calc_temporal_sim(data, pos):
         window_word_other = np.hanning(len(otherword))
         x_win = word * window_word
         x_win_other = otherword * window_word_other
-        word_downsampled = resample(x_win, 1000)
-        otherword_downsampled = resample(x_win_other, 1000)
+        word_downsampled = resample(x_win, num=int(len(word)*1000/24414.0625))
+        otherword_downsampled = resample(x_win_other, num=int(len(otherword)*1000/24414.0625))
 
-        corr = np.correlate(word_downsampled, otherword_downsampled, mode='same')
+        # Calculate the cross-correlation between the two signals
+        corr = np.correlate(word_downsampled, otherword_downsampled, mode='full')
+
+        # Normalize the cross-correlation
+        corr = corr / np.sqrt(np.sum(word_downsampled ** 2) * np.sum(otherword_downsampled ** 2))
         # Compute the temporal similarity as the maximum value of the cross-correlation
         similarity = np.max(corr)
         if i == 0:
