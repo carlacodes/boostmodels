@@ -798,7 +798,7 @@ def run_optuna_study_falsealarm(dataframe, y):
     study = optuna.create_study(direction="minimize", study_name="LGBM Classifier")
     df_to_use = dataframe[
         ["cosinesim", "pitchofprecur", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
-         "falsealarm", "pastcorrectresp", "pastcatchtrial", "trialNum", "targTimes", ]]
+         "falsealarm", "pastcorrectresp","temporalsim", "pastcatchtrial", "trialNum", "targTimes", ]]
 
     col = 'falsealarm'
     X = df_to_use.loc[:, df_to_use.columns != col]
