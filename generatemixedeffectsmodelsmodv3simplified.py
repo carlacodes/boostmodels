@@ -573,18 +573,18 @@ def runlgbreleasetimes(df_use):
 
     labels = [item.get_text() for item in ax.get_yticklabels()]
     print(labels)
-    labels[11] = 'distance to sensor'
-    labels[10] = 'target F0'
-    labels[9] = 'trial number'
-    labels[8] = 'precursor = target F0'
-    labels[7] = 'male talker'
-    labels[6] = 'time until target'
-    labels[5] = 'target F0 - precursor F0'
-    labels[4] = 'day of week'
-    labels[3] = 'precursor F0'
-    labels[2] = 'past trial was catch'
-    labels[1] = 'trial took place in AM'
-    labels[0] = 'past trial was correct'
+    # labels[11] = 'distance to sensor'
+    # labels[10] = 'target F0'
+    # labels[9] = 'trial number'
+    # labels[8] = 'precursor = target F0'
+    # labels[7] = 'male talker'
+    # labels[6] = 'time until target'
+    # labels[5] = 'target F0 - precursor F0'
+    # labels[4] = 'day of week'
+    # labels[3] = 'precursor F0'
+    # labels[2] = 'past trial was catch'
+    # labels[1] = 'trial took place in AM'
+    # labels[0] = 'past trial was correct'
 
     ax.set_yticklabels(labels)
 
@@ -1481,13 +1481,13 @@ def plot_reaction_times(ferrets):
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
-    df_by_ferretdict = plot_reaction_times(ferrets)
-
-    df_left, df_right = plot_correct_response_byside(ferrets)
-
-    test_df = run_reaction_time_fa_pipleine(ferrets)
-
-    test_df2 = run_reaction_time_fa_pipleine_male(ferrets)
+    # df_by_ferretdict = plot_reaction_times(ferrets)
+    #
+    # df_left, df_right = plot_correct_response_byside(ferrets)
+    #
+    # test_df = run_reaction_time_fa_pipleine(ferrets)
+    #
+    # test_df2 = run_reaction_time_fa_pipleine_male(ferrets)
 
     #xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(ferrets)
 
@@ -1498,11 +1498,11 @@ if __name__ == '__main__':
 
 
 
-    # modelreg_reduc, modelregcat_reduc, modelregcat, modelreg, predictedrelease, df_use, dfcat_use, predictedcorrectresp, explainedvar, explainvarreleasetime = run_mixed_effects_analysis(
-    #     ferrets)
+    modelreg_reduc, modelregcat_reduc, modelregcat, modelreg, predictedrelease, df_use, dfcat_use, predictedcorrectresp, explainedvar, explainvarreleasetime = run_mixed_effects_analysis(
+        ferrets)
     # # plotpredictedversusactual(predictedrelease, df_use)
     # # plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use)
-    # xg_reg, ypred, y_test, results = runlgbreleasetimes(df_use)
+    xg_reg, ypred, y_test, results = runlgbreleasetimes(df_use)
     # coeffofweight = len(dfcat_use[dfcat_use['correctresp'] == 0]) / len(dfcat_use[dfcat_use['correctresp'] == 1])
     # col = 'correctresp'
     # dfx = dfcat_use.loc[:, dfcat_use.columns != col]
