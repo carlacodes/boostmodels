@@ -87,8 +87,6 @@ def calc_cosine_acrossdata(data, pos):
     word = np.concatenate((word, zeros_array), axis=0)
     word = scaledata(word, -7797, 7797)
 
-    #word = word / np.linalg.norm(word)
-
     # get cosine similarity
     for i in range(0, len(data)):
         otherword = data[i]
@@ -100,10 +98,13 @@ def calc_cosine_acrossdata(data, pos):
             #add zero padding to shorter word
             #print('yes')
             word = np.concatenate((word, np.zeros(abs(np.size(word,0) - len(otherword)))))
-        elif len(otherword) <  np.size(word,0):
+            word = np.fft.fft(word)
+        elif len(otherword) < np.size(word,0):
             #print('less than')
             #otherword = np.pad(otherword, (1, abs(np.size(word,1)- len(otherword))), 'constant')
             otherword = np.concatenate((otherword, np.zeros(abs(np.size(word,0) - len(otherword)))))
+            #take the fft
+            otherword = np.fft.fft(otherword)
         cosinesim = calc_cosine_similarity(word, otherword)
         print(cosinesim)
         if i == 0:
@@ -111,7 +112,6 @@ def calc_cosine_acrossdata(data, pos):
         else:
             cosinesimvector = np.append(cosinesimvector, cosinesim)
 
-    #cosine_similarity = calc_cosine_similarity(data, word)
 
     return cosinesimvector
     # data is a vector of audio samples
