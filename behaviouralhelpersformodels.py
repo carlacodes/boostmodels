@@ -27,9 +27,7 @@ class behaviouralhelperscg:
         numofferrets = allData['ferret'].unique()
         for ferret in numofferrets:
             print(ferret)
-            # newdata = allData.iloc(allData['ferret'] == ferret)
             newdata = allData[allData['ferret'] == ferret]
-            # newdata = allData['absentTime'][0]
             newdata['targTimes'] = newdata['timeToTarget'] / fs
 
             newdata['centreRelease'] = newdata['lickRelease'] - newdata['startTrialLick']
@@ -200,14 +198,11 @@ class behaviouralhelperscg:
             intra_trial_roving = np.delete(intra_trial_roving, 0)
 
             newdata['pitchoftarg'] = pitchoftarg.tolist()
-
-            # pitchofprecur = np.delete(pitchofprecur, droplist)
             newdata['pitchofprecur'] = pitchofprecur.tolist()
 
             falsealarm = falsealarm.astype(int)
             pastcatchtrial = pastcatchtrial.astype(int)
             pastcorrectresp = pastcorrectresp.astype(int)
-
 
             newdata['falsealarm'] = falsealarm.tolist()
             newdata['intra_trial_roving'] = intra_trial_roving.tolist()
