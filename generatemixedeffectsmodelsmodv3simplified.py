@@ -814,8 +814,9 @@ def run_optuna_study_falsealarm(dataframe, y):
     return study
 def run_optuna_study_correctresponse(dataframe, y):
     study = optuna.create_study(direction="minimize", study_name="LGBM Classifier")
-    df_to_use =  dataframe[["pitchoftarg", "pitchofprecur", "talker", "side", "precur_and_targ_same",
-    "targTimes", "DaysSinceStart", "AM", "cosinesim", "stepval", "pastcorrectresp", "pastcatchtrial", "trialNum", "correctresp"]]
+    df_to_use = dataframe[
+        ["cosinesim", "pitchofprecur", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
+         "falsealarm", "pastcorrectresp", "temporalsim", "pastcatchtrial", "trialNum", "targTimes", ]]
 
 
 
