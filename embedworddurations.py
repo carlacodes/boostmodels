@@ -187,6 +187,13 @@ def main():
     # word_times_female_normalised = word_times/word_times[0]
 
     cosinesimvectormale = calc_cosine_acrossdata(worddictionary_male,0)
+
+    temporalcorrmale = calc_temporal_sim(worddictionary_male, 0)
+    temporalcorrfemale = calc_temporal_sim(worddictionary_female, 0)
+
+    np.save('D:/Stimuli/temporalcorrmale.npy', temporalcorrmale)
+    np.save('D:/Stimuli/temporalcorrfemale.npy', temporalcorrfemale)
+
     np.save('D:/Stimuli/cosinesimvectorfemale.npy', cosinesimvectorfemale)
     np.save('D:/Stimuli/cosinesimvectormale.npy', cosinesimvectormale)
 
