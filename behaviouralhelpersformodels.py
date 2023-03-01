@@ -58,6 +58,7 @@ class behaviouralhelperscg:
 
             precur_and_targ_same = np.empty(len(pitchshiftmat))
             intra_trial_roving = []
+            control_trial = []
             talkerlist2 = np.empty(len(pitchshiftmat))
 
             falsealarm = np.empty(shape=(0, 0))
@@ -77,11 +78,16 @@ class behaviouralhelperscg:
 
                 chosentrial = pitchshiftmat.values[i]
                 is_all_zero = np.all((chosentrial == 0))
+                if is_all_zero:
+                    control_trial.append(0)
+                else:
+                    control_trial.append(1)
+
                 if isinstance(chosentrial, float) or is_all_zero:
                     chosentrial = talkermat.values[i].astype(int)
-                    intra_trial_roving[i] = 0
+                    intra_trial_roving.append(0)
                 else:
-                    intra_trial_roving[i] = 1
+                    intra_trial_roving.append(1)
 
                 chosendisttrial = precursorlist.values[i]
                 chosentalker = talkerlist.values[i]
