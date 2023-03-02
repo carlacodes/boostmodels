@@ -958,7 +958,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput):
 def runlgbfaornotwithoptuna(dataframe, paramsinput):
     df_to_use = dataframe[
         ["cosinesim", "pitchofprecur", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
-         "falsealarm", "pastcorrectresp", "pastcatchtrial", "trialNum", "targTimes", ]]
+         "falsealarm","temporalsim", "pastcorrectresp", "pastcatchtrial", "trialNum", "targTimes", ]]
 
     col = 'falsealarm'
     dfx = df_to_use.loc[:, df_to_use.columns != col]
