@@ -508,7 +508,7 @@ def runxgboostreleasetimes(df_use):
     param = {'max_depth': 2, 'eta': 1, 'objective': 'reg:squarederror'}
     param['nthread'] = 4
     param['eval_metric'] = 'auc'
-    xg_reg = xgb.XGBRegressor(tree_method='gpu_hist', objective='reg:squarederror', colsample_bytree=0.3,
+    xg_reg = xgb.XGBRegressor(tree_method='gpu_hist', colsample_bytree=0.3,
                               learning_rate=0.1,
                               max_depth=10, alpha=10, n_estimators=10, enable_categorical=True)
     xg_reg.fit(X_train, y_train)
@@ -1545,6 +1545,6 @@ if __name__ == '__main__':
     col = 'ferret'
     dfx = dfx.loc[:, dfx.columns != col]
 
-    study_release_times = run_optuna_study_releasetimes(dfx, df_use[col])
+    study_release_times = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
     xg_reg, ypred, y_test, results = runlgbreleasetimes(df_use, study_release_times.best_params)
 
