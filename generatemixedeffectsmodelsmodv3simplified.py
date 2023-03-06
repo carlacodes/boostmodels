@@ -1468,7 +1468,7 @@ def plot_reaction_times(ferrets):
     #
 
 if __name__ == '__main__':
-    ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
+    ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
     # df_by_ferretdict = plot_reaction_times(ferrets)
     #
     # df_left, df_right = plot_correct_response_byside(ferrets)
