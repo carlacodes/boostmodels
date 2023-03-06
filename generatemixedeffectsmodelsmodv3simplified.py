@@ -644,7 +644,9 @@ def balanced_subsample(x, y, subsample_size=1.0):
     return xs, ys
 
 
-def runlgbcorrectresponse(dfx, dfy, paramsinput):
+def runlgbcorrectresponse(dfx, dfy, paramsinput=None):
+    #params input from optuna study run on 06/03/2023
+    paramsinput ={'colsample_bytree': 0.4253436090928764, 'alpha': 18.500902749816458, 'is_unbalanced': True, 'n_estimators': 8700, 'learning_rate': 0.45629236152754304, 'num_leaves': 670, 'max_depth': 3, 'min_data_in_leaf': 200, 'lambda_l1': 4, 'lambda_l2': 64, 'min_gain_to_split': 0.016768866636887758, 'bagging_fraction': 0.9, 'bagging_freq': 3, 'feature_fraction': 0.2}
 
     X_train, X_test, y_train, y_test = train_test_split(dfx, dfy, test_size=0.2, random_state=123)
     print(X_train.shape)
@@ -711,8 +713,10 @@ def runlgbcorrectresponse(dfx, dfy, paramsinput):
     ax.set_title("Permutation Importances (test set)")
     fig.tight_layout()
     plt.show()
-    explainer = shap.Explainer(xg_reg, dfx)
-    shap_values2 = explainer(dfx)
+
+    explainer = shap.Explainer(xg_reg, X_train)
+
+    shap_values2 = explainer(X_train)
     fig, ax = plt.subplots(figsize=(15, 15))
     shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "precur_and_targ_same"])
 
