@@ -1269,7 +1269,7 @@ def runfalsealarmpipeline(ferrets):
 
     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
-def run_correct_responsepipleine(ferrets):
+def run_correct_responsepipeline(ferrets):
     resultingcr_df = get_df_behav(ferrets=ferrets, includefaandmiss=False,includemissonly=True, startdate='04-01-2020', finishdate='01-10-2022')
     filepath = Path('D:/dfformixedmodels/correctresponsemodel_dfuse.csv')
     filepath.parent.mkdir(parents=True, exist_ok=True)
@@ -1531,16 +1531,20 @@ if __name__ == '__main__':
 
     # xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(ferrets)
 
-    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = run_correct_responsepipleine(ferrets)
+    # xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = run_correct_responsepipeline(ferrets)
 
 
 
     modelreg_reduc, modelregcat_reduc, modelregcat, modelreg, predictedrelease, df_use, dfcat_use, predictedcorrectresp, explainedvar, explainvarreleasetime = run_mixed_effects_analysis(
         ferrets)
-    # # plotpredictedversusactual(predictedrelease, df_use)
-    # # plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use)
-    # xg_reg, ypred, y_test, results = runlgbreleasetimes(df_use)
 
-    study_release_times = run_optuna_study_releasetimes(df_use)
+
+    col = 'realRelReleaseTimes'
+    dfx = df_use.loc[:, df_use.columns != col]
+    # remove ferret as possible feature
+    col = 'ferret'
+    dfx = dfx.loc[:, dfx.columns != col]
+
+    study_release_times = run_optuna_study_releasetimes(dfx, df_use[col])
     xg_reg, ypred, y_test, results = runlgbreleasetimes(df_use, study_release_times.best_params)
 
