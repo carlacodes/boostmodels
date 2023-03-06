@@ -268,8 +268,9 @@ def get_df_behav(path=None,
         newdata['precur_and_targ_same'] = precur_and_targ_same.tolist()
         newdata['timeToTarget'] = newdata['timeToTarget'] / 24414.0625
         newdata['AM'] = newdata['AM'].astype(int)
-        newdata['talker'] = newdata['talker'] - 1
-
+        # newdata['talker'] = newdata['talker'] - 1
+        #make male talker lower values because it is lower in pitch
+        newdata['talker'] = newdata['talker'].replace({2: 0})
 
         # only look at v2 pitches from recent experiments
         newdata = newdata[(newdata.pitchoftarg == 1) | (newdata.pitchoftarg == 2) | (newdata.pitchoftarg == 3) | (
@@ -1492,16 +1493,16 @@ if __name__ == '__main__':
         ferrets)
     # # plotpredictedversusactual(predictedrelease, df_use)
     # # plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use)
-    xg_reg, ypred, y_test, results = runlgbreleasetimes(df_use)
+    # xg_reg, ypred, y_test, results = runlgbreleasetimes(df_use)
     # coeffofweight = len(dfcat_use[dfcat_use['correctresp'] == 0]) / len(dfcat_use[dfcat_use['correctresp'] == 1])
-    # col = 'correctresp'
-    # dfx = dfcat_use.loc[:, dfcat_use.columns != col]
-    # # remove ferret as possible feature
-    # col = 'ferret'
-    # dfx = dfx.loc[:, dfx.columns != col]
-    # # dfx, dfy = balanced_subsample(dfx, dfcat_use['correctresp'], 0.5)
-    # study = run_optuna_study_correctresp(dfx.to_numpy(), dfcat_use['correctresp'].to_numpy(), coeffofweight)
-    # xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy = runlgbcorrectresponse(dfx,
-    #                                                                                                         dfcat_use[
-    #                                                                                                             'correctresp'],
-    #                                                                                                         study.best_params)
+    col = 'correctresp'
+    dfx = dfcat_use.loc[:, dfcat_use.columns != col]
+    # remove ferret as possible feature
+    col = 'ferret'
+    dfx = dfx.loc[:, dfx.columns != col]
+    # dfx, dfy = balanced_subsample(dfx, dfcat_use['correctresp'], 0.5)
+    study = run_optuna_study_correctresp(dfx.to_numpy(), dfcat_use['correctresp'].to_numpy())
+    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy = runlgbcorrectresponse(dfx,
+                                                                                                            dfcat_use[
+                                                                                                                'correctresp'],
+                                                                                                            study.best_params)
