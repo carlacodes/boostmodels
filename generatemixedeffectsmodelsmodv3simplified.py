@@ -752,7 +752,7 @@ def objective_releasetimes(trial, X, y):
         X_train, X_test = X[train_idx], X[test_idx]
         y_train, y_test = y[train_idx], y[test_idx]
 
-        model = lgb.LGBMRegressor(objective='reg:squarederror', random_state=123, **param_grid)
+        model = lgb.LGBMRegressor(random_state=123, **param_grid)
         model.fit(
             X_train,
             y_train,
