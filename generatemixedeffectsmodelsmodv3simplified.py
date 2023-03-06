@@ -529,7 +529,7 @@ def runxgboostreleasetimes(df_use):
     return xg_reg, ypred, y_test, results
 
 
-def runlgbreleasetimes(df_use):
+def runlgbreleasetimes(df_use, paramsinput=None):
     col = 'realRelReleaseTimes'
     dfx = df_use.loc[:, df_use.columns != col]
     # remove ferret as possible feature
@@ -539,17 +539,12 @@ def runlgbreleasetimes(df_use):
     X_train, X_test, y_train, y_test = train_test_split(dfx, df_use['realRelReleaseTimes'], test_size=0.2,
                                                         random_state=123)
 
-    dtrain = lgb.Dataset(X_train, label=y_train)
-    dtest = lgb.Dataset(X_test, label=y_test)
 
-    param = {'max_depth': 2, 'eta': 1, 'objective': 'reg:squarederror'}
-    param['nthread'] = 4
-    param['eval_metric'] = 'auc'
-    evallist = [(dtrain, 'train'), (dtest, 'eval')]
-    # bst = xgb.train(param, dtrain, num_round, evallist)
-    xg_reg = lgb.LGBMRegressor(colsample_bytree=0.3, learning_rate=0.1,
-                               max_depth=10, alpha=10, n_estimators=10, verbose=1)
+    # param = {'max_depth': 2, 'eta': 1, 'objective': 'reg:squarederror'}
+    # param['nthread'] = 4
+    # param['eval_metric'] = 'auc'
 
+    xg_reg = lgb.LGBMRegressor(objective='reg:squarederror', random_state=123, verbose=1, **paramsinput)
     xg_reg.fit(X_train, y_train, eval_metric='neg_mean_squared_error', verbose=1)
     ypred = xg_reg.predict(X_test)
     lgb.plot_importance(xg_reg)
@@ -561,8 +556,8 @@ def runlgbreleasetimes(df_use):
     mse_train = mean_squared_error(ypred, y_test)
 
     mse = mean_squared_error(ypred, y_test)
-    print("MSE: %.2f" % (mse))
-    print("negative MSE: %.2f%%" % (np.mean(results) * 100.0))
+    print("MSE on test: %.2f" % (mse))
+    print("negative MSE training: %.2f%%" % (np.mean(results) * 100.0))
     print(results)
     shap_values = shap.TreeExplainer(xg_reg).shap_values(dfx)
     fig, ax = plt.subplots(figsize=(15, 15))
@@ -669,19 +664,7 @@ def runlgbcorrectresponse(dfx, dfy, paramsinput=None):
                "bagging_freq": 1,
                "feature_fraction": 0.6000000000000001}
 
-    # colsample_bytree: 0.8163174226131737
-    # alpha: 4.971464509571637
-    # n_estimators: 9300
-    # learning_rate: 0.2744671988597753
-    # num_leaves: 530
-    # max_depth: 15
-    # min_data_in_leaf: 400
-    # lambda_l1: 2
-    # lambda_l2: 44
-    # min_gain_to_split: 0.008680941888662716
-    # bagging_fraction: 0.9
-    # bagging_freq: 1
-    # feature_fraction: 0.6000000000000001
+
     xg_reg = lgb.LGBMClassifier(objective="binary", random_state=123,
                                 **paramsinput)  # colsample_bytree=0.4398528259745191, alpha=14.412788226345182,
 
@@ -739,6 +722,51 @@ def runlgbcorrectresponse(dfx, dfy, paramsinput=None):
 
     return xg_reg, ypred, y_test, results, shap_values, X_train, y_train, bal_accuracy
 
+def objective_releasetimes(trial, X, y):
+    param_grid = {
+        # "device_type": trial.suggest_categorical("device_type", ['gpu']),
+        "colsample_bytree": trial.suggest_float("colsample_bytree", 0.3, 1),
+        "alpha": trial.suggest_float("alpha", 1, 20),
+        "is_unbalanced": trial.suggest_categorical("is_unbalanced", [True]),
+        "n_estimators": trial.suggest_int("n_estimators", 100, 10000, step=100),
+        "learning_rate": trial.suggest_float("learning_rate", 0.001, 0.5),
+        "num_leaves": trial.suggest_int("num_leaves", 20, 3000, step=10),
+        "max_depth": trial.suggest_int("max_depth", 3, 20),
+        "min_data_in_leaf": trial.suggest_int("min_data_in_leaf", 200, 10000, step=100),
+        "lambda_l1": trial.suggest_int("lambda_l1", 0, 100, step=2),
+        "lambda_l2": trial.suggest_int("lambda_l2", 0, 100, step=2),
+        "min_gain_to_split": trial.suggest_float("min_gain_to_split", 0, 15),
+        "bagging_fraction": trial.suggest_float(
+            "bagging_fraction", 0.2, 0.95, step=0.1
+        ),
+        "bagging_freq": trial.suggest_int("bagging_freq", 1, 20, step=1),
+        "feature_fraction": trial.suggest_float(
+            "feature_fraction", 0.2, 0.95, step=0.1
+        ),
+    }
+
+    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=123)
+
+    cv_scores = np.empty(5)
+    for idx, (train_idx, test_idx) in enumerate(cv.split(X, y)):
+        X_train, X_test = X[train_idx], X[test_idx]
+        y_train, y_test = y[train_idx], y[test_idx]
+
+        model = lgb.LGBMRegressor(objective='reg:squarederror', random_state=123, **param_grid)
+        model.fit(
+            X_train,
+            y_train,
+            eval_set=[(X_test, y_test)],
+            eval_metric="neg_mean_squared_error)",
+            early_stopping_rounds=100,
+            callbacks=[
+                LightGBMPruningCallback(trial, "neg_mean_squared_error")
+            ],  # Add a pruning callback
+        )
+        preds = model.predict_proba(X_test)
+        cv_scores[idx] = sklearn.metrics.log_loss(y_test, preds)
+
+    return np.mean(cv_scores)
 
 def objective(trial, X, y):
     param_grid = {
@@ -798,6 +826,16 @@ def run_optuna_study_correctresp(X, y):
     for key, value in study.best_params.items():
         print(f"\t\t{key}: {value}")
     return study
+
+def run_optuna_study_releasetimes(X, y):
+    study = optuna.create_study(direction="minimize", study_name="LGBM regressor")
+    func = lambda trial: objective_releasetimes(trial, X, y)
+    study.optimize(func, n_trials=1000)
+    print("Number of finished trials: ", len(study.trials))
+    for key, value in study.best_params.items():
+        print(f"\t\t{key}: {value}")
+    return study
+
 
 def run_optuna_study_falsealarm(dataframe, y):
     study = optuna.create_study(direction="minimize", study_name="LGBM Classifier")
@@ -1498,6 +1536,10 @@ if __name__ == '__main__':
     # # plotpredictedversusactual(predictedrelease, df_use)
     # # plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use)
     # xg_reg, ypred, y_test, results = runlgbreleasetimes(df_use)
+
+    study_release_times = run_optuna_study_releasetimes(df_use)
+    xg_reg, ypred, y_test, results = runlgbreleasetimes(df_use, study_release_times.best_params)
+
     # coeffofweight = len(dfcat_use[dfcat_use['correctresp'] == 0]) / len(dfcat_use[dfcat_use['correctresp'] == 1])
     col = 'correctresp'
     dfx = dfcat_use.loc[:, dfcat_use.columns != col]
