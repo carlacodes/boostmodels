@@ -783,7 +783,7 @@ def objective(trial, X, y):
     return np.mean(cv_scores)
 
 
-def run_optuna_study_correctresp(X, y, coeffofweight):
+def run_optuna_study_correctresp(X, y):
     study = optuna.create_study(direction="minimize", study_name="LGBM Classifier")
     func = lambda trial: objective(trial, X, y)
     study.optimize(func, n_trials=1000)
