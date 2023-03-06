@@ -966,6 +966,8 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput):
     X_train, X_test, y_train, y_test = train_test_split(dfx, df_to_use['falsealarm'], test_size=0.2, random_state=123)
     print(X_train.shape)
     print(X_test.shape)
+    #ran optuna study 06/03/2022 to find best params, balanced accuracy 57%, accuracy 63%
+    paramsinput = {'colsample_bytree': 0.7024634011442671, 'alpha': 15.7349076305505, 'is_unbalanced': True, 'n_estimators': 6900, 'learning_rate': 0.3579458041084967, 'num_leaves': 1790, 'max_depth': 4, 'min_data_in_leaf': 200, 'lambda_l1': 0, 'lambda_l2': 24, 'min_gain_to_split': 2.34923345270416, 'bagging_fraction': 0.9, 'bagging_freq': 12, 'feature_fraction': 0.9}
 
     xg_reg = lgb.LGBMClassifier(objective="binary", random_state=123,
                                 **paramsinput)
