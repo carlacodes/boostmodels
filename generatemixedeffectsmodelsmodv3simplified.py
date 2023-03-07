@@ -757,14 +757,14 @@ def objective_releasetimes(trial, X, y):
             X_train,
             y_train,
             eval_set=[(X_test, y_test)],
-            eval_metric="neg_mean_squared_error)",
+            eval_metric="l2",
             early_stopping_rounds=100,
             callbacks=[
-                LightGBMPruningCallback(trial, "neg_mean_squared_error")
+                LightGBMPruningCallback(trial, "l2")
             ],  # Add a pruning callback
         )
-        preds = model.predict_proba(X_test)
-        cv_scores[idx] = sklearn.metrics.log_loss(y_test, preds)
+        preds = model.predict(X_test)
+        cv_scores[idx] = sklearn.metrics.neg_mean_squared_error(y_test, preds)
 
     return np.mean(cv_scores)
 
