@@ -764,7 +764,7 @@ def objective_releasetimes(trial, X, y):
             ],  # Add a pruning callback
         )
         preds = model.predict(X_test)
-        cv_scores[idx] = sklearn.metrics.neg_mean_squared_error(y_test, preds)
+        cv_scores[idx] = sklearn.metrics.mean_squared_error(y_test, preds)
 
     return np.mean(cv_scores)
 
