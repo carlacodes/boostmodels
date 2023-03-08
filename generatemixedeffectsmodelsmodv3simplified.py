@@ -544,8 +544,8 @@ def runlgbreleasetimes(df_use, paramsinput=None):
     # param['nthread'] = 4
     # param['eval_metric'] = 'auc'
 
-    xg_reg = lgb.LGBMRegressor(objective='reg:squarederror', random_state=123, verbose=1, **paramsinput)
-    xg_reg.fit(X_train, y_train, eval_metric='neg_mean_squared_error', verbose=1)
+    xg_reg = lgb.LGBMRegressor(random_state=123, verbose=1, **paramsinput)
+    xg_reg.fit(X_train, y_train, verbose=1)
     ypred = xg_reg.predict(X_test)
     lgb.plot_importance(xg_reg)
     plt.title('feature importances for the LGBM Correct Release Times model')
