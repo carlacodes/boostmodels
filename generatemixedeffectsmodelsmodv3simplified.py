@@ -7,6 +7,7 @@ from instruments.behaviouralAnalysis import createWeekBehaviourFigs, reactionTim
 from sklearn.preprocessing import MinMaxScaler
 from pymer4.models import Lmer
 from pathlib import Path
+import math
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import KFold
 from sklearn.model_selection import cross_val_score
@@ -263,6 +264,7 @@ def get_df_behav(path=None,
         newdata['talker'] = talkerlist2.tolist()
         newdata['pastcatchtrial'] = pastcatchtrial.tolist()
         newdata['stepval'] = stepval.tolist()
+        newdata['realRelReleaseTimes'] = np.log(newdata['realRelReleaseTimes'])
         newdata['cosinesim'] = correspondcosinelist.tolist()
         precur_and_targ_same = precur_and_targ_same.astype(int)
         newdata['precur_and_targ_same'] = precur_and_targ_same.tolist()
@@ -295,7 +297,7 @@ def get_df_behav(path=None,
 
 # editing to extract different vars from df
 def run_mixed_effects_analysis(ferrets):
-    df = get_df_behav(ferrets=ferrets, includefaandmiss=False, startdate='04-01-2020', finishdate='01-10-2022')
+    df = get_df_behav(ferrets=ferrets, includefaandmiss=False, startdate='04-01-2020', finishdate='09-03-2023')
 
     dfuse = df[["pitchoftarg", "pitchofprecur", "talker", "side", "precur_and_targ_same",
                 "timeToTarget", "DaysSinceStart", "AM",
@@ -600,6 +602,7 @@ def runlgbreleasetimes(df_use, paramsinput=None):
     shap.plots.scatter(shap_values2[:, "pitchoftarg"], color=shap_values2[:, "talker"])
     plt.title('Reaction Time Model')
     plt.show()
+    #logthe release times
     shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"],
                        title='Correct Responses - Reaction Time Model SHAP response \n vs. trial number')
     plt.show()
@@ -727,8 +730,7 @@ def objective_releasetimes(trial, X, y):
         # "device_type": trial.suggest_categorical("device_type", ['gpu']),
         "colsample_bytree": trial.suggest_float("colsample_bytree", 0.3, 1),
         "alpha": trial.suggest_float("alpha", 1, 20),
-        "is_unbalanced": trial.suggest_categorical("is_unbalanced", [True]),
-        "n_estimators": trial.suggest_int("n_estimators", 100, 10000, step=100),
+        "n_estimators": trial.suggest_int("n_estimators", 50, 10000, step=100),
         "learning_rate": trial.suggest_float("learning_rate", 0.001, 0.5),
         "num_leaves": trial.suggest_int("num_leaves", 20, 3000, step=10),
         "max_depth": trial.suggest_int("max_depth", 3, 20),
@@ -737,7 +739,7 @@ def objective_releasetimes(trial, X, y):
         "lambda_l2": trial.suggest_int("lambda_l2", 0, 100, step=2),
         "min_gain_to_split": trial.suggest_float("min_gain_to_split", 0, 15),
         "bagging_fraction": trial.suggest_float(
-            "bagging_fraction", 0.2, 0.95, step=0.1
+            "bagging_fraction", 0.1, 0.95, step=0.1
         ),
         "bagging_freq": trial.suggest_int("bagging_freq", 1, 20, step=1),
         "feature_fraction": trial.suggest_float(
@@ -745,7 +747,7 @@ def objective_releasetimes(trial, X, y):
         ),
     }
 
-    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=123)
+    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 
     cv_scores = np.empty(5)
     for idx, (train_idx, test_idx) in enumerate(cv.split(X, y)):
