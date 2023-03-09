@@ -16,6 +16,7 @@ import lightgbm as lgb
 import optuna
 from optuna.integration import LightGBMPruningCallback
 from sklearn.model_selection import StratifiedKFold
+
 scaler = MinMaxScaler()
 import os
 import xgboost as xgb
@@ -24,6 +25,7 @@ import rpy2.robjects.numpy2ri
 import sklearn
 from sklearn.model_selection import train_test_split
 from behaviouralhelpersformodels import *
+
 rpy2.robjects.numpy2ri.activate()
 from rpy2.robjects.packages import importr
 
@@ -215,7 +217,7 @@ def get_df_behav(path=None,
             except:
                 indexdrop = newdata.iloc[i].name
                 droplist = np.append(droplist, i - 1)
-                #arrays START AT 0, but the index starts at 1, so the index is 1 less than the array
+                # arrays START AT 0, but the index starts at 1, so the index is 1 less than the array
                 droplistnew = np.append(droplistnew, indexdrop)
                 continue
 
@@ -231,7 +233,6 @@ def get_df_behav(path=None,
 
         correctresp = correctresp[~np.isnan(correctresp)]
         correspondcosinelist = correspondcosinelist[~np.isnan(correspondcosinelist)]
-
 
         pitchoftarg = np.delete(pitchoftarg, 0)
         talkerlist2 = np.delete(talkerlist2, 0)
@@ -258,20 +259,19 @@ def get_df_behav(path=None,
         pastcatchtrial = pastcatchtrial.astype(int)
         pastcorrectresp = pastcorrectresp.astype(int)
 
-
         newdata['correctresp'] = correctresp.tolist()
         newdata['pastcorrectresp'] = pastcorrectresp.tolist()
         newdata['talker'] = talkerlist2.tolist()
         newdata['pastcatchtrial'] = pastcatchtrial.tolist()
         newdata['stepval'] = stepval.tolist()
-        newdata['realRelReleaseTimes'] = np.log(newdata['realRelReleaseTimes'])
+        # newdata['realRelReleaseTimes'] = np.log(newdata['realRelReleaseTimes'])
         newdata['cosinesim'] = correspondcosinelist.tolist()
         precur_and_targ_same = precur_and_targ_same.astype(int)
         newdata['precur_and_targ_same'] = precur_and_targ_same.tolist()
         newdata['timeToTarget'] = newdata['timeToTarget'] / 24414.0625
         newdata['AM'] = newdata['AM'].astype(int)
         # newdata['talker'] = newdata['talker'] - 1
-        #make male talker lower values because it is lower in pitch
+        # make male talker lower values because it is lower in pitch
         newdata['talker'] = newdata['talker'].replace({2: 0})
 
         # only look at v2 pitches from recent experiments
@@ -364,7 +364,6 @@ def run_mixed_effects_analysis(ferrets):
     # 1 is 191, 2 is 124, 3 is 144hz female, 5 is 251, 8 is 144hz male, 13 is109hz male
     # pitchof targ 1 is 124hz male, pitchoftarg4 is 109Hz Male
 
-
     ax = modelregcat_reduc.plot_summary()
     plt.title('Model Summary of Coefficients for P(Correct Responses)')
     labels = [item.get_text() for item in ax.get_yticklabels()]
@@ -388,7 +387,6 @@ def run_mixed_effects_analysis(ferrets):
     plt.gca().get_yticklabels()[5].set_color("blue")
     plt.gca().get_yticklabels()[8].set_color("blue")
     plt.show()
-
 
     ax = modelreg_reduc.plot_summary()
 
@@ -501,7 +499,6 @@ def runxgboostreleasetimes(df_use):
     dfx['DaysSinceStart'] = dfx['DaysSinceStart'].astype('category')
     dfx['precur_and_targ_same'] = dfx['precur_and_targ_same'].astype('category')
 
-
     X_train, X_test, y_train, y_test = train_test_split(dfx, df_use['realRelReleaseTimes'], test_size=0.2,
                                                         random_state=123)
     dtrain = xgb.DMatrix(X_train, label=y_train, enable_categorical=True)
@@ -540,7 +537,6 @@ def runlgbreleasetimes(df_use, paramsinput=None):
 
     X_train, X_test, y_train, y_test = train_test_split(dfx, df_use['realRelReleaseTimes'], test_size=0.2,
                                                         random_state=123)
-
 
     # param = {'max_depth': 2, 'eta': 1, 'objective': 'reg:squarederror'}
     # param['nthread'] = 4
@@ -602,7 +598,7 @@ def runlgbreleasetimes(df_use, paramsinput=None):
     shap.plots.scatter(shap_values2[:, "pitchoftarg"], color=shap_values2[:, "talker"])
     plt.title('Reaction Time Model')
     plt.show()
-    #logthe release times
+    # logthe release times
     shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"],
                        title='Correct Responses - Reaction Time Model SHAP response \n vs. trial number')
     plt.show()
@@ -643,8 +639,11 @@ def balanced_subsample(x, y, subsample_size=1.0):
 
 
 def runlgbcorrectresponse(dfx, dfy, paramsinput=None):
-    #params input from optuna study run on 06/03/2023
-    paramsinput ={'colsample_bytree': 0.4253436090928764, 'alpha': 18.500902749816458, 'is_unbalanced': True, 'n_estimators': 8700, 'learning_rate': 0.45629236152754304, 'num_leaves': 670, 'max_depth': 3, 'min_data_in_leaf': 200, 'lambda_l1': 4, 'lambda_l2': 64, 'min_gain_to_split': 0.016768866636887758, 'bagging_fraction': 0.9, 'bagging_freq': 3, 'feature_fraction': 0.2}
+    # params input from optuna study run on 06/03/2023
+    paramsinput = {'colsample_bytree': 0.4253436090928764, 'alpha': 18.500902749816458, 'is_unbalanced': True,
+                   'n_estimators': 8700, 'learning_rate': 0.45629236152754304, 'num_leaves': 670, 'max_depth': 3,
+                   'min_data_in_leaf': 200, 'lambda_l1': 4, 'lambda_l2': 64, 'min_gain_to_split': 0.016768866636887758,
+                   'bagging_fraction': 0.9, 'bagging_freq': 3, 'feature_fraction': 0.2}
 
     X_train, X_test, y_train, y_test = train_test_split(dfx, dfy, test_size=0.2, random_state=123)
     print(X_train.shape)
@@ -667,10 +666,8 @@ def runlgbcorrectresponse(dfx, dfy, paramsinput=None):
                "bagging_freq": 1,
                "feature_fraction": 0.6000000000000001}
 
-
     xg_reg = lgb.LGBMClassifier(objective="binary", random_state=123,
                                 **paramsinput)  # colsample_bytree=0.4398528259745191, alpha=14.412788226345182,
-
 
     xg_reg.fit(X_train, y_train, eval_metric="cross_entropy_lambda", verbose=1000)
     ypred = xg_reg.predict_proba(X_test)
@@ -725,6 +722,7 @@ def runlgbcorrectresponse(dfx, dfy, paramsinput=None):
 
     return xg_reg, ypred, y_test, results, shap_values, X_train, y_train, bal_accuracy
 
+
 def objective_releasetimes(trial, X, y):
     param_grid = {
         # "device_type": trial.suggest_categorical("device_type", ['gpu']),
@@ -769,6 +767,7 @@ def objective_releasetimes(trial, X, y):
         cv_scores[idx] = sklearn.metrics.mean_squared_error(y_test, preds)
 
     return np.mean(cv_scores)
+
 
 def objective(trial, X, y):
     param_grid = {
@@ -829,10 +828,11 @@ def run_optuna_study_correctresp(X, y):
         print(f"\t\t{key}: {value}")
     return study
 
+
 def run_optuna_study_releasetimes(X, y):
     study = optuna.create_study(direction="minimize", study_name="LGBM regressor")
-    # func = lambda trial: objective_releasetimes(trial, X, y)
-    study.optimize(objective_releasetimes(trial, X, y), n_trials=1000)
+    func = lambda trial: objective_releasetimes(trial, X, y)
+    study.optimize(func, n_trials=1000)
     print("Number of finished trials: ", len(study.trials))
     for key, value in study.best_params.items():
         print(f"\t\t{key}: {value}")
@@ -843,7 +843,7 @@ def run_optuna_study_falsealarm(dataframe, y):
     study = optuna.create_study(direction="minimize", study_name="LGBM Classifier")
     df_to_use = dataframe[
         ["cosinesim", "pitchofprecur", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
-         "falsealarm", "pastcorrectresp","temporalsim", "pastcatchtrial", "trialNum", "targTimes", ]]
+         "falsealarm", "pastcorrectresp", "temporalsim", "pastcatchtrial", "trialNum", "targTimes", ]]
 
     col = 'falsealarm'
     X = df_to_use.loc[:, df_to_use.columns != col]
@@ -857,13 +857,13 @@ def run_optuna_study_falsealarm(dataframe, y):
     for key, value in study.best_params.items():
         print(f"\t\t{key}: {value}")
     return study
+
+
 def run_optuna_study_correctresponse(dataframe, y):
     study = optuna.create_study(direction="minimize", study_name="LGBM Classifier")
     df_to_use = dataframe[
         ["cosinesim", "pitchofprecur", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
          "falsealarm", "pastcorrectresp", "temporalsim", "pastcatchtrial", "trialNum", "targTimes", ]]
-
-
 
     col = 'correctesp'
     X = df_to_use.loc[:, df_to_use.columns != col]
@@ -877,7 +877,9 @@ def run_optuna_study_correctresponse(dataframe, y):
     for key, value in study.best_params.items():
         print(f"\t\t{key}: {value}")
     return study
-def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput = None):
+
+
+def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None):
     if paramsinput is None:
         paramsinput = {'colsample_bytree': 0.4253436090928764, 'alpha': 18.500902749816458, 'is_unbalanced': True,
                        'n_estimators': 8700, 'learning_rate': 0.45629236152754304, 'num_leaves': 670, 'max_depth': 3,
@@ -886,7 +888,8 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput = None):
                        'feature_fraction': 0.2}
 
     df_to_use = dataframe[["pitchoftarg", "pitchofprecur", "talker", "side", "precur_and_targ_same",
-    "targTimes", "DaysSinceStart", "AM", "cosinesim", "stepval", "pastcorrectresp", "pastcatchtrial", "trialNum", "correctresp"]]
+                           "targTimes", "DaysSinceStart", "AM", "cosinesim", "stepval", "pastcorrectresp",
+                           "pastcatchtrial", "trialNum", "correctresp"]]
 
     col = 'correctresp'
     dfx = df_to_use.loc[:, df_to_use.columns != col]
@@ -944,7 +947,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput = None):
 
     shap.plots.scatter(shap_values2[:, "precur_and_targ_same"], color=shap_values2[:, "talker"])
     plt.show()
-    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"], show = False)
+    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"], show=False)
     plt.title('trial number \n vs. SHAP value impact')
     plt.ylabel('SHAP value', fontsize=18)
     plt.savefig('D:/behavmodelfigs/correctrespmodel/trialnumdepenencyplot.png', dpi=500)
@@ -952,7 +955,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput = None):
 
     shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "precur_and_targ_same"], show=False)
     plt.title('Cosine similarity \n vs. SHAP value impact')
-    plt.ylabel('SHAP value',  fontsize=18)
+    plt.ylabel('SHAP value', fontsize=18)
     plt.savefig('D:/behavmodelfigs/correctrespmodel/cosinesimdepenencyplot.png', dpi=500)
     plt.show()
 
@@ -984,13 +987,13 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput = None):
     np.save('D:/behavmodelfigs/correctrespponseoptunaparams4_strat5kfold.npy', paramsinput)
 
     shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "pitchoftarg"], show=False)
-    plt.title('Cosine similarity as a function \n of SHAP values, coloured by the target pitch', fontsize = 18)
+    plt.title('Cosine similarity as a function \n of SHAP values, coloured by the target pitch', fontsize=18)
     plt.ylabel('SHAP value', fontsize=18)
     plt.savefig('D:/behavmodelfigs/correctrespmodel/cosinesimcolouredtalkers.png', dpi=500)
     plt.show()
     fig, ax = plt.subplots(figsize=(15, 35))
     shap.plots.scatter(shap_values2[:, "side"], color=shap_values2[:, "trialNum"], show=False)
-    plt.title('SHAP values as a function of the side of the audio, \n coloured by the trial number', fontsize = 18)
+    plt.title('SHAP values as a function of the side of the audio, \n coloured by the trial number', fontsize=18)
     plt.ylabel('SHAP value', fontsize=18)
     plt.xticks([0, 1], ['Left', 'Right'], fontsize=18)
     plt.savefig('D:/behavmodelfigs/correctrespmodel/sidetrialnumbercolor.png', dpi=500)
@@ -998,19 +1001,21 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput = None):
 
     fig, ax = plt.subplots(figsize=(15, 55))
     shap.plots.scatter(shap_values2[:, "pitchoftarg"], color=shap_values2[:, "targTimes"], show=False)
-    plt.title('SHAP values as a function of the pitch of the target, \n coloured by the target presentation time', fontsize = 18)
+    plt.title('SHAP values as a function of the pitch of the target, \n coloured by the target presentation time',
+              fontsize=18)
     plt.ylabel('SHAP value', fontsize=18)
     plt.xlabel('Pitch of target', fontsize=12)
-    plt.xticks([1,2,3,4,5], ['109 Hz', '124 Hz', '144 Hz', '191 Hz', '251 Hz'], fontsize=18)
+    plt.xticks([1, 2, 3, 4, 5], ['109 Hz', '124 Hz', '144 Hz', '191 Hz', '251 Hz'], fontsize=18)
     plt.savefig('D:/behavmodelfigs/correctrespmodel/pitchoftargcolouredbytargtimes.png', dpi=500)
     plt.show()
 
     return xg_reg, ypred, y_test, results, shap_values1, X_train, y_train, bal_accuracy, shap_values2
 
+
 def runlgbfaornotwithoptuna(dataframe, paramsinput):
     df_to_use = dataframe[
         ["cosinesim", "pitchofprecur", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
-         "falsealarm","temporalsim", "pastcorrectresp", "pastcatchtrial", "trialNum", "targTimes", ]]
+         "falsealarm", "temporalsim", "pastcorrectresp", "pastcatchtrial", "trialNum", "targTimes", ]]
 
     col = 'falsealarm'
     dfx = df_to_use.loc[:, df_to_use.columns != col]
@@ -1018,8 +1023,11 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput):
     X_train, X_test, y_train, y_test = train_test_split(dfx, df_to_use['falsealarm'], test_size=0.2, random_state=123)
     print(X_train.shape)
     print(X_test.shape)
-    #ran optuna study 06/03/2022 to find best params, balanced accuracy 57%, accuracy 63%
-    paramsinput = {'colsample_bytree': 0.7024634011442671, 'alpha': 15.7349076305505, 'is_unbalanced': True, 'n_estimators': 6900, 'learning_rate': 0.3579458041084967, 'num_leaves': 1790, 'max_depth': 4, 'min_data_in_leaf': 200, 'lambda_l1': 0, 'lambda_l2': 24, 'min_gain_to_split': 2.34923345270416, 'bagging_fraction': 0.9, 'bagging_freq': 12, 'feature_fraction': 0.9}
+    # ran optuna study 06/03/2022 to find best params, balanced accuracy 57%, accuracy 63%
+    paramsinput = {'colsample_bytree': 0.7024634011442671, 'alpha': 15.7349076305505, 'is_unbalanced': True,
+                   'n_estimators': 6900, 'learning_rate': 0.3579458041084967, 'num_leaves': 1790, 'max_depth': 4,
+                   'min_data_in_leaf': 200, 'lambda_l1': 0, 'lambda_l2': 24, 'min_gain_to_split': 2.34923345270416,
+                   'bagging_fraction': 0.9, 'bagging_freq': 12, 'feature_fraction': 0.9}
 
     xg_reg = lgb.LGBMClassifier(objective="binary", random_state=123,
                                 **paramsinput)
@@ -1094,12 +1102,11 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput):
 
     shap.plots.scatter(shap_values2[:, "pitchofprecur"], color=shap_values2[:, "targTimes"], show=False)
     plt.ylabel('SHAP value', fontsize=10)
-    plt.title('False alarm model - pitch of the \n precursor word versus SHAP value impact', fontsize = 18)
+    plt.title('False alarm model - pitch of the \n precursor word versus SHAP value impact', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
     plt.xlabel('Pitch of precursor word', fontsize=16)
     plt.savefig('D:/behavmodelfigs/pitchofprecurtargtimes.png', dpi=500)
     plt.show()
-
 
     shap.plots.scatter(shap_values2[:, "targTimes"], color=shap_values2[:, "cosinesim"], show=False)
     plt.title('False alarm model - Target Times coloured by Cosine Similarity vs Their Impact on the SHAP value')
@@ -1108,13 +1115,13 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput):
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "targTimes"], color=shap_values2[:, "trialNum"], show=False)
-    plt.title('False alarm model - Target times \n coloured by trial number vs their SHAP value', fontsize = 18)
+    plt.title('False alarm model - Target times \n coloured by trial number vs their SHAP value', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
     plt.xlabel('Target times', fontsize=16)
     plt.savefig('D:/behavmodelfigs/targtimestrialnum.png', dpi=500)
     plt.show()
     shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "targTimes"], show=False)
-    plt.title('False alarm model - Trial number \n coloured by target times vs their SHAP value', fontsize = 18)
+    plt.title('False alarm model - Trial number \n coloured by target times vs their SHAP value', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
     plt.xlabel('Trial number', fontsize=16)
     plt.savefig('D:/behavmodelfigs/trialnumbercolortargtimes.png', dpi=500)
@@ -1134,6 +1141,7 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput):
     plt.show()
 
     return xg_reg, ypred, y_test, results, shap_values1, X_train, y_train, bal_accuracy, shap_values2
+
 
 def runlgbfaornot(dataframe):
     df_to_use = dataframe[
@@ -1180,7 +1188,7 @@ def runlgbfaornot(dataframe):
 
     shap_values1 = shap.TreeExplainer(xg_reg).shap_values(dfx)
     fig, ax = plt.subplots(figsize=(15, 15))
-    shap.summary_plot(shap_values1, dfx, show = False)
+    shap.summary_plot(shap_values1, dfx, show=False)
     plt.title('Ranked list of features over their impact in predicting a false alarm')
     fig.tight_layout()
     plt.savefig('D:/behavmodelfigs/ranked_features.png', dpi=500)
@@ -1233,7 +1241,7 @@ def runlgbfaornot(dataframe):
     plt.savefig('D:/behavmodelfigs/intratrialrovingcosinecolor.png', dpi=500)
 
     plt.show()
-    fig,ax = plt.subplots(figsize=(15, 15))
+    fig, ax = plt.subplots(figsize=(15, 15))
     shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "pitchoftarg"], show=False)
     plt.title('False alarm model - trial number as a function of SHAP values, coloured by pitch of target')
     fig.tight_layout()
@@ -1254,6 +1262,7 @@ def runlgbfaornot(dataframe):
 
     return xg_reg, ypred, y_test, results, shap_values1, X_train, y_train, bal_accuracy, shap_values2
 
+
 def runfalsealarmpipeline(ferrets):
     resultingfa_df = behaviouralhelperscg.get_false_alarm_behavdata(ferrets=ferrets, startdate='04-01-2020',
                                                                     finishdate='01-10-2022')
@@ -1263,27 +1272,31 @@ def runfalsealarmpipeline(ferrets):
     resultingfa_df.to_csv(filepath)
     study = run_optuna_study_falsealarm(resultingfa_df, resultingfa_df['falsealarm'].to_numpy())
     print(study.best_params)
-    #best_params = np.load('D:/behavmodelfigs/falsealarmoptunaparams3_strat5kfold.npy', allow_pickle=True).item()
+    # best_params = np.load('D:/behavmodelfigs/falsealarmoptunaparams3_strat5kfold.npy', allow_pickle=True).item()
 
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbfaornotwithoptuna(
         resultingfa_df, study.best_params)
-    #np.save('D:/behavmodelfigs/falsealarmoptunaparams2.npy', study.best_params)
+    # np.save('D:/behavmodelfigs/falsealarmoptunaparams2.npy', study.best_params)
 
     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
+
 def run_correct_responsepipeline(ferrets):
-    resultingcr_df = get_df_behav(ferrets=ferrets, includefaandmiss=False,includemissonly=True, startdate='04-01-2020', finishdate='01-10-2022')
+    resultingcr_df = get_df_behav(ferrets=ferrets, includefaandmiss=False, includemissonly=True, startdate='04-01-2020',
+                                  finishdate='01-10-2022')
     filepath = Path('D:/dfformixedmodels/correctresponsemodel_dfuse.csv')
     filepath.parent.mkdir(parents=True, exist_ok=True)
     resultingcr_df.to_csv(filepath)
-    #old BEST PARAMS without clove's data
+    # old BEST PARAMS without clove's data
     best_params = np.load('D:/behavmodelfigs/correctrespponseoptunaparams4_strat5kfold.npy', allow_pickle=True).item()
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbcorrectrespornotwithoptuna(
         resultingcr_df)
     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
+
 def run_reaction_time_fa_pipleine_female(ferrets):
-    resultingdf = behaviouralhelperscg.get_reactiontime_data(ferrets=ferrets, startdate='04-01-2020', finishdate='01-10-2022')
+    resultingdf = behaviouralhelperscg.get_reactiontime_data(ferrets=ferrets, startdate='04-01-2020',
+                                                             finishdate='01-10-2022')
     df_use = resultingdf.loc[:, resultingdf.columns != 'ferret']
     df_use = df_use.loc[df_use['intra_trial_roving'] == 0]
     df_use = df_use.loc[df_use['talker'] == 1]
@@ -1295,26 +1308,23 @@ def run_reaction_time_fa_pipleine_female(ferrets):
 
     df_use = df_use.loc[:, df_use.columns != 'realRelReleaseTimes']
 
-
-
     col = 'centreRelease'
     dfx = df_use.loc[:, df_use.columns != col]
     # remove ferret as possible feature
     col = 'ferret'
-    col2=['target', 'startResponseTime', 'distractors', 'recBlock', 'lickRelease2', 'lickReleaseCount', 'PitchShiftMat', 'attenOrder', 'dDurs', 'tempAttens', 'currAttenList', 'attenList', 'fName', 'Level', 'dates', 'ferretname', 'noiseType', 'noiseFile']
+    col2 = ['target', 'startResponseTime', 'distractors', 'recBlock', 'lickRelease2', 'lickReleaseCount',
+            'PitchShiftMat', 'attenOrder', 'dDurs', 'tempAttens', 'currAttenList', 'attenList', 'fName', 'Level',
+            'dates', 'ferretname', 'noiseType', 'noiseFile']
     dfx = dfx.loc[:, dfx.columns != col]
     # for name in col2:
     #     dfx = dfx.loc[:, dfx.columns != name]
     for column in dfx.columns:
         if column == 'AM' or column == 'side':
             pass
-        elif column.isnumeric()==False:
+        elif column.isnumeric() == False:
             dfx = dfx.loc[:, dfx.columns != column]
         elif column.isnumeric():
             pass
-
-
-
 
     X_train, X_test, y_train, y_test = train_test_split(dfx, df_use['centreRelease'], test_size=0.2,
                                                         random_state=123)
@@ -1329,7 +1339,6 @@ def run_reaction_time_fa_pipleine_female(ferrets):
     # bst = xgb.train(param, dtrain, num_round, evallist)
     xg_reg = lgb.LGBMRegressor(colsample_bytree=0.3, learning_rate=0.1,
                                max_depth=10, alpha=10, n_estimators=10, verbose=1)
-
 
     xg_reg.fit(X_train, y_train, eval_metric='neg_mean_squared_error', verbose=1)
     ypred = xg_reg.predict(X_test)
@@ -1351,8 +1360,11 @@ def run_reaction_time_fa_pipleine_female(ferrets):
     plt.show()
 
     return resultingdf
+
+
 def run_reaction_time_fa_pipleine_male(ferrets):
-    resultingdf = behaviouralhelperscg.get_reactiontime_data(ferrets=ferrets, startdate='04-01-2020', finishdate='01-10-2022')
+    resultingdf = behaviouralhelperscg.get_reactiontime_data(ferrets=ferrets, startdate='04-01-2020',
+                                                             finishdate='01-10-2022')
     df_use = resultingdf.loc[:, resultingdf.columns != 'ferret']
     df_use = df_use.loc[df_use['intra_trial_roving'] == 0]
     df_use = df_use.loc[df_use['talker'] == 2]
@@ -1361,20 +1373,21 @@ def run_reaction_time_fa_pipleine_male(ferrets):
     df_use = df_use.loc[:, df_use.columns != 'side']
     df_use = df_use.loc[:, df_use.columns != 'AM']
 
-
     df_use = df_use.loc[:, df_use.columns != 'distractor_or_fa']
     df_use = df_use.loc[:, df_use.columns != 'realRelReleaseTimes']
 
     col = 'centreRelease'
     dfx = df_use.loc[:, df_use.columns != col]
     col = 'ferret'
-    col2=['target', 'startResponseTime', 'distractors', 'recBlock', 'lickRelease2', 'lickReleaseCount', 'PitchShiftMat', 'attenOrder', 'dDurs', 'tempAttens', 'currAttenList', 'attenList', 'fName', 'Level', 'dates', 'ferretname', 'noiseType', 'noiseFile']
+    col2 = ['target', 'startResponseTime', 'distractors', 'recBlock', 'lickRelease2', 'lickReleaseCount',
+            'PitchShiftMat', 'attenOrder', 'dDurs', 'tempAttens', 'currAttenList', 'attenList', 'fName', 'Level',
+            'dates', 'ferretname', 'noiseType', 'noiseFile']
     dfx = dfx.loc[:, dfx.columns != col]
 
     for column in dfx.columns:
         if column == 'AM' or column == 'side':
             pass
-        elif column.isnumeric()==False:
+        elif column.isnumeric() == False:
             dfx = dfx.loc[:, dfx.columns != column]
         elif column.isnumeric():
             pass
@@ -1387,7 +1400,6 @@ def run_reaction_time_fa_pipleine_male(ferrets):
     param['eval_metric'] = 'auc'
     xg_reg = lgb.LGBMRegressor(colsample_bytree=0.3, learning_rate=0.1,
                                max_depth=10, alpha=10, n_estimators=10, verbose=1)
-
 
     xg_reg.fit(X_train, y_train, eval_metric='neg_mean_squared_error', verbose=1)
     ypred = xg_reg.predict(X_test)
@@ -1412,11 +1424,12 @@ def run_reaction_time_fa_pipleine_male(ferrets):
 
 
 def plot_correct_response_byside(ferrets):
-    resultingdf = behaviouralhelperscg.get_reactiontime_data(ferrets=ferrets, startdate='04-01-2020', finishdate='01-10-2022')
+    resultingdf = behaviouralhelperscg.get_reactiontime_data(ferrets=ferrets, startdate='04-01-2020',
+                                                             finishdate='01-10-2022')
     df_use = resultingdf
     df_use = df_use.loc[df_use['intra_trial_roving'] == 0]
 
-    #plot the proportion of correct responses by side
+    # plot the proportion of correct responses by side
 
     df_left = df_use.loc[df_use['side'] == 0]
     df_right = df_use.loc[df_use['side'] == 1]
@@ -1430,73 +1443,75 @@ def plot_correct_response_byside(ferrets):
     df_left_by_ferret = {}
     df_right_by_ferret = {}
 
-    #now plot by ferret ID
-    ferrets = [0,1,2,3]
+    # now plot by ferret ID
+    ferrets = [0, 1, 2, 3]
     for ferret in ferrets:
-
         df_left_test = df_use.loc[df_use['side'] == 0]
         df_right_test = df_use.loc[df_use['side'] == 1]
         df_left_by_ferret[ferret] = df_left_test.loc[df_left_test['ferret'] == ferret]
         df_right_by_ferret[ferret] = df_right_test.loc[df_right_test['ferret'] == ferret]
 
     ax, fig = plt.subplots(figsize=(10, 12))
-    plt.bar(['left - zola', 'right - zola', 'left - cru', 'right - cru', 'left - tina', 'right-tina', 'left - mac', 'right-mac'], [df_left_by_ferret[0]['correct'].mean(), df_right_by_ferret[0]['correct'].mean(), df_left_by_ferret[1]['correct'].mean(), df_right_by_ferret[1]['correct'].mean(), df_left_by_ferret[2]['correct'].mean(), df_right_by_ferret[2]['correct'].mean(), df_left_by_ferret[3]['correct'].mean(), df_right_by_ferret[3]['correct'].mean()])
-    plt.title('Proportion of correct responses by side registered by sensors, \n  irrespective of talker, by ferret ID', fontsize = 15)
-    plt.xticks(rotation=45, fontsize = 12)  # rotate the x axis labels
+    plt.bar(['left - zola', 'right - zola', 'left - cru', 'right - cru', 'left - tina', 'right-tina', 'left - mac',
+             'right-mac'], [df_left_by_ferret[0]['correct'].mean(), df_right_by_ferret[0]['correct'].mean(),
+                            df_left_by_ferret[1]['correct'].mean(), df_right_by_ferret[1]['correct'].mean(),
+                            df_left_by_ferret[2]['correct'].mean(), df_right_by_ferret[2]['correct'].mean(),
+                            df_left_by_ferret[3]['correct'].mean(), df_right_by_ferret[3]['correct'].mean()])
+    plt.title('Proportion of correct responses by side registered by sensors, \n  irrespective of talker, by ferret ID',
+              fontsize=15)
+    plt.xticks(rotation=45, fontsize=12)  # rotate the x axis labels
     plt.ylim(0, 1)
 
-    plt.ylabel('proportion of correct responses', fontsize = 13)
+    plt.ylabel('proportion of correct responses', fontsize=13)
     plt.savefig('D:/behavmodelfigs/proportion_correct_responses_by_side_by_ferret.png', dpi=500)
     plt.show()
     return df_left, df_right
 
+
 def plot_reaction_times(ferrets):
-    #plot the reaction times by animal
-    resultingdf = behaviouralhelperscg.get_reactiontime_data(ferrets=ferrets, startdate='04-01-2020', finishdate='01-10-2022')
+    # plot the reaction times by animal
+    resultingdf = behaviouralhelperscg.get_reactiontime_data(ferrets=ferrets, startdate='04-01-2020',
+                                                             finishdate='01-10-2022')
     df_use = resultingdf
 
     df_left_by_ferret = {}
     df_female = df_use.loc[df_use['talker'] == 1]
     df_female_control = df_female.loc[df_female['intra_trial_roving'] == 0]
 
-
     df_female = df_use.loc[df_use['talker'] == 1]
     df_female_rove = df_female.loc[df_female['intra_trial_roving'] == 1]
-
 
     df_male = df_use.loc[df_use['talker'] == 2]
     df_male_control = df_male.loc[df_male['intra_trial_roving'] == 0]
     df_male_rove = df_male.loc[df_male['intra_trial_roving'] == 1]
 
-    #now plot generally by all ferrets
+    # now plot generally by all ferrets
     ax, fig = plt.subplots(figsize=(10, 12))
     sns.distplot(df_use['realRelReleaseTimes'], hist=True, kde=False, color='blue',
                  hist_kws={'edgecolor': 'black'})
-    plt.title('Distribution of reaction times, \n irrespective of talker and ferret', fontsize = 15)
+    plt.title('Distribution of reaction times, \n irrespective of talker and ferret', fontsize=15)
     plt.show()
 
-    #now plot by talker, showing reaction times
-    sns.distplot(df_female_control['realRelReleaseTimes'],color='blue', label = 'control F0')
-    sns.distplot(df_female_rove['realRelReleaseTimes'], color = 'red',label ='roved F0')
-    plt.title('Reaction times for the female talker, \n irrespective of ferret',  fontsize = 15)
-    plt.legend(fontsize = 10)
-    plt.xlabel('reaction time relative to target presentation (s)', fontsize = 13)
+    # now plot by talker, showing reaction times
+    sns.distplot(df_female_control['realRelReleaseTimes'], color='blue', label='control F0')
+    sns.distplot(df_female_rove['realRelReleaseTimes'], color='red', label='roved F0')
+    plt.title('Reaction times for the female talker, \n irrespective of ferret', fontsize=15)
+    plt.legend(fontsize=10)
+    plt.xlabel('reaction time relative to target presentation (s)', fontsize=13)
     plt.show()
 
-
-    sns.distplot(df_male_control['realRelReleaseTimes'],color='green', label = 'control F0')
-    sns.distplot(df_male_rove['realRelReleaseTimes'], color = 'orange',label ='roved F0')
-    plt.title('Reaction times for the male talker, \n irrespective of ferret',  fontsize = 15)
-    plt.legend(fontsize = 10)
-    plt.xlabel('reaction time relative to target presentation (s)', fontsize = 13)
+    sns.distplot(df_male_control['realRelReleaseTimes'], color='green', label='control F0')
+    sns.distplot(df_male_rove['realRelReleaseTimes'], color='orange', label='roved F0')
+    plt.title('Reaction times for the male talker, \n irrespective of ferret', fontsize=15)
+    plt.legend(fontsize=10)
+    plt.xlabel('reaction time relative to target presentation (s)', fontsize=13)
     plt.show()
-
 
     df_by_ferret = {}
-    df_by_ferret_f_control={}
-    df_by_ferret_f_rove={}
-    df_by_ferret_m_control={}
-    df_by_ferret_m_rove={}
+    df_by_ferret_f_control = {}
+    df_by_ferret_f_rove = {}
+    df_by_ferret_m_control = {}
+    df_by_ferret_m_rove = {}
 
     # now plot by ferret ID
     ferrets = [0, 1, 2, 3]
@@ -1509,17 +1524,17 @@ def plot_reaction_times(ferrets):
     for ferret in ferrets:
         sns.distplot(df_by_ferret_f_control[ferret]['realRelReleaseTimes'], color='blue', label='control F0, female')
         sns.distplot(df_by_ferret_f_rove[ferret]['realRelReleaseTimes'], color='red', label='roved F0, female')
-        sns.distplot(df_by_ferret_m_control[ferret]['realRelReleaseTimes'], color = 'green', label='control F0, male')
-        sns.distplot(df_by_ferret_m_rove[ferret]['realRelReleaseTimes'], color = 'orange', label='roved F0, male')
-        plt.title('Reaction times for ferret ID ' + str(ferret_labels[ferret]), fontsize = 15)
-        plt.legend(fontsize = 10)
-        plt.xlabel('reaction time relative to target presentation (s)', fontsize = 13)
+        sns.distplot(df_by_ferret_m_control[ferret]['realRelReleaseTimes'], color='green', label='control F0, male')
+        sns.distplot(df_by_ferret_m_rove[ferret]['realRelReleaseTimes'], color='orange', label='roved F0, male')
+        plt.title('Reaction times for ferret ID ' + str(ferret_labels[ferret]), fontsize=15)
+        plt.legend(fontsize=10)
+        plt.xlabel('reaction time relative to target presentation (s)', fontsize=13)
         plt.show()
-
 
     return df_by_ferret
 
     #
+
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
@@ -1535,18 +1550,17 @@ if __name__ == '__main__':
 
     # xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = run_correct_responsepipeline(ferrets)
 
-
-
     modelreg_reduc, modelregcat_reduc, modelregcat, modelreg, predictedrelease, df_use, dfcat_use, predictedcorrectresp, explainedvar, explainvarreleasetime = run_mixed_effects_analysis(
         ferrets)
-
 
     col = 'realRelReleaseTimes'
     dfx = df_use.loc[:, df_use.columns != col]
     # remove ferret as possible feature
-    # col = 'ferret'
-    # dfx = dfx.loc[:, dfx.columns != col]
+    col2 = 'ferret'
+    dfx = dfx.loc[:, dfx.columns != col2]
+
+    col3 = 'stepval'
+    dfx = dfx.loc[:, dfx.columns != col3]
 
     study_release_times = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
     xg_reg, ypred, y_test, results = runlgbreleasetimes(df_use, study_release_times.best_params)
-
