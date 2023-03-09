@@ -307,7 +307,7 @@ def run_mixed_effects_analysis(ferrets):
 
     modelreg = Lmer(
         "realRelReleaseTimes ~ talker*(pitchoftarg)+ talker*(stepval)+ side + timeToTarget + DaysSinceStart + AM  + (1|ferret)",
-        data=dfuse, family='gamma')
+        data=dfuse)
 
     print(modelreg.fit(factors={"side": ["0", "1"], "stepval": ["0.0", "1.0", "-1.0"], "AM": ["0", "1"],
                                 "pitchoftarg": ['1', '2', '3', '4', '5'], "talker": ["0.0", "1.0"], }, ordered=True,
@@ -341,7 +341,7 @@ def run_mixed_effects_analysis(ferrets):
 
     modelreg_reduc = Lmer(
         "realRelReleaseTimes ~ talker*(pitchoftarg)+side + talker*stepval+timeToTarget  + (1|ferret)",
-        data=dfuse, family='gamma')
+        data=dfuse)
 
     print(modelreg_reduc.fit(factors={"side": ["0", "1"],
                                       "pitchoftarg": ['1', '2', '3', '4', '5'], "talker": ["0.0", "1.0"],
@@ -535,8 +535,8 @@ def runlgbreleasetimes(df_use, paramsinput=None):
     col = 'realRelReleaseTimes'
     dfx = df_use.loc[:, df_use.columns != col]
     # remove ferret as possible feature
-    col = 'ferret'
-    dfx = dfx.loc[:, dfx.columns != col]
+    # col = 'ferret'
+    # dfx = dfx.loc[:, dfx.columns != col]
 
     X_train, X_test, y_train, y_test = train_test_split(dfx, df_use['realRelReleaseTimes'], test_size=0.2,
                                                         random_state=123)
@@ -747,7 +747,7 @@ def objective_releasetimes(trial, X, y):
         ),
     }
 
-    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+    cv = KFold(n_splits=5, shuffle=True, random_state=42)
 
     cv_scores = np.empty(5)
     for idx, (train_idx, test_idx) in enumerate(cv.split(X, y)):
@@ -831,8 +831,8 @@ def run_optuna_study_correctresp(X, y):
 
 def run_optuna_study_releasetimes(X, y):
     study = optuna.create_study(direction="minimize", study_name="LGBM regressor")
-    func = lambda trial: objective_releasetimes(trial, X, y)
-    study.optimize(func, n_trials=1000)
+    # func = lambda trial: objective_releasetimes(trial, X, y)
+    study.optimize(objective_releasetimes(trial, X, y), n_trials=1000)
     print("Number of finished trials: ", len(study.trials))
     for key, value in study.best_params.items():
         print(f"\t\t{key}: {value}")
@@ -1544,8 +1544,8 @@ if __name__ == '__main__':
     col = 'realRelReleaseTimes'
     dfx = df_use.loc[:, df_use.columns != col]
     # remove ferret as possible feature
-    col = 'ferret'
-    dfx = dfx.loc[:, dfx.columns != col]
+    # col = 'ferret'
+    # dfx = dfx.loc[:, dfx.columns != col]
 
     study_release_times = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
     xg_reg, ypred, y_test, results = runlgbreleasetimes(df_use, study_release_times.best_params)
