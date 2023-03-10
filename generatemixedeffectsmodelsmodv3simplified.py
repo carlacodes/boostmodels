@@ -610,16 +610,13 @@ def runlgbreleasetimes(df_use, paramsinput=None):
     return xg_reg, ypred, y_test, results
 
 
-def runlgbreleasetimes_for_a_ferret(df_use, paramsinput=None):
+def runlgbreleasetimes_for_a_ferret(df_use, paramsinput=None, ferret = 1, ferret_id='F1815_Cruella'
+                                                                                    ):
+    df_use = df_use[df_use['ferret'] == ferret]
     col = 'realRelReleaseTimes'
     dfx = df_use.loc[:, df_use.columns != col]
     col = 'ferret'
     dfx = dfx.loc[:, dfx.columns != col]
-    # col = 'stepval'
-    # dfx = dfx.loc[:, dfx.columns != col]
-    # remove ferret as possible feature
-    # col = 'ferret'
-    # dfx = dfx.loc[:, dfx.columns != col]
 
     X_train, X_test, y_train, y_test = train_test_split(dfx, df_use['realRelReleaseTimes'], test_size=0.2,
                                                         random_state=123)
@@ -632,7 +629,7 @@ def runlgbreleasetimes_for_a_ferret(df_use, paramsinput=None):
     xg_reg.fit(X_train, y_train, verbose=1)
     ypred = xg_reg.predict(X_test)
     lgb.plot_importance(xg_reg)
-    plt.title('feature importances for the LGBM Correct Release Times model')
+    plt.title('feature importances for the LGBM Correct Release Times model for ferret ' + ferret_id)
     plt.show()
 
     kfold = KFold(n_splits=10)
@@ -640,7 +637,7 @@ def runlgbreleasetimes_for_a_ferret(df_use, paramsinput=None):
     mse_train = mean_squared_error(ypred, y_test)
 
     mse = mean_squared_error(ypred, y_test)
-    print("MSE on test: %.4f" % (mse))
+    print("MSE on test: %.4f" % (mse) +ferret_id)
     print("negative MSE training: %.2f%%" % (np.mean(results) * 100.0))
     print(results)
     shap_values = shap.TreeExplainer(xg_reg).shap_values(dfx)
@@ -648,8 +645,8 @@ def runlgbreleasetimes_for_a_ferret(df_use, paramsinput=None):
     # title kwargs still does nothing so need this workaround for summary plots
     shap.summary_plot(shap_values, dfx, show=False)
     fig, ax = plt.gcf(), plt.gca()
-    plt.title('Ranked list of features over their impact in predicting reaction time')
-    plt.xlabel('SHAP value (impact on model output) on reaction time')
+    plt.title('Ranked list of features over their impact in predicting reaction time for' + ferret_id)
+    plt.xlabel('SHAP value (impact on model output) on reaction time' + ferret_id)
 
     labels = [item.get_text() for item in ax.get_yticklabels()]
     print(labels)
@@ -686,10 +683,10 @@ def runlgbreleasetimes_for_a_ferret(df_use, paramsinput=None):
     plt.show()
     # logthe release times
     shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"],
-                       title='Correct Responses - Reaction Time Model SHAP response \n vs. trial number')
+                       title='Correct Responses - Reaction Time Model SHAP response \n vs. trial number for' + ferret_id)
     plt.show()
 
-    return xg_reg, ypred, y_test, results
+    return xg_reg, ypred, y_test, results, mse
 
 
 def balanced_subsample(x, y, subsample_size=1.0):
@@ -1649,4 +1646,10 @@ if __name__ == '__main__':
     # dfx = dfx.loc[:, dfx.columns != col3]
 
     # study_release_times = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
-    xg_reg, ypred, y_test, results = runlgbreleasetimes(df_use)
+    # xg_reg, ypred, y_test, results = runlgbreleasetimes(df_use)
+    count = 0
+    for ferret_id in ferrets:
+
+        xg_reg, ypred, y_test, results, mse = runlgbreleasetimes_for_a_ferret(df_use, 0, ferret_id = ferret_id)
+        count +=1
+
