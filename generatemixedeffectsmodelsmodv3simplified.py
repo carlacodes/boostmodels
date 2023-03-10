@@ -531,6 +531,10 @@ def runxgboostreleasetimes(df_use):
 def runlgbreleasetimes(df_use, paramsinput=None):
     col = 'realRelReleaseTimes'
     dfx = df_use.loc[:, df_use.columns != col]
+    col = 'ferret'
+    dfx = dfx.loc[:, dfx.columns != col]
+    # col = 'stepval'
+    # dfx = dfx.loc[:, dfx.columns != col]
     # remove ferret as possible feature
     # col = 'ferret'
     # dfx = dfx.loc[:, dfx.columns != col]
@@ -542,7 +546,7 @@ def runlgbreleasetimes(df_use, paramsinput=None):
     # param['nthread'] = 4
     # param['eval_metric'] = 'auc'
 
-    xg_reg = lgb.LGBMRegressor(random_state=123, verbose=1, **paramsinput)
+    xg_reg = lgb.LGBMRegressor(random_state=123, verbose=1)
     xg_reg.fit(X_train, y_train, verbose=1)
     ypred = xg_reg.predict(X_test)
     lgb.plot_importance(xg_reg)
@@ -1559,8 +1563,8 @@ if __name__ == '__main__':
     col2 = 'ferret'
     dfx = dfx.loc[:, dfx.columns != col2]
 
-    col3 = 'stepval'
-    dfx = dfx.loc[:, dfx.columns != col3]
+    # col3 = 'stepval'
+    # dfx = dfx.loc[:, dfx.columns != col3]
 
-    study_release_times = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
-    xg_reg, ypred, y_test, results = runlgbreleasetimes(df_use, study_release_times.best_params)
+    # study_release_times = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
+    xg_reg, ypred, y_test, results = runlgbreleasetimes(df_use)
