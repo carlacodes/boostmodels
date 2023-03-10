@@ -558,7 +558,89 @@ def runlgbreleasetimes(df_use, paramsinput=None):
     mse_train = mean_squared_error(ypred, y_test)
 
     mse = mean_squared_error(ypred, y_test)
-    print("MSE on test: %.2f" % (mse))
+    print("MSE on test: %.4f" % (mse))
+    print("negative MSE training: %.2f%%" % (np.mean(results) * 100.0))
+    print(results)
+    shap_values = shap.TreeExplainer(xg_reg).shap_values(dfx)
+    fig, ax = plt.subplots(figsize=(15, 15))
+    # title kwargs still does nothing so need this workaround for summary plots
+    shap.summary_plot(shap_values, dfx, show=False)
+    fig, ax = plt.gcf(), plt.gca()
+    plt.title('Ranked list of features over their impact in predicting reaction time')
+    plt.xlabel('SHAP value (impact on model output) on reaction time')
+
+    labels = [item.get_text() for item in ax.get_yticklabels()]
+    print(labels)
+    # labels[11] = 'distance to sensor'
+    # labels[10] = 'target F0'
+    # labels[9] = 'trial number'
+    # labels[8] = 'precursor = target F0'
+    # labels[7] = 'male talker'
+    # labels[6] = 'time until target'
+    # labels[5] = 'target F0 - precursor F0'
+    # labels[4] = 'day of week'
+    # labels[3] = 'precursor F0'
+    # labels[2] = 'past trial was catch'
+    # labels[1] = 'trial took place in AM'
+    # labels[0] = 'past trial was correct'
+
+    ax.set_yticklabels(labels)
+
+    plt.show()
+
+    shap.dependence_plot("timeToTarget", shap_values, dfx)  #
+
+    explainer = shap.Explainer(xg_reg, dfx)
+    shap_values2 = explainer(dfx)
+    fig, ax = plt.subplots(figsize=(15, 15))
+    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "precur_and_targ_same"])
+    fig.tight_layout()
+
+    plt.subplots_adjust(left=-10, right=0.5)
+
+    plt.show()
+    shap.plots.scatter(shap_values2[:, "pitchoftarg"], color=shap_values2[:, "talker"])
+    plt.title('Reaction Time Model')
+    plt.show()
+    # logthe release times
+    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"],
+                       title='Correct Responses - Reaction Time Model SHAP response \n vs. trial number')
+    plt.show()
+
+    return xg_reg, ypred, y_test, results
+
+
+def runlgbreleasetimes_for_a_ferret(df_use, paramsinput=None):
+    col = 'realRelReleaseTimes'
+    dfx = df_use.loc[:, df_use.columns != col]
+    col = 'ferret'
+    dfx = dfx.loc[:, dfx.columns != col]
+    # col = 'stepval'
+    # dfx = dfx.loc[:, dfx.columns != col]
+    # remove ferret as possible feature
+    # col = 'ferret'
+    # dfx = dfx.loc[:, dfx.columns != col]
+
+    X_train, X_test, y_train, y_test = train_test_split(dfx, df_use['realRelReleaseTimes'], test_size=0.2,
+                                                        random_state=123)
+
+    # param = {'max_depth': 2, 'eta': 1, 'objective': 'reg:squarederror'}
+    # param['nthread'] = 4
+    # param['eval_metric'] = 'auc'
+
+    xg_reg = lgb.LGBMRegressor(random_state=123, verbose=1)
+    xg_reg.fit(X_train, y_train, verbose=1)
+    ypred = xg_reg.predict(X_test)
+    lgb.plot_importance(xg_reg)
+    plt.title('feature importances for the LGBM Correct Release Times model')
+    plt.show()
+
+    kfold = KFold(n_splits=10)
+    results = cross_val_score(xg_reg, X_train, y_train, scoring='neg_mean_squared_error', cv=kfold)
+    mse_train = mean_squared_error(ypred, y_test)
+
+    mse = mean_squared_error(ypred, y_test)
+    print("MSE on test: %.4f" % (mse))
     print("negative MSE training: %.2f%%" % (np.mean(results) * 100.0))
     print(results)
     shap_values = shap.TreeExplainer(xg_reg).shap_values(dfx)
