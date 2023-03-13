@@ -1349,7 +1349,26 @@ def runlgbfaornot(dataframe):
 
 def runfalsealarmpipeline(ferrets):
     resultingfa_df = behaviouralhelperscg.get_false_alarm_behavdata(ferrets=ferrets, startdate='04-01-2020',
-                                                                    finishdate='01-10-2022')
+                                                                    finishdate='01-03-2023')
+    len_of_data_male = {}
+    len_of_data_female = {}
+    len_of_data_female_intra = {}
+    len_of_data_female_inter = {}
+    len_of_data_male_intra = {}
+    len_of_data_male_inter = {}
+    for i in range(0, len(ferrets)):
+        noncorrectiondata = resultingfa_df[resultingfa_df['correctionTrial'] == 0]
+        noncorrectiondata = noncorrectiondata[noncorrectiondata['currAtten'] == 0]
+
+        interdata = noncorrectiondata[noncorrectiondata['inter_trial_roving'] == 1]
+        intradata = noncorrectiondata[noncorrectiondata['intra_trial_roving'] == 1]
+        len_of_data_female_intra[ferrets[i]] = len(intradata[(intradata['ferret'] == i) & (intradata['talker'] == 0.0)])
+        len_of_data_female_inter[ferrets[i]] = len(interdata[(interdata['ferret'] == i) & (interdata['talker'] == 0.0)])
+
+        len_of_data_male_inter[ferrets[i]] = len(interdata[(interdata['ferret'] == i) & (interdata['talker'] == 1.0)])
+        len_of_data_male_intra[ferrets[i]] = len(intradata[(intradata['ferret'] == i ) & (intradata['talker'] == 1.0)])
+
+
     filepath = Path('D:/dfformixedmodels/falsealarmmodel_dfuse.csv')
     filepath.parent.mkdir(parents=True, exist_ok=True)
 
@@ -1630,7 +1649,7 @@ if __name__ == '__main__':
     #
     # test_df2 = run_reaction_time_fa_pipleine_male(ferrets)
 
-    # xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(ferrets)
+    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(ferrets)
 
     # xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = run_correct_responsepipeline(ferrets)
 

@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 
 
-class behaviouralhelperscg:
+class behaviouralhelperscg():
 
     def get_false_alarm_behavdata(path=None,
                      output=None,
@@ -22,7 +22,13 @@ class behaviouralhelperscg:
 
         allData, ferrets = extractAllFerretData(ferrets, path, startDate=startdate,
                                                 finishDate=finishdate)
+        len_of_data = {}
         fs = 24414.062500
+        for i in range(0, len(ferrets)):
+            noncorrectiondata = allData[allData['correctionTrial'] == 0]
+            noncorrectiondata = noncorrectiondata[noncorrectiondata['currAtten'] == 0]
+            len_of_data[ferrets[i]] = len(noncorrectiondata[noncorrectiondata['ferret'] == i])
+
         bigdata = pd.DataFrame()
         numofferrets = allData['ferret'].unique()
         for ferret in numofferrets:
@@ -58,6 +64,7 @@ class behaviouralhelperscg:
 
             precur_and_targ_same = np.empty(len(pitchshiftmat))
             intra_trial_roving = []
+            inter_trial_roving = []
             control_trial = []
             talkerlist2 = np.empty(len(pitchshiftmat))
 
@@ -88,6 +95,11 @@ class behaviouralhelperscg:
                     intra_trial_roving.append(0)
                 else:
                     intra_trial_roving.append(1)
+
+                if isinstance(chosentrial, float):
+                    inter_trial_roving.append(0)
+                else:
+                    inter_trial_roving.append(1)
 
                 chosendisttrial = precursorlist.values[i]
                 chosentalker = talkerlist.values[i]
@@ -165,9 +177,7 @@ class behaviouralhelperscg:
 
                 except:
                     indexdrop = newdata.iloc[i].name
-                    #droplist = np.append(droplist, i - 1)
-                    #arrays START AT 0, but the index starts at 1, so the index is 1 less than the array
-                    #droplistnew = np.append(droplistnew, indexdrop)
+
                     pitchoftarg[i] = np.nan
                     if isinstance(chosentrial, int):
                         pitchofprecur[i] = chosentrial
@@ -212,6 +222,7 @@ class behaviouralhelperscg:
 
             newdata['falsealarm'] = falsealarm.tolist()
             newdata['intra_trial_roving'] = intra_trial_roving
+            newdata['inter_trial_roving'] = inter_trial_roving
             newdata['correctresp'] = correctresp.tolist()
             newdata['distractor_or_fa'] = distractor_or_fa.tolist()
             newdata['pastcorrectresp'] = pastcorrectresp.tolist()
@@ -242,15 +253,18 @@ class behaviouralhelperscg:
             newdata['cosinesim'] = correspondcosinelist
             newdata['temporalsim'] = correspondtempsimlist
 
-            newdata = newdata[(newdata.pitchoftarg == 1) | (newdata.pitchoftarg == 2) | (newdata.pitchoftarg == 3) | (
-                    newdata.pitchoftarg == 4) | (newdata.pitchoftarg == 5)]
-            newdata = newdata[
-                (newdata.pitchofprecur == 1) | (newdata.pitchofprecur == 2) | (newdata.pitchofprecur == 3) | (
-                        newdata.pitchofprecur == 4) | (newdata.pitchofprecur == 5)]
+            newdata = newdata[(newdata.talker == 1) | (newdata.talker == 2) | (newdata.talker == 3) | (
+                    newdata.talker == 4) | (newdata.talker == 5)]
+
+            # newdata = newdata[(newdata.pitchoftarg == 1) | (newdata.pitchoftarg == 2) | (newdata.pitchoftarg == 3) | (
+            #         newdata.pitchoftarg == 4) | (newdata.pitchoftarg == 5)]
+            # newdata = newdata[
+            #     (newdata.pitchofprecur == 1) | (newdata.pitchofprecur == 2) | (newdata.pitchofprecur == 3) | (
+            #             newdata.pitchofprecur == 4) | (newdata.pitchofprecur == 5)]
 
             newdata = newdata[(newdata.correctionTrial == 0)]  # | (allData.response == 7)
             newdata = newdata[(newdata.currAtten == 0)]  # | (allData.response == 7)
-            newdata = newdata[(newdata.catchTrial == 0)]  # | (allData.response == 7)
+            # newdata = newdata[(newdata.catchTrial == 0)]  # | (allData.response == 7)
 
 
             bigdata = bigdata.append(newdata)
