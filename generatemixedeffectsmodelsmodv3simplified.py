@@ -1362,11 +1362,11 @@ def runfalsealarmpipeline(ferrets):
 
         interdata = noncorrectiondata[noncorrectiondata['inter_trial_roving'] == 1]
         intradata = noncorrectiondata[noncorrectiondata['intra_trial_roving'] == 1]
-        len_of_data_female_intra[ferrets[i]] = len(intradata[(intradata['ferret'] == i) & (intradata['talker'] == 0.0)])
-        len_of_data_female_inter[ferrets[i]] = len(interdata[(interdata['ferret'] == i) & (interdata['talker'] == 0.0)])
+        len_of_data_female_intra[ferrets[i]] = len(intradata[(intradata['ferret'] == i) & (intradata['talker'] == 1.0)])
+        len_of_data_female_inter[ferrets[i]] = len(interdata[(interdata['ferret'] == i) & (interdata['talker'] == 1.0)])
 
-        len_of_data_male_inter[ferrets[i]] = len(interdata[(interdata['ferret'] == i) & (interdata['talker'] == 1.0)])
-        len_of_data_male_intra[ferrets[i]] = len(intradata[(intradata['ferret'] == i ) & (intradata['talker'] == 1.0)])
+        len_of_data_male_inter[ferrets[i]] = len(interdata[(interdata['ferret'] == i) & (interdata['talker'] == 2.0)])
+        len_of_data_male_intra[ferrets[i]] = len(intradata[(intradata['ferret'] == i ) & (intradata['talker'] == 2.0)])
 
 
     filepath = Path('D:/dfformixedmodels/falsealarmmodel_dfuse.csv')
