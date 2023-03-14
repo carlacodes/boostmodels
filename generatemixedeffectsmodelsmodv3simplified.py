@@ -1360,6 +1360,10 @@ def runfalsealarmpipeline(ferrets):
         noncorrectiondata = resultingfa_df[resultingfa_df['correctionTrial'] == 0]
         noncorrectiondata = noncorrectiondata[noncorrectiondata['currAtten'] == 0]
 
+
+        len_of_data_male[ferrets[i]] = len(noncorrectiondata[(noncorrectiondata['ferret'] == i) & (noncorrectiondata['talker'] == 2.0) & (noncorrectiondata['control_trial'] == 1)])
+        len_of_data_female[ferrets[i]] = len(noncorrectiondata[(noncorrectiondata['ferret'] == i) & (noncorrectiondata['talker'] == 1.0) & (noncorrectiondata['control_trial'] == 1)])
+
         interdata = noncorrectiondata[noncorrectiondata['inter_trial_roving'] == 1]
         intradata = noncorrectiondata[noncorrectiondata['intra_trial_roving'] == 1]
         len_of_data_female_intra[ferrets[i]] = len(intradata[(intradata['ferret'] == i) & (intradata['talker'] == 1.0)])
