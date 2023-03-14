@@ -97,9 +97,9 @@ class behaviouralhelperscg():
                     intra_trial_roving.append(1)
 
                 if isinstance(chosentrial, float):
-                    inter_trial_roving.append(0)
-                else:
                     inter_trial_roving.append(1)
+                else:
+                    inter_trial_roving.append(0)
 
                 chosendisttrial = precursorlist.values[i]
                 chosentalker = talkerlist.values[i]
