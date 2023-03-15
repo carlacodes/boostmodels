@@ -661,8 +661,8 @@ def runlgbreleasetimes_for_a_ferret(data, paramsinput=None, ferret=1, ferret_nam
 
     shap.dependence_plot("timeToTarget", shap_values, dfx)  #
 
-    explainer = shap.Explainer(xg_reg, dfx)
-    shap_values2 = explainer(dfx)
+    explainer = shap.Explainer(xg_reg, X_train)
+    shap_values2 = explainer(X_train)
     fig, ax = plt.subplots(figsize=(15, 15))
     shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "precur_and_targ_same"])
     fig.tight_layout()
