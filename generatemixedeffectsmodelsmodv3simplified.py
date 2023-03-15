@@ -325,7 +325,7 @@ def run_mixed_effects_analysis(ferrets):
         data=dfcat_use, family='binomial')
 
     print(modelregcat_reduc.fit(factors={"side": ["0", "1"],
-                                         "pitchoftarg": ['1', '2', '3', '4', '5'], "talker": ["0.0", "1.0"],
+                                         "pitchoftarg": ['1', '2', '3', '4', '5'], "talker": ["1.0", "2.0"],
                                          "stepval": ["0.0", "-1.0", "1.0"]},
                                 REML=False,
                                 old_optimizer=True))
@@ -335,7 +335,7 @@ def run_mixed_effects_analysis(ferrets):
         data=dfuse)
 
     print(modelreg_reduc.fit(factors={"side": ["0", "1"],
-                                      "pitchoftarg": ['1', '2', '3', '4', '5'], "talker": ["0.0", "1.0"],
+                                      "pitchoftarg": ['1', '2', '3', '4', '5'], "talker": ["1.0", "2.0"],
                                       "stepval": ["0.0", "-1.0", "1.0"]},
                              ordered=True, REML=False,
                              old_optimizer=False))
