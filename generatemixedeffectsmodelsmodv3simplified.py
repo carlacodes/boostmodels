@@ -518,15 +518,17 @@ def runxgboostreleasetimes(df_use):
     plt.show()
     return xg_reg, ypred, y_test, results
 
+def extract_release_times_data(ferrets):
+    df = get_df_behav(ferrets=ferrets, includefaandmiss=False, startdate='04-01-2020', finishdate='09-03-2023')
 
-def runlgbreleasetimes(df_use, paramsinput=None):
-    col = 'realRelReleaseTimes'
-    dfx = df_use.loc[:, df_use.columns != col]
-    col = 'ferret'
-    dfx = dfx.loc[:, dfx.columns != col]
+    dfuse = df[["pitchoftarg", "pitchofprecur", "talker", "side", "precur_and_targ_same",
+                "timeToTarget", "DaysSinceStart", "AM",
+                "realRelReleaseTimes", "ferret", "stepval", "pastcorrectresp", "pastcatchtrial", "trialNum"]]
+    return dfuse
+def runlgbreleasetimes(X, y, paramsinput=None):
 
 
-    X_train, X_test, y_train, y_test = train_test_split(dfx.to_numpy(), df_use['realRelReleaseTimes'].to_numpy(), test_size=0.2,
+    X_train, X_test, y_train, y_test = train_test_split(X,y, test_size=0.2,
                                                         random_state=42)
 
     # param = {'max_depth': 2, 'eta': 1, 'objective': 'reg:squarederror'}
@@ -652,7 +654,7 @@ def runlgbreleasetimes_for_a_ferret(data, paramsinput=None, ferret=1, ferret_nam
     # labels[0] = 'past trial was correct'
 
     ax.set_yticklabels(labels)
-    plt.savefig('shap_summary_plot_correct_release_times_' + ferret_name + '.png', dpi=300, bbox_inches='tight')
+    plt.savefig('figs/shap_summary_plot_correct_release_times_' + ferret_name + '.png', dpi=300, bbox_inches='tight')
 
     plt.show()
 
@@ -1644,20 +1646,27 @@ if __name__ == '__main__':
 
     # xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = run_correct_responsepipeline(ferrets)
 
-    modelreg_reduc, modelregcat_reduc, modelregcat, modelreg, predictedrelease, df_use, dfcat_use, predictedcorrectresp, explainedvar, explainvarreleasetime = run_mixed_effects_analysis(
-        ferrets)
+    # modelreg_reduc, modelregcat_reduc, modelregcat, modelreg, predictedrelease, df_use, dfcat_use, predictedcorrectresp, explainedvar, explainvarreleasetime = run_mixed_effects_analysis(
+    #     ferrets)
+
+    df_use = extract_release_times_data(ferrets)
 
     col = 'realRelReleaseTimes'
     dfx = df_use.loc[:, df_use.columns != col]
+
+
     # remove ferret as possible feature
     col2 = 'ferret'
     dfx = dfx.loc[:, dfx.columns != col2]
+
+    # col3 = 'pitchofprecur'
+    # dfx = dfx.loc[:, dfx.columns != col3]
 
     # col3 = 'stepval'
     # dfx = dfx.loc[:, dfx.columns != col3]
 
     study_release_times = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
-    xg_reg, ypred, y_test, results = runlgbreleasetimes(df_use, paramsinput=study_release_times.best_params)
+    xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx.to_numpy(), df_use[col].to_numpy(), paramsinput=study_release_times.best_params)
     count = 0
     for ferret_id in ferrets:
         xg_reg, ypred, y_test, results, mse = runlgbreleasetimes_for_a_ferret(df_use, ferret=count,
