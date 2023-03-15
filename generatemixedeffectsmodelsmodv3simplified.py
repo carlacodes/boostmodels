@@ -524,11 +524,7 @@ def runlgbreleasetimes(df_use, paramsinput=None):
     dfx = df_use.loc[:, df_use.columns != col]
     col = 'ferret'
     dfx = dfx.loc[:, dfx.columns != col]
-    # col = 'stepval'
-    # dfx = dfx.loc[:, dfx.columns != col]
-    # remove ferret as possible feature
-    # col = 'ferret'
-    # dfx = dfx.loc[:, dfx.columns != col]
+
 
     X_train, X_test, y_train, y_test = train_test_split(dfx, df_use['realRelReleaseTimes'], test_size=0.2,
                                                         random_state=42)
@@ -802,9 +798,9 @@ def runlgbcorrectresponse(dfx, dfy, paramsinput=None):
 def objective_releasetimes(trial, X, y):
     param_grid = {
         # "device_type": trial.suggest_categorical("device_type", ['gpu']),
-        "colsample_bytree": trial.suggest_float("colsample_bytree", 0.3, 1),
+        "colsample_bytree": trial.suggest_float("colsample_bytree", 0.1, 1),
         "alpha": trial.suggest_float("alpha", 1, 20),
-        "n_estimators": trial.suggest_int("n_estimators", 50, 10000, step=100),
+        "n_estimators": trial.suggest_int("n_estimators", 5, 10000, step=100),
         "learning_rate": trial.suggest_float("learning_rate", 0.001, 0.5),
         "num_leaves": trial.suggest_int("num_leaves", 20, 3000, step=10),
         "max_depth": trial.suggest_int("max_depth", 3, 20),
@@ -833,7 +829,6 @@ def objective_releasetimes(trial, X, y):
             X_train,
             y_train,
             eval_set=[(X_test, y_test)],
-            eval_metric="l2",
             early_stopping_rounds=100,
             callbacks=[
                 LightGBMPruningCallback(trial, "l2")
