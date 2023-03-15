@@ -531,13 +531,13 @@ def runlgbreleasetimes(df_use, paramsinput=None):
     # dfx = dfx.loc[:, dfx.columns != col]
 
     X_train, X_test, y_train, y_test = train_test_split(dfx, df_use['realRelReleaseTimes'], test_size=0.2,
-                                                        random_state=123)
+                                                        random_state=42)
 
     # param = {'max_depth': 2, 'eta': 1, 'objective': 'reg:squarederror'}
     # param['nthread'] = 4
     # param['eval_metric'] = 'auc'
 
-    xg_reg = lgb.LGBMRegressor(random_state=123, verbose=1)
+    xg_reg = lgb.LGBMRegressor(random_state=42, verbose=1, **paramsinput)
     xg_reg.fit(X_train, y_train, verbose=1)
     ypred = xg_reg.predict(X_test)
     lgb.plot_importance(xg_reg)
@@ -576,6 +576,7 @@ def runlgbreleasetimes(df_use, paramsinput=None):
     # labels[0] = 'past trial was correct'
 
     ax.set_yticklabels(labels)
+    plt.savefig('figs/shapsummaryplot_allanimals.png')
 
     plt.show()
 
@@ -1660,8 +1661,8 @@ if __name__ == '__main__':
     # col3 = 'stepval'
     # dfx = dfx.loc[:, dfx.columns != col3]
 
-    # study_release_times = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
-    xg_reg, ypred, y_test, results = runlgbreleasetimes(df_use)
+    study_release_times = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
+    xg_reg, ypred, y_test, results = runlgbreleasetimes(df_use, study_release_times.best_params)
     count = 0
     for ferret_id in ferrets:
         xg_reg, ypred, y_test, results, mse = runlgbreleasetimes_for_a_ferret(df_use, ferret=count,
