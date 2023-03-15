@@ -526,7 +526,7 @@ def runlgbreleasetimes(df_use, paramsinput=None):
     dfx = dfx.loc[:, dfx.columns != col]
 
 
-    X_train, X_test, y_train, y_test = train_test_split(dfx, df_use['realRelReleaseTimes'], test_size=0.2,
+    X_train, X_test, y_train, y_test = train_test_split(dfx.to_numpy(), df_use['realRelReleaseTimes'].to_numpy(), test_size=0.2,
                                                         random_state=42)
 
     # param = {'max_depth': 2, 'eta': 1, 'objective': 'reg:squarederror'}
@@ -1657,7 +1657,7 @@ if __name__ == '__main__':
     # dfx = dfx.loc[:, dfx.columns != col3]
 
     study_release_times = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
-    xg_reg, ypred, y_test, results = runlgbreleasetimes(df_use, study_release_times.best_params)
+    xg_reg, ypred, y_test, results = runlgbreleasetimes(df_use, paramsinput=study_release_times.best_params)
     count = 0
     for ferret_id in ferrets:
         xg_reg, ypred, y_test, results, mse = runlgbreleasetimes_for_a_ferret(df_use, ferret=count,
