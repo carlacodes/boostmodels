@@ -108,9 +108,6 @@ def get_df_behav(path=None,
         pitchoftarg = np.empty(len(pitchshiftmat))
         pitchofprecur = np.empty(len(pitchshiftmat))
         stepval = np.empty(len(pitchshiftmat))
-        gradinpitch = np.empty(len(pitchshiftmat))
-        gradinpitchprecur = np.empty(len(pitchshiftmat))
-        timetotarglist = np.empty(len(pitchshiftmat))
 
         precur_and_targ_same = np.empty(len(pitchshiftmat))
         talkerlist2 = np.empty(len(pitchshiftmat))
@@ -120,7 +117,6 @@ def get_df_behav(path=None,
         pastcatchtrial = np.empty(shape=(0, 0))
         droplist = np.empty(shape=(0, 0))
         droplistnew = np.empty(shape=(0, 0))
-        print(len(newdata['realRelReleaseTimes'].values))
         correspondcosinelist = np.empty(shape=(0, 0))
 
         for i in range(1, len(newdata['realRelReleaseTimes'].values)):
@@ -207,7 +203,6 @@ def get_df_behav(path=None,
                     pitchofprecur[i] = 1.0
 
                 if pitchoftarg[i] == 1.0:
-                    # print('pitch of targ original')
                     pitchoftarg[i] = 4.0
 
                 if pitchoftarg[i] == 13.0:
@@ -225,7 +220,6 @@ def get_df_behav(path=None,
                      axis=0,
                      inplace=True)
         newdata.drop(droplistnew, axis=0, inplace=True)
-
         droplist = [int(x) for x in droplist]  # drop corrupted metdata trials
 
         pitchoftarg = pitchoftarg.astype(int)
@@ -245,14 +239,11 @@ def get_df_behav(path=None,
         stepval = np.delete(stepval, droplist)
 
         newdata['pitchoftarg'] = pitchoftarg.tolist()
-
         pitchofprecur = np.delete(pitchofprecur, droplist)
         newdata['pitchofprecur'] = pitchofprecur.tolist()
-
         correctresp = np.delete(correctresp, droplist)
         pastcorrectresp = np.delete(pastcorrectresp, droplist)
         pastcatchtrial = np.delete(pastcatchtrial, droplist)
-
         precur_and_targ_same = np.delete(precur_and_targ_same, droplist)
 
         correctresp = correctresp.astype(int)
@@ -270,9 +261,8 @@ def get_df_behav(path=None,
         newdata['precur_and_targ_same'] = precur_and_targ_same.tolist()
         newdata['timeToTarget'] = newdata['timeToTarget'] / 24414.0625
         newdata['AM'] = newdata['AM'].astype(int)
-        # newdata['talker'] = newdata['talker'] - 1
         # make male talker lower values because it is lower in pitch
-        newdata['talker'] = newdata['talker'].replace({2: 0})
+        #newdata['talker'] = newdata['talker'].replace({2: 0})
 
         # only look at v2 pitches from recent experiments
         newdata = newdata[(newdata.pitchoftarg == 1) | (newdata.pitchoftarg == 2) | (newdata.pitchoftarg == 3) | (
@@ -282,6 +272,7 @@ def get_df_behav(path=None,
 
         newdata = newdata[(newdata.correctionTrial == 0)]  # | (allData.response == 7)
         newdata = newdata[(newdata.currAtten == 0)]  # | (allData.response == 7)
+
         if includefaandmiss is True:
             newdata = newdata[
                 (newdata.response == 0) | (newdata.response == 1) | (newdata.response == 7) | (newdata.response == 5)]
@@ -310,7 +301,7 @@ def run_mixed_effects_analysis(ferrets):
         data=dfuse)
 
     print(modelreg.fit(factors={"side": ["0", "1"], "stepval": ["0.0", "1.0", "-1.0"], "AM": ["0", "1"],
-                                "pitchoftarg": ['1', '2', '3', '4', '5'], "talker": ["0.0", "1.0"], }, ordered=True,
+                                "pitchoftarg": ['1', '2', '3', '4', '5'], "talker": ["1.0", "2.0"], }, ordered=True,
                        REML=False,
                        old_optimizer=False))
 
@@ -326,7 +317,7 @@ def run_mixed_effects_analysis(ferrets):
         data=dfcat_use, family='binomial')
 
     print(modelregcat.fit(factors={"side": ["0", "1"], "stepval": ["0.0", "-1.0", "1.0"], "AM": ["0", "1"],
-                                   "pitchoftarg": ['1', '2', '3', '4', '5'], "talker": ["0.0", "1.0"]}, REML=False,
+                                   "pitchoftarg": ['1', '2', '3', '4', '5'], "talker": ["1.0", "2.0"]}, REML=False,
                           old_optimizer=True))
 
     modelregcat_reduc = Lmer(
@@ -1653,7 +1644,7 @@ if __name__ == '__main__':
     #
     # test_df2 = run_reaction_time_fa_pipleine_male(ferrets)
 
-    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(ferrets)
+    # xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(ferrets)
 
     # xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = run_correct_responsepipeline(ferrets)
 
@@ -1670,7 +1661,7 @@ if __name__ == '__main__':
     # dfx = dfx.loc[:, dfx.columns != col3]
 
     # study_release_times = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
-    # xg_reg, ypred, y_test, results = runlgbreleasetimes(df_use)
+    xg_reg, ypred, y_test, results = runlgbreleasetimes(df_use)
     count = 0
     for ferret_id in ferrets:
         xg_reg, ypred, y_test, results, mse = runlgbreleasetimes_for_a_ferret(df_use, ferret=count,
