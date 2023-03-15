@@ -1,13 +1,12 @@
 import sklearn.metrics
 from rpy2.robjects import pandas2ri
 import seaborn as sns
-from instruments.io.BehaviourIO import BehaviourDataSet, WeekBehaviourDataSet
+from instruments.io.BehaviourIO import BehaviourDataSet
 from sklearn.inspection import permutation_importance
-from instruments.behaviouralAnalysis import createWeekBehaviourFigs, reactionTimeAnalysis  # outputbehaviordf
+from instruments.behaviouralAnalysis import reactionTimeAnalysis  # outputbehaviordf
 from sklearn.preprocessing import MinMaxScaler
 from pymer4.models import Lmer
 from pathlib import Path
-import math
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import KFold
 from sklearn.model_selection import cross_val_score
@@ -24,7 +23,7 @@ import matplotlib.pyplot as plt
 import rpy2.robjects.numpy2ri
 import sklearn
 from sklearn.model_selection import train_test_split
-from behaviouralhelpersformodels import *
+from helpers.behaviouralhelpersformodels import *
 
 rpy2.robjects.numpy2ri.activate()
 from rpy2.robjects.packages import importr
