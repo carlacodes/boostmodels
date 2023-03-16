@@ -535,6 +535,10 @@ def runlgbreleasetimes(X, y, paramsinput=None):
     # param['eval_metric'] = 'auc'
 
     xg_reg = lgb.LGBMRegressor(random_state=42, verbose=1, **paramsinput)
+    # xg_reg = lgb.LGBMRegressor( colsample_bytree=0.3, learning_rate=0.1,
+    #                           max_depth=10, alpha=10, n_estimators=10, random_state=42, verbose=1)
+
+
     xg_reg.fit(X_train, y_train, verbose=1)
     ypred = xg_reg.predict(X_test)
     lgb.plot_importance(xg_reg)
@@ -799,23 +803,17 @@ def runlgbcorrectresponse(dfx, dfy, paramsinput=None):
 def objective_releasetimes(trial, X, y):
     param_grid = {
         # "device_type": trial.suggest_categorical("device_type", ['gpu']),
-        "colsample_bytree": trial.suggest_float("colsample_bytree", 0.1, 1),
-        "alpha": trial.suggest_float("alpha", 1, 20),
-        "n_estimators": trial.suggest_int("n_estimators", 5, 10000, step=100),
-        "learning_rate": trial.suggest_float("learning_rate", 0.001, 0.5),
-        "num_leaves": trial.suggest_int("num_leaves", 20, 3000, step=10),
-        "max_depth": trial.suggest_int("max_depth", 3, 20),
-        "min_data_in_leaf": trial.suggest_int("min_data_in_leaf", 200, 10000, step=100),
-        "lambda_l1": trial.suggest_int("lambda_l1", 0, 100, step=2),
-        "lambda_l2": trial.suggest_int("lambda_l2", 0, 100, step=2),
-        "min_gain_to_split": trial.suggest_float("min_gain_to_split", 0, 15),
+    #     colsample_bytree = 0.3, learning_rate = 0.1,
+    # max_depth = 10, alpha = 10, n_estimators = 10, random_state = 42, verbose = 1
+        "colsample_bytree": trial.suggest_float("colsample_bytree", 0.1, 0.6),
+        "alpha": trial.suggest_float("alpha", 5, 20),
+        "n_estimators": trial.suggest_int("n_estimators", 2, 100, step=2),
+        "learning_rate": trial.suggest_float("learning_rate", 0.01, 0.3),
+        "max_depth": trial.suggest_int("max_depth", 5, 50),
         "bagging_fraction": trial.suggest_float(
             "bagging_fraction", 0.1, 0.95, step=0.1
         ),
-        "bagging_freq": trial.suggest_int("bagging_freq", 1, 20, step=1),
-        "feature_fraction": trial.suggest_float(
-            "feature_fraction", 0.2, 0.95, step=0.1
-        ),
+        "bagging_freq": trial.suggest_int("bagging_freq", 0, 30, step=1),
     }
 
     cv = KFold(n_splits=5, shuffle=True, random_state=42)
@@ -1666,8 +1664,8 @@ if __name__ == '__main__':
 
     study_release_times = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
     xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx.to_numpy(), df_use[col].to_numpy(), paramsinput=study_release_times.best_params)
-    count = 0
-    for ferret_id in ferrets:
-        xg_reg, ypred, y_test, results, mse = runlgbreleasetimes_for_a_ferret(df_use, ferret=count,
-                                                                              ferret_name=ferret_id)
-        count += 1
+    # count = 0
+    # for ferret_id in ferrets:
+    #     xg_reg, ypred, y_test, results, mse = runlgbreleasetimes_for_a_ferret(df_use, ferret=count,
+    #                                                                           ferret_name=ferret_id)
+    #     count += 1
