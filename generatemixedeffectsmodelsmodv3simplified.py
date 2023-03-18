@@ -490,7 +490,7 @@ def runxgboostreleasetimes(df_use):
     dfx['precur_and_targ_same'] = dfx['precur_and_targ_same'].astype('category')
 
     X_train, X_test, y_train, y_test = train_test_split(dfx, df_use['realRelReleaseTimes'], test_size=0.2,
-                                                        random_state=123)
+                                                        random_state=42)
     dtrain = xgb.DMatrix(X_train, label=y_train, enable_categorical=True)
     dtest = xgb.DMatrix(X_test, label=y_test, enable_categorical=True)
 
@@ -505,7 +505,7 @@ def runxgboostreleasetimes(df_use):
     xgb.plot_importance(xg_reg)
     plt.show()
 
-    kfold = KFold(n_splits=3, shuffle=True, random_state=123)
+    kfold = KFold(n_splits=3, shuffle=True, random_state=42)
     results = cross_val_score(xg_reg, X_train, y_train, scoring='neg_mean_squared_error', cv=kfold)
 
     mse = mean_squared_error(ypred, y_test)
@@ -618,7 +618,7 @@ def runlgbreleasetimes_for_a_ferret(data, paramsinput=None, ferret=1, ferret_nam
     # param['nthread'] = 4
     # param['eval_metric'] = 'auc'
 
-    xg_reg = lgb.LGBMRegressor(random_state=123, verbose=1)
+    xg_reg = lgb.LGBMRegressor(random_state=123, verbose=1, **paramsinput)
     xg_reg.fit(X_train, y_train, verbose=1)
     ypred = xg_reg.predict(X_test)
     lgb.plot_importance(xg_reg)
@@ -626,13 +626,12 @@ def runlgbreleasetimes_for_a_ferret(data, paramsinput=None, ferret=1, ferret_nam
     plt.show()
 
     kfold = KFold(n_splits=10)
-    results = cross_val_score(xg_reg, X_train, y_train, scoring='neg_mean_squared_error', cv=kfold)
-    mse_train = mean_squared_error(ypred, y_test)
+    mse_train = cross_val_score(xg_reg, X_train, y_train, scoring='neg_mean_squared_error', cv=kfold)
 
-    mse = mean_squared_error(ypred, y_test)
-    print("MSE on test: %.4f" % (mse) + ferret_name)
-    print("negative MSE training: %.2f%%" % (np.mean(results) * 100.0))
-    print(results)
+    mse_test = mean_squared_error(ypred, y_test)
+    print("MSE on test: %.4f" % (mse_test) + ferret_name)
+    print("negative MSE training: %.2f%%" % (np.mean(mse_train) * 100.0))
+    print(mse_train)
     shap_values = shap.TreeExplainer(xg_reg).shap_values(dfx)
     fig, ax = plt.subplots(figsize=(15, 15))
     # title kwargs still does nothing so need this workaround for summary plots
@@ -643,6 +642,13 @@ def runlgbreleasetimes_for_a_ferret(data, paramsinput=None, ferret=1, ferret_nam
 
     labels = [item.get_text() for item in ax.get_yticklabels()]
     print(labels)
+    trainandtestaccuracy ={
+        'ferret': ferret_name,
+        'mse_test': mse_test,
+        'mse_train': mse_train,
+        'mean_mse_train': np.mean(mse_train),
+    }
+    np.save('metrics/modelmse' + ferret_name + '.npy', trainandtestaccuracy)
     # labels[11] = 'distance to sensor'
     # labels[10] = 'target F0'
     # labels[9] = 'trial number'
@@ -1662,10 +1668,20 @@ if __name__ == '__main__':
     # col3 = 'stepval'
     # dfx = dfx.loc[:, dfx.columns != col3]
 
-    study_release_times = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
-    xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx.to_numpy(), df_use[col].to_numpy(), paramsinput=study_release_times.best_params)
-    # count = 0
-    # for ferret_id in ferrets:
-    #     xg_reg, ypred, y_test, results, mse = runlgbreleasetimes_for_a_ferret(df_use, ferret=count,
-    #                                                                           ferret_name=ferret_id)
-    #     count += 1
+    # study_release_times = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
+    best_params = {'colsample_bytree': 0.49619263716341894,
+     'alpha': 8.537376181435246,
+     'n_estimators': 96,
+     'learning_rate': 0.17871472565344848,
+     'max_depth': 5,
+     'bagging_fraction': 0.7000000000000001,
+     'bagging_freq': 6}
+
+    xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx.to_numpy(), df_use[col].to_numpy(), paramsinput=best_params)
+    count = 0
+    for ferret_id in ferrets:
+        study_release_times = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
+        np.save('optuna_results/best_params_release_times_ferret_' + str(count) + '.npy', study_release_times)
+        xg_reg, ypred, y_test, results, mse = runlgbreleasetimes_for_a_ferret(df_use, paramsinput=study_release_times.best_params, ferret=count,
+                                                                              ferret_name=ferret_id)
+        count += 1
