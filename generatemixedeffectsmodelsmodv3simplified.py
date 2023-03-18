@@ -254,7 +254,7 @@ def get_df_behav(path=None,
         newdata['talker'] = talkerlist2.tolist()
         newdata['pastcatchtrial'] = pastcatchtrial.tolist()
         newdata['stepval'] = stepval.tolist()
-        newdata['realRelReleaseTimes'] = np.log(newdata['realRelReleaseTimes'])
+        # newdata['realRelReleaseTimes'] = np.log(newdata['realRelReleaseTimes'])
         newdata['cosinesim'] = correspondcosinelist.tolist()
         precur_and_targ_same = precur_and_targ_same.astype(int)
         newdata['precur_and_targ_same'] = precur_and_targ_same.tolist()
@@ -806,10 +806,10 @@ def objective_releasetimes(trial, X, y):
     #     colsample_bytree = 0.3, learning_rate = 0.1,
     # max_depth = 10, alpha = 10, n_estimators = 10, random_state = 42, verbose = 1
         "colsample_bytree": trial.suggest_float("colsample_bytree", 0.1, 0.6),
-        "alpha": trial.suggest_float("alpha", 5, 20),
+        "alpha": trial.suggest_float("alpha", 5, 15),
         "n_estimators": trial.suggest_int("n_estimators", 2, 100, step=2),
         "learning_rate": trial.suggest_float("learning_rate", 0.01, 0.3),
-        "max_depth": trial.suggest_int("max_depth", 5, 50),
+        "max_depth": trial.suggest_int("max_depth", 5, 20),
         "bagging_fraction": trial.suggest_float(
             "bagging_fraction", 0.1, 0.95, step=0.1
         ),
