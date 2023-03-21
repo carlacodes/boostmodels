@@ -1604,6 +1604,7 @@ def plot_reaction_times(ferrets):
     plt.title('Reaction times for the male talker, \n irrespective of ferret', fontsize=15)
     plt.legend(fontsize=10)
     plt.xlabel('reaction time relative to target presentation (s)', fontsize=13)
+    plt.savefig('D:/behavmodelfigs/reaction_times_by_talker.png', dpi=500)
     plt.show()
 
     df_by_ferret = {}
@@ -1628,6 +1629,7 @@ def plot_reaction_times(ferrets):
         plt.title('Reaction times for ferret ID ' + str(ferret_labels[ferret]), fontsize=15)
         plt.legend(fontsize=10)
         plt.xlabel('reaction time relative to target presentation (s)', fontsize=13)
+        plt.savefig('D:/behavmodelfigs/reaction_times_by_ferret_' + str(ferret_labels[ferret]) + '.png', dpi=500)
         plt.show()
 
     return df_by_ferret
@@ -1651,6 +1653,8 @@ if __name__ == '__main__':
 
     # modelreg_reduc, modelregcat_reduc, modelregcat, modelreg, predictedrelease, df_use, dfcat_use, predictedcorrectresp, explainedvar, explainvarreleasetime = run_mixed_effects_analysis(
     #     ferrets)
+
+    plot_reaction_times(ferrets)
 
     df_use = extract_release_times_data(ferrets)
 
