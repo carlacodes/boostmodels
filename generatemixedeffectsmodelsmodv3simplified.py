@@ -1536,6 +1536,8 @@ def plot_correct_response_byside(ferrets):
     plt.bar(['left', 'right'], [df_left['correct'].mean(), df_right['correct'].mean()])
     plt.title('Proportion of correct responses by side registered by sensors, \n irrespective of talker and ferret')
     plt.ylabel('proportion of correct responses')
+    plt.xlabel('side of the auditory stimulus')
+    plt.ylim(0, 1)
     plt.savefig('D:/behavmodelfigs/proportion_correct_responses_by_side.png', dpi=500)
 
     plt.show()
@@ -1543,7 +1545,7 @@ def plot_correct_response_byside(ferrets):
     df_right_by_ferret = {}
 
     # now plot by ferret ID
-    ferrets = [0, 1, 2, 3]
+    ferrets = [0, 1, 2, 3, 4]
     for ferret in ferrets:
         df_left_test = df_use.loc[df_use['side'] == 0]
         df_right_test = df_use.loc[df_use['side'] == 1]
@@ -1551,18 +1553,20 @@ def plot_correct_response_byside(ferrets):
         df_right_by_ferret[ferret] = df_right_test.loc[df_right_test['ferret'] == ferret]
 
     ax, fig = plt.subplots(figsize=(10, 12))
-    plt.bar(['left - zola', 'right - zola', 'left - cru', 'right - cru', 'left - tina', 'right-tina', 'left - mac',
-             'right-mac'], [df_left_by_ferret[0]['correct'].mean(), df_right_by_ferret[0]['correct'].mean(),
+    plt.bar(['left - F1702', 'right - F1702', 'left - 1815', 'right - F1815', 'left - F1803', 'right-F1803', 'left - F2002',
+             'right- F2002', 'left - F2105', 'right - F2105'], [df_left_by_ferret[0]['correct'].mean(), df_right_by_ferret[0]['correct'].mean(),
                             df_left_by_ferret[1]['correct'].mean(), df_right_by_ferret[1]['correct'].mean(),
                             df_left_by_ferret[2]['correct'].mean(), df_right_by_ferret[2]['correct'].mean(),
-                            df_left_by_ferret[3]['correct'].mean(), df_right_by_ferret[3]['correct'].mean()])
+                            df_left_by_ferret[3]['correct'].mean(), df_right_by_ferret[3]['correct'].mean(),
+                            df_left_by_ferret[4]['correct'].mean(), df_right_by_ferret[4]['correct'].mean()])
+
     plt.title('Proportion of correct responses by side registered by sensors, \n  irrespective of talker, by ferret ID',
               fontsize=15)
     plt.xticks(rotation=45, fontsize=12)  # rotate the x axis labels
     plt.ylim(0, 1)
 
     plt.ylabel('proportion of correct responses', fontsize=13)
-    plt.savefig('D:/behavmodelfigs/proportion_correct_responses_by_side_by_ferret.png', dpi=500)
+    plt.savefig('D:/behavmodelfigs/proportion_correct_responses_by_side_by_ferret.png', dpi=1000)
     plt.show()
     return df_left, df_right
 
@@ -1616,13 +1620,13 @@ def plot_reaction_times_intra(ferrets):
     df_by_ferret_m_rove = {}
 
     # now plot by ferret ID
-    ferrets = [0, 1, 2, 3]
+    ferrets = [0, 1, 2, 3, 4]
     for ferret in ferrets:
         df_by_ferret_f_control[ferret] = df_female_control.loc[df_female_control['ferret'] == ferret]
         df_by_ferret_f_rove[ferret] = df_female_rove.loc[df_female_rove['ferret'] == ferret]
         df_by_ferret_m_control[ferret] = df_male_rove.loc[df_male_rove['ferret'] == ferret]
         df_by_ferret_m_rove[ferret] = df_male_control.loc[df_male_control['ferret'] == ferret]
-    ferret_labels = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
+    ferret_labels = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
     for ferret in ferrets:
         sns.distplot(df_by_ferret_f_control[ferret]['realRelReleaseTimes'], color='blue', label='control F0, female')
         sns.distplot(df_by_ferret_f_rove[ferret]['realRelReleaseTimes'], color='red', label='intra-trial roved F0, female')
@@ -1631,7 +1635,7 @@ def plot_reaction_times_intra(ferrets):
         plt.title('Reaction times for ferret ID ' + str(ferret_labels[ferret]), fontsize=15)
         plt.legend(fontsize=10)
         plt.xlabel('reaction time relative to target presentation (s)', fontsize=13)
-        plt.savefig('D:/behavmodelfigs/reaction_times_by_ferret_' + str(ferret_labels[ferret]) + '.png', dpi=500)
+        plt.savefig('D:/behavmodelfigs/reaction_times_by_ferret_' + str(ferret_labels[ferret]) + '.png', dpi=1000)
         plt.show()
 
     return df_by_ferret
@@ -1711,8 +1715,8 @@ def plot_reaction_times_interandintra(ferrets):
         sns.distplot(df_by_ferret_f_rove[ferret]['realRelReleaseTimes'], color='red', label='inter-roved F0, female')
         sns.distplot(df_by_ferret_m_control[ferret]['realRelReleaseTimes'], color='green', label='control F0, male')
         sns.distplot(df_by_ferret_m_rove[ferret]['realRelReleaseTimes'], color='orange', label='inter-roved F0, male')
-        sns.displot(df_by_ferret_f_rove_intra[ferret]['realRelReleaseTimes'], color = 'darkmagenta', label = 'intra-roved F0, female')
-        sns.displot(df_by_ferret_m_rove_intra[ferret]['realRelReleaseTimes'], color = 'orangered', label = 'intra-roved F0, male')
+        sns.distplot(df_by_ferret_f_rove_intra[ferret]['realRelReleaseTimes'], color = 'darkmagenta', label = 'intra-roved F0, female')
+        sns.distplot(df_by_ferret_m_rove_intra[ferret]['realRelReleaseTimes'], color = 'orangered', label = 'intra-roved F0, male')
 
 
         plt.title('Reaction times for ferret ID ' + str(ferret_labels[ferret]), fontsize=15)
@@ -1727,7 +1731,7 @@ if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
     # df_by_ferretdict = plot_reaction_times(ferrets)
     #
-    # df_left, df_right = plot_correct_response_byside(ferrets)
+    df_left, df_right = plot_correct_response_byside(ferrets)
     #
     # test_df = run_reaction_time_fa_pipleine(ferrets)
     #
