@@ -315,6 +315,7 @@ class behaviouralhelperscg():
             stepval = np.empty(len(pitchshiftmat))
             distractor_or_fa =[]
             intra_trial_roving = []
+            inter_trial_roving = []
             control_trial = []
 
             talkerlist2 = np.empty(len(pitchshiftmat))
@@ -373,6 +374,13 @@ class behaviouralhelperscg():
                     intra_trial_roving.append(0)
                 else:
                     intra_trial_roving.append(1)
+
+                chosentalker = talkerlist.values[i]
+
+                if chosentalker == 3 or chosentalker == 5 or chosentalker == 8 or chosentalker == 13:
+                    inter_trial_roving.append(1)
+                else:
+                    inter_trial_roving.append(0)
 
                 chosendisttrial = precursorlist.values[i]
                 chosentalker = talkerlist.values[i]
@@ -500,6 +508,7 @@ class behaviouralhelperscg():
             newdata['falsealarm'] = falsealarm.tolist()
             newdata['control_trial'] = control_trial
             newdata['intra_trial_roving'] = intra_trial_roving
+            newdata['inter_trial_roving'] = inter_trial_roving
             newdata['correctresp'] = correctresp.tolist()
             newdata['distractor_or_fa'] = distractor_or_fa
             newdata['pastcorrectresp'] = pastcorrectresp.tolist()
