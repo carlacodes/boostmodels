@@ -1575,13 +1575,13 @@ def plot_reaction_times_intra(ferrets):
 
     df_left_by_ferret = {}
     df_female = df_use.loc[df_use['talker'] == 1]
-    df_female_control = df_female.loc[df_female['intra_trial_roving'] == 0]
+    df_female_control = df_female.loc[df_female['control_trial'] == 1]
 
     df_female = df_use.loc[df_use['talker'] == 1]
     df_female_rove = df_female.loc[df_female['intra_trial_roving'] == 1]
 
     df_male = df_use.loc[df_use['talker'] == 2]
-    df_male_control = df_male.loc[df_male['intra_trial_roving'] == 0]
+    df_male_control = df_male.loc[df_male['control_trial'] == 1]
     df_male_rove = df_male.loc[df_male['intra_trial_roving'] == 1]
 
     # now plot generally by all ferrets
@@ -1645,13 +1645,13 @@ def plot_reaction_times_inter(ferrets):
 
     df_left_by_ferret = {}
     df_female = df_use.loc[df_use['talker'] == 1]
-    df_female_control = df_female.loc[df_female['intra_trial_roving'] == 0]
+    df_female_control = df_female.loc[df_female['control_trial'] == 1]
 
     df_female = df_use.loc[df_use['talker'] == 1]
     df_female_rove = df_female.loc[df_female['inter_trial_roving'] == 1]
 
     df_male = df_use.loc[df_use['talker'] == 2]
-    df_male_control = df_male.loc[df_male['intra_trial_roving'] == 0]
+    df_male_control = df_male.loc[df_male['control_trial'] == 1]
     df_male_rove = df_male.loc[df_male['inter_trial_roving'] == 1]
 
     # now plot generally by all ferrets
@@ -1723,7 +1723,8 @@ if __name__ == '__main__':
     # modelreg_reduc, modelregcat_reduc, modelregcat, modelreg, predictedrelease, df_use, dfcat_use, predictedcorrectresp, explainedvar, explainvarreleasetime = run_mixed_effects_analysis(
     #     ferrets)
 
-    plot_reaction_times(ferrets)
+    plot_reaction_times_intra(ferrets)
+    plot_reaction_times_inter(ferrets)
 
     df_use = extract_release_times_data(ferrets)
 

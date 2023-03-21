@@ -364,6 +364,7 @@ class behaviouralhelperscg():
                 is_all_zero = np.all((chosentrial == 0))
 
 
+
                 if is_all_zero:
                     control_trial.append(0)
                 else:
