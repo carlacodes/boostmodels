@@ -1637,7 +1637,7 @@ def plot_reaction_times_intra(ferrets):
     return df_by_ferret
 
     #
-def plot_reaction_times_inter(ferrets):
+def plot_reaction_times_interandintra(ferrets):
     # plot the reaction times by animal
     resultingdf = behaviouralhelperscg.get_reactiontime_data(ferrets=ferrets, startdate='04-01-2020',
                                                              finishdate='01-10-2022')
@@ -1649,10 +1649,13 @@ def plot_reaction_times_inter(ferrets):
 
     df_female = df_use.loc[df_use['talker'] == 1]
     df_female_rove = df_female.loc[df_female['inter_trial_roving'] == 1]
+    df_female_rove_intra = df_female.loc[df_female['intra_trial_roving'] == 1]
+
 
     df_male = df_use.loc[df_use['talker'] == 2]
     df_male_control = df_male.loc[df_male['control_trial'] == 1]
     df_male_rove = df_male.loc[df_male['inter_trial_roving'] == 1]
+    df_male_rove_intra = df_male.loc[df_male['intra_trial_roving'] == 1]
 
     # now plot generally by all ferrets
     ax, fig = plt.subplots(figsize=(10, 12))
@@ -1664,19 +1667,23 @@ def plot_reaction_times_inter(ferrets):
     # now plot by talker, showing reaction times
     sns.distplot(df_female_control['realRelReleaseTimes'], color='blue', label='control F0')
     sns.distplot(df_female_rove['realRelReleaseTimes'], color='red', label='inter-roved F0')
+    sns.distplot(df_female_rove_intra['realRelReleaseTimes'], color='darkmagenta', label='intra-roved F0')
+
     plt.title('Reaction times for the female talker, \n irrespective of ferret', fontsize=15)
     plt.legend(fontsize=10)
     plt.xlabel('reaction time relative to target presentation (s)', fontsize=13)
-    plt.savefig('D:/behavmodelfigs/reaction_times_by_talker_female_inter.png', dpi=500)
+    plt.savefig('D:/behavmodelfigs/reaction_times_by_talker_female_interandintra.png', dpi=500)
 
     plt.show()
 
     sns.distplot(df_male_control['realRelReleaseTimes'], color='green', label='control F0')
     sns.distplot(df_male_rove['realRelReleaseTimes'], color='orange', label='inter-roved F0')
+    sns.distplot(df_male_rove_intra['realRelReleaseTimes'], color='orangered', label='intra-roved F0')
+
     plt.title('Reaction times for the male talker, \n irrespective of ferret', fontsize=15)
     plt.legend(fontsize=10)
     plt.xlabel('reaction time relative to target presentation (s)', fontsize=13)
-    plt.savefig('D:/behavmodelfigs/reaction_times_by_talker_male_inter.png', dpi=500)
+    plt.savefig('D:/behavmodelfigs/reaction_times_by_talker_male_interandintra.png', dpi=500)
     plt.show()
 
     df_by_ferret = {}
@@ -1684,20 +1691,30 @@ def plot_reaction_times_inter(ferrets):
     df_by_ferret_f_rove = {}
     df_by_ferret_m_control = {}
     df_by_ferret_m_rove = {}
-
+    df_by_ferret_f_rove_intra={}
+    df_by_ferret_m_rove_intra = {}
     # now plot by ferret ID
     ferrets = [0, 1, 2, 3]
     for ferret in ferrets:
         df_by_ferret_f_control[ferret] = df_female_control.loc[df_female_control['ferret'] == ferret]
         df_by_ferret_f_rove[ferret] = df_female_rove.loc[df_female_rove['ferret'] == ferret]
+        df_by_ferret_f_rove_intra[ferret] = df_female_rove_intra.loc[df_female_rove_intra['ferret'] == ferret]
+
+
         df_by_ferret_m_control[ferret] = df_male_rove.loc[df_male_rove['ferret'] == ferret]
         df_by_ferret_m_rove[ferret] = df_male_control.loc[df_male_control['ferret'] == ferret]
+        df_by_ferret_m_rove_intra[ferret] = df_male_rove_intra.loc[df_male_rove_intra['ferret'] == ferret]
+
     ferret_labels = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
     for ferret in ferrets:
         sns.distplot(df_by_ferret_f_control[ferret]['realRelReleaseTimes'], color='blue', label='control F0, female')
-        sns.distplot(df_by_ferret_f_rove[ferret]['realRelReleaseTimes'], color='red', label='inter-trial roved F0, female')
+        sns.distplot(df_by_ferret_f_rove[ferret]['realRelReleaseTimes'], color='red', label='inter-roved F0, female')
         sns.distplot(df_by_ferret_m_control[ferret]['realRelReleaseTimes'], color='green', label='control F0, male')
-        sns.distplot(df_by_ferret_m_rove[ferret]['realRelReleaseTimes'], color='orange', label='inter-trial roved F0, male')
+        sns.distplot(df_by_ferret_m_rove[ferret]['realRelReleaseTimes'], color='orange', label='inter-roved F0, male')
+        sns.displot(df_by_ferret_f_rove_intra[ferret]['realRelReleaseTimes'], color = 'darkmagenta', label = 'intra-roved F0, female')
+        sns.displot(df_by_ferret_m_rove_intra[ferret]['realRelReleaseTimes'], color = 'orangered', label = 'intra-roved F0, male')
+
+
         plt.title('Reaction times for ferret ID ' + str(ferret_labels[ferret]), fontsize=15)
         plt.legend(fontsize=10)
         plt.xlabel('reaction time relative to target presentation (s)', fontsize=13)
@@ -1723,8 +1740,8 @@ if __name__ == '__main__':
     # modelreg_reduc, modelregcat_reduc, modelregcat, modelreg, predictedrelease, df_use, dfcat_use, predictedcorrectresp, explainedvar, explainvarreleasetime = run_mixed_effects_analysis(
     #     ferrets)
 
-    plot_reaction_times_intra(ferrets)
-    plot_reaction_times_inter(ferrets)
+    # plot_reaction_times_intra(ferrets)
+    plot_reaction_times_interandintra(ferrets)
 
     df_use = extract_release_times_data(ferrets)
 
