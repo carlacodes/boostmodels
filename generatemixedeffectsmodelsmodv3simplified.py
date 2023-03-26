@@ -1,11 +1,11 @@
 import sklearn.metrics
-from rpy2.robjects import pandas2ri
+# from rpy2.robjects import pandas2ri
 import seaborn as sns
 from instruments.io.BehaviourIO import BehaviourDataSet
 from sklearn.inspection import permutation_importance
 from instruments.behaviouralAnalysis import reactionTimeAnalysis  # outputbehaviordf
 from sklearn.preprocessing import MinMaxScaler
-from pymer4.models import Lmer
+# from pymer4.models import Lmer
 from pathlib import Path
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import KFold
@@ -15,24 +15,24 @@ import lightgbm as lgb
 import optuna
 from optuna.integration import LightGBMPruningCallback
 from sklearn.model_selection import StratifiedKFold
-
 scaler = MinMaxScaler()
 import os
 import xgboost as xgb
 import matplotlib.pyplot as plt
-import rpy2.robjects.numpy2ri
+# import rpy2.robjects.numpy2ri
 import sklearn
 from sklearn.model_selection import train_test_split
 from helpers.behaviouralhelpersformodels import *
+os.environ['R_HOME'] = 'C:/PROGRA~1/R/R-41~1.3/bin/x64/R'
 
-rpy2.robjects.numpy2ri.activate()
-from rpy2.robjects.packages import importr
+# rpy2.robjects.numpy2ri.activate()
+# from rpy2.robjects.packages import importr
 
-# import R's "base" package
-base = importr('base')
-easystats = importr('easystats')
-performance = importr('performance')
-rstats = importr('stats')
+# # import R's "base" package
+# base = importr('base')
+# easystats = importr('easystats')
+# performance = importr('performance')
+# rstats = importr('stats')
 
 
 def cli_reaction_time(path=None,
@@ -1728,9 +1728,11 @@ def plot_reaction_times_interandintra(ferrets):
     return df_by_ferret
 
 if __name__ == '__main__':
-    ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
+    ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni'] #'F2105_Clove'
     # df_by_ferretdict = plot_reaction_times(ferrets)
     #
+    plot_reaction_times_interandintra(ferrets)
+
     df_left, df_right = plot_correct_response_byside(ferrets)
     #
     # test_df = run_reaction_time_fa_pipleine(ferrets)
@@ -1745,7 +1747,6 @@ if __name__ == '__main__':
     #     ferrets)
 
     # plot_reaction_times_intra(ferrets)
-    plot_reaction_times_interandintra(ferrets)
 
     df_use = extract_release_times_data(ferrets)
 
