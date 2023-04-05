@@ -378,10 +378,10 @@ class behaviouralhelperscg():
 
                 chosentalker = talkerlist.values[i]
 
-                if chosentalker == 3 or chosentalker == 5 or chosentalker == 8 or chosentalker == 13:
-                    inter_trial_roving.append(1)
-                else:
+                if chosentalker == 1 or chosentalker == 2:
                     inter_trial_roving.append(0)
+                else:
+                    inter_trial_roving.append(1)
 
                 chosendisttrial = precursorlist.values[i]
                 chosentalker = talkerlist.values[i]
