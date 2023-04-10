@@ -588,6 +588,8 @@ def runlgbreleasetimes(X, y, paramsinput=None):
     fig, ax = plt.subplots(figsize=(15, 15))
     shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "precur_and_targ_same"])
     fig.tight_layout()
+    plt.savefig('figs/talkerprecurandtargsame_dependencyplot.png')
+
 
     plt.subplots_adjust(left=-10, right=0.5)
 
@@ -598,6 +600,8 @@ def runlgbreleasetimes(X, y, paramsinput=None):
     # logthe release times
     shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"],
                        title='Correct Responses - Reaction Time Model SHAP response \n vs. trial number')
+    plt.savefig('figs/reactiontimeversustrialnumber_dependencyplot.png')
+
     plt.show()
 
     return xg_reg, ypred, y_test, results
@@ -1730,16 +1734,16 @@ if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni'] #'F2105_Clove'
     # df_by_ferretdict = plot_reaction_times(ferrets)
     #
-    plot_reaction_times_interandintra(ferrets)
-
-    df_left, df_right = plot_correct_response_byside(ferrets)
+    # plot_reaction_times_interandintra(ferrets)
     #
-    # test_df = run_reaction_time_fa_pipleine(ferrets)
+    # df_left, df_right = plot_correct_response_byside(ferrets)
+    # #
+    # # test_df = run_reaction_time_fa_pipleine(ferrets)
+    # #
+    # # test_df2 = run_reaction_time_fa_pipleine_male(ferrets)
     #
-    # test_df2 = run_reaction_time_fa_pipleine_male(ferrets)
-
-    # xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(ferrets)
-
+    # # xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(ferrets)
+    #
     # xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = run_correct_responsepipeline(ferrets)
 
     # modelreg_reduc, modelregcat_reduc, modelregcat, modelreg, predictedrelease, df_use, dfcat_use, predictedcorrectresp, explainedvar, explainvarreleasetime = run_mixed_effects_analysis(
