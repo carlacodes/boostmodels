@@ -577,7 +577,7 @@ def runlgbreleasetimes(X, y, paramsinput=None):
     # labels[0] = 'past trial was correct'
 
     ax.set_yticklabels(labels)
-    plt.savefig('figs/shapsummaryplot_allanimals.png')
+    plt.savefig('figs/shapsummaryplot_allanimals2.png')
 
     plt.show()
 
@@ -586,21 +586,30 @@ def runlgbreleasetimes(X, y, paramsinput=None):
     explainer = shap.Explainer(xg_reg, dfx)
     shap_values2 = explainer(dfx)
     fig, ax = plt.subplots(figsize=(15, 15))
-    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "precur_and_targ_same"])
+    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "precur_and_targ_same"], show = False)
     fig.tight_layout()
-    plt.savefig('figs/talkerprecurandtargsame_dependencyplot.png')
+    plt.savefig('figs/talkerprecurandtargsame_dependencyplot2.png')
 
 
     plt.subplots_adjust(left=-10, right=0.5)
 
     plt.show()
-    shap.plots.scatter(shap_values2[:, "pitchoftarg"], color=shap_values2[:, "talker"])
+    shap.plots.scatter(shap_values2[:, "pitchoftarg"], color=shap_values2[:, "talker"], show = False)
     plt.title('Reaction Time Model')
     plt.show()
     # logthe release times
     shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"],
-                       title='Correct Responses - Reaction Time Model SHAP response \n vs. trial number')
+                       title='Correct Responses - Reaction Time Model SHAP response \n vs. trial number', show = False)
+    fig, ax = plt.gcf(), plt.gca()
+
     plt.savefig('figs/reactiontimeversustrialnumber_dependencyplot.png')
+
+    plt.show()
+
+    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"],
+                       title='Correct Responses - Reaction Time Model SHAP response \n vs. trial number', show=False)
+    fig, ax = plt.gcf(), plt.gca()
+    plt.savefig('figs/reactiontimeversustrialnumber_dependencyplot2.png')
 
     plt.show()
 
