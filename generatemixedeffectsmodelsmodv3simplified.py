@@ -25,14 +25,6 @@ from sklearn.model_selection import train_test_split
 from helpers.behaviouralhelpersformodels import *
 os.environ['R_HOME'] = 'C:/PROGRA~1/R/R-41~1.3/bin/x64/R'
 
-# rpy2.robjects.numpy2ri.activate()
-# from rpy2.robjects.packages import importr
-
-# # import R's "base" package
-# base = importr('base')
-# easystats = importr('easystats')
-# performance = importr('performance')
-# rstats = importr('stats')
 
 
 def cli_reaction_time(path=None,
@@ -1743,7 +1735,7 @@ if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni'] #'F2105_Clove'
     # df_by_ferretdict = plot_reaction_times(ferrets)
     #
-    # plot_reaction_times_interandintra(ferrets)
+    plot_reaction_times_interandintra(ferrets)
     #
     # df_left, df_right = plot_correct_response_byside(ferrets)
     # #
