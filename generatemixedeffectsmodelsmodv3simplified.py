@@ -1655,12 +1655,12 @@ def plot_reaction_times_interandintra(ferrets):
     df_female = df_use.loc[df_use['talker'] == 1]
     df_female_control = df_female.loc[df_female['control_trial'] == 1]
 
-    df_female = df_use.loc[df_use['talker'] == 1]
+    df_female = df_use.loc[(df_use['talker'] == 1) | (df_use['talker'] == 3) | (df_use['talker'] == 5)]
     df_female_rove = df_female.loc[df_female['inter_trial_roving'] == 1]
     df_female_rove_intra = df_female.loc[df_female['intra_trial_roving'] == 1]
 
 
-    df_male = df_use.loc[df_use['talker'] == 2]
+    df_male = df_use.loc[(df_use['talker'] == 2) | (df_use['talker'] == 8) | (df_use['talker'] == 13)]
     df_male_control = df_male.loc[df_male['control_trial'] == 1]
     df_male_rove = df_male.loc[df_male['inter_trial_roving'] == 1]
     df_male_rove_intra = df_male.loc[df_male['intra_trial_roving'] == 1]
