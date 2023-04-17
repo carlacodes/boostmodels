@@ -1684,9 +1684,9 @@ def plot_reaction_times_interandintra(ferrets):
 
     plt.show()
 
-    #sns.distplot(df_male_control['realRelReleaseTimes'], color='green', label='control F0')
+    sns.distplot(df_male_control['realRelReleaseTimes'], color='green', label='control F0')
     sns.distplot(df_male_rove['realRelReleaseTimes'], color='orange', label='inter-roved F0')
-    #sns.distplot(df_male_rove_intra['realRelReleaseTimes'], color='red', label='intra-roved F0')
+    sns.distplot(df_male_rove_intra['realRelReleaseTimes'], color='red', label='intra-roved F0')
 
     plt.title('Reaction times for the male talker, \n irrespective of ferret', fontsize=15)
     plt.legend(fontsize=10)
