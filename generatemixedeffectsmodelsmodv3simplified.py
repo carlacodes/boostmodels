@@ -1270,8 +1270,26 @@ def runlgbfaornot(dataframe):
     shap_values1 = shap.TreeExplainer(xg_reg).shap_values(dfx)
     fig, ax = plt.subplots(figsize=(15, 15))
     shap.summary_plot(shap_values1, dfx, show=False)
-    plt.title('Ranked list of features over their impact in predicting a false alarm')
+    fig, ax = plt.gcf(), plt.gca()
+    plt.title('Ranked list of features over their \n impact in predicting a false alarm', fontsize = 18)
+    labels = [item.get_text() for item in ax.get_yticklabels()]
+    print(labels)
+    labels[11] = 'time to target presentation'
+    labels[10] = 'pitch of precursor'
+    labels[9] = 'trial number'
+    labels[8] = 'past trial was catch'
+    labels[7] = 'side of audio presentation'
+    labels[6] = 'talker'
+    labels[5] = 'past trial was correct'
+    labels[4] = 'AM'
+    labels[3] = 'intra-trial roving'
+    labels[2] = 'Day since start of experiment week'
+    labels[1] = 'cosine similarity'
+    labels[0] = 'temporal similarity'
+    ax.set_yticklabels(labels)
     fig.tight_layout()
+
+
     plt.savefig('D:/behavmodelfigs/ranked_features.png', dpi=500)
 
     plt.show()
