@@ -1380,7 +1380,7 @@ def runfalsealarmpipeline(ferrets):
 
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbfaornotwithoptuna(
         resultingfa_df, study.best_params)
-    # np.save('D:/behavmodelfigs/falsealarmoptunaparams2.npy', study.best_params)
+    np.save('optuna_results/falsealarm_optunaparams.npy', study.best_params)
 
     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
@@ -1734,8 +1734,8 @@ def plot_reaction_times_interandintra(ferrets):
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni'] #'F2105_Clove'
     # df_by_ferretdict = plot_reaction_times(ferrets)
-    #
-    plot_reaction_times_interandintra(ferrets)
+    # #
+    # plot_reaction_times_interandintra(ferrets)
     #
     # df_left, df_right = plot_correct_response_byside(ferrets)
     # #
@@ -1743,7 +1743,7 @@ if __name__ == '__main__':
     # #
     # # test_df2 = run_reaction_time_fa_pipleine_male(ferrets)
     #
-    # # xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(ferrets)
+    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(ferrets)
     #
     # xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = run_correct_responsepipeline(ferrets)
 
