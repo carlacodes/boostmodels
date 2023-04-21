@@ -1128,7 +1128,7 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput):
     shap.summary_plot(shap_values1, X_train, show=False)
     plt.title('Ranked list of features over their \n impact in predicting a false alarm', fontsize=18)
     fig.tight_layout()
-    plt.savefig('D:/behavmodelfigs/ranked_features_falsealarmmodel.png', dpi=500)
+    plt.savefig('D:/behavmodelfigs/ranked_features_falsealarmmodel.png', dpi=1000)
     plt.show()
 
     shap.dependence_plot("pitchofprecur", shap_values1[0], X_train)  #
