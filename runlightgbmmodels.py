@@ -11,6 +11,7 @@ from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import KFold
 from sklearn.model_selection import cross_val_score
 import shap
+import matplotlib
 import lightgbm as lgb
 import optuna
 from optuna.integration import LightGBMPruningCallback
@@ -1122,36 +1123,41 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput):
     print("Accuracy: %.2f%%" % (np.mean(results) * 100.0))
     print(results)
     print('Balanced Accuracy: %.2f%%' % (np.mean(bal_accuracy) * 100.0))
-    plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, bal_accuracy)
+    plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test, bal_accuracy, dfx)
 
-    return xg_reg, ypred, y_test, results, X_train, y_train, X_test, bal_accuracy
+    return xg_reg, ypred, y_test, results, X_train, y_train, X_test, bal_accuracy, dfx
 
-def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test, bal_accuracy):
+def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test, bal_accuracy, dfx):
     shap_values1 = shap.TreeExplainer(xg_reg).shap_values(X_train)
     plt.subplots(figsize=(25, 25))
-    shap.summary_plot(shap_values1, dfx, show=False)
+
+    custom_colors = ['slategray', 'lightcoral']  # Add more colors as needed
+    cmap = matplotlib.colors.ListedColormap(custom_colors)
+    shap.summary_plot(shap_values1, dfx, show = False, color = cmap)
+
     fig, ax = plt.gcf(), plt.gca()
     plt.title('Ranked list of features over their \n impact in predicting a false alarm', fontsize = 18)
+    # Get the plot's Patch objects
     labels = [item.get_text() for item in ax.get_yticklabels()]
     print(labels)
-    # labels[11] = 'time to target presentation'
-    # labels[10] = 'pitch of precursor'
-    # labels[9] = 'trial number'
-    # labels[8] = 'past trial was catch'
-    # labels[7] = 'side of audio presentation'
-    # labels[6] = 'talker'
-    # labels[5] = 'past trial was correct'
-    # labels[4] = 'AM'
-    # labels[3] = 'intra-trial roving'
-    # labels[2] = 'day since start of experiment week'
-    # labels[1] = 'cosine similarity'
-    # labels[0] = 'temporal similarity'
+    labels[11] = 'time to target presentation'
+    labels[10] = 'pitch of precursor'
+    labels[9] = 'trial number'
+    labels[8] = 'side of audio presentation'
+    labels[7] = 'talker'
+    labels[6] = 'past trial was catch'
+    labels[5] = 'past trial was correct'
+    labels[4] = 'intra_trial roving'
+    labels[3] = 'AM session'
+    labels[2] = 'cosine similarity'
+    labels[1] = 'Day since start of week'
+    labels[0] = 'temporal similarity'
     ax.set_yticklabels(labels)
     fig.tight_layout()
     plt.savefig('D:/behavmodelfigs/fa_or_not_model/ranked_features.png', dpi=1000, bbox_inches = "tight")
     plt.show()
 
-    shap.dependence_plot("pitchofprecur", shap_values1[0], X_train)  #
+    shap.dependence_plot("pitchofprecur", shap_values1[0], X_train, cmap = custom_colors)  #
     plt.show()
     result = permutation_importance(xg_reg, X_test, y_test, n_repeats=10,
                                     random_state=123, n_jobs=2)
@@ -1166,8 +1172,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     explainer = shap.Explainer(xg_reg, dfx)
     shap_values2 = explainer(X_train)
     fig, ax = plt.subplots(figsize=(15, 15))
-    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "intra_trial_roving"])
-    fig.tight_layout()
+    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "intra_trial_roving"], cmap = custom_colors)
     plt.tight_layout()
     plt.subplots_adjust(left=-10, right=0.5)
 
@@ -1232,9 +1237,10 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.ylabel('SHAP value', fontsize=10)
     plt.savefig('D:/behavmodelfigs/cosinesimtargtimes.png', dpi=500)
     plt.show()
-    np.save('D:/behavmodelfigs/falsealarmoptunaparams_improveddf3_strat5kfold.npy', paramsinput)
+
     fig, ax = plt.subplots(figsize=(15, 15))
     shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "talker"], show=False)
+
     plt.title('False alarm model - cosine similarity  \n as a function of SHAP values, coloured by talker')
     plt.ylabel('SHAP value corresponding to cosine sim.', fontsize=10)
     fig.tight_layout()
@@ -1783,7 +1789,7 @@ if __name__ == '__main__':
     # #
     # # test_df2 = run_reaction_time_fa_pipleine_male(ferrets)
     #
-    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(ferrets)
+    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(ferrets, optimization= False)
     #
     # xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = run_correct_responsepipeline(ferrets)
 
