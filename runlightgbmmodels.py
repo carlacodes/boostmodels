@@ -22,8 +22,6 @@ from sklearn.model_selection import train_test_split
 from helpers.behaviouralhelpersformodels import *
 # os.environ['R_HOME'] = 'C:/PROGRA~1/R/R-41~1.3/bin/x64/R'
 
-
-
 def cli_reaction_time(path=None,
                       output=None,
                       ferrets=None,
@@ -871,9 +869,6 @@ if __name__ == '__main__':
     #
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(ferrets, optimization= False)
     #
-    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = run_correct_responsepipeline(ferrets)
-
-
 
     # plot_reaction_times_intra(ferrets)
 
