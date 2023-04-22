@@ -134,94 +134,6 @@ def runxgboostreleasetimes(df_use):
 
 
 
-
-def runlgbcorrectresponse(dfx, dfy, paramsinput=None):
-    # params input from optuna study run on 06/03/2023
-    paramsinput = {'colsample_bytree': 0.4253436090928764, 'alpha': 18.500902749816458, 'is_unbalanced': True,
-                   'n_estimators': 8700, 'learning_rate': 0.45629236152754304, 'num_leaves': 670, 'max_depth': 3,
-                   'min_data_in_leaf': 200, 'lambda_l1': 4, 'lambda_l2': 64, 'min_gain_to_split': 0.016768866636887758,
-                   'bagging_fraction': 0.9, 'bagging_freq': 3, 'feature_fraction': 0.2}
-
-    X_train, X_test, y_train, y_test = train_test_split(dfx, dfy, test_size=0.2, random_state=123)
-    print(X_train.shape)
-    print(X_test.shape)
-
-    dtrain = lgb.Dataset(X_train, label=y_train)
-    dtest = lgb.Dataset(X_test, label=y_test)
-    params2 = {"n_estimators": 9300,
-               "scale_pos_weight": 0.3,
-               "colsample_bytree": 0.8163174226131737,
-               "alpha": 4.971464509571637,
-               "learning_rate": 0.2744671988597753,
-               "num_leaves": 530,
-               "max_depth": 15,
-               "min_data_in_leaf": 400,
-               "lambda_l1": 2,
-               "lambda_l2": 44,
-               "min_gain_to_split": 0.008680941888662716,
-               "bagging_fraction": 0.9,
-               "bagging_freq": 1,
-               "feature_fraction": 0.6000000000000001}
-
-    xg_reg = lgb.LGBMClassifier(objective="binary", random_state=123,
-                                **paramsinput)  # colsample_bytree=0.4398528259745191, alpha=14.412788226345182,
-
-    xg_reg.fit(X_train, y_train, eval_metric="cross_entropy_lambda", verbose=1000)
-    ypred = xg_reg.predict_proba(X_test)
-    # lgb.plot_importance(xg_reg)
-    # plt.show()
-
-    kfold = KFold(n_splits=10, shuffle=True, random_state=123)
-    results = cross_val_score(xg_reg, X_test, y_test, scoring='accuracy', cv=kfold)
-    bal_accuracy = cross_val_score(xg_reg, X_test, y_test, scoring='balanced_accuracy', cv=kfold)
-    print("Accuracy: %.2f%%" % (np.mean(results) * 100.0))
-    print(results)
-    print('Balanced Accuracy: %.2f%%' % (np.mean(bal_accuracy) * 100.0))
-
-    shap_values = shap.TreeExplainer(xg_reg).shap_values(dfx)
-    shap.summary_plot(shap_values, dfx)
-    plt.show()
-
-    shap.dependence_plot("pitchoftarg", shap_values[0], dfx)  #
-    plt.show()
-    result = permutation_importance(xg_reg, X_test, y_test, n_repeats=10,
-                                    random_state=123, n_jobs=2)
-    sorted_idx = result.importances_mean.argsort()
-
-    fig, ax = plt.subplots(figsize=(15, 15))
-    ax.barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T)
-    ax.set_title("Permutation Importances (test set)")
-    fig.tight_layout()
-    plt.show()
-
-    explainer = shap.Explainer(xg_reg, X_train)
-
-    shap_values2 = explainer(X_train)
-    fig, ax = plt.subplots(figsize=(15, 15))
-    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "precur_and_targ_same"])
-
-    fig.tight_layout()
-    plt.tight_layout()
-    plt.subplots_adjust(left=-10, right=0.5)
-    plt.show()
-
-    shap.plots.scatter(shap_values2[:, "pitchoftarg"], color=shap_values2[:, "talker"])
-    plt.show()
-
-    shap.plots.scatter(shap_values2[:, "pitchoftarg"], color=shap_values2[:, "precur_and_targ_same"])
-    plt.show()
-
-    shap.plots.scatter(shap_values2[:, "precur_and_targ_same"], color=shap_values2[:, "talker"])
-    plt.show()
-
-    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"])
-    plt.show()
-
-    return xg_reg, ypred, y_test, results, shap_values, X_train, y_train, bal_accuracy
-
-
-
-
 def objective(trial, X, y):
     param_grid = {
         # "device_type": trial.suggest_categorical("device_type", ['gpu']),
@@ -269,17 +181,7 @@ def objective(trial, X, y):
     return np.mean(cv_scores)
 
 
-def run_optuna_study_correctresp(X, y):
-    study = optuna.create_study(direction="minimize", study_name="LGBM Classifier")
-    func = lambda trial: objective(trial, X, y)
-    study.optimize(func, n_trials=1000)
-    print("Number of finished trials: ", len(study.trials))
-    print(f"\tBest value of binary log loss: {study.best_value:.5f}")
-    print(f"\tBest params:")
 
-    for key, value in study.best_params.items():
-        print(f"\t\t{key}: {value}")
-    return study
 
 
 
@@ -322,139 +224,6 @@ def run_optuna_study_correctresponse(dataframe, y):
     for key, value in study.best_params.items():
         print(f"\t\t{key}: {value}")
     return study
-
-
-def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None):
-    if paramsinput is None:
-        paramsinput = {'colsample_bytree': 0.4253436090928764, 'alpha': 18.500902749816458, 'is_unbalanced': True,
-                       'n_estimators': 8700, 'learning_rate': 0.45629236152754304, 'num_leaves': 670, 'max_depth': 3,
-                       'min_data_in_leaf': 200, 'lambda_l1': 4, 'lambda_l2': 64,
-                       'min_gain_to_split': 0.016768866636887758, 'bagging_fraction': 0.9, 'bagging_freq': 3,
-                       'feature_fraction': 0.2}
-
-    df_to_use = dataframe[["pitchoftarg", "pitchofprecur", "talker", "side", "precur_and_targ_same",
-                           "targTimes", "DaysSinceStart", "AM", "cosinesim", "stepval", "pastcorrectresp",
-                           "pastcatchtrial", "trialNum", "correctresp"]]
-
-    col = 'correctresp'
-    dfx = df_to_use.loc[:, df_to_use.columns != col]
-
-    X_train, X_test, y_train, y_test = train_test_split(dfx, df_to_use['correctresp'], test_size=0.2, random_state=123)
-    print(X_train.shape)
-    print(X_test.shape)
-
-    xg_reg = lgb.LGBMClassifier(objective="binary", random_state=123,
-                                **paramsinput)
-
-    xg_reg.fit(X_train, y_train, eval_metric="cross_entropy_lambda", verbose=1000)
-    ypred = xg_reg.predict_proba(X_test)
-
-    kfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=123)
-    results = cross_val_score(xg_reg, X_test, y_test, scoring='accuracy', cv=kfold)
-    bal_accuracy = cross_val_score(xg_reg, X_test, y_test, scoring='balanced_accuracy', cv=kfold)
-    print("Accuracy: %.2f%%" % (np.mean(results) * 100.0))
-    print(results)
-    print('Balanced Accuracy: %.2f%%' % (np.mean(bal_accuracy) * 100.0))
-
-    shap_values1 = shap.TreeExplainer(xg_reg).shap_values(X_train)
-    fig, ax = plt.subplots(figsize=(10, 65))
-    shap.summary_plot(shap_values1, X_train, show=False)
-    plt.title('Ranked list of features over their \n impact in predicting a correct response', fontsize=18)
-    fig.tight_layout()
-    plt.savefig('D:/behavmodelfigs/correctrespmodel/correctresponsemodelrankedfeatures.png', dpi=500)
-
-    plt.show()
-    shap.dependence_plot("pitchofprecur", shap_values1[0], X_train)  #
-    plt.show()
-    result = permutation_importance(xg_reg, X_test, y_test, n_repeats=10,
-                                    random_state=123, n_jobs=2)
-    sorted_idx = result.importances_mean.argsort()
-
-    fig, ax = plt.subplots(figsize=(15, 15))
-    ax.barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T)
-    ax.set_title("Permutation Importances (test set)")
-    fig.tight_layout()
-    plt.savefig('D:/behavmodelfigs/permutation_importance.png', dpi=500)
-    plt.show()
-    explainer = shap.Explainer(xg_reg, X_train)
-    shap_values2 = explainer(X_train)
-    fig, ax = plt.subplots(figsize=(15, 15))
-    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "precur_and_targ_same"], ax=ax)
-    plt.tight_layout()
-    plt.subplots_adjust(left=-10, right=0.5)
-
-    plt.show()
-    shap.plots.scatter(shap_values2[:, "pitchofprecur"], color=shap_values2[:, "talker"])
-    plt.show()
-
-    shap.plots.scatter(shap_values2[:, "pitchofprecur"], color=shap_values2[:, "precur_and_targ_same"], show=False)
-    plt.show()
-
-    shap.plots.scatter(shap_values2[:, "precur_and_targ_same"], color=shap_values2[:, "talker"])
-    plt.show()
-    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"], show=False)
-    plt.title('trial number \n vs. SHAP value impact')
-    plt.ylabel('SHAP value', fontsize=18)
-    plt.savefig('D:/behavmodelfigs/correctrespmodel/trialnumdepenencyplot.png', dpi=500)
-    plt.show()
-
-    shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "precur_and_targ_same"], show=False)
-    plt.title('Cosine similarity \n vs. SHAP value impact')
-    plt.ylabel('SHAP value', fontsize=18)
-    plt.savefig('D:/behavmodelfigs/correctrespmodel/cosinesimdepenencyplot.png', dpi=500)
-    plt.show()
-
-    shap.plots.scatter(shap_values2[:, "precur_and_targ_same"], color=shap_values2[:, "cosinesim"], show=False)
-
-    plt.title('Intra trial roving \n versus SHAP value impact', fontsize=18)
-    plt.ylabel('SHAP value', fontsize=18)
-    plt.savefig('D:/behavmodelfigs/correctrespmodel/intratrialrovingcosinecolor.png', dpi=500)
-    plt.show()
-
-    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "targTimes"], show=False)
-    plt.title('CR model - Trial number versus SHAP value, \n colored by target presentation time', fontsize=18)
-    plt.ylabel('SHAP value', fontsize=18)
-    plt.xlabel('Trial number', fontsize=15)
-    plt.savefig('D:/behavmodelfigs/correctrespmodel/trialnumtargtimecolor.png', dpi=500)
-    plt.show()
-
-    shap.plots.scatter(shap_values2[:, "targTimes"], color=shap_values2[:, "trialNum"], show=False)
-    plt.title('CR model - Target times versus SHAP value, \n colored by trial number', fontsize=18)
-    plt.ylabel('SHAP value', fontsize=18)
-    plt.xlabel('Target presentation time', fontsize=15)
-    plt.savefig('D:/behavmodelfigs/correctrespmodel/targtimestrialnumcolor.png', dpi=500)
-    plt.show()
-
-    shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "targTimes"], show=False)
-    plt.title('Cosine Similarity as a function \n of SHAP values coloured by targTimes')
-    plt.savefig('D:/behavmodelfigs/correctrespmodel/cosinesimtargtimes.png', dpi=500)
-    plt.show()
-    np.save('D:/behavmodelfigs/correctrespponseoptunaparams4_strat5kfold.npy', paramsinput)
-
-    shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "pitchoftarg"], show=False)
-    plt.title('Cosine similarity as a function \n of SHAP values, coloured by the target pitch', fontsize=18)
-    plt.ylabel('SHAP value', fontsize=18)
-    plt.savefig('D:/behavmodelfigs/correctrespmodel/cosinesimcolouredtalkers.png', dpi=500)
-    plt.show()
-    fig, ax = plt.subplots(figsize=(15, 35))
-    shap.plots.scatter(shap_values2[:, "side"], color=shap_values2[:, "trialNum"], show=False)
-    plt.title('SHAP values as a function of the side of the audio, \n coloured by the trial number', fontsize=18)
-    plt.ylabel('SHAP value', fontsize=18)
-    plt.xticks([0, 1], ['Left', 'Right'], fontsize=18)
-    plt.savefig('D:/behavmodelfigs/correctrespmodel/sidetrialnumbercolor.png', dpi=500)
-    plt.show()
-
-    fig, ax = plt.subplots(figsize=(15, 55))
-    shap.plots.scatter(shap_values2[:, "pitchoftarg"], color=shap_values2[:, "targTimes"], show=False)
-    plt.title('SHAP values as a function of the pitch of the target, \n coloured by the target presentation time',
-              fontsize=18)
-    plt.ylabel('SHAP value', fontsize=18)
-    plt.xlabel('Pitch of target', fontsize=12)
-    plt.xticks([1, 2, 3, 4, 5], ['109 Hz', '124 Hz', '144 Hz', '191 Hz', '251 Hz'], fontsize=18)
-    plt.savefig('D:/behavmodelfigs/correctrespmodel/pitchoftargcolouredbytargtimes.png', dpi=500)
-    plt.show()
-
-    return xg_reg, ypred, y_test, results, shap_values1, X_train, y_train, bal_accuracy, shap_values2
 
 
 def runlgbfaornotwithoptuna(dataframe, paramsinput):
@@ -1120,7 +889,7 @@ if __name__ == '__main__':
     #
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(ferrets, optimization= False)
     #
-    # xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = run_correct_responsepipeline(ferrets)
+    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = run_correct_responsepipeline(ferrets)
 
 
 
