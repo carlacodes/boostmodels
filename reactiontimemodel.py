@@ -24,8 +24,55 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import sklearn
 from sklearn.model_selection import train_test_split
-from helpers.behaviouralhelpersformodels import *
+from helpers.behaviouralhelpersformodels import *\
 
+
+def run_optuna_study_releasetimes(X, y):
+    study = optuna.create_study(direction="minimize", study_name="LGBM regressor")
+    func = lambda trial: objective_releasetimes(trial, X, y)
+    study.optimize(func, n_trials=1000)
+    print("Number of finished trials: ", len(study.trials))
+    for key, value in study.best_params.items():
+        print(f"\t\t{key}: {value}")
+    return study
+
+def objective_releasetimes(trial, X, y):
+    param_grid = {
+        # "device_type": trial.suggest_categorical("device_type", ['gpu']),
+    #     colsample_bytree = 0.3, learning_rate = 0.1,
+    # max_depth = 10, alpha = 10, n_estimators = 10, random_state = 42, verbose = 1
+        "colsample_bytree": trial.suggest_float("colsample_bytree", 0.1, 0.6),
+        "alpha": trial.suggest_float("alpha", 5, 15),
+        "n_estimators": trial.suggest_int("n_estimators", 2, 100, step=2),
+        "learning_rate": trial.suggest_float("learning_rate", 0.01, 0.3),
+        "max_depth": trial.suggest_int("max_depth", 5, 20),
+        "bagging_fraction": trial.suggest_float(
+            "bagging_fraction", 0.1, 0.95, step=0.1
+        ),
+        "bagging_freq": trial.suggest_int("bagging_freq", 0, 30, step=1),
+    }
+
+    cv = KFold(n_splits=5, shuffle=True, random_state=42)
+
+    cv_scores = np.empty(5)
+    for idx, (train_idx, test_idx) in enumerate(cv.split(X, y)):
+        X_train, X_test = X[train_idx], X[test_idx]
+        y_train, y_test = y[train_idx], y[test_idx]
+
+        model = lgb.LGBMRegressor(random_state=123, **param_grid)
+        model.fit(
+            X_train,
+            y_train,
+            eval_set=[(X_test, y_test)],
+            early_stopping_rounds=100,
+            callbacks=[
+                LightGBMPruningCallback(trial, "l2")
+            ],  # Add a pruning callback
+        )
+        preds = model.predict(X_test)
+        cv_scores[idx] = sklearn.metrics.mean_squared_error(y_test, preds)
+
+    return np.mean(cv_scores)
 def runlgbreleasetimes_for_a_ferret(data, paramsinput=None, ferret=1, ferret_name='F1815_Cruella'
                                     ):
     data = data[data['ferret'] == ferret]
