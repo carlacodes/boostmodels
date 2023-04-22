@@ -3,7 +3,7 @@ work in progress for models I'm working on now to characterise main features of 
 n.b. pymer4 DOES NOT WORK in python 3.10, downgrade to python 3.9 <br>
 
 This is an implementation of lightGBM and SHAP to predict the probability of an animal making a false alarm, miss, or hit using gradient-boosted regression
-and classification trees. 
+and classification trees. This code assumes you have put your behavioural data into a pandas dataframe where each factor or variable of interest is represented as a column.
 
 To set up:
 1. Install python 3.9
