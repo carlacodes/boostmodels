@@ -1,11 +1,8 @@
 import sklearn.metrics
-# from rpy2.robjects import pandas2ri
 import seaborn as sns
 from instruments.io.BehaviourIO import BehaviourDataSet
 from sklearn.inspection import permutation_importance
 from instruments.behaviouralAnalysis import reactionTimeAnalysis  # outputbehaviordf
-from sklearn.preprocessing import MinMaxScaler
-# from pymer4.models import Lmer
 from pathlib import Path
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import KFold
@@ -16,11 +13,9 @@ import lightgbm as lgb
 import optuna
 from optuna.integration import LightGBMPruningCallback
 from sklearn.model_selection import StratifiedKFold
-# scaler = MinMaxScaler()
 import os
 import xgboost as xgb
 import matplotlib.pyplot as plt
-# import rpy2.robjects.numpy2ri
 import matplotlib.colors as mcolors
 import sklearn
 from sklearn.model_selection import train_test_split
