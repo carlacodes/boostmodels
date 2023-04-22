@@ -948,10 +948,13 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     shap_values1 = shap.TreeExplainer(xg_reg).shap_values(X_train)
     plt.subplots(figsize=(25, 25))
 
-    custom_colors = ['slategray', 'slategray', 'lightcoral', 'lightcoral']  # Add more colors as needed
-    cmapcustom = matplotlib.colors.ListedColormap(custom_colors)
-    shap.summary_plot(shap_values1, dfx, show = False, color=cmapcustom)
+    custom_colors = ['slategray',  'hotpink', "yellow"]  # Add more colors as needed
+    # cmapcustom = matplotlib.colors.ListedColormap(custom_colors)
+    cmapcustom = mcolors.LinearSegmentedColormap.from_list('my_custom_cmap', custom_colors, N=1000)
+    custom_colors_summary = ['slategray', 'hotpink',]  # Add more colors as needed
+    cmapsummary = matplotlib.colors.ListedColormap(custom_colors_summary)
 
+    shap.summary_plot(shap_values1, dfx, show = False, color=cmapsummary)
     fig, ax = plt.gcf(), plt.gca()
     plt.title('Ranked list of features over their \n impact in predicting a false alarm', fontsize = 18)
     # Get the plot's Patch objects
@@ -996,71 +999,36 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.tight_layout()
     plt.subplots_adjust(left=-10, right=0.5)
 
-    plt.show()
-    shap.plots.scatter(shap_values2[:, "pitchofprecur"], color=shap_values2[:, "talker"])
-    plt.show()
-
-    shap.plots.scatter(shap_values2[:, "pitchofprecur"], color=shap_values2[:, "intra_trial_roving"], show=False)
-    plt.show()
-
-    shap.plots.scatter(shap_values2[:, "intra_trial_roving"], color=shap_values2[:, "talker"])
-    plt.show()
-    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"])
-    plt.show()
-
-    shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "intra_trial_roving"], show=False)
-    plt.title('False alarm model - Cosine similarity vs. SHAP value impact')
+    shap.plots.scatter(shap_values2[:, "pitchofprecur"], color=shap_values2[:, "targTimes"], show=False,
+                                 cmap=cmapcustom)
+    fig, ax = plt.gcf(), plt.gca()
+    # Get colorbar
+    cb_ax = fig.axes[1]
+    # Modifying color bar parameters
+    cb_ax.tick_params(labelsize=15)
+    cb_ax.set_ylabel("Target Presentation Time", fontsize=12)
     plt.ylabel('SHAP value', fontsize=10)
-    plt.savefig('D:/behavmodelfigs/cosinesimdepenencyplot.png', dpi=500)
-    plt.show()
-
-    shap.plots.scatter(shap_values2[:, "intra_trial_roving"], color=shap_values2[:, "cosinesim"], show=False)
-    plt.title('False alarm model - Intra trial roving versus SHAP value impact')
-    plt.ylabel('SHAP value', fontsize=10)
-    plt.savefig('D:/behavmodelfigs/intratrialrovingcosinecolor.png', dpi=500)
-    plt.show()
-
-    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "cosinesim"], show=False)
-    plt.ylabel('SHAP value', fontsize=10)
-    plt.title('False alarm model - Trial number versus SHAP value impact')
-    plt.savefig('D:/behavmodelfigs/trialnumcosinecolor.png', dpi=500)
-    plt.show()
-
-    shap.plots.scatter(shap_values2[:, "pitchofprecur"], color=shap_values2[:, "targTimes"], show=False)
-    plt.ylabel('SHAP value', fontsize=10)
-    plt.title('False alarm model - pitch of the \n precursor word versus SHAP value impact', fontsize=18)
+    plt.title('Pitch of the precursor word \n versus impact in false alarm probability', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
     plt.xlabel('Pitch of precursor word', fontsize=16)
-    plt.savefig('D:/behavmodelfigs/pitchofprecurtargtimes.png', dpi=500)
+    plt.savefig('D:/behavmodelfigs/fa_or_not_model/pitchofprecurtargtimes.png', dpi=500)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "targTimes"], color=shap_values2[:, "cosinesim"], show=False)
-    plt.title('False alarm model - Target Times coloured by Cosine Similarity vs Their Impact on the SHAP value')
+
+    shap.plots.scatter(shap_values2[:, "targTimes"], color=shap_values2[:, "trialNum"], show=False, cmap =cmapcustom)
+    fig, ax = plt.gcf(), plt.gca()
+    # Get colorbar
+    cb_ax = fig.axes[1]
+    # Modifying color bar parameters
+    cb_ax.tick_params(labelsize=15)
+    cb_ax.set_ylabel("Target Presentation Time", fontsize=12)
     plt.ylabel('SHAP value', fontsize=10)
-    plt.savefig('D:/behavmodelfigs/targtimescosinecolor.png', dpi=500)
-    plt.show()
-
-    shap.plots.scatter(shap_values2[:, "targTimes"], color=shap_values2[:, "trialNum"], show=False)
-    plt.title('False alarm model - Target times \n coloured by trial number vs their SHAP value', fontsize=18)
-    plt.ylabel('SHAP value', fontsize=16)
-    plt.xlabel('Target times', fontsize=16)
-    plt.savefig('D:/behavmodelfigs/targtimestrialnum.png', dpi=500)
-    plt.show()
-    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "targTimes"], show=False)
-    plt.title('False alarm model - Trial number \n coloured by target times vs their SHAP value', fontsize=18)
+    plt.title('Target presentation time \n versus impact in false alarm probability', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
     plt.xlabel('Trial number', fontsize=16)
-    plt.savefig('D:/behavmodelfigs/trialnumbercolortargtimes.png', dpi=500)
+    plt.savefig('D:/behavmodelfigs/fa_or_not_model/targtimescolouredbytrialnumber.png', dpi=1000)
     plt.show()
 
-    fig, ax = plt.subplots(figsize=(15, 15))
-    shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "talker"], show=False)
-
-    plt.title('False alarm model - cosine similarity  \n as a function of SHAP values, coloured by talker')
-    plt.ylabel('SHAP value corresponding to cosine sim.', fontsize=10)
-    fig.tight_layout()
-    plt.savefig('D:/behavmodelfigs/cosinesimcolouredtalkers.png', dpi=500)
-    plt.show()
 
     return xg_reg, ypred, y_test, results, shap_values1, X_train, y_train, bal_accuracy, shap_values2
 
