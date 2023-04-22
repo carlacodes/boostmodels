@@ -151,3 +151,6 @@ def run_mixed_effects_analysis(ferrets):
     dfcat_use.to_csv(filepath)
     return modelreg_reduc, modelregcat_reduc, modelregcat, modelreg, predictedrelease, dfuse, dfcat_use, predictedcorrectresp, explainedvar, explainvarreleasetime
 
+def main():
+    modelreg_reduc, modelregcat_reduc, modelregcat, modelreg, predictedrelease, df_use, dfcat_use, predictedcorrectresp, explainedvar, explainvarreleasetime = run_mixed_effects_analysis(
+        ferrets)
