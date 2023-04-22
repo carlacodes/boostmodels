@@ -1133,4 +1133,3 @@ if __name__ == '__main__':
     # col3 = 'stepval'
     # dfx = dfx.loc[:, dfx.columns != col3]
 
-    study_release_times = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())

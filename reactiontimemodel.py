@@ -270,6 +270,7 @@ def main():
     # remove ferret as possible feature
     col2 = 'ferret'
     dfx = dfx.loc[:, dfx.columns != col2]
+    # study_release_times = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
 
     # study_release_times = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
     best_params = {'colsample_bytree': 0.49619263716341894,
