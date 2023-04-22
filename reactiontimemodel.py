@@ -282,3 +282,6 @@ def main():
      'bagging_freq': 6}
 
     xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx.to_numpy(), df_use[col].to_numpy(), paramsinput=best_params)
+
+if __name__ == '__main__':
+    main()
