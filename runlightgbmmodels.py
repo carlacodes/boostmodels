@@ -1122,7 +1122,11 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput):
     print("Accuracy: %.2f%%" % (np.mean(results) * 100.0))
     print(results)
     print('Balanced Accuracy: %.2f%%' % (np.mean(bal_accuracy) * 100.0))
+    plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, bal_accuracy)
 
+    return xg_reg, ypred, y_test, results, X_train, y_train, X_test, bal_accuracy
+
+def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test, bal_accuracy):
     shap_values1 = shap.TreeExplainer(xg_reg).shap_values(X_train)
     fig, ax = plt.subplots(figsize=(15, 65))
     shap.summary_plot(shap_values1, X_train, show=False)
@@ -1268,7 +1272,7 @@ def runlgbfaornot(dataframe):
     print('Balanced Accuracy: %.2f%%' % (np.mean(bal_accuracy) * 100.0))
 
     shap_values1 = shap.TreeExplainer(xg_reg).shap_values(dfx)
-    fig, ax = plt.subplots(figsize=(15, 15))
+    plt.subplots(figsize=(25, 25))
     shap.summary_plot(shap_values1, dfx, show=False)
     fig, ax = plt.gcf(), plt.gca()
     plt.title('Ranked list of features over their \n impact in predicting a false alarm', fontsize = 18)
@@ -1283,23 +1287,23 @@ def runlgbfaornot(dataframe):
     labels[5] = 'past trial was correct'
     labels[4] = 'AM'
     labels[3] = 'intra-trial roving'
-    labels[2] = 'Day since start of experiment week'
+    labels[2] = 'day since start of experiment week'
     labels[1] = 'cosine similarity'
     labels[0] = 'temporal similarity'
     ax.set_yticklabels(labels)
     fig.tight_layout()
 
 
-    plt.savefig('D:/behavmodelfigs/ranked_features.png', dpi=500)
-
+    plt.savefig('D:/behavmodelfigs/fa_or_not_model/ranked_features.png', dpi=1000, bbox_inches = "tight")
     plt.show()
+
     shap.dependence_plot("pitchofprecur", shap_values1[0], dfx)  #
     plt.show()
     result = permutation_importance(xg_reg, X_test, y_test, n_repeats=10,
                                     random_state=123, n_jobs=2)
     sorted_idx = result.importances_mean.argsort()
 
-    fig, ax = plt.subplots(figsize=(15, 15))
+    fig, ax = plt.subplots(figsize=(20, 15))
     ax.barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T)
     ax.set_title("Permutation Importances (test set)")
     fig.tight_layout()
@@ -1362,7 +1366,7 @@ def runlgbfaornot(dataframe):
     return xg_reg, ypred, y_test, results, shap_values1, X_train, y_train, bal_accuracy, shap_values2
 
 
-def runfalsealarmpipeline(ferrets):
+def runfalsealarmpipeline(ferrets, optimization = False ):
     resultingfa_df = behaviouralhelperscg.get_false_alarm_behavdata(ferrets=ferrets, startdate='04-01-2020',
                                                                     finishdate='01-03-2023')
     len_of_data_male = {}
@@ -1390,16 +1394,18 @@ def runfalsealarmpipeline(ferrets):
 
     filepath = Path('D:/dfformixedmodels/falsealarmmodel_dfuse.csv')
     filepath.parent.mkdir(parents=True, exist_ok=True)
+    if optimization == False:
+        #load the saved params
+        params = np.load('optuna_results/falsealarm_optunaparams.npy', allow_pickle=True).item()
+    else:
+        study = run_optuna_study_falsealarm(resultingfa_df, resultingfa_df['falsealarm'].to_numpy())
+        print(study.best_params)
+        params = study.best_params
+        np.save('optuna_results/falsealarm_optunaparams.npy', study.best_params)
 
     resultingfa_df.to_csv(filepath)
-    study = run_optuna_study_falsealarm(resultingfa_df, resultingfa_df['falsealarm'].to_numpy())
-    print(study.best_params)
-    # best_params = np.load('D:/behavmodelfigs/falsealarmoptunaparams3_strat5kfold.npy', allow_pickle=True).item()
-
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbfaornotwithoptuna(
-        resultingfa_df, study.best_params)
-    np.save('optuna_results/falsealarm_optunaparams.npy', study.best_params)
-
+        resultingfa_df, params)
     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
 
