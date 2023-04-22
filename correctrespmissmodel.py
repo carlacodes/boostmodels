@@ -170,13 +170,38 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     print('Balanced Accuracy: %.2f%%' % (np.mean(bal_accuracy) * 100.0))
 
     shap_values1 = shap.TreeExplainer(xg_reg).shap_values(X_train)
-    fig, ax = plt.subplots(figsize=(10, 65))
-    shap.summary_plot(shap_values1, X_train, show=False)
-    plt.title('Ranked list of features over their \n impact in predicting a correct response', fontsize=18)
-    fig.tight_layout()
-    plt.savefig('D:/behavmodelfigs/correctrespmodel/correctresponsemodelrankedfeatures.png', dpi=500)
 
-    plt.show()
+
+    custom_colors = ['gold',  'peru', "purple"]  # Add more colors as needed
+    # cmapcustom = matplotlib.colors.ListedColormap(custom_colors)
+    cmapcustom = mcolors.LinearSegmentedColormap.from_list('my_custom_cmap', custom_colors, N=1000)
+    custom_colors_summary = ['peru', 'gold',]  # Add more colors as needed
+    cmapsummary = matplotlib.colors.ListedColormap(custom_colors_summary)
+
+    shap.summary_plot(shap_values1, X_train, show = False, color=cmapsummary)
+    fig, ax = plt.gcf(), plt.gca()
+    plt.title('Ranked list of features over their \n impact in predicting a hit or miss', fontsize = 18)
+    # Get the plot's Patch objects
+    labels = [item.get_text() for item in ax.get_yticklabels()]
+    print(labels)
+    labels[12] = 'side of audio presentation'
+    labels[11] = 'trial number'
+    labels[10] = 'pitch of precursor'
+    labels[9] = 'target presentation time'
+    labels[8] = 'pitch of target'
+    labels[7] = 'session occured in the morning'
+    labels[6] = 'cosine similarity'
+    labels[5] = 'past trial was catch'
+    labels[4] = 'precursor pitch = target pitch'
+    labels[3] = 'past trial was correct'
+    labels[2] = 'pitch change'
+    labels[1] = 'Days since start of week'
+    labels[0] = 'talker'
+    ax.set_yticklabels(labels)
+    fig.tight_layout()
+    plt.savefig('D:/behavmodelfigs/correctresp_or_miss/shap_summary_correctresp.png', dpi=1000, bbox_inches = "tight")
+
+
     shap.dependence_plot("pitchofprecur", shap_values1[0], X_train)  #
     plt.show()
     result = permutation_importance(xg_reg, X_test, y_test, n_repeats=10,
@@ -189,19 +214,33 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     fig.tight_layout()
     plt.savefig('D:/behavmodelfigs/permutation_importance.png', dpi=500)
     plt.show()
+
+
     explainer = shap.Explainer(xg_reg, X_train)
     shap_values2 = explainer(X_train)
     fig, ax = plt.subplots(figsize=(15, 15))
-    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "precur_and_targ_same"], ax=ax)
+    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "pitchofprecur"], ax=ax, cmap = cmapcustom)
     plt.tight_layout()
     plt.subplots_adjust(left=-10, right=0.5)
-
-    plt.show()
-    shap.plots.scatter(shap_values2[:, "pitchofprecur"], color=shap_values2[:, "talker"])
+    plt.savefig('D:/behavmodelfigs/correctresp_or_miss/trialnum_vs_precurpitch.png', dpi=1000)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "pitchofprecur"], color=shap_values2[:, "precur_and_targ_same"], show=False)
+    fig, ax = plt.subplots(figsize=(15, 15))
+    shap.plots.scatter(shap_values2[:, "side"], color=shap_values2[:, "pitchofprecur"], ax=ax, cmap = cmapcustom, show = False)
+    fig, ax = plt.gcf(), plt.gca()
+    cb_ax = fig.axes[1]
+    # Modifying color bar parameters
+    cb_ax.tick_params(labelsize=15)
+    cb_ax.set_ylabel("Pitch of precursor word", fontsize=12)
+
+    plt.xticks([0, 1 ], labels = ['left', 'right'], fontsize =12)
+    plt.ylabel('SHAP value', fontsize=10)
+    plt.title('Pitch of the side of the booth \n versus impact in correct response over miss probability', fontsize=18)
+    plt.ylabel('SHAP value', fontsize=16)
+    plt.xlabel('Side of audio presenetation', fontsize=16)
+    plt.savefig('D:/behavmodelfigs/correctresp_or_miss/sidevsprecurpitch.png', dpi=1000)
     plt.show()
+
 
     shap.plots.scatter(shap_values2[:, "precur_and_targ_same"], color=shap_values2[:, "talker"])
     plt.show()
