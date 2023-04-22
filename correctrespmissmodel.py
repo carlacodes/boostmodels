@@ -225,15 +225,15 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     plt.savefig('D:/behavmodelfigs/correctresp_or_miss/trialnum_vs_precurpitch.png', dpi=1000)
     plt.show()
 
-    fig, ax = plt.subplots(figsize=(15, 15))
+    fig, ax = plt.subplots(figsize=(10, 10))
     shap.plots.scatter(shap_values2[:, "side"], color=shap_values2[:, "pitchofprecur"], ax=ax, cmap = cmapcustom, show = False)
     fig, ax = plt.gcf(), plt.gca()
     cb_ax = fig.axes[1]
     # Modifying color bar parameters
     cb_ax.tick_params(labelsize=15)
-    cb_ax.set_ylabel("Pitch of precursor word", fontsize=12)
+    cb_ax.set_ylabel("Pitch of precursor word", fontsize=15)
 
-    plt.xticks([0, 1 ], labels = ['left', 'right'], fontsize =12)
+    plt.xticks([0, 1 ], labels = ['left', 'right'], fontsize =15)
     plt.ylabel('SHAP value', fontsize=10)
     plt.title('Pitch of the side of the booth \n versus impact in correct response over miss probability', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
