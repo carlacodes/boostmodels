@@ -128,7 +128,7 @@ def run_optuna_study_correctresp(X, y):
     for key, value in study.best_params.items():
         print(f"\t\t{key}: {value}")
     return study
-def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None):
+def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization = False):
     if paramsinput is None:
         paramsinput = {'colsample_bytree': 0.4253436090928764, 'alpha': 18.500902749816458, 'is_unbalanced': True,
                        'n_estimators': 8700, 'learning_rate': 0.45629236152754304, 'num_leaves': 670, 'max_depth': 3,
@@ -142,6 +142,15 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None):
 
     col = 'correctresp'
     dfx = df_to_use.loc[:, df_to_use.columns != col]
+
+    if optimization == False:
+        #load the saved params
+        paramsinput = np.load('optuna_results/correctresponse_optunaparams.npy', allow_pickle=True).item()
+    else:
+        study = run_optuna_study_correctresp(dfx, df_to_use['correctresp'].to_numpy())
+        print(study.best_params)
+        paramsinput = study.best_params
+        np.save('optuna_results/correctresponse_optunaparams.npy', study.best_params)
 
     X_train, X_test, y_train, y_test = train_test_split(dfx, df_to_use['correctresp'], test_size=0.2, random_state=123)
     print(X_train.shape)
@@ -263,14 +272,12 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None):
 
 def run_correct_responsepipeline(ferrets):
     resultingcr_df = behaviouralhelperscg.get_df_behav(ferrets=ferrets, includefaandmiss=False, includemissonly=True, startdate='04-01-2020',
-                                  finishdate='01-10-2022')
+                                  finishdate='03-01-2023')
     filepath = Path('D:/dfformixedmodels/correctresponsemodel_dfuse.csv')
     filepath.parent.mkdir(parents=True, exist_ok=True)
     resultingcr_df.to_csv(filepath)
-    # old BEST PARAMS without clove's data
-    best_params = np.load('D:/behavmodelfigs/correctrespponseoptunaparams4_strat5kfold.npy', allow_pickle=True).item()
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbcorrectrespornotwithoptuna(
-        resultingcr_df)
+        resultingcr_df, optimization=True)
     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
 
