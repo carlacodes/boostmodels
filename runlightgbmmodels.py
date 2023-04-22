@@ -21,6 +21,7 @@ import os
 import xgboost as xgb
 import matplotlib.pyplot as plt
 # import rpy2.robjects.numpy2ri
+import matplotlib.colors as mcolors
 import sklearn
 from sklearn.model_selection import train_test_split
 from helpers.behaviouralhelpersformodels import *
@@ -947,9 +948,9 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     shap_values1 = shap.TreeExplainer(xg_reg).shap_values(X_train)
     plt.subplots(figsize=(25, 25))
 
-    custom_colors = ['slategray', 'lightcoral']  # Add more colors as needed
-    cmap = matplotlib.colors.ListedColormap(custom_colors)
-    shap.summary_plot(shap_values1, dfx, show = False, color = cmap)
+    custom_colors = ['slategray', 'slategray', 'lightcoral', 'lightcoral']  # Add more colors as needed
+    cmapcustom = matplotlib.colors.ListedColormap(custom_colors)
+    shap.summary_plot(shap_values1, dfx, show = False, color=cmapcustom)
 
     fig, ax = plt.gcf(), plt.gca()
     plt.title('Ranked list of features over their \n impact in predicting a false alarm', fontsize = 18)
@@ -988,7 +989,9 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     explainer = shap.Explainer(xg_reg, dfx)
     shap_values2 = explainer(X_train)
     fig, ax = plt.subplots(figsize=(15, 15))
-    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "intra_trial_roving"], cmap = plt.get_cmap("plasma"))
+
+    # Plot the scatter plot with the colormap
+    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "intra_trial_roving"], cmap=cmapcustom)
     plt.show()
     plt.tight_layout()
     plt.subplots_adjust(left=-10, right=0.5)
@@ -1048,11 +1051,6 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.ylabel('SHAP value', fontsize=16)
     plt.xlabel('Trial number', fontsize=16)
     plt.savefig('D:/behavmodelfigs/trialnumbercolortargtimes.png', dpi=500)
-    plt.show()
-    shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "targTimes"], show=False)
-    plt.title('Cosine Similarity as a function of SHAP values, coloured by targTimes')
-    plt.ylabel('SHAP value', fontsize=10)
-    plt.savefig('D:/behavmodelfigs/cosinesimtargtimes.png', dpi=500)
     plt.show()
 
     fig, ax = plt.subplots(figsize=(15, 15))
@@ -1205,7 +1203,7 @@ def runlgbfaornot(dataframe):
     return xg_reg, ypred, y_test, results, shap_values1, X_train, y_train, bal_accuracy, shap_values2
 
 
-def runfalsealarmpipeline(ferrets, optimization = False ):
+def runfalsealarmpipeline(ferrets, optimization = True ):
     resultingfa_df = behaviouralhelperscg.get_false_alarm_behavdata(ferrets=ferrets, startdate='04-01-2020',
                                                                     finishdate='01-03-2023')
     len_of_data_male = {}
