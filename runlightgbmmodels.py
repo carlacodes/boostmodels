@@ -1128,11 +1128,27 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput):
 
 def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test, bal_accuracy):
     shap_values1 = shap.TreeExplainer(xg_reg).shap_values(X_train)
-    fig, ax = plt.subplots(figsize=(15, 65))
-    shap.summary_plot(shap_values1, X_train, show=False)
-    plt.title('Ranked list of features over their \n impact in predicting a false alarm', fontsize=18)
+    plt.subplots(figsize=(25, 25))
+    shap.summary_plot(shap_values1, dfx, show=False)
+    fig, ax = plt.gcf(), plt.gca()
+    plt.title('Ranked list of features over their \n impact in predicting a false alarm', fontsize = 18)
+    labels = [item.get_text() for item in ax.get_yticklabels()]
+    print(labels)
+    # labels[11] = 'time to target presentation'
+    # labels[10] = 'pitch of precursor'
+    # labels[9] = 'trial number'
+    # labels[8] = 'past trial was catch'
+    # labels[7] = 'side of audio presentation'
+    # labels[6] = 'talker'
+    # labels[5] = 'past trial was correct'
+    # labels[4] = 'AM'
+    # labels[3] = 'intra-trial roving'
+    # labels[2] = 'day since start of experiment week'
+    # labels[1] = 'cosine similarity'
+    # labels[0] = 'temporal similarity'
+    ax.set_yticklabels(labels)
     fig.tight_layout()
-    plt.savefig('D:/behavmodelfigs/ranked_features_falsealarmmodel.png', dpi=1000)
+    plt.savefig('D:/behavmodelfigs/fa_or_not_model/ranked_features.png', dpi=1000, bbox_inches = "tight")
     plt.show()
 
     shap.dependence_plot("pitchofprecur", shap_values1[0], X_train)  #
