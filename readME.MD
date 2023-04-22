@@ -1,4 +1,4 @@
-## Mixed effect models repo for behavioural animal data
+## Gradient-boosted regression and classification trees repo for behavioural animal data
 work in progress for models I'm working on now to characterise main features of animal rxn time and correct response data across animal subjhects.
 n.b. pymer4 DOES NOT WORK in python 3.10, downgrade to python 3.9 <br>
 
