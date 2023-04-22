@@ -147,7 +147,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
         #load the saved params
         paramsinput = np.load('optuna_results/correctresponse_optunaparams.npy', allow_pickle=True).item()
     else:
-        study = run_optuna_study_correctresp(dfx, df_to_use['correctresp'].to_numpy())
+        study = run_optuna_study_correctresp(dfx.to_numpy(), df_to_use['correctresp'].to_numpy())
         print(study.best_params)
         paramsinput = study.best_params
         np.save('optuna_results/correctresponse_optunaparams.npy', study.best_params)
