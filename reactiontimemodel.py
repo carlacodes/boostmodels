@@ -251,7 +251,7 @@ def runlgbreleasetimes(X, y, paramsinput=None):
     return xg_reg, ypred, y_test, results
 
 def extract_release_times_data(ferrets):
-    df = behaviouralhelperscg.get_df_behav(ferrets=ferrets, includefaandmiss=False, startdate='04-01-2020', finishdate='09-03-2023')
+    df = behaviouralhelperscg.get_df_behav(ferrets=ferrets, includefaandmiss=False, startdate='04-01-2020', finishdate='01-03-2023')
     dfuse = df[["pitchoftarg", "pitchofprecur", "talker", "side", "precur_and_targ_same",
                 "timeToTarget", "DaysSinceStart", "AM",
                 "realRelReleaseTimes", "ferret", "stepval", "pastcorrectresp", "pastcatchtrial", "trialNum"]]
@@ -272,7 +272,7 @@ def main():
     dfx = dfx.loc[:, dfx.columns != col2]
     # study_release_times = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
 
-    # study_release_times = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
+    study_release_times = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
     best_params = {'colsample_bytree': 0.49619263716341894,
      'alpha': 8.537376181435246,
      'n_estimators': 96,
