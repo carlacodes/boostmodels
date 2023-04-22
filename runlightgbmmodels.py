@@ -16,7 +16,7 @@ import lightgbm as lgb
 import optuna
 from optuna.integration import LightGBMPruningCallback
 from sklearn.model_selection import StratifiedKFold
-scaler = MinMaxScaler()
+# scaler = MinMaxScaler()
 import os
 import xgboost as xgb
 import matplotlib.pyplot as plt
@@ -24,7 +24,7 @@ import matplotlib.pyplot as plt
 import sklearn
 from sklearn.model_selection import train_test_split
 from helpers.behaviouralhelpersformodels import *
-os.environ['R_HOME'] = 'C:/PROGRA~1/R/R-41~1.3/bin/x64/R'
+# os.environ['R_HOME'] = 'C:/PROGRA~1/R/R-41~1.3/bin/x64/R'
 
 
 
@@ -536,9 +536,8 @@ def runlgbreleasetimes_for_a_ferret(data, paramsinput=None, ferret=1, ferret_nam
     # logthe release times
     shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"],
                        title='Correct Responses - Reaction Time Model SHAP response \n vs. trial number for' + ferret_name)
-    plt.show()
 
-    return xg_reg, ypred, y_test, results, mse
+    return xg_reg, ypred, y_test, results, mse_test
 
 
 
@@ -974,7 +973,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.savefig('D:/behavmodelfigs/fa_or_not_model/ranked_features.png', dpi=1000, bbox_inches = "tight")
     plt.show()
 
-    shap.dependence_plot("pitchofprecur", shap_values1[0], X_train, cmap = custom_colors)  #
+    shap.dependence_plot("pitchofprecur", shap_values1[0], X_train)  #
     plt.show()
     result = permutation_importance(xg_reg, X_test, y_test, n_repeats=10,
                                     random_state=123, n_jobs=2)
@@ -989,7 +988,8 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     explainer = shap.Explainer(xg_reg, dfx)
     shap_values2 = explainer(X_train)
     fig, ax = plt.subplots(figsize=(15, 15))
-    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "intra_trial_roving"], cmap = custom_colors)
+    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "intra_trial_roving"], cmap = plt.get_cmap("plasma"))
+    plt.show()
     plt.tight_layout()
     plt.subplots_adjust(left=-10, right=0.5)
 
@@ -1595,7 +1595,7 @@ def plot_reaction_times_interandintra(ferrets):
     return df_by_ferret
 
 if __name__ == '__main__':
-    ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni'] #'F2105_Clove'
+    ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'] #'F2105_Clove'
     # df_by_ferretdict = plot_reaction_times(ferrets)
     # #
     # plot_reaction_times_interandintra(ferrets)
