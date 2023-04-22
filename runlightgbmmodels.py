@@ -181,11 +181,6 @@ def objective(trial, X, y):
     return np.mean(cv_scores)
 
 
-
-
-
-
-
 def run_optuna_study_falsealarm(dataframe, y):
     study = optuna.create_study(direction="minimize", study_name="LGBM Classifier")
     df_to_use = dataframe[
@@ -526,19 +521,6 @@ def runfalsealarmpipeline(ferrets, optimization = True ):
     resultingfa_df.to_csv(filepath)
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbfaornotwithoptuna(
         resultingfa_df, params)
-    return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
-
-
-def run_correct_responsepipeline(ferrets):
-    resultingcr_df = behaviouralhelperscg.get_df_behav(ferrets=ferrets, includefaandmiss=False, includemissonly=True, startdate='04-01-2020',
-                                  finishdate='01-10-2022')
-    filepath = Path('D:/dfformixedmodels/correctresponsemodel_dfuse.csv')
-    filepath.parent.mkdir(parents=True, exist_ok=True)
-    resultingcr_df.to_csv(filepath)
-    # old BEST PARAMS without clove's data
-    best_params = np.load('D:/behavmodelfigs/correctrespponseoptunaparams4_strat5kfold.npy', allow_pickle=True).item()
-    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbcorrectrespornotwithoptuna(
-        resultingcr_df)
     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
 
