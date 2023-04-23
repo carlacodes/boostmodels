@@ -478,8 +478,11 @@ class behaviouralhelperscg():
             newdata = newdata[(newdata.talker == 1) | (newdata.talker == 2) | (newdata.talker == 3) | (
                     newdata.talker == 4) | (newdata.talker == 5)]
 
-            # newdata = newdata[(newdata.pitchoftarg == 1) | (newdata.pitchoftarg == 2) | (newdata.pitchoftarg == 3) | (
-            #         newdata.pitchoftarg == 4) | (newdata.pitchoftarg == 5)]
+            newdata = newdata[(newdata.pitchofprecur == 1) | (newdata.pitchofprecur == 2) | (newdata.pitchofprecur == 3) | (
+                    newdata.pitchofprecur == 4) | (newdata.pitchofprecur == 5)]
+
+            newdata = newdata[(newdata.pitchoftarg == 1) | (newdata.pitchoftarg == 2) | (newdata.pitchoftarg == 3) | (
+                    newdata.pitchoftarg == 4) | (newdata.pitchoftarg == 5)]
             # newdata = newdata[
             #     (newdata.pitchofprecur == 1) | (newdata.pitchofprecur == 2) | (newdata.pitchofprecur == 3) | (
             #             newdata.pitchofprecur == 4) | (newdata.pitchofprecur == 5)]
