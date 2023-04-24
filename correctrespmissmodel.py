@@ -241,6 +241,20 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     plt.savefig('D:/behavmodelfigs/correctresp_or_miss/sidevsprecurpitch.png', dpi=1000)
     plt.show()
 
+    shap.plots.scatter(shap_values2[:, "pitchoftarg"], color=shap_values2[:, "pitchofprecur"], show=False, cmap = matplotlib.colormaps[cmapname])
+    fig, ax = plt.gcf(), plt.gca()
+    # Get colorbar
+    cb_ax = fig.axes[1]
+    # Modifying color bar parameters
+    cb_ax.tick_params(labelsize=15)
+    cb_ax.set_ylabel("Pitch of precursor", fontsize=12)
+    plt.ylabel('SHAP value', fontsize=10)
+    plt.title('Pitch of target \n versus impact in predicting a correct response over miss', fontsize=18)
+    plt.ylabel('SHAP value', fontsize=16)
+    plt.xlabel('Pitch of target', fontsize=16)
+    plt.savefig('D:/behavmodelfigs/correctresp_or_miss/pitchoftargcolouredbyprecur.png', dpi=1000)
+    plt.show()
+
 
     shap.plots.scatter(shap_values2[:, "precur_and_targ_same"], color=shap_values2[:, "talker"])
     plt.show()

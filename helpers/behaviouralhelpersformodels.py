@@ -192,7 +192,8 @@ class behaviouralhelperscg():
             correctresp = correctresp.astype(int)
             pastcatchtrial = pastcatchtrial.astype(int)
             pastcorrectresp = pastcorrectresp.astype(int)
-
+            misslist = np.where((correctresp==0)|(correctresp==1), correctresp^1, correctresp)
+            newdata['misslist'] = misslist.tolist()
             newdata['correctresp'] = correctresp.tolist()
             newdata['pastcorrectresp'] = pastcorrectresp.tolist()
             newdata['talker'] = talkerlist2.tolist()
