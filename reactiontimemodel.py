@@ -192,28 +192,28 @@ def runlgbreleasetimes(X, y, paramsinput=None):
 
     labels = [item.get_text() for item in ax.get_yticklabels()]
     print(labels)
-    # labels[11] = 'distance to sensor'
-    # labels[10] = 'target F0'
-    # labels[9] = 'trial number'
-    # labels[8] = 'precursor = target F0'
-    # labels[7] = 'male talker'
-    # labels[6] = 'time until target'
-    # labels[5] = 'target F0 - precursor F0'
-    # labels[4] = 'day of week'
-    # labels[3] = 'precursor F0'
-    # labels[2] = 'past trial was catch'
-    # labels[1] = 'trial took place in AM'
-    # labels[0] = 'past trial was correct'
+    labels[11] = 'distance to sensor'
+    labels[10] = 'target F0'
+    labels[9] = 'trial number'
+    labels[8] = 'precursor = target F0'
+    labels[7] = 'male talker'
+    labels[6] = 'time until target'
+    labels[5] = 'target F0 - precursor F0'
+    labels[4] = 'day of week'
+    labels[3] = 'precursor F0'
+    labels[2] = 'past trial was catch'
+    labels[1] = 'trial took place in AM'
+    labels[0] = 'past trial was correct'
 
     ax.set_yticklabels(labels)
     plt.savefig('figs/shapsummaryplot_allanimals2.png')
 
     plt.show()
 
-    shap.dependence_plot("timeToTarget", shap_values, dfx)  #
+    shap.dependence_plot("timeToTarget", shap_values, X_train)  #
 
-    explainer = shap.Explainer(xg_reg, dfx)
-    shap_values2 = explainer(dfx)
+    explainer = shap.Explainer(xg_reg, X_train)
+    shap_values2 = explainer(X_train)
     fig, ax = plt.subplots(figsize=(15, 15))
     shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "precur_and_targ_same"], show = False)
     fig.tight_layout()
@@ -277,7 +277,7 @@ def run_correctrxntime_model(ferrets, optimization = False ):
         best_params = best_study_results.best_params
         np.save('optuna_results/best_paramsreleastimemodel_allferrets.npy', best_params)
 
-    xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx.to_numpy(), df_use[col].to_numpy(), paramsinput=best_params)
+    xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx, df_use[col], paramsinput=best_params)
 
 
 def main():
