@@ -192,12 +192,13 @@ def runlgbreleasetimes(X, y, paramsinput=None):
     cmapcustom = mcolors.LinearSegmentedColormap.from_list('my_custom_cmap', custom_colors, N=1000)
     custom_colors_summary = ['lightcoral', "cyan", "orange"]  # Add more colors as needed
     cmapsummary = matplotlib.colors.ListedColormap(custom_colors_summary)
-    cmapname = "magma"
+    cmapname = "viridis"
+    fig, ax = plt.subplots(figsize=(15, 15))
     shap.summary_plot(shap_values, X, show=False, cmap = matplotlib.colormaps[cmapname])
+
     fig, ax = plt.gcf(), plt.gca()
     plt.title('Ranked list of features over their impact in predicting reaction time')
     plt.xlabel('SHAP value (impact on model output) on reaction time')
-
     labels = [item.get_text() for item in ax.get_yticklabels()]
     print(labels)
     labels[11] = 'trial Number'
@@ -214,37 +215,41 @@ def runlgbreleasetimes(X, y, paramsinput=None):
     labels[0] = 'past trial was correct'
 
     ax.set_yticklabels(labels)
-    plt.savefig('figs/shapsummaryplot_allanimals2.png', dpi=1000, bbox_inches='tight')
+    plt.savefig('figs/correctrxntimemodel/shapsummaryplot_allanimals2.png', dpi=1000, bbox_inches='tight')
 
     plt.show()
 
     shap.dependence_plot("timeToTarget", shap_values, X)  #
     explainer = shap.Explainer(xg_reg, X)
     shap_values2 = explainer(X_train)
-    fig, ax = plt.subplots(figsize=(15, 15))
-    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "precur_and_targ_same"], show = False)
-    fig.tight_layout()
-    plt.savefig('figs/talkerprecurandtargsame_dependencyplot2.png')
-    plt.subplots_adjust(left=-10, right=0.5)
 
-    plt.show()
-    shap.plots.scatter(shap_values2[:, "pitchoftarg"], color=shap_values2[:, "talker"], show = False)
-    plt.title('Reaction Time Model')
-    plt.show()
-    # logthe release times
-    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"],
-                       title='Correct Responses - Reaction Time Model SHAP response \n vs. trial number', show = False)
+
+    shap.plots.scatter(shap_values2[:, "timeToTarget"], color=shap_values2[:, "trialNum"], show=False, cmap = matplotlib.colormaps[cmapname])
     fig, ax = plt.gcf(), plt.gca()
-
-    plt.savefig('figs/reactiontimeversustrialnumber_dependencyplot.png')
-
+    # Get colorbar
+    cb_ax = fig.axes[1]
+    # Modifying color bar parameters
+    cb_ax.tick_params(labelsize=15)
+    cb_ax.set_ylabel("Trial number", fontsize=12)
+    plt.ylabel('SHAP value', fontsize=10)
+    plt.title('Target presentation time \n versus impact in predicted reacton time', fontsize=18)
+    plt.ylabel('SHAP value', fontsize=16)
+    plt.xlabel('Target presentation time', fontsize=16)
+    plt.savefig('figs/correctrxntimemodel/targtimescolouredbytrialnumber.png', dpi=1000)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"],
-                       title='Correct Responses - Reaction Time Model SHAP response \n vs. trial number', show=False)
+    shap.plots.scatter(shap_values2[:, "pitchoftarg"], color=shap_values2[:, "pitchofprecur"], show=False, cmap = matplotlib.colormaps[cmapname])
     fig, ax = plt.gcf(), plt.gca()
-    plt.savefig('figs/reactiontimeversustrialnumber_dependencyplot2.png')
-
+    # Get colorbar
+    cb_ax = fig.axes[1]
+    # Modifying color bar parameters
+    cb_ax.tick_params(labelsize=15)
+    cb_ax.set_ylabel("Pitch of precursor", fontsize=12)
+    plt.ylabel('SHAP value', fontsize=10)
+    plt.title('Pitch of target \n versus impact in predicted reacton time', fontsize=18)
+    plt.ylabel('SHAP value', fontsize=16)
+    plt.xlabel('Pitch of target', fontsize=16)
+    plt.savefig('figs/correctrxntimemodel/pitchoftargcolouredbyprecur.png', dpi=1000)
     plt.show()
 
     return xg_reg, ypred, y_test, results
