@@ -182,10 +182,10 @@ def runlgbreleasetimes(X, y, paramsinput=None):
     print("MSE on test: %.4f" % (mse))
     print("negative MSE training: %.2f%%" % (np.mean(results) * 100.0))
     print(results)
-    shap_values = shap.TreeExplainer(xg_reg).shap_values(dfx)
+    shap_values = shap.TreeExplainer(xg_reg).shap_values(X)
     fig, ax = plt.subplots(figsize=(15, 15))
     # title kwargs still does nothing so need this workaround for summary plots
-    shap.summary_plot(shap_values, dfx, show=False)
+    shap.summary_plot(shap_values, X, show=False)
     fig, ax = plt.gcf(), plt.gca()
     plt.title('Ranked list of features over their impact in predicting reaction time')
     plt.xlabel('SHAP value (impact on model output) on reaction time')
@@ -282,7 +282,7 @@ def run_correctrxntime_model(ferrets, optimization = False ):
 
 def main():
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'] #'F2105_Clove'
-    run_correctrxntime_model(ferrets, optimization = True)
+    run_correctrxntime_model(ferrets, optimization = False)
 
 
 if __name__ == '__main__':
