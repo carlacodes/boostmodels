@@ -192,8 +192,8 @@ def runlgbreleasetimes(X, y, paramsinput=None):
     cmapcustom = mcolors.LinearSegmentedColormap.from_list('my_custom_cmap', custom_colors, N=1000)
     custom_colors_summary = ['lightcoral', "cyan", "orange"]  # Add more colors as needed
     cmapsummary = matplotlib.colors.ListedColormap(custom_colors_summary)
-
-    shap.summary_plot(shap_values, X, show=False, cmap = cmapsummary)
+    cmapname = "magma"
+    shap.summary_plot(shap_values, X, show=False, cmap = matplotlib.colormaps[cmapname])
     fig, ax = plt.gcf(), plt.gca()
     plt.title('Ranked list of features over their impact in predicting reaction time')
     plt.xlabel('SHAP value (impact on model output) on reaction time')
@@ -214,20 +214,17 @@ def runlgbreleasetimes(X, y, paramsinput=None):
     labels[0] = 'past trial was correct'
 
     ax.set_yticklabels(labels)
-    plt.savefig('figs/shapsummaryplot_allanimals2.png')
+    plt.savefig('figs/shapsummaryplot_allanimals2.png', dpi=1000, bbox_inches='tight')
 
     plt.show()
 
     shap.dependence_plot("timeToTarget", shap_values, X)  #
-
     explainer = shap.Explainer(xg_reg, X)
     shap_values2 = explainer(X_train)
     fig, ax = plt.subplots(figsize=(15, 15))
     shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "precur_and_targ_same"], show = False)
     fig.tight_layout()
     plt.savefig('figs/talkerprecurandtargsame_dependencyplot2.png')
-
-
     plt.subplots_adjust(left=-10, right=0.5)
 
     plt.show()
