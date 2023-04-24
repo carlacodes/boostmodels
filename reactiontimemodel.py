@@ -192,17 +192,17 @@ def runlgbreleasetimes(X, y, paramsinput=None):
 
     labels = [item.get_text() for item in ax.get_yticklabels()]
     print(labels)
-    labels[11] = 'distance to sensor'
-    labels[10] = 'target F0'
-    labels[9] = 'trial number'
-    labels[8] = 'precursor = target F0'
-    labels[7] = 'male talker'
-    labels[6] = 'time until target'
-    labels[5] = 'target F0 - precursor F0'
-    labels[4] = 'day of week'
-    labels[3] = 'precursor F0'
-    labels[2] = 'past trial was catch'
-    labels[1] = 'trial took place in AM'
+    labels[11] = 'trial Number'
+    labels[10] = 'time to target'
+    labels[9] = 'side of audio presentation'
+    labels[8] = 'pitch of target'
+    labels[7] = 'pitch of precursor'
+    labels[6] = 'day since start of week'
+    labels[5] = 'trial took place in AM'
+    labels[4] = 'past trial catch'
+    labels[3] = 'male/female talker'
+    labels[2] = 'precursor = target pitch'
+    labels[1] = 'change in pitch value'
     labels[0] = 'past trial was correct'
 
     ax.set_yticklabels(labels)
@@ -210,9 +210,9 @@ def runlgbreleasetimes(X, y, paramsinput=None):
 
     plt.show()
 
-    shap.dependence_plot("timeToTarget", shap_values, X_train)  #
+    shap.dependence_plot("timeToTarget", shap_values, X)  #
 
-    explainer = shap.Explainer(xg_reg, X_train)
+    explainer = shap.Explainer(xg_reg, X)
     shap_values2 = explainer(X_train)
     fig, ax = plt.subplots(figsize=(15, 15))
     shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "precur_and_targ_same"], show = False)
