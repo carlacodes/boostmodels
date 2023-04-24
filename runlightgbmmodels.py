@@ -337,6 +337,20 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.savefig('D:/behavmodelfigs/fa_or_not_model/targtimescolouredbytrialnumber.png', dpi=1000)
     plt.show()
 
+    shap.plots.scatter(shap_values2[:, "pitchoftarg"], color=shap_values2[:, "pitchofprecur"], show=False, cmap = cmapcustom)
+    fig, ax = plt.gcf(), plt.gca()
+    # Get colorbar
+    cb_ax = fig.axes[1]
+    # Modifying color bar parameters
+    cb_ax.tick_params(labelsize=15)
+    cb_ax.set_ylabel("Pitch of precursor", fontsize=12)
+    plt.ylabel('SHAP value', fontsize=10)
+    plt.title('Pitch of target \n versus impact in predicting a false alarm', fontsize=18)
+    plt.ylabel('SHAP value', fontsize=16)
+    plt.xlabel('Pitch of target', fontsize=16)
+    plt.savefig('D:/behavmodelfigs/fa_or_not_model/pitchoftargcolouredbyprecur.png', dpi=1000)
+    plt.show()
+
 
     return xg_reg, ypred, y_test, results, shap_values1, X_train, y_train, bal_accuracy, shap_values2
 
@@ -866,7 +880,7 @@ if __name__ == '__main__':
     # #
     # # test_df2 = run_reaction_time_fa_pipleine_male(ferrets)
     #
-    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(ferrets, optimization= True)
+    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(ferrets, optimization= False)
     #
 
     # plot_reaction_times_intra(ferrets)

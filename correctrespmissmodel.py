@@ -147,12 +147,12 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
         #load the saved params
         paramsinput = np.load('optuna_results/correctresponse_optunaparams.npy', allow_pickle=True).item()
     else:
-        study = run_optuna_study_correctresp(dfx.to_numpy(), df_to_use['correctresp'].to_numpy())
+        study = run_optuna_study_correctresp(dfx.to_numpy(), df_to_use['misslist'].to_numpy())
         print(study.best_params)
         paramsinput = study.best_params
         np.save('optuna_results/correctresponse_optunaparams.npy', study.best_params)
 
-    X_train, X_test, y_train, y_test = train_test_split(dfx, df_to_use['correctresp'], test_size=0.2, random_state=123)
+    X_train, X_test, y_train, y_test = train_test_split(dfx, df_to_use['misslist'], test_size=0.2, random_state=123)
     print(X_train.shape)
     print(X_test.shape)
 
@@ -180,7 +180,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
 
     shap.summary_plot(shap_values1, X_train, show = False, color=cmapsummary)
     fig, ax = plt.gcf(), plt.gca()
-    plt.title('Ranked list of features over their \n impact in predicting a hit or miss', fontsize = 18)
+    plt.title('Ranked list of features over their \n impact in predicting a miss', fontsize = 18)
     # Get the plot's Patch objects
     labels = [item.get_text() for item in ax.get_yticklabels()]
     print(labels)
@@ -225,7 +225,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     cb_ax = fig.axes[1]
     # Modifying color bar parameters
     cb_ax.tick_params(labelsize=15)
-    cb_ax.set_ylabel("Pitch of precursor word", fontsize=15)    plt.subplots_adjust(left=-10, right=0.5)
+    cb_ax.set_ylabel("Pitch of precursor word", fontsize=15)
     plt.savefig('D:/behavmodelfigs/correctresp_or_miss/trialnum_vs_precurpitch.png', dpi=1000, bbox_inches = "tight")
     plt.show()
 
@@ -239,13 +239,13 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
 
     plt.xticks([0, 1 ], labels = ['left', 'right'], fontsize =15)
     plt.ylabel('SHAP value', fontsize=10)
-    plt.title('Pitch of the side of the booth \n versus impact in correct response over miss probability', fontsize=18)
+    plt.title('Pitch of the side of the booth \n versus impact in miss probability', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
     plt.xlabel('Side of audio presenetation', fontsize=16)
     plt.savefig('D:/behavmodelfigs/correctresp_or_miss/sidevsprecurpitch.png', dpi=1000)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "pitchoftarg"], color=shap_values2[:, "pitchofprecur"], show=False, cmap = matplotlib.colormaps[cmapname])
+    shap.plots.scatter(shap_values2[:, "pitchoftarg"], color=shap_values2[:, "pitchofprecur"], show=False, cmap = cmapcustom)
     fig, ax = plt.gcf(), plt.gca()
     # Get colorbar
     cb_ax = fig.axes[1]
@@ -253,7 +253,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     cb_ax.tick_params(labelsize=15)
     cb_ax.set_ylabel("Pitch of precursor", fontsize=12)
     plt.ylabel('SHAP value', fontsize=10)
-    plt.title('Pitch of target \n versus impact in predicting a correct response over miss', fontsize=18)
+    plt.title('Pitch of target \n versus impact in miss probability', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
     plt.xlabel('Pitch of target', fontsize=16)
     plt.savefig('D:/behavmodelfigs/correctresp_or_miss/pitchoftargcolouredbyprecur.png', dpi=1000)
