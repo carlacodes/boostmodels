@@ -138,9 +138,9 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
 
     df_to_use = dataframe[["pitchoftarg", "pitchofprecur", "talker", "side", "precur_and_targ_same",
                            "targTimes", "DaysSinceStart", "AM", "cosinesim", "stepval", "pastcorrectresp",
-                           "pastcatchtrial", "trialNum", "correctresp"]]
+                           "pastcatchtrial", "trialNum", "misslist"]]
 
-    col = 'correctresp'
+    col = 'misslist'
     dfx = df_to_use.loc[:, df_to_use.columns != col]
 
     if optimization == False:
@@ -218,11 +218,15 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
 
     explainer = shap.Explainer(xg_reg, X_train)
     shap_values2 = explainer(X_train)
+
     fig, ax = plt.subplots(figsize=(15, 15))
     shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "pitchofprecur"], ax=ax, cmap = cmapcustom)
-    plt.tight_layout()
-    plt.subplots_adjust(left=-10, right=0.5)
-    plt.savefig('D:/behavmodelfigs/correctresp_or_miss/trialnum_vs_precurpitch.png', dpi=1000)
+    fig, ax = plt.gcf(), plt.gca()
+    cb_ax = fig.axes[1]
+    # Modifying color bar parameters
+    cb_ax.tick_params(labelsize=15)
+    cb_ax.set_ylabel("Pitch of precursor word", fontsize=15)    plt.subplots_adjust(left=-10, right=0.5)
+    plt.savefig('D:/behavmodelfigs/correctresp_or_miss/trialnum_vs_precurpitch.png', dpi=1000, bbox_inches = "tight")
     plt.show()
 
     fig, ax = plt.subplots(figsize=(10, 10))
@@ -330,7 +334,7 @@ def run_correct_responsepipeline(ferrets):
     filepath.parent.mkdir(parents=True, exist_ok=True)
     resultingcr_df.to_csv(filepath)
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbcorrectrespornotwithoptuna(
-        resultingcr_df, optimization=False)
+        resultingcr_df, optimization=True)
     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
 
