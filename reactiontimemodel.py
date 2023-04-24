@@ -185,7 +185,15 @@ def runlgbreleasetimes(X, y, paramsinput=None):
     shap_values = shap.TreeExplainer(xg_reg).shap_values(X)
     fig, ax = plt.subplots(figsize=(15, 15))
     # title kwargs still does nothing so need this workaround for summary plots
-    shap.summary_plot(shap_values, X, show=False)
+
+    #introduce cmap
+    custom_colors = ['lightcoral', "cyan", "orange"]  # Add more colors as needed
+    # cmapcustom = matplotlib.colors.ListedColormap(custom_colors)
+    cmapcustom = mcolors.LinearSegmentedColormap.from_list('my_custom_cmap', custom_colors, N=1000)
+    custom_colors_summary = ['lightcoral', "cyan", "orange"]  # Add more colors as needed
+    cmapsummary = matplotlib.colors.ListedColormap(custom_colors_summary)
+
+    shap.summary_plot(shap_values, X, show=False, cmap = cmapsummary)
     fig, ax = plt.gcf(), plt.gca()
     plt.title('Ranked list of features over their impact in predicting reaction time')
     plt.xlabel('SHAP value (impact on model output) on reaction time')
