@@ -221,8 +221,8 @@ def run_optuna_study_correctresponse(dataframe, y):
 
 def runlgbfaornotwithoptuna(dataframe, paramsinput):
     df_to_use = dataframe[
-        ["cosinesim", "pitchofprecur", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
-         "falsealarm", "temporalsim", "pastcorrectresp", "pastcatchtrial", "trialNum", "targTimes", ]]
+        ["targTimes","trialNum",  "pitchofprecur", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
+         "falsealarm", "temporalsim", "pastcorrectresp", "pastcatchtrial", "cosinesim",]]
 
     col = 'falsealarm'
     dfx = df_to_use.loc[:, df_to_use.columns != col]
@@ -263,6 +263,30 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     custom_colors_summary = ['slategray', 'hotpink',]  # Add more colors as needed
     cmapsummary = matplotlib.colors.ListedColormap(custom_colors_summary)
 
+
+    feature_importances = np.abs(shap_values1).sum(axis=0)
+
+    # Calculate the cumulative sum of feature importances
+    cumulative_importances_list = []
+    for shap_values in shap_values1:
+        feature_importances = np.abs(shap_values).sum(axis=0)
+        cumulative_importances = np.cumsum(feature_importances)
+        cumulative_importances_list.append(cumulative_importances)
+
+    # Calculate the combined cumulative sum of feature importances
+    cumulative_importances_combined = np.sum(cumulative_importances_list, axis=0)
+    feature_labels = dfx.columns
+    # Plot the elbow plot
+    plt.plot(feature_labels, cumulative_importances_combined, marker='o')
+    plt.xlabel('Features')
+    plt.ylabel('Cumulative Feature Importance')
+    plt.title('Elbow Plot of Cumulative Feature Importance for False Alarm')
+    plt.xticks(rotation=45, ha='right')  # rotate x-axis labels for better readability
+    plt.savefig('D:/behavmodelfigs/fa_or_not_model/elbowplot.png', dpi=500)
+    plt.show()
+
+
+
     shap.summary_plot(shap_values1, dfx, show = False, color=cmapsummary)
     fig, ax = plt.gcf(), plt.gca()
     plt.title('Ranked list of features over their \n impact in predicting a false alarm', fontsize = 18)
@@ -288,18 +312,13 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
 
     shap.dependence_plot("pitchofprecur", shap_values1[0], X_train)  #
     plt.show()
+
     result = permutation_importance(xg_reg, X_test, y_test, n_repeats=1000,
                                     random_state=123, n_jobs=2)
     importances = result.importances_mean
-    indices = np.argsort(importances)[::-1]
-    # Plot the permutation importances as an elbow plot
-    plt.figure(figsize=(10, 6))
-    plt.plot(range(1, len(importances) + 1), importances[indices], 'b.-')
-    plt.xlabel('Number of Features')
-    plt.ylabel('Permutation Importance')
-    plt.title('Permutation Importances: Elbow Plot')
-    plt.savefig('D:/behavmodelfigs/fa_or_not_model/permutationfeatureimportances_elbow.png', bbox_inches='tight', dpi = 1000)
-    plt.show()
+
+
+
     #partial dependency plots
     explainer = shap.Explainer(xg_reg, dfx)
     shap_values2 = explainer(X_train)
@@ -356,7 +375,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.ylabel('SHAP value', fontsize=10)
     plt.title('Target presentation \n versus impact in predicting a false alarm', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
-    plt.xlabel('Target presentaton time', fontsize=16)
+    plt.xlabel('Target presentation time', fontsize=16)
     plt.savefig('D:/behavmodelfigs/fa_or_not_model/trialtime_colouredbyprecur.png', dpi=1000)
     plt.show()
 
