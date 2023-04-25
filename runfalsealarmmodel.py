@@ -278,12 +278,12 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     feature_labels = dfx.columns
     # Plot the elbow plot
     plt.figure(figsize=(10, 6))
-    plt.plot(feature_labels, cumulative_importances_combined, marker='o')
+    plt.plot(feature_labels, cumulative_importances_combined, marker='o', color = 'slategray')
     plt.xlabel('Features')
     plt.ylabel('Cumulative Feature Importance')
     plt.title('Elbow Plot of Cumulative Feature Importance for False Alarm Model')
     plt.xticks(rotation=45, ha='right')  # rotate x-axis labels for better readability
-    plt.savefig('D:/behavmodelfigs/fa_or_not_model/elbowplot.png', dpi=500)
+    plt.savefig('D:/behavmodelfigs/fa_or_not_model/elbowplot.png', dpi=500, bbox_inches='tight')
     plt.show()
 
 
