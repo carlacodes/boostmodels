@@ -93,6 +93,7 @@ def runlgbreleasetimes_for_a_ferret(data, paramsinput=None, ferret=1, ferret_nam
     mse_train = cross_val_score(xg_reg, X_train, y_train, scoring='neg_mean_squared_error', cv=kfold)
 
     mse_test = mean_squared_error(ypred, y_test)
+    mse_test = cross_val_score(xg_reg, X_test, y_test, scoring='neg_mean_squared_error', cv=kfold)
     print("MSE on test: %.4f" % (mse_test) + ferret_name)
     print("negative MSE training: %.2f%%" % (np.mean(mse_train) * 100.0))
     print(mse_train)
@@ -243,12 +244,15 @@ def runlgbreleasetimes(X, y, paramsinput=None):
     # Get colorbar
     cb_ax = fig.axes[1]
     # Modifying color bar parameters
-    cb_ax.tick_params(labelsize=15)
+    cb_ax.tick_params(ticks=[-1, 0, 1], labelsize=15)
     cb_ax.set_ylabel("Pitch of precursor", fontsize=12)
+    cb_ax.set_yticklabels( ['109 Hz', '124 Hz', '144 Hz', '191 Hz', '251 Hz'], fontsize=15)
+
     plt.ylabel('SHAP value', fontsize=10)
     plt.title('Pitch of target \n versus impact in predicted reacton time', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
-    plt.xlabel('Pitch of target', fontsize=16)
+    plt.xlabel('Pitch of target (Hz)', fontsize=16)
+    plt.xticks([1,2,3,4,5], labels=['109', '124', '144 ', '191', '251'], fontsize=15)
     plt.savefig('figs/correctrxntimemodel/pitchoftargcolouredbyprecur.png', dpi=1000)
     plt.show()
 

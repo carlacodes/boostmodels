@@ -219,13 +219,19 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     explainer = shap.Explainer(xg_reg, X_train)
     shap_values2 = explainer(X_train)
 
-    fig, ax = plt.subplots(figsize=(15, 15))
-    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "pitchofprecur"], ax=ax, cmap = cmapcustom)
+    fig, ax = plt.subplots()
+    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "pitchofprecur"], ax=ax, cmap = cmapcustom, show = False)
     fig, ax = plt.gcf(), plt.gca()
     cb_ax = fig.axes[1]
+
     # Modifying color bar parameters
     cb_ax.tick_params(labelsize=15)
-    cb_ax.set_ylabel("Pitch of precursor word", fontsize=15)
+    cb_ax.set_yticks([1, 2, 3,4, 5])
+    cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
+    cb_ax.set_ylabel("Pitch of precursor word (Hz)", fontsize=15)
+    plt.title('Trial number and its effet on the \n false alarm probability', fontsize = 18)
+    plt.xlabel('Trial number', fontsize = 15)
+    plt.ylabel('SHAP value', fontsize = 15)
     plt.savefig('D:/behavmodelfigs/correctresp_or_miss/trialnum_vs_precurpitch.png', dpi=1000, bbox_inches = "tight")
     plt.show()
 
@@ -251,11 +257,14 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     cb_ax = fig.axes[1]
     # Modifying color bar parameters
     cb_ax.tick_params(labelsize=15)
+    cb_ax.set_ticks([0, 1, 2, 3, 4])
     cb_ax.set_ylabel("Pitch of precursor", fontsize=12)
+    cb_ax.set_yticklabels( ['109 Hz', '124 Hz', '144 Hz', '191 Hz', '251 Hz'], fontsize=15)
     plt.ylabel('SHAP value', fontsize=10)
     plt.title('Pitch of target \n versus impact in miss probability', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
-    plt.xlabel('Pitch of target', fontsize=16)
+    plt.xlabel('Pitch of target (Hz)', fontsize=16)
+    plt.xticks([1,2,3,4,5], labels=['109', '124', '144 ', '191', '251'], fontsize=15)
     plt.savefig('D:/behavmodelfigs/correctresp_or_miss/pitchoftargcolouredbyprecur.png', dpi=1000)
     plt.show()
 
