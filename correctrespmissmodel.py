@@ -342,7 +342,7 @@ def run_correct_responsepipeline(ferrets):
     filepath.parent.mkdir(parents=True, exist_ok=True)
     resultingcr_df.to_csv(filepath)
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbcorrectrespornotwithoptuna(
-        resultingcr_df, optimization=True)
+        resultingcr_df, optimization=False)
     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
 
