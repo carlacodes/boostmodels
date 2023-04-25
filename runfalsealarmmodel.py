@@ -248,6 +248,7 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput):
     print("Accuracy: %.2f%%" % (np.mean(results) * 100.0))
     print(results)
     print('Balanced Accuracy: %.2f%%' % (np.mean(bal_accuracy) * 100.0))
+
     plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test, bal_accuracy, dfx)
 
     return xg_reg, ypred, y_test, results, X_train, y_train, X_test, bal_accuracy, dfx
@@ -261,6 +262,21 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     cmapcustom = mcolors.LinearSegmentedColormap.from_list('my_custom_cmap', custom_colors, N=1000)
     custom_colors_summary = ['slategray', 'hotpink',]  # Add more colors as needed
     cmapsummary = matplotlib.colors.ListedColormap(custom_colors_summary)
+
+    importances = np.abs(shap_values.values).mean(axis=0)  # calculate average absolute Shapley value for each feature
+    sorted_idx = np.argsort(importances)[::-1]  # sort feature importances in descending order
+    cumulative_importance = np.cumsum(importances[sorted_idx])
+    # Step 4: Plot feature importances as an "elbow" plot
+    plt.figure(figsize=(10, 6))
+    plt.plot(range(1, len(importances) + 1), cumulative_importance, 'b-', cmap = cmapcustom)
+    plt.xlabel('Number of Features')
+    plt.ylabel('Cumulative Importance')
+    plt.title('Feature Importances (Elbow Plot)')
+    plt.xticks(np.arange(1, len(importances) + 1, step=1))
+    plt.grid(True)
+    plt.savefig('D:/behavmodelfigs/fa_or_not_model/featureimportances_elbow.png', bbox_inches='tight')
+    plt.show()
+
 
     shap.summary_plot(shap_values1, dfx, show = False, color=cmapsummary)
     fig, ax = plt.gcf(), plt.gca()
