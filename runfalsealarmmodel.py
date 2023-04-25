@@ -303,7 +303,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
 
     shap.dependence_plot("pitchofprecur", shap_values1[0], X_train)  #
     plt.show()
-    result = permutation_importance(xg_reg, X_test, y_test, n_repeats=10,
+    result = permutation_importance(xg_reg, X_test, y_test, n_repeats=1000,
                                     random_state=123, n_jobs=2)
     sorted_idx = result.importances_mean.argsort()
 
