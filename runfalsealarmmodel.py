@@ -315,6 +315,8 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     # Modifying color bar parameters
     cb_ax.tick_params(labelsize=15)
     cb_ax.set_ylabel("Intra-trial roving", fontsize=12)
+
+
     plt.ylabel('SHAP value', fontsize=10)
     plt.title('Pitch of the precursor word \n versus impact in false alarm probability', fontsize=18)
     plt.xticks([1,2,3,4,5], labels=['109 Hz', '124 Hz', '144 Hz', '191 Hz', '251 Hz'], fontsize=15)
@@ -344,6 +346,8 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     cb_ax = fig.axes[1]
     # Modifying color bar parameters
     cb_ax.tick_params(labelsize=15)
+    cb_ax.set_yticks([1, 2, 3,4, 5])
+    cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
     cb_ax.set_ylabel("Pitch of precursor", fontsize=12)
     plt.ylabel('SHAP value', fontsize=10)
     plt.title('Pitch of target \n versus impact in predicting a false alarm', fontsize=18)
