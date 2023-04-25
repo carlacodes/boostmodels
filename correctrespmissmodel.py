@@ -178,6 +178,26 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     custom_colors_summary = ['peru', 'gold',]  # Add more colors as needed
     cmapsummary = matplotlib.colors.ListedColormap(custom_colors_summary)
 
+    #elbow plot
+    cumulative_importances_list = []
+    for shap_values in shap_values1:
+        feature_importances = np.abs(shap_values).sum(axis=0)
+        cumulative_importances = np.cumsum(feature_importances)
+        cumulative_importances_list.append(cumulative_importances)
+
+    # Calculate the combined cumulative sum of feature importances
+    cumulative_importances_combined = np.sum(cumulative_importances_list, axis=0)
+    feature_labels = dfx.columns
+    # Plot the elbow plot
+    plt.figure(figsize=(10, 6))
+    plt.plot(feature_labels, cumulative_importances_combined, marker='o', color = 'slategray')
+    plt.xlabel('Features')
+    plt.ylabel('Cumulative Feature Importance')
+    plt.title('Elbow Plot of Cumulative Feature Importance for False Alarm Model')
+    plt.xticks(rotation=45, ha='right')  # rotate x-axis labels for better readability
+    plt.savefig('D:/behavmodelfigs/correctresp_or_miss/elbowplot.png', dpi=500, bbox_inches='tight')
+    plt.show()
+
     shap.summary_plot(shap_values1, X_train, show = False, color=cmapsummary)
     fig, ax = plt.gcf(), plt.gca()
     plt.title('Ranked list of features over their \n impact in predicting a miss', fontsize = 18)
