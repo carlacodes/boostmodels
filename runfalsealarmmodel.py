@@ -263,7 +263,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     custom_colors_summary = ['slategray', 'hotpink',]  # Add more colors as needed
     cmapsummary = matplotlib.colors.ListedColormap(custom_colors_summary)
 
-    importances = np.abs(shap_values.values).mean(axis=0)  # calculate average absolute Shapley value for each feature
+    importances = np.abs(shap_values1.values).mean(axis=0)  # calculate average absolute Shapley value for each feature
     sorted_idx = np.argsort(importances)[::-1]  # sort feature importances in descending order
     cumulative_importance = np.cumsum(importances[sorted_idx])
     # Step 4: Plot feature importances as an "elbow" plot
