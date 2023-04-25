@@ -340,7 +340,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.savefig('D:/behavmodelfigs/fa_or_not_model/targtimescolouredbytrialnumber.png', dpi=1000)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "pitchoftarg"], color=shap_values2[:, "pitchofprecur"], show=False, cmap = cmapcustom)
+    shap.plots.scatter(shap_values2[:, "targTimes"], color=shap_values2[:, "pitchofprecur"], show=False, cmap = cmapcustom)
     fig, ax = plt.gcf(), plt.gca()
     # Get colorbar
     cb_ax = fig.axes[1]
@@ -350,10 +350,10 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
     cb_ax.set_ylabel("Pitch of precursor", fontsize=12)
     plt.ylabel('SHAP value', fontsize=10)
-    plt.title('Pitch of target \n versus impact in predicting a false alarm', fontsize=18)
+    plt.title('Target presentation \n versus impact in predicting a false alarm', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
-    plt.xlabel('Pitch of target', fontsize=16)
-    plt.savefig('D:/behavmodelfigs/fa_or_not_model/pitchoftargcolouredbyprecur.png', dpi=1000)
+    plt.xlabel('Target presentaton time', fontsize=16)
+    plt.savefig('D:/behavmodelfigs/fa_or_not_model/trialtime_colouredbyprecur.png', dpi=1000)
     plt.show()
 
 
