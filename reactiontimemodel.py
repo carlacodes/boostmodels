@@ -227,7 +227,7 @@ def runlgbreleasetimes(X, y, paramsinput=None):
 
     # Calculate the combined cumulative sum of feature importances
     cumulative_importances_combined = np.sum(cumulative_importances_list, axis=0)
-    feature_labels = dfx.columns
+    feature_labels = X.columns
     # Plot the elbow plot
     plt.figure(figsize=(10, 6))
     plt.plot(feature_labels, cumulative_importances_combined, marker='o', color = 'slategray')
@@ -235,7 +235,7 @@ def runlgbreleasetimes(X, y, paramsinput=None):
     plt.ylabel('Cumulative Feature Importance')
     plt.title('Elbow Plot of Cumulative Feature Importance for Correct Reaction Time Model')
     plt.xticks(rotation=45, ha='right')  # rotate x-axis labels for better readability
-    plt.savefig('D:/behavmodelfigs/fa_or_not_model/elbowplot.png', dpi=500, bbox_inches='tight')
+    plt.savefig('figs/correctrxntimemodel/elbowplot.png', dpi=500, bbox_inches='tight')
     plt.show()
 
     fig, ax = plt.subplots(figsize=(15, 15))
