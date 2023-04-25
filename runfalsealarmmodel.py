@@ -263,21 +263,6 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     custom_colors_summary = ['slategray', 'hotpink',]  # Add more colors as needed
     cmapsummary = matplotlib.colors.ListedColormap(custom_colors_summary)
 
-    importances = np.abs(shap_values1.values).mean(axis=0)  # calculate average absolute Shapley value for each feature
-    sorted_idx = np.argsort(importances)[::-1]  # sort feature importances in descending order
-    cumulative_importance = np.cumsum(importances[sorted_idx])
-    # Step 4: Plot feature importances as an "elbow" plot
-    plt.figure(figsize=(10, 6))
-    plt.plot(range(1, len(importances) + 1), cumulative_importance, 'b-', cmap = cmapcustom)
-    plt.xlabel('Number of Features')
-    plt.ylabel('Cumulative Importance')
-    plt.title('Feature Importances (Elbow Plot)')
-    plt.xticks(np.arange(1, len(importances) + 1, step=1))
-    plt.grid(True)
-    plt.savefig('D:/behavmodelfigs/fa_or_not_model/featureimportances_elbow.png', bbox_inches='tight')
-    plt.show()
-
-
     shap.summary_plot(shap_values1, dfx, show = False, color=cmapsummary)
     fig, ax = plt.gcf(), plt.gca()
     plt.title('Ranked list of features over their \n impact in predicting a false alarm', fontsize = 18)
@@ -305,14 +290,17 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.show()
     result = permutation_importance(xg_reg, X_test, y_test, n_repeats=1000,
                                     random_state=123, n_jobs=2)
-    sorted_idx = result.importances_mean.argsort()
-
-    fig, ax = plt.subplots(figsize=(15, 15))
-    ax.barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T)
-    ax.set_title("Permutation Importances (test set)")
-    fig.tight_layout()
-    plt.savefig('D:/behavmodelfigs/permutation_importance.png', dpi=500)
+    importances = result.importances_mean
+    indices = np.argsort(importances)[::-1]
+    # Plot the permutation importances as an elbow plot
+    plt.figure(figsize=(10, 6))
+    plt.plot(range(1, len(importances) + 1), importances[indices], 'b.-')
+    plt.xlabel('Number of Features')
+    plt.ylabel('Permutation Importance')
+    plt.title('Permutation Importances: Elbow Plot')
+    plt.savefig('D:/behavmodelfigs/fa_or_not_model/permutationfeatureimportances_elbow.png', bbox_inches='tight', dpi = 1000)
     plt.show()
+    #partial dependency plots
     explainer = shap.Explainer(xg_reg, dfx)
     shap_values2 = explainer(X_train)
     fig, ax = plt.subplots(figsize=(15, 15))
