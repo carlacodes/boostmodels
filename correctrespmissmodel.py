@@ -223,7 +223,6 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "pitchofprecur"], ax=ax, cmap = cmapcustom, show = False)
     fig, ax = plt.gcf(), plt.gca()
     cb_ax = fig.axes[1]
-
     # Modifying color bar parameters
     cb_ax.tick_params(labelsize=15)
     cb_ax.set_yticks([1, 2, 3,4, 5])

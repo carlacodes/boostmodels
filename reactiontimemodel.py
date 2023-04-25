@@ -244,9 +244,12 @@ def runlgbreleasetimes(X, y, paramsinput=None):
     # Get colorbar
     cb_ax = fig.axes[1]
     # Modifying color bar parameters
-    cb_ax.tick_params(ticks=[-1, 0, 1], labelsize=15)
+    cb_ax.tick_params(labelsize=15)
+
+    cb_ax.set_yticks([1, 2, 3,4, 5])
+    cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
     cb_ax.set_ylabel("Pitch of precursor", fontsize=12)
-    cb_ax.set_yticklabels( ['109 Hz', '124 Hz', '144 Hz', '191 Hz', '251 Hz'], fontsize=15)
+
 
     plt.ylabel('SHAP value', fontsize=10)
     plt.title('Pitch of target \n versus impact in predicted reacton time', fontsize=18)
