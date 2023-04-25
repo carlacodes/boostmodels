@@ -136,9 +136,9 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
                        'min_gain_to_split': 0.016768866636887758, 'bagging_fraction': 0.9, 'bagging_freq': 3,
                        'feature_fraction': 0.2}
 
-    df_to_use = dataframe[["pitchoftarg", "pitchofprecur", "talker", "side", "precur_and_targ_same",
+    df_to_use = dataframe[["pitchoftarg", "trialNum", "misslist", "pitchofprecur", "talker", "side", "precur_and_targ_same",
                            "targTimes", "DaysSinceStart", "AM", "cosinesim", "stepval", "pastcorrectresp",
-                           "pastcatchtrial", "trialNum", "misslist"]]
+                           "pastcatchtrial", ]]
 
     col = 'misslist'
     dfx = df_to_use.loc[:, df_to_use.columns != col]
@@ -190,10 +190,10 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     feature_labels = dfx.columns
     # Plot the elbow plot
     plt.figure(figsize=(10, 6))
-    plt.plot(feature_labels, cumulative_importances_combined, marker='o', color = 'slategray')
+    plt.plot(feature_labels, cumulative_importances_combined, marker='o', color = 'gold')
     plt.xlabel('Features')
     plt.ylabel('Cumulative Feature Importance')
-    plt.title('Elbow Plot of Cumulative Feature Importance for False Alarm Model')
+    plt.title('Elbow Plot of Cumulative Feature Importance for Miss Model')
     plt.xticks(rotation=45, ha='right')  # rotate x-axis labels for better readability
     plt.savefig('D:/behavmodelfigs/correctresp_or_miss/elbowplot.png', dpi=500, bbox_inches='tight')
     plt.show()

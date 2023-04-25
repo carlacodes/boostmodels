@@ -78,10 +78,6 @@ def runlgbreleasetimes_for_a_ferret(data, paramsinput=None, ferret=1, ferret_nam
     X_train, X_test, y_train, y_test = train_test_split(dfx, data['realRelReleaseTimes'], test_size=0.2,
                                                         random_state=123)
 
-    # param = {'max_depth': 2, 'eta': 1, 'objective': 'reg:squarederror'}
-    # param['nthread'] = 4
-    # param['eval_metric'] = 'auc'
-
     xg_reg = lgb.LGBMRegressor(random_state=123, verbose=1, **paramsinput)
     xg_reg.fit(X_train, y_train, verbose=1)
     ypred = xg_reg.predict(X_test)
@@ -99,14 +95,14 @@ def runlgbreleasetimes_for_a_ferret(data, paramsinput=None, ferret=1, ferret_nam
     print(mse_train)
     shap_values = shap.TreeExplainer(xg_reg).shap_values(dfx)
 
-    cumulative_importances_list = []
-    for shap_values in shap_values1:
-        feature_importances = np.abs(shap_values).sum(axis=0)
-        cumulative_importances = np.cumsum(feature_importances)
-        cumulative_importances_list.append(cumulative_importances)
+    # cumulative_importances_list = []
+    # for shap_values in shap_values1:
+    #     feature_importances = np.abs(shap_values).sum(axis=0)
+    #     cumulative_importances = np.cumsum(feature_importances)
+    #     cumulative_importances_list.append(cumulative_importances)
 
     # Calculate the combined cumulative sum of feature importances
-    cumulative_importances_combined = np.sum(cumulative_importances_list, axis=0)
+    cumulative_importances_combined = np.sum(np.abs(shap_values), axis=0)
     feature_labels = dfx.columns
     # Plot the elbow plot
     plt.figure(figsize=(10, 6))
@@ -210,30 +206,19 @@ def runlgbreleasetimes(X, y, paramsinput=None):
     shap_values = shap.TreeExplainer(xg_reg).shap_values(X)
     fig, ax = plt.subplots(figsize=(15, 15))
     # title kwargs still does nothing so need this workaround for summary plots
-
-    #introduce cmap
-    custom_colors = ['lightcoral', "cyan", "orange"]  # Add more colors as needed
-    # cmapcustom = matplotlib.colors.ListedColormap(custom_colors)
-    cmapcustom = mcolors.LinearSegmentedColormap.from_list('my_custom_cmap', custom_colors, N=1000)
-    custom_colors_summary = ['lightcoral', "cyan", "orange"]  # Add more colors as needed
-    cmapsummary = matplotlib.colors.ListedColormap(custom_colors_summary)
     cmapname = "viridis"
 
-    cumulative_importances_list = []
-    for shap_values in shap_values:
-        feature_importances = np.abs(shap_values).sum(axis=0)
-        cumulative_importances = np.cumsum(feature_importances)
-        cumulative_importances_list.append(cumulative_importances)
+    feature_importances = np.abs(shap_values).sum(axis=0)
+    cumulative_importances = np.cumsum(feature_importances)
 
-    # Calculate the combined cumulative sum of feature importances
-    cumulative_importances_combined = np.sum(cumulative_importances_list, axis=0)
+
     feature_labels = X.columns
     # Plot the elbow plot
     plt.figure(figsize=(10, 6))
-    plt.plot(feature_labels, cumulative_importances_combined, marker='o', color = 'slategray')
+    plt.plot(feature_labels, cumulative_importances, marker='o', color = 'cyan')
     plt.xlabel('Features')
     plt.ylabel('Cumulative Feature Importance')
-    plt.title('Elbow Plot of Cumulative Feature Importance for Correct Reaction Time Model')
+    plt.title('Elbow Plot of Cumulative Feature Importance for Correct Reaction Time Model', fontsize = 20)
     plt.xticks(rotation=45, ha='right')  # rotate x-axis labels for better readability
     plt.savefig('figs/correctrxntimemodel/elbowplot.png', dpi=500, bbox_inches='tight')
     plt.show()
