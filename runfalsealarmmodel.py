@@ -180,7 +180,7 @@ def objective(trial, X, y):
 
 
 def run_optuna_study_falsealarm(dataframe, y, ferret_as_feature = False):
-    study = optuna.create_study(direction="minimize", study_name="LGBM Classifier")\
+    study = optuna.create_study(direction="minimize", study_name="LGBM Classifier")
     if ferret_as_feature:
         df_to_use = dataframe[
             ["cosinesim", "ferret", "pitchofprecur", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
