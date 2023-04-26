@@ -378,7 +378,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.title('Target presentation time \n versus impact in false alarm probability', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
     plt.xlabel('Trial number', fontsize=16)
-    plt.savefig( fig_dir / 'targtimescolouredbytrialnumber.png', dpi=1000)
+    plt.savefig(fig_dir / 'targtimescolouredbytrialnumber.png', dpi=1000)
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "targTimes"], color=shap_values2[:, "pitchofprecur"], show=False, cmap = cmapcustom)
