@@ -13,14 +13,12 @@ import lightgbm as lgb
 import optuna
 from optuna.integration import LightGBMPruningCallback
 from sklearn.model_selection import StratifiedKFold
-import os
 import xgboost as xgb
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import sklearn
 from sklearn.model_selection import train_test_split
 from helpers.behaviouralhelpersformodels import *
-# os.environ['R_HOME'] = 'C:/PROGRA~1/R/R-41~1.3/bin/x64/R'
 
 def cli_reaction_time(path=None,
                       output=None,
@@ -272,13 +270,10 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.subplots(figsize=(25, 25))
 
     custom_colors = ['slategray',  'hotpink', "yellow"]  # Add more colors as needed
-    # cmapcustom = matplotlib.colors.ListedColormap(custom_colors)
     cmapcustom = mcolors.LinearSegmentedColormap.from_list('my_custom_cmap', custom_colors, N=1000)
     custom_colors_summary = ['slategray', 'hotpink',]  # Add more colors as needed
     cmapsummary = matplotlib.colors.ListedColormap(custom_colors_summary)
 
-
-    feature_importances = np.abs(shap_values1).sum(axis=0)
 
     # Calculate the cumulative sum of feature importances
     cumulative_importances_list = []
@@ -324,6 +319,8 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     fig.tight_layout()
     plt.savefig(fig_dir / 'fa_or_not_model/ranked_features.png', dpi=1000, bbox_inches = "tight")
     plt.show()
+
+
     #calculate permutation importance
     result = permutation_importance(xg_reg, X_test, y_test, n_repeats=100,
                                     random_state=123, n_jobs=2)
