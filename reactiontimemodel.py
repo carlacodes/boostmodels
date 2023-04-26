@@ -311,25 +311,39 @@ def run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature = 
     if ferret_as_feature == False:
         col2 = 'ferret'
         dfx = dfx.loc[:, dfx.columns != col2]
+        if optimization == False:
+            best_params = {'colsample_bytree': 0.49619263716341894,
+                           'alpha': 8.537376181435246,
+                           'n_estimators': 96,
+                           'learning_rate': 0.17871472565344848,
+                           'max_depth': 5,
+                           'bagging_fraction': 0.7000000000000001,
+                           'bagging_freq': 6}
+            best_params = np.load('optuna_results/best_paramsreleastimemodel_allferrets.npy', allow_pickle=True).item()
+        else:
+            best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
+            best_params = best_study_results.best_params
+            np.save('optuna_results/best_paramsreleastimemodel_allferrets.npy', best_params)
     else:
         dfx = dfx
+        if optimization == False:
+            best_params = {'colsample_bytree': 0.49619263716341894,
+                           'alpha': 8.537376181435246,
+                           'n_estimators': 96,
+                           'learning_rate': 0.17871472565344848,
+                           'max_depth': 5,
+                           'bagging_fraction': 0.7000000000000001,
+                           'bagging_freq': 6}
+            best_params = np.load('optuna_results/best_paramsreleastimemodel_allferrets_ferretasfeature.npy', allow_pickle=True).item()
+        else:
+            best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
+            best_params = best_study_results.best_params
+            np.save('optuna_results/best_paramsreleastimemodel_allferrets_ferretasfeature.npy', best_params)
 
 
-    if optimization == False:
-        best_params = {'colsample_bytree': 0.49619263716341894,
-                       'alpha': 8.537376181435246,
-                       'n_estimators': 96,
-                       'learning_rate': 0.17871472565344848,
-                       'max_depth': 5,
-                       'bagging_fraction': 0.7000000000000001,
-                       'bagging_freq': 6}
-        best_params = np.load('optuna_results/best_paramsreleastimemodel_allferrets.npy', allow_pickle=True).item()
-    else:
-        best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
-        best_params = best_study_results.best_params
-        np.save('optuna_results/best_paramsreleastimemodel_allferrets.npy', best_params)
 
-    xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx, df_use[col], paramsinput=best_params, ferret_as_feature = ferret_as_feature)
+
+    xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx, df_use[col], paramsinput=best_params, ferret_as_feature=ferret_as_feature)
 
 
 def main():

@@ -128,7 +128,7 @@ def run_optuna_study_correctresp(X, y):
     for key, value in study.best_params.items():
         print(f"\t\t{key}: {value}")
     return study
-def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization = False):
+def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization = False, ferret_as_feature=False):
     if paramsinput is None:
         paramsinput = {'colsample_bytree': 0.4253436090928764, 'alpha': 18.500902749816458, 'is_unbalanced': True,
                        'n_estimators': 8700, 'learning_rate': 0.45629236152754304, 'num_leaves': 670, 'max_depth': 3,
@@ -136,21 +136,41 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
                        'min_gain_to_split': 0.016768866636887758, 'bagging_fraction': 0.9, 'bagging_freq': 3,
                        'feature_fraction': 0.2}
 
-    df_to_use = dataframe[["pitchoftarg", "trialNum", "misslist", "pitchofprecur", "talker", "side", "precur_and_targ_same",
+    if ferret_as_feature == True:
+        df_to_use = dataframe[["pitchoftarg", "trialNum", "misslist", "pitchofprecur", "talker", "side", "precur_and_targ_same",
+                           "targTimes", "DaysSinceStart", "AM", "cosinesim", "stepval", "pastcorrectresp",
+                           "pastcatchtrial", "ferret"]]
+        fig_dir = Path('D:/behavmodelfigs/correctresp_or_miss/ferret_as_feature')
+        col = 'misslist'
+        dfx = df_to_use.loc[:, df_to_use.columns != col]
+        if optimization == False:
+            # load the saved params
+            paramsinput = np.load('optuna_results/correctresponse_optunaparams_ferretasfeature.npy', allow_pickle=True).item()
+        else:
+            study = run_optuna_study_correctresp(dfx.to_numpy(), df_to_use['misslist'].to_numpy())
+            print(study.best_params)
+            paramsinput = study.best_params
+            np.save('optuna_results/correctresponse_optunaparams_ferretasfeature.npy', study.best_params)
+
+    else:
+        df_to_use = dataframe[["pitchoftarg", "trialNum", "misslist", "pitchofprecur", "talker", "side", "precur_and_targ_same",
                            "targTimes", "DaysSinceStart", "AM", "cosinesim", "stepval", "pastcorrectresp",
                            "pastcatchtrial", ]]
+        fig_dir = Path('D:/behavmodelfigs/correctresp_or_miss/')
+        col = 'misslist'
+        dfx = df_to_use.loc[:, df_to_use.columns != col]
+        if optimization == False:
+            # load the saved params
+            paramsinput = np.load('optuna_results/correctresponse_optunaparams.npy', allow_pickle=True).item()
+        else:
+            study = run_optuna_study_correctresp(dfx.to_numpy(), df_to_use['misslist'].to_numpy())
+            print(study.best_params)
+            paramsinput = study.best_params
+            np.save('optuna_results/correctresponse_optunaparams.npy', study.best_params)
 
-    col = 'misslist'
-    dfx = df_to_use.loc[:, df_to_use.columns != col]
 
-    if optimization == False:
-        #load the saved params
-        paramsinput = np.load('optuna_results/correctresponse_optunaparams.npy', allow_pickle=True).item()
-    else:
-        study = run_optuna_study_correctresp(dfx.to_numpy(), df_to_use['misslist'].to_numpy())
-        print(study.best_params)
-        paramsinput = study.best_params
-        np.save('optuna_results/correctresponse_optunaparams.npy', study.best_params)
+
+
 
     X_train, X_test, y_train, y_test = train_test_split(dfx, df_to_use['misslist'], test_size=0.2, random_state=123)
     print(X_train.shape)
@@ -195,7 +215,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     plt.ylabel('Cumulative Feature Importance')
     plt.title('Elbow Plot of Cumulative Feature Importance for Miss Model')
     plt.xticks(rotation=45, ha='right')  # rotate x-axis labels for better readability
-    plt.savefig('D:/behavmodelfigs/correctresp_or_miss/elbowplot.png', dpi=500, bbox_inches='tight')
+    plt.savefig(fig_dir / 'elbowplot.png', dpi=500, bbox_inches='tight')
     plt.show()
 
     shap.summary_plot(shap_values1, X_train, show = False, color=cmapsummary)
@@ -219,7 +239,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     labels[0] = 'talker'
     ax.set_yticklabels(labels)
     fig.tight_layout()
-    plt.savefig('D:/behavmodelfigs/correctresp_or_miss/shap_summary_correctresp.png', dpi=1000, bbox_inches = "tight")
+    plt.savefig(fig_dir / 'shap_summary_correctresp.png', dpi=1000, bbox_inches = "tight")
 
 
     shap.dependence_plot("pitchofprecur", shap_values1[0], X_train)  #
@@ -232,7 +252,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     ax.barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T)
     ax.set_title("Permutation Importances (test set)")
     fig.tight_layout()
-    plt.savefig('D:/behavmodelfigs/permutation_importance.png', dpi=500)
+    plt.savefig(fig_dir / 'permutation_importance.png', dpi=500)
     plt.show()
 
 
@@ -267,7 +287,6 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     plt.title('Pitch of the side of the booth \n versus impact in miss probability', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
     plt.xlabel('Side of audio presenetation', fontsize=16)
-    plt.savefig('D:/behavmodelfigs/correctresp_or_miss/sidevsprecurpitch.png', dpi=1000)
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "pitchoftarg"], color=shap_values2[:, "pitchofprecur"], show=False, cmap = cmapcustom)
@@ -285,7 +304,6 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     plt.ylabel('SHAP value', fontsize=16)
     plt.xlabel('Pitch of target (Hz)', fontsize=16)
     plt.xticks([1,2,3,4,5], labels=['109', '124', '144 ', '191', '251'], fontsize=15)
-    plt.savefig('D:/behavmodelfigs/correctresp_or_miss/pitchoftargcolouredbyprecur.png', dpi=1000)
     plt.show()
 
 
@@ -294,53 +312,45 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"], show=False)
     plt.title('trial number \n vs. SHAP value impact')
     plt.ylabel('SHAP value', fontsize=18)
-    plt.savefig('D:/behavmodelfigs/correctrespmodel/trialnumdepenencyplot.png', dpi=500)
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "precur_and_targ_same"], show=False)
     plt.title('Cosine similarity \n vs. SHAP value impact')
     plt.ylabel('SHAP value', fontsize=18)
-    plt.savefig('D:/behavmodelfigs/correctrespmodel/cosinesimdepenencyplot.png', dpi=500)
+    # plt.savefig('D:/behavmodelfigs/correctrespmodel/cosinesimdepenencyplot.png', dpi=500)
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "precur_and_targ_same"], color=shap_values2[:, "cosinesim"], show=False)
 
     plt.title('Intra trial roving \n versus SHAP value impact', fontsize=18)
     plt.ylabel('SHAP value', fontsize=18)
-    plt.savefig('D:/behavmodelfigs/correctrespmodel/intratrialrovingcosinecolor.png', dpi=500)
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "targTimes"], show=False)
     plt.title('CR model - Trial number versus SHAP value, \n colored by target presentation time', fontsize=18)
     plt.ylabel('SHAP value', fontsize=18)
     plt.xlabel('Trial number', fontsize=15)
-    plt.savefig('D:/behavmodelfigs/correctrespmodel/trialnumtargtimecolor.png', dpi=500)
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "targTimes"], color=shap_values2[:, "trialNum"], show=False)
     plt.title('CR model - Target times versus SHAP value, \n colored by trial number', fontsize=18)
     plt.ylabel('SHAP value', fontsize=18)
     plt.xlabel('Target presentation time', fontsize=15)
-    plt.savefig('D:/behavmodelfigs/correctrespmodel/targtimestrialnumcolor.png', dpi=500)
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "targTimes"], show=False)
     plt.title('Cosine Similarity as a function \n of SHAP values coloured by targTimes')
-    plt.savefig('D:/behavmodelfigs/correctrespmodel/cosinesimtargtimes.png', dpi=500)
     plt.show()
-    np.save('D:/behavmodelfigs/correctrespponseoptunaparams4_strat5kfold.npy', paramsinput)
 
     shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "pitchoftarg"], show=False)
     plt.title('Cosine similarity as a function \n of SHAP values, coloured by the target pitch', fontsize=18)
     plt.ylabel('SHAP value', fontsize=18)
-    plt.savefig('D:/behavmodelfigs/correctrespmodel/cosinesimcolouredtalkers.png', dpi=500)
     plt.show()
     fig, ax = plt.subplots(figsize=(15, 35))
     shap.plots.scatter(shap_values2[:, "side"], color=shap_values2[:, "trialNum"], show=False)
     plt.title('SHAP values as a function of the side of the audio, \n coloured by the trial number', fontsize=18)
     plt.ylabel('SHAP value', fontsize=18)
     plt.xticks([0, 1], ['Left', 'Right'], fontsize=18)
-    plt.savefig('D:/behavmodelfigs/correctrespmodel/sidetrialnumbercolor.png', dpi=500)
     plt.show()
 
     fig, ax = plt.subplots(figsize=(15, 55))
@@ -350,7 +360,6 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     plt.ylabel('SHAP value', fontsize=18)
     plt.xlabel('Pitch of target', fontsize=12)
     plt.xticks([1, 2, 3, 4, 5], ['109 Hz', '124 Hz', '144 Hz', '191 Hz', '251 Hz'], fontsize=18)
-    plt.savefig('D:/behavmodelfigs/correctrespmodel/pitchoftargcolouredbytargtimes.png', dpi=500)
     plt.show()
 
     return xg_reg, ypred, y_test, results, shap_values1, X_train, y_train, bal_accuracy, shap_values2
@@ -363,7 +372,7 @@ def run_correct_responsepipeline(ferrets):
     filepath.parent.mkdir(parents=True, exist_ok=True)
     resultingcr_df.to_csv(filepath)
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbcorrectrespornotwithoptuna(
-        resultingcr_df, optimization=False)
+        resultingcr_df, optimization=False, ferret_as_feature = True)
     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
 
