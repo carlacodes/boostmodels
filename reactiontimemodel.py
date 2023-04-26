@@ -289,9 +289,9 @@ def runlgbreleasetimes(X, y, paramsinput=None):
 
 def extract_release_times_data(ferrets):
     df = behaviouralhelperscg.get_df_behav(ferrets=ferrets, includefaandmiss=False, startdate='04-01-2020', finishdate='01-03-2023')
-    dfuse = df[["pitchoftarg", "pitchofprecur", "talker", "side", "precur_and_targ_same",
+    dfuse = df[["pitchoftarg", "pitchofprecur", "pastcatchtrial", "trialNum","talker", "side", "precur_and_targ_same",
                 "timeToTarget", "DaysSinceStart", "AM",
-                "realRelReleaseTimes", "ferret", "stepval", "pastcorrectresp", "pastcatchtrial", "trialNum"]]
+                "realRelReleaseTimes", "ferret", "stepval", "pastcorrectresp"]]
     return dfuse
 
 
