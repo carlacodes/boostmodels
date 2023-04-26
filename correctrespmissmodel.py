@@ -238,13 +238,13 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
 
     shap.dependence_plot("pitchofprecur", shap_values1[0], X_train)  #
     plt.show()
-    result = permutation_importance(xg_reg, X_test, y_test, n_repeats=10,
+
+    result = permutation_importance(xg_reg, X_test, y_test, n_repeats=100,
                                     random_state=123, n_jobs=2)
     sorted_idx = result.importances_mean.argsort()
-
     fig, ax = plt.subplots(figsize=(15, 15))
-    ax.barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T)
-    ax.set_title("Permutation Importances (test set)")
+    ax.barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, color = 'peru')
+    ax.set_title("Permutation importances on predicting a miss")
     fig.tight_layout()
     plt.savefig(fig_dir / 'permutation_importance.png', dpi=500)
     plt.show()

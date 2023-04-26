@@ -260,11 +260,14 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput, ferret_as_feature = False):
     print(results)
     print('Balanced Accuracy: %.2f%%' % (np.mean(bal_accuracy) * 100.0))
 
-    plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test, bal_accuracy, dfx)
+    plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test, bal_accuracy, dfx, ferret_as_feature = ferret_as_feature)
 
     return xg_reg, ypred, y_test, results, X_train, y_train, X_test, bal_accuracy, dfx
 
-def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test, bal_accuracy, dfx):
+def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test, bal_accuracy, dfx, ferret_as_feature = False):
+    if ferret_as_feature:
+        fig_dir = Path('D:/behavmodelfigs/fa_or_not_model/')
+
     shap_values1 = shap.TreeExplainer(xg_reg).shap_values(X_train)
     plt.subplots(figsize=(25, 25))
 
@@ -294,7 +297,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.ylabel('Cumulative Feature Importance')
     plt.title('Elbow Plot of Cumulative Feature Importance for False Alarm Model')
     plt.xticks(rotation=45, ha='right')  # rotate x-axis labels for better readability
-    plt.savefig('D:/behavmodelfigs/fa_or_not_model/elbowplot.png', dpi=500, bbox_inches='tight')
+    plt.savefig(fig_dir / 'elbowplot.png', dpi=500, bbox_inches='tight')
     plt.show()
 
 
@@ -319,23 +322,26 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     labels[0] = 'temporal similarity'
     ax.set_yticklabels(labels)
     fig.tight_layout()
-    plt.savefig('D:/behavmodelfigs/fa_or_not_model/ranked_features.png', dpi=1000, bbox_inches = "tight")
+    plt.savefig(fig_dir / 'fa_or_not_model/ranked_features.png', dpi=1000, bbox_inches = "tight")
+    plt.show()
+    #calculate permutation importance
+    result = permutation_importance(xg_reg, X_test, y_test, n_repeats=100,
+                                    random_state=123, n_jobs=2)
+    sorted_idx = result.importances_mean.argsort()
+    fig, ax = plt.subplots(figsize=(15, 15))
+    ax.barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, color = 'cyan')
+    ax.set_title("Permutation importances on predicting the reaction time")
+    fig.tight_layout()
+    plt.savefig(fig_dir / 'permutation_importance.png', dpi=500)
     plt.show()
 
     shap.dependence_plot("pitchofprecur", shap_values1[0], X_train)  #
     plt.show()
 
-    result = permutation_importance(xg_reg, X_test, y_test, n_repeats=1000,
-                                    random_state=123, n_jobs=2)
-    importances = result.importances_mean
-
-
-
     #partial dependency plots
     explainer = shap.Explainer(xg_reg, dfx)
     shap_values2 = explainer(X_train)
     fig, ax = plt.subplots(figsize=(15, 15))
-
     # Plot the scatter plot with the colormap
     shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "intra_trial_roving"], cmap=cmapcustom)
     plt.show()
@@ -357,7 +363,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.xticks([1,2,3,4,5], labels=['109 Hz', '124 Hz', '144 Hz', '191 Hz', '251 Hz'], fontsize=15)
     plt.ylabel('SHAP value', fontsize=16)
     plt.xlabel('Pitch of precursor word', fontsize=16)
-    plt.savefig('D:/behavmodelfigs/fa_or_not_model/pitchofprecurintratrialrove.png', dpi=500)
+    plt.savefig(fig_dir / 'pitchofprecurintratrialrove.png', dpi=500)
     plt.show()
 
 
@@ -372,7 +378,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.title('Target presentation time \n versus impact in false alarm probability', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
     plt.xlabel('Trial number', fontsize=16)
-    plt.savefig('D:/behavmodelfigs/fa_or_not_model/targtimescolouredbytrialnumber.png', dpi=1000)
+    plt.savefig( fig_dir / 'targtimescolouredbytrialnumber.png', dpi=1000)
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "targTimes"], color=shap_values2[:, "pitchofprecur"], show=False, cmap = cmapcustom)
@@ -388,7 +394,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.title('Target presentation \n versus impact in predicting a false alarm', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
     plt.xlabel('Target presentation time', fontsize=16)
-    plt.savefig('D:/behavmodelfigs/fa_or_not_model/trialtime_colouredbyprecur.png', dpi=1000)
+    plt.savefig(fig_dir / 'trialtime_colouredbyprecur.png', dpi=1000)
     plt.show()
 
 
@@ -533,7 +539,7 @@ def runlgbfaornot(dataframe):
     return xg_reg, ypred, y_test, results, shap_values1, X_train, y_train, bal_accuracy, shap_values2
 
 
-def runfalsealarmpipeline(ferrets, optimization = False, ferret_as_feature = False ):
+def runfalsealarmpipeline(ferrets, optimization = False, ferret_as_feature=False ):
     resultingfa_df = behaviouralhelperscg.get_false_alarm_behavdata(ferrets=ferrets, startdate='04-01-2020',
                                                                     finishdate='01-03-2023')
     len_of_data_male = {}
