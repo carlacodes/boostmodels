@@ -179,11 +179,17 @@ def objective(trial, X, y):
     return np.mean(cv_scores)
 
 
-def run_optuna_study_falsealarm(dataframe, y):
-    study = optuna.create_study(direction="minimize", study_name="LGBM Classifier")
-    df_to_use = dataframe[
-        ["cosinesim", "pitchofprecur", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
-         "falsealarm", "pastcorrectresp", "temporalsim", "pastcatchtrial", "trialNum", "targTimes", ]]
+def run_optuna_study_falsealarm(dataframe, y, ferret_as_feature = False):
+    study = optuna.create_study(direction="minimize", study_name="LGBM Classifier")\
+    if ferret_as_feature:
+        df_to_use = dataframe[
+            ["cosinesim", "ferret", "pitchofprecur", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
+             "falsealarm", "pastcorrectresp", "temporalsim", "pastcatchtrial", "trialNum", "targTimes", ]]
+    else:
+        df_to_use = dataframe[
+            ["cosinesim", "pitchofprecur", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
+             "falsealarm", "pastcorrectresp", "temporalsim", "pastcatchtrial", "trialNum", "targTimes", ]]
+
 
     col = 'falsealarm'
     X = df_to_use.loc[:, df_to_use.columns != col]
@@ -219,10 +225,15 @@ def run_optuna_study_correctresponse(dataframe, y):
     return study
 
 
-def runlgbfaornotwithoptuna(dataframe, paramsinput):
-    df_to_use = dataframe[
-        ["targTimes","trialNum",  "pitchofprecur", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
-         "falsealarm", "temporalsim", "pastcorrectresp", "pastcatchtrial", "cosinesim",]]
+def runlgbfaornotwithoptuna(dataframe, paramsinput, ferret_as_feature = False):
+    if ferret_as_feature:
+        df_to_use = dataframe[
+            ["targTimes", "ferret", "trialNum",  "pitchofprecur", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
+             "falsealarm", "temporalsim", "pastcorrectresp", "pastcatchtrial", "cosinesim",]]
+    else:
+        df_to_use = dataframe[
+            ["targTimes", "trialNum", "pitchofprecur", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
+             "falsealarm", "temporalsim", "pastcorrectresp", "pastcatchtrial", "cosinesim", ]]
 
     col = 'falsealarm'
     dfx = df_to_use.loc[:, df_to_use.columns != col]
@@ -231,10 +242,10 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput):
     print(X_train.shape)
     print(X_test.shape)
     # ran optuna study 06/03/2022 to find best params, balanced accuracy 57%, accuracy 63%
-    paramsinput = {'colsample_bytree': 0.7024634011442671, 'alpha': 15.7349076305505, 'is_unbalanced': True,
-                   'n_estimators': 6900, 'learning_rate': 0.3579458041084967, 'num_leaves': 1790, 'max_depth': 4,
-                   'min_data_in_leaf': 200, 'lambda_l1': 0, 'lambda_l2': 24, 'min_gain_to_split': 2.34923345270416,
-                   'bagging_fraction': 0.9, 'bagging_freq': 12, 'feature_fraction': 0.9}
+    # paramsinput = {'colsample_bytree': 0.7024634011442671, 'alpha': 15.7349076305505, 'is_unbalanced': True,
+    #                'n_estimators': 6900, 'learning_rate': 0.3579458041084967, 'num_leaves': 1790, 'max_depth': 4,
+    #                'min_data_in_leaf': 200, 'lambda_l1': 0, 'lambda_l2': 24, 'min_gain_to_split': 2.34923345270416,
+    #                'bagging_fraction': 0.9, 'bagging_freq': 12, 'feature_fraction': 0.9}
 
     xg_reg = lgb.LGBMClassifier(objective="binary", random_state=123,
                                 **paramsinput)
@@ -522,7 +533,7 @@ def runlgbfaornot(dataframe):
     return xg_reg, ypred, y_test, results, shap_values1, X_train, y_train, bal_accuracy, shap_values2
 
 
-def runfalsealarmpipeline(ferrets, optimization = False ):
+def runfalsealarmpipeline(ferrets, optimization = False, ferret_as_feature = False ):
     resultingfa_df = behaviouralhelperscg.get_false_alarm_behavdata(ferrets=ferrets, startdate='04-01-2020',
                                                                     finishdate='01-03-2023')
     len_of_data_male = {}
@@ -549,18 +560,21 @@ def runfalsealarmpipeline(ferrets, optimization = False ):
 
     filepath = Path('D:/dfformixedmodels/falsealarmmodel_dfuse.csv')
     filepath.parent.mkdir(parents=True, exist_ok=True)
+
+
+
     if optimization == False:
         #load the saved params
         params = np.load('optuna_results/falsealarm_optunaparams.npy', allow_pickle=True).item()
     else:
-        study = run_optuna_study_falsealarm(resultingfa_df, resultingfa_df['falsealarm'].to_numpy())
+        study = run_optuna_study_falsealarm(resultingfa_df, resultingfa_df['falsealarm'].to_numpy(), ferret_as_feature = ferret_as_feature)
         print(study.best_params)
         params = study.best_params
         np.save('optuna_results/falsealarm_optunaparams.npy', study.best_params)
 
     resultingfa_df.to_csv(filepath)
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbfaornotwithoptuna(
-        resultingfa_df, params)
+        resultingfa_df, params, ferret_as_feature = ferret_as_feature)
     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
 
@@ -909,7 +923,7 @@ if __name__ == '__main__':
     # #
     # # test_df2 = run_reaction_time_fa_pipleine_male(ferrets)
     #
-    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(ferrets, optimization= False)
+    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(ferrets, optimization= False, ferret_as_feature = True)
     #
 
     # plot_reaction_times_intra(ferrets)
