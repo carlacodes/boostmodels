@@ -4,8 +4,6 @@ from instruments.io.BehaviourIO import BehaviourDataSet
 from sklearn.inspection import permutation_importance
 from instruments.behaviouralAnalysis import reactionTimeAnalysis  # outputbehaviordf
 from pathlib import Path
-from sklearn.metrics import mean_squared_error
-from sklearn.model_selection import KFold
 from sklearn.model_selection import cross_val_score
 import shap
 import matplotlib
@@ -170,15 +168,12 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
 
 
 
-
-
     X_train, X_test, y_train, y_test = train_test_split(dfx, df_to_use['misslist'], test_size=0.2, random_state=123)
     print(X_train.shape)
     print(X_test.shape)
 
     xg_reg = lgb.LGBMClassifier(objective="binary", random_state=123,
                                 **paramsinput)
-
     xg_reg.fit(X_train, y_train, eval_metric="cross_entropy_lambda", verbose=1000)
     ypred = xg_reg.predict_proba(X_test)
 
@@ -193,7 +188,6 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
 
 
     custom_colors = ['gold',  'peru', "purple"]  # Add more colors as needed
-    # cmapcustom = matplotlib.colors.ListedColormap(custom_colors)
     cmapcustom = mcolors.LinearSegmentedColormap.from_list('my_custom_cmap', custom_colors, N=1000)
     custom_colors_summary = ['peru', 'gold',]  # Add more colors as needed
     cmapsummary = matplotlib.colors.ListedColormap(custom_colors_summary)
