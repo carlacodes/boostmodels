@@ -174,7 +174,7 @@ def runlgbreleasetimes_for_a_ferret(data, paramsinput=None, ferret=1, ferret_nam
 
 
 
-def runlgbreleasetimes(X, y, paramsinput=None):
+def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False):
 
 
     X_train, X_test, y_train, y_test = train_test_split(X,y, test_size=0.2,
@@ -183,6 +183,12 @@ def runlgbreleasetimes(X, y, paramsinput=None):
     # param = {'max_depth': 2, 'eta': 1, 'objective': 'reg:squarederror'}
     # param['nthread'] = 4
     # param['eval_metric'] = 'auc'
+
+    from pathlib import Path
+    if ferret_as_feature:
+        fig_savedir = Path('/figs/correctrxntimemodel/ferretasfeature')
+    else:
+        fig_savedir = Path('/figs/correctrxntimemodel/')
 
     xg_reg = lgb.LGBMRegressor(random_state=42, verbose=1, **paramsinput)
     # xg_reg = lgb.LGBMRegressor( colsample_bytree=0.3, learning_rate=0.1,
@@ -220,7 +226,7 @@ def runlgbreleasetimes(X, y, paramsinput=None):
     plt.ylabel('Cumulative Feature Importance')
     plt.title('Elbow Plot of Cumulative Feature Importance for Correct Reaction Time Model', fontsize = 20)
     plt.xticks(rotation=45, ha='right')  # rotate x-axis labels for better readability
-    plt.savefig('figs/correctrxntimemodel/elbowplot.png', dpi=500, bbox_inches='tight')
+    plt.savefig(fig_savedir / ' elbowplot.png', dpi=500, bbox_inches='tight')
     plt.show()
 
     fig, ax = plt.subplots(figsize=(15, 15))
@@ -245,7 +251,7 @@ def runlgbreleasetimes(X, y, paramsinput=None):
     labels[0] = 'past trial was correct'
 
     ax.set_yticklabels(labels)
-    plt.savefig('figs/correctrxntimemodel/shapsummaryplot_allanimals2.png', dpi=1000, bbox_inches='tight')
+    plt.savefig(fig_savedir / 'shapsummaryplot_allanimals2.png', dpi=1000, bbox_inches='tight')
 
     plt.show()
 
@@ -265,7 +271,7 @@ def runlgbreleasetimes(X, y, paramsinput=None):
     plt.title('Target presentation time \n versus impact in predicted reacton time', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
     plt.xlabel('Target presentation time', fontsize=16)
-    plt.savefig('figs/correctrxntimemodel/targtimescolouredbytrialnumber.png', dpi=1000)
+    plt.savefig(fig_savedir /'targtimescolouredbytrialnumber.png', dpi=1000)
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "pitchoftarg"], color=shap_values2[:, "pitchofprecur"], show=False, cmap = matplotlib.colormaps[cmapname])
@@ -282,7 +288,7 @@ def runlgbreleasetimes(X, y, paramsinput=None):
     plt.ylabel('SHAP value', fontsize=16)
     plt.xlabel('Pitch of target (Hz)', fontsize=16)
     plt.xticks([1,2,3,4,5], labels=['109', '124', '144 ', '191', '251'], fontsize=15)
-    plt.savefig('figs/correctrxntimemodel/pitchoftargcolouredbyprecur.png', dpi=1000)
+    plt.savefig( fig_savedir /'pitchoftargcolouredbyprecur.png', dpi=1000)
     plt.show()
 
     return xg_reg, ypred, y_test, results
@@ -296,16 +302,19 @@ def extract_release_times_data(ferrets):
 
 
 
-def run_correctrxntime_model(ferrets, optimization = False ):
+def run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature = False ):
     df_use = extract_release_times_data(ferrets)
-
     col = 'realRelReleaseTimes'
     dfx = df_use.loc[:, df_use.columns != col]
 
     # remove ferret as possible feature
-    col2 = 'ferret'
-    dfx = dfx.loc[:, dfx.columns != col2]
-    # study_release_times = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
+    if ferret_as_feature == False:
+        col2 = 'ferret'
+        dfx = dfx.loc[:, dfx.columns != col2]
+    else:
+        dfx = dfx
+
+
     if optimization == False:
         best_params = {'colsample_bytree': 0.49619263716341894,
                        'alpha': 8.537376181435246,
@@ -320,7 +329,7 @@ def run_correctrxntime_model(ferrets, optimization = False ):
         best_params = best_study_results.best_params
         np.save('optuna_results/best_paramsreleastimemodel_allferrets.npy', best_params)
 
-    xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx, df_use[col], paramsinput=best_params)
+    xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx, df_use[col], paramsinput=best_params, ferret_as_feature = ferret_as_feature)
 
 
 def main():
