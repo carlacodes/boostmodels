@@ -259,7 +259,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False):
     result = permutation_importance(xg_reg, X_test, y_test, n_repeats=100,
                                     random_state=123, n_jobs=2)
     sorted_idx = result.importances_mean.argsort()
-    fig, ax = plt.subplots(figsize=(15, 15))
+    fig, ax = plt.subplots()
     ax.barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, color = 'cyan')
     ax.set_title("Permutation importances on predicting the reaction time")
     fig.tight_layout()

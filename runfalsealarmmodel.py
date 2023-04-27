@@ -264,7 +264,9 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput, ferret_as_feature = False):
 
 def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test, bal_accuracy, dfx, ferret_as_feature = False):
     if ferret_as_feature:
-        fig_dir = Path('D:/behavmodelfigs/fa_or_not_model/')
+        fig_dir = Path('D:/behavmodelfigs/fa_or_not_model/ferret_as_feature')
+    else:
+        fig_dir = Path('D:/behavmodelfigs/fa_or_not_model')
 
     shap_values1 = shap.TreeExplainer(xg_reg).shap_values(X_train)
     plt.subplots(figsize=(25, 25))
