@@ -188,9 +188,9 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False):
 
     from pathlib import Path
     if ferret_as_feature:
-        fig_savedir = Path('/figs/correctrxntimemodel/ferretasfeature')
+        fig_savedir = Path('figs/correctrxntimemodel/ferret_as_feature')
     else:
-        fig_savedir = Path('/figs/correctrxntimemodel/')
+        fig_savedir = Path('figs/correctrxntimemodel/')
 
     xg_reg = lgb.LGBMRegressor(random_state=42, verbose=1, **paramsinput)
     # xg_reg = lgb.LGBMRegressor( colsample_bytree=0.3, learning_rate=0.1,
@@ -228,7 +228,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False):
     plt.ylabel('Cumulative Feature Importance')
     plt.title('Elbow Plot of Cumulative Feature Importance for Correct Reaction Time Model', fontsize = 20)
     plt.xticks(rotation=45, ha='right')  # rotate x-axis labels for better readability
-    plt.savefig(fig_savedir / ' elbowplot.png', dpi=500, bbox_inches='tight')
+    plt.savefig(fig_savedir / 'elbowplot.png', dpi=500, bbox_inches='tight')
     plt.show()
 
     fig, ax = plt.subplots(figsize=(15, 15))
@@ -359,7 +359,7 @@ def run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature = 
 
 def main():
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'] #'F2105_Clove'
-    run_correctrxntime_model(ferrets, optimization = False)
+    run_correctrxntime_model(ferrets, optimization = True, ferret_as_feature=True)
 
 
 if __name__ == '__main__':
