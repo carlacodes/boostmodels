@@ -359,7 +359,7 @@ def run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature = 
 
 def main():
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'] #'F2105_Clove'
-    run_correctrxntime_model(ferrets, optimization = True, ferret_as_feature=True)
+    run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature=True)
 
 
 if __name__ == '__main__':
