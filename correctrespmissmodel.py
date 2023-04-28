@@ -231,7 +231,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     labels[2] = 'pitch change'
     labels[1] = 'Days since start of week'
     labels[0] = 'talker'
-    ax.set_yticklabels(labels)
+    # ax.set_yticklabels(labels)
     fig.tight_layout()
     plt.savefig(fig_dir / 'shap_summary_correctresp.png', dpi=1000, bbox_inches = "tight")
 
@@ -262,10 +262,10 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     cb_ax.set_yticks([1, 2, 3,4, 5])
     cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
     cb_ax.set_ylabel("Pitch of precursor word (Hz)", fontsize=15)
-    plt.title('Trial number and its effet on the \n false alarm probability', fontsize = 18)
+    plt.title('Trial number and its effet on the \n miss probability', fontsize = 18)
     plt.xlabel('Trial number', fontsize = 15)
     plt.ylabel('SHAP value', fontsize = 15)
-    plt.savefig('D:/behavmodelfigs/correctresp_or_miss/trialnum_vs_precurpitch.png', dpi=1000, bbox_inches = "tight")
+    plt.savefig( fig_dir / 'trialnum_vs_precurpitch.png', dpi=1000, bbox_inches = "tight")
     plt.show()
 
     fig, ax = plt.subplots(figsize=(10, 10))
@@ -370,6 +370,15 @@ def run_correct_responsepipeline(ferrets):
     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
 
+def test_function(ferrets):
+    resultingcr_df = behaviouralhelperscg.get_df_behav(ferrets=ferrets, includefaandmiss=False, includemissonly=True, startdate='04-01-2020',
+                                  finishdate='03-01-2023')
+    filepath = Path('D:/dfformixedmodels/correctresponsemodel_dfuse.csv')
+    filepath.parent.mkdir(parents=True, exist_ok=True)
+    resultingcr_df.to_csv(filepath)
+    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbcorrectrespornotwithoptuna(
+        resultingcr_df, optimization=False, ferret_as_feature = True)
+    return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'] #'F2105_Clove'

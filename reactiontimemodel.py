@@ -239,20 +239,20 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False):
     plt.xlabel('SHAP value (impact on model output) on reaction time')
     labels = [item.get_text() for item in ax.get_yticklabels()]
     print(labels)
-    labels[11] = 'trial Number'
-    labels[10] = 'time to target'
-    labels[9] = 'side of audio presentation'
-    labels[8] = 'pitch of target'
-    labels[7] = 'pitch of precursor'
-    labels[6] = 'day since start of week'
-    labels[5] = 'trial took place in AM'
-    labels[4] = 'past trial catch'
-    labels[3] = 'male/female talker'
-    labels[2] = 'precursor = target pitch'
-    labels[1] = 'change in pitch value'
-    labels[0] = 'past trial was correct'
-
-    ax.set_yticklabels(labels)
+    # labels[11] = 'trial Number'
+    # labels[10] = 'time to target'
+    # labels[9] = 'side of audio presentation'
+    # labels[8] = 'pitch of target'
+    # labels[7] = 'pitch of precursor'
+    # labels[6] = 'day since start of week'
+    # labels[5] = 'trial took place in AM'
+    # labels[4] = 'past trial catch'
+    # labels[3] = 'male/female talker'
+    # labels[2] = 'precursor = target pitch'
+    # labels[1] = 'change in pitch value'
+    # labels[0] = 'past trial was correct'
+    #
+    # ax.set_yticklabels(labels)
     plt.savefig(fig_savedir / 'shapsummaryplot_allanimals2.png', dpi=1000, bbox_inches='tight')
     plt.show()
 

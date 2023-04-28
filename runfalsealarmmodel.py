@@ -305,19 +305,19 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     # Get the plot's Patch objects
     labels = [item.get_text() for item in ax.get_yticklabels()]
     print(labels)
-    labels[11] = 'time to target presentation'
-    labels[10] = 'pitch of precursor'
-    labels[9] = 'trial number'
-    labels[8] = 'side of audio presentation'
-    labels[7] = 'talker'
-    labels[6] = 'past trial was catch'
-    labels[5] = 'past trial was correct'
-    labels[4] = 'intra_trial roving'
-    labels[3] = 'AM session'
-    labels[2] = 'cosine similarity'
-    labels[1] = 'Day since start of week'
-    labels[0] = 'temporal similarity'
-    ax.set_yticklabels(labels)
+    # labels[11] = 'time to target presentation'
+    # labels[10] = 'pitch of precursor'
+    # labels[9] = 'trial number'
+    # labels[8] = 'side of audio presentation'
+    # labels[7] = 'talker'
+    # labels[6] = 'past trial was catch'
+    # labels[5] = 'past trial was correct'
+    # labels[4] = 'intra_trial roving'
+    # labels[3] = 'AM session'
+    # labels[2] = 'cosine similarity'
+    # labels[1] = 'Day since start of week'
+    # labels[0] = 'temporal similarity'
+    # ax.set_yticklabels(labels)
     fig.tight_layout()
     plt.savefig(fig_dir / 'ranked_features.png', dpi=1000, bbox_inches = "tight")
     plt.show()
