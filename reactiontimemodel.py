@@ -485,7 +485,7 @@ def main():
     # run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature=True)
 
     for ferret in ferrets:
-        run_correctrxntime_model_for_a_ferret([ferret], optimization=True, ferret_as_feature=False)
+        run_correctrxntime_model_for_a_ferret([ferret], optimization=False, ferret_as_feature=False)
 
 
 
