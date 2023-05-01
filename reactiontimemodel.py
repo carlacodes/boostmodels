@@ -172,11 +172,11 @@ def runlgbreleasetimes_for_a_ferret(data, paramsinput=None, ferret=1, ferret_nam
     shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"],
                        title='Correct Responses - Reaction Time Model SHAP response \n vs. trial number for' + ferret_name)
 
-    return xg_reg, ypred, y_test, results, mse_test
+    return xg_reg, ypred, y_test, mse_test
 
 
 
-def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False):
+def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_ferret=False, ferrets=None):
 
 
     X_train, X_test, y_train, y_test = train_test_split(X,y, test_size=0.2,
@@ -188,9 +188,25 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False):
 
     from pathlib import Path
     if ferret_as_feature:
-        fig_savedir = Path('figs/correctrxntimemodel/ferret_as_feature')
+        if one_ferret:
+
+            fig_savedir = Path('figs/correctrxntimemodel/ferret_as_feature' / ferrets[0])
+            if fig_savedir.exists():
+                pass
+            else:
+                fig_savedir.mkdir(parents=True, exist_ok=True)
+        else:
+            fig_savedir = Path('figs/correctrxntimemodel/ferret_as_feature')
     else:
-        fig_savedir = Path('figs/correctrxntimemodel/')
+        if one_ferret:
+
+            fig_savedir = Path('figs/correctrxntimemodel/' / ferrets[0])
+            if fig_savedir.exists():
+                pass
+            else:
+                fig_savedir.mkdir(parents=True, exist_ok=True)
+        else:
+            fig_savedir = Path('figs/correctrxntimemodel/')
 
     xg_reg = lgb.LGBMRegressor(random_state=42, verbose=1, **paramsinput)
     # xg_reg = lgb.LGBMRegressor( colsample_bytree=0.3, learning_rate=0.1,
@@ -200,7 +216,10 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False):
     xg_reg.fit(X_train, y_train, verbose=1)
     ypred = xg_reg.predict(X_test)
     lgb.plot_importance(xg_reg)
-    plt.title('feature importances for the LGBM Correct Release Times model')
+    if one_ferret:
+        plt.title('feature importances for the LGBM Correct Release Times model for' + ferrets[0])
+    else:
+        plt.title('feature importances for the LGBM Correct Release Times model')
     plt.show()
 
     kfold = KFold(n_splits=10)
@@ -226,7 +245,10 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False):
     plt.plot(feature_labels, cumulative_importances, marker='o', color = 'cyan')
     plt.xlabel('Features')
     plt.ylabel('Cumulative Feature Importance')
-    plt.title('Elbow Plot of Cumulative Feature Importance for Correct Reaction Time Model', fontsize = 20)
+    if one_ferret:
+        plt.title('Elbow Plot of Cumulative Feature Importance for Correct Reaction Time Model for' + ferrets[0], fontsize = 20)
+    else:
+        plt.title('Elbow Plot of Cumulative Feature Importance for Correct Reaction Time Model', fontsize = 20)
     plt.xticks(rotation=45, ha='right')  # rotate x-axis labels for better readability
     plt.savefig(fig_savedir / 'elbowplot.png', dpi=500, bbox_inches='tight')
     plt.show()
@@ -302,6 +324,72 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False):
     plt.savefig( fig_savedir /'pitchoftargcolouredbyprecur.png', dpi=1000)
     plt.show()
 
+    shap.plots.scatter(shap_values2[:, "ferret"], color=shap_values2[:, "timeToTarget"], show=False, cmap = matplotlib.colormaps[cmapname])
+    fig, ax = plt.gcf(), plt.gca()
+    # Get colorbar
+    cb_ax = fig.axes[1]
+    # Modifying color bar parameters
+    cb_ax.tick_params(labelsize=15)
+    cb_ax.set_yticks([1, 2, 3,4, 5])
+    # cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
+    cb_ax.set_ylabel("Target presentation time ", fontsize=12)
+    plt.ylabel('SHAP value', fontsize=10)
+    plt.title('Ferret \n versus impact in predicted reacton time', fontsize=18)
+    plt.ylabel('SHAP value', fontsize=16)
+    plt.xlabel('Ferret', fontsize=16)
+    # plt.xticks([1,2,3,4,5], labels=['109', '124', '144 ', '191', '251'], fontsize=15)
+    plt.xticks([0,1,2,3,4], labels=['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'], fontsize=15)
+    #rotate xtick labels:
+    plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
+    plt.savefig( fig_savedir /'ferretcolouredbytargtimes.png', dpi=1000)
+    plt.show()
+
+    shap.plots.scatter(shap_values2[:, "ferret"], color=shap_values2[:, "pitchofprecur"], show=False,
+                       cmap=matplotlib.colormaps[cmapname])
+    fig, ax = plt.gcf(), plt.gca()
+    # Get colorbar
+    cb_ax = fig.axes[1]
+    # Modifying color bar parameters
+    cb_ax.tick_params(labelsize=15)
+    cb_ax.set_yticks([1, 2, 3, 4, 5])
+    # cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
+    cb_ax.set_ylabel("Precursor = Target pitch ", fontsize=12)
+    plt.ylabel('SHAP value', fontsize=10)
+    plt.title('Ferret \n versus impact in predicted reacton time', fontsize=18)
+    plt.ylabel('SHAP value', fontsize=16)
+    plt.xlabel('Ferret', fontsize=16)
+    # plt.xticks([1,2,3,4,5], labels=['109', '124', '144 ', '191', '251'], fontsize=15)
+    plt.xticks([0, 1, 2, 3, 4], labels=['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'],
+               fontsize=15)
+    # rotate xtick labels:
+    plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
+    plt.savefig(fig_savedir / 'ferretcolouredbyintratrialroving.png', dpi=1000)
+    plt.show()
+
+    shap.plots.scatter(shap_values2[:, "side"], color=shap_values2[:, "ferret"], show=False,
+                       cmap=matplotlib.colormaps[cmapname])
+    fig, ax = plt.gcf(), plt.gca()
+    # Get colorbar
+    cb_ax = fig.axes[1]
+    # Modifying color bar parameters
+    cb_ax.tick_params(labelsize=15)
+    cb_ax.set_yticks([0, 1, 2, 3, 4])
+    cb_ax.set_yticklabels(['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'])
+    cb_ax.set_ylabel("ferret ", fontsize=12)
+    # plt.xticks([0, 1, 2, 3, 4], labels=['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'],
+    #            fontsize=15)
+    plt.ylabel('SHAP value', fontsize=10)
+    plt.title('Ferret \n versus impact in predicted reacton time', fontsize=18)
+
+    # plt.ylabel('SHAP value', fontsize=16)
+    plt.xlabel('side', fontsize=16)
+    plt.xticks([0,1], labels=['left', 'right'], fontsize=15)
+
+    # rotate xtick labels:
+    plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
+    plt.savefig(fig_savedir / 'sidecolouredbyferret.png', dpi=1000)
+    plt.show()
+
     return xg_reg, ypred, y_test, results
 
 def extract_release_times_data(ferrets):
@@ -323,13 +411,6 @@ def run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature = 
         col2 = 'ferret'
         dfx = dfx.loc[:, dfx.columns != col2]
         if optimization == False:
-            best_params = {'colsample_bytree': 0.49619263716341894,
-                           'alpha': 8.537376181435246,
-                           'n_estimators': 96,
-                           'learning_rate': 0.17871472565344848,
-                           'max_depth': 5,
-                           'bagging_fraction': 0.7000000000000001,
-                           'bagging_freq': 6}
             best_params = np.load('optuna_results/best_paramsreleastimemodel_allferrets.npy', allow_pickle=True).item()
         else:
             best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
@@ -338,13 +419,6 @@ def run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature = 
     else:
         dfx = dfx
         if optimization == False:
-            best_params = {'colsample_bytree': 0.49619263716341894,
-                           'alpha': 8.537376181435246,
-                           'n_estimators': 96,
-                           'learning_rate': 0.17871472565344848,
-                           'max_depth': 5,
-                           'bagging_fraction': 0.7000000000000001,
-                           'bagging_freq': 6}
             best_params = np.load('optuna_results/best_paramsreleastimemodel_allferrets_ferretasfeature.npy', allow_pickle=True).item()
         else:
             best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
@@ -357,9 +431,37 @@ def run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature = 
     xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx, df_use[col], paramsinput=best_params, ferret_as_feature=ferret_as_feature)
 
 
+
+def run_correctrxntime_model_for_a_ferret(ferrets, optimization = False, ferret_as_feature = False ):
+    df_use = extract_release_times_data(ferrets)
+    col = 'realRelReleaseTimes'
+    dfx = df_use.loc[:, df_use.columns != col]
+
+    # remove ferret as possible feature
+    if ferret_as_feature == False:
+        col2 = 'ferret'
+        dfx = dfx.loc[:, dfx.columns != col2]
+        if optimization == False:
+            best_params = np.load('optuna_results/best_paramsreleastimemodel_'+ ferrets[0]+ '.npy', allow_pickle=True).item()
+        else:
+            best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
+            best_params = best_study_results.best_params
+            np.save('optuna_results/best_paramsreleastimemodel_'+ ferrets[0]+ '.npy', best_params)
+    else:
+        dfx = dfx
+        if optimization == False:
+            best_params = np.load('optuna_results/best_paramsreleastimemodel_ferretasfeature_'+ ferrets[0]+ '.npy', allow_pickle=True).item()
+        else:
+            best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
+            best_params = best_study_results.best_params
+            np.save('optuna_results/best_paramsreleastimemodel_ferretasfeature_'+ ferrets[0]+ '.npy', best_params)
+    xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx, df_use[col], paramsinput=best_params, ferret_as_feature=ferret_as_feature)
+
+
 def main():
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'] #'F2105_Clove'
     run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature=True)
+
 
 
 if __name__ == '__main__':
