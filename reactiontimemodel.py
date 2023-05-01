@@ -315,23 +315,23 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     plt.savefig(fig_savedir /'targtimescolouredbytrialnumber.png', dpi=1000)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "pitchoftarg"], color=shap_values2[:, "pitchofprecur"], show=False, cmap = matplotlib.colormaps[cmapname])
+    shap.plots.scatter(shap_values2[:, "pitchoftarg"], color=shap_values2[:, "precur_and_targ_same"], show=False, cmap = matplotlib.colormaps[cmapname])
     fig, ax = plt.gcf(), plt.gca()
     # Get colorbar
     cb_ax = fig.axes[1]
     # Modifying color bar parameters
     cb_ax.tick_params(labelsize=15)
     cb_ax.set_yticks([1, 2, 3,4, 5])
-    cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
-    cb_ax.set_ylabel("Pitch of precursor", fontsize=12)
+    # cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
+    cb_ax.set_ylabel("Pitch of precursor = target", fontsize=12)
     plt.ylabel('SHAP value', fontsize=10)
     if one_ferret:
         plt.title('Pitch of target \n versus impact in predicted reacton time for' + ferrets[0], fontsize=18)
     else:
         plt.title('Pitch of target \n versus impact in predicted reacton time', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
-    plt.xlabel('Pitch of target (Hz)', fontsize=16)
-    plt.xticks([1,2,3,4,5], labels=['109', '124', '144 ', '191', '251'], fontsize=15)
+    plt.xlabel('Pitch of target', fontsize=16)
+    # plt.xticks([1,2,3,4,5], labels=['109', '124', '144 ', '191', '251'], fontsize=15)
     plt.savefig( fig_savedir /'pitchoftargcolouredbyprecur.png', dpi=1000)
     plt.show()
 
