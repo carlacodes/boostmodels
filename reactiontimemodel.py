@@ -257,7 +257,10 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     shap.summary_plot(shap_values, X, show=False, cmap = matplotlib.colormaps[cmapname])
 
     fig, ax = plt.gcf(), plt.gca()
-    plt.title('Ranked list of features over their impact in predicting reaction time')
+    if one_ferret:
+        plt.title('Ranked list of features over their impact in predicting reaction time for' + ferrets[0])
+    else:
+        plt.title('Ranked list of features over their impact in predicting reaction time')
     plt.xlabel('SHAP value (impact on model output) on reaction time')
     labels = [item.get_text() for item in ax.get_yticklabels()]
     print(labels)
@@ -301,7 +304,10 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     cb_ax.tick_params(labelsize=15)
     cb_ax.set_ylabel("Trial number", fontsize=12)
     plt.ylabel('SHAP value', fontsize=10)
-    plt.title('Target presentation time \n versus impact in predicted reacton time', fontsize=18)
+    if one_ferret:
+        plt.title('Target presentation time \n versus impact in predicted reacton time for' + ferrets[0], fontsize=18)
+    else:
+        plt.title('Target presentation time \n versus impact in predicted reacton time', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
     plt.xlabel('Target presentation time', fontsize=16)
     plt.savefig(fig_savedir /'targtimescolouredbytrialnumber.png', dpi=1000)
@@ -317,7 +323,10 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
     cb_ax.set_ylabel("Pitch of precursor", fontsize=12)
     plt.ylabel('SHAP value', fontsize=10)
-    plt.title('Pitch of target \n versus impact in predicted reacton time', fontsize=18)
+    if one_ferret:
+        plt.title('Pitch of target \n versus impact in predicted reacton time for' + ferrets[0], fontsize=18)
+    else:
+        plt.title('Pitch of target \n versus impact in predicted reacton time', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
     plt.xlabel('Pitch of target (Hz)', fontsize=16)
     plt.xticks([1,2,3,4,5], labels=['109', '124', '144 ', '191', '251'], fontsize=15)
@@ -334,7 +343,10 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     # cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
     cb_ax.set_ylabel("Target presentation time ", fontsize=12)
     plt.ylabel('SHAP value', fontsize=10)
-    plt.title('Ferret \n versus impact in predicted reacton time', fontsize=18)
+    if one_ferret:
+        plt.title('Ferret \n versus impact in predicted reacton time for' + ferrets[0], fontsize=18)
+    else:
+        plt.title('Ferret \n versus impact in predicted reacton time', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
     plt.xlabel('Ferret', fontsize=16)
     # plt.xticks([1,2,3,4,5], labels=['109', '124', '144 ', '191', '251'], fontsize=15)
@@ -355,7 +367,10 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     # cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
     cb_ax.set_ylabel("Precursor = Target pitch ", fontsize=12)
     plt.ylabel('SHAP value', fontsize=10)
-    plt.title('Ferret \n versus impact in predicted reacton time', fontsize=18)
+    if one_ferret:
+        plt.title('Ferret \n versus impact in predicted reacton time for' + ferrets[0], fontsize=18)
+    else:
+        plt.title('Ferret \n versus impact in predicted reacton time', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
     plt.xlabel('Ferret', fontsize=16)
     # plt.xticks([1,2,3,4,5], labels=['109', '124', '144 ', '191', '251'], fontsize=15)
@@ -366,29 +381,31 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     plt.savefig(fig_savedir / 'ferretcolouredbyintratrialroving.png', dpi=1000)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "side"], color=shap_values2[:, "ferret"], show=False,
-                       cmap=matplotlib.colormaps[cmapname])
-    fig, ax = plt.gcf(), plt.gca()
-    # Get colorbar
-    cb_ax = fig.axes[1]
-    # Modifying color bar parameters
-    cb_ax.tick_params(labelsize=15)
-    cb_ax.set_yticks([0, 1, 2, 3, 4])
-    cb_ax.set_yticklabels(['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'])
-    cb_ax.set_ylabel("ferret ", fontsize=12)
-    # plt.xticks([0, 1, 2, 3, 4], labels=['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'],
-    #            fontsize=15)
-    plt.ylabel('SHAP value', fontsize=10)
-    plt.title('Ferret \n versus impact in predicted reacton time', fontsize=18)
+    if one_ferret == False:
+        shap.plots.scatter(shap_values2[:, "side"], color=shap_values2[:, "ferret"], show=False,
+                           cmap=matplotlib.colormaps[cmapname])
+        fig, ax = plt.gcf(), plt.gca()
+        # Get colorbar
+        cb_ax = fig.axes[1]
+        # Modifying color bar parameters
+        cb_ax.tick_params(labelsize=15)
+        cb_ax.set_yticks([0, 1, 2, 3, 4])
+        cb_ax.set_yticklabels(['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'])
+        cb_ax.set_ylabel("ferret ", fontsize=12)
+        # plt.xticks([0, 1, 2, 3, 4], labels=['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'],
+        #            fontsize=15)
+        plt.ylabel('SHAP value', fontsize=10)
 
-    # plt.ylabel('SHAP value', fontsize=16)
-    plt.xlabel('side', fontsize=16)
-    plt.xticks([0,1], labels=['left', 'right'], fontsize=15)
+        plt.title('Ferret \n versus impact in predicted reacton time', fontsize=18)
 
-    # rotate xtick labels:
-    plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
-    plt.savefig(fig_savedir / 'sidecolouredbyferret.png', dpi=1000)
-    plt.show()
+        # plt.ylabel('SHAP value', fontsize=16)
+        plt.xlabel('side', fontsize=16)
+        plt.xticks([0,1], labels=['left', 'right'], fontsize=15)
+
+        # rotate xtick labels:
+        plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
+        plt.savefig(fig_savedir / 'sidecolouredbyferret.png', dpi=1000)
+        plt.show()
 
     return xg_reg, ypred, y_test, results
 
@@ -396,7 +413,7 @@ def extract_release_times_data(ferrets):
     df = behaviouralhelperscg.get_df_behav(ferrets=ferrets, includefaandmiss=False, startdate='04-01-2020', finishdate='01-03-2023')
     dfuse = df[["pitchoftarg", "pitchofprecur", "pastcatchtrial", "trialNum","talker", "side", "precur_and_targ_same",
                 "timeToTarget", "DaysSinceStart", "AM",
-                "realRelReleaseTimes", "ferret", "stepval", "pastcorrectresp"]]
+                "realRelReleaseTimes", "ferret", "pastcorrectresp"]]
     return dfuse
 
 
