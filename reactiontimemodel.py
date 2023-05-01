@@ -190,7 +190,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     if ferret_as_feature:
         if one_ferret:
 
-            fig_savedir = Path('figs/correctrxntimemodel/ferret_as_feature' / ferrets[0])
+            fig_savedir = Path('figs/correctrxntimemodel/ferret_as_feature/' + ferrets[0])
             if fig_savedir.exists():
                 pass
             else:
@@ -200,7 +200,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     else:
         if one_ferret:
 
-            fig_savedir = Path('figs/correctrxntimemodel/' / ferrets[0])
+            fig_savedir = Path('figs/correctrxntimemodel/'+ ferrets[0])
             if fig_savedir.exists():
                 pass
             else:
