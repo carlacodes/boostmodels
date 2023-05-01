@@ -236,11 +236,12 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     cmapname = "viridis"
 
     feature_importances = np.abs(shap_values).sum(axis=0)
-    feature_importances = feature_importances.sort_values(ascending=True)
+    sorted_indices = np.argsort(feature_importances)
+    feature_importances = feature_importances[sorted_indices]
+    feature_labels = X.columns[sorted_indices]
     cumulative_importances = np.cumsum(feature_importances)
 
 
-    feature_labels = X.columns
     # Plot the elbow plot
     plt.figure(figsize=(10, 6))
     plt.plot(feature_labels, cumulative_importances, marker='o', color = 'cyan')
@@ -484,7 +485,7 @@ def main():
     # run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature=True)
 
     for ferret in ferrets:
-        run_correctrxntime_model_for_a_ferret([ferret], optimization=False, ferret_as_feature=False)
+        run_correctrxntime_model_for_a_ferret([ferret], optimization=True, ferret_as_feature=False)
 
 
 
