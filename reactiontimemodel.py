@@ -479,11 +479,10 @@ def run_correctrxntime_model_for_a_ferret(ferrets, optimization = False, ferret_
 
 def main():
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    ferrets = ['F1702_Zola']
     # run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature=True)
 
     for ferret in ferrets:
-        run_correctrxntime_model_for_a_ferret([ferret], optimization=False, ferret_as_feature=False)
+        run_correctrxntime_model_for_a_ferret([ferret], optimization=True, ferret_as_feature=False)
 
 
 
