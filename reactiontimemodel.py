@@ -333,55 +333,55 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     plt.savefig( fig_savedir /'pitchoftargcolouredbyprecur.png', dpi=1000)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "ferret"], color=shap_values2[:, "timeToTarget"], show=False, cmap = matplotlib.colormaps[cmapname])
-    fig, ax = plt.gcf(), plt.gca()
-    # Get colorbar
-    cb_ax = fig.axes[1]
-    # Modifying color bar parameters
-    cb_ax.tick_params(labelsize=15)
-    cb_ax.set_yticks([1, 2, 3,4, 5])
-    # cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
-    cb_ax.set_ylabel("Target presentation time ", fontsize=12)
-    plt.ylabel('SHAP value', fontsize=10)
-    if one_ferret:
-        plt.title('Ferret \n versus impact in predicted reacton time for' + ferrets[0], fontsize=18)
-    else:
-        plt.title('Ferret \n versus impact in predicted reacton time', fontsize=18)
-    plt.ylabel('SHAP value', fontsize=16)
-    plt.xlabel('Ferret', fontsize=16)
-    # plt.xticks([1,2,3,4,5], labels=['109', '124', '144 ', '191', '251'], fontsize=15)
-    plt.xticks([0,1,2,3,4], labels=['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'], fontsize=15)
-    #rotate xtick labels:
-    plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
-    plt.savefig( fig_savedir /'ferretcolouredbytargtimes.png', dpi=1000)
-    plt.show()
-
-    shap.plots.scatter(shap_values2[:, "ferret"], color=shap_values2[:, "pitchofprecur"], show=False,
-                       cmap=matplotlib.colormaps[cmapname])
-    fig, ax = plt.gcf(), plt.gca()
-    # Get colorbar
-    cb_ax = fig.axes[1]
-    # Modifying color bar parameters
-    cb_ax.tick_params(labelsize=15)
-    cb_ax.set_yticks([1, 2, 3, 4, 5])
-    # cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
-    cb_ax.set_ylabel("Precursor = Target pitch ", fontsize=12)
-    plt.ylabel('SHAP value', fontsize=10)
-    if one_ferret:
-        plt.title('Ferret \n versus impact in predicted reacton time for' + ferrets[0], fontsize=18)
-    else:
-        plt.title('Ferret \n versus impact in predicted reacton time', fontsize=18)
-    plt.ylabel('SHAP value', fontsize=16)
-    plt.xlabel('Ferret', fontsize=16)
-    # plt.xticks([1,2,3,4,5], labels=['109', '124', '144 ', '191', '251'], fontsize=15)
-    plt.xticks([0, 1, 2, 3, 4], labels=['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'],
-               fontsize=15)
-    # rotate xtick labels:
-    plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
-    plt.savefig(fig_savedir / 'ferretcolouredbyintratrialroving.png', dpi=1000)
-    plt.show()
-
     if one_ferret == False:
+        shap.plots.scatter(shap_values2[:, "ferret"], color=shap_values2[:, "timeToTarget"], show=False, cmap = matplotlib.colormaps[cmapname])
+        fig, ax = plt.gcf(), plt.gca()
+        # Get colorbar
+        cb_ax = fig.axes[1]
+        # Modifying color bar parameters
+        cb_ax.tick_params(labelsize=15)
+        cb_ax.set_yticks([1, 2, 3,4, 5])
+        # cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
+        cb_ax.set_ylabel("Target presentation time ", fontsize=12)
+        plt.ylabel('SHAP value', fontsize=10)
+        if one_ferret:
+            plt.title('Ferret \n versus impact in predicted reacton time for' + ferrets[0], fontsize=18)
+        else:
+            plt.title('Ferret \n versus impact in predicted reacton time', fontsize=18)
+        plt.ylabel('SHAP value', fontsize=16)
+        plt.xlabel('Ferret', fontsize=16)
+        # plt.xticks([1,2,3,4,5], labels=['109', '124', '144 ', '191', '251'], fontsize=15)
+        plt.xticks([0,1,2,3,4], labels=['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'], fontsize=15)
+        #rotate xtick labels:
+        plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
+        plt.savefig( fig_savedir /'ferretcolouredbytargtimes.png', dpi=1000)
+        plt.show()
+
+        shap.plots.scatter(shap_values2[:, "ferret"], color=shap_values2[:, "pitchofprecur"], show=False,
+                           cmap=matplotlib.colormaps[cmapname])
+        fig, ax = plt.gcf(), plt.gca()
+        # Get colorbar
+        cb_ax = fig.axes[1]
+        # Modifying color bar parameters
+        cb_ax.tick_params(labelsize=15)
+        cb_ax.set_yticks([1, 2, 3, 4, 5])
+        # cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
+        cb_ax.set_ylabel("Precursor = Target pitch ", fontsize=12)
+        plt.ylabel('SHAP value', fontsize=10)
+        if one_ferret:
+            plt.title('Ferret \n versus impact in predicted reacton time for' + ferrets[0], fontsize=18)
+        else:
+            plt.title('Ferret \n versus impact in predicted reacton time', fontsize=18)
+        plt.ylabel('SHAP value', fontsize=16)
+        plt.xlabel('Ferret', fontsize=16)
+        # plt.xticks([1,2,3,4,5], labels=['109', '124', '144 ', '191', '251'], fontsize=15)
+        plt.xticks([0, 1, 2, 3, 4], labels=['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'],
+                   fontsize=15)
+        # rotate xtick labels:
+        plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
+        plt.savefig(fig_savedir / 'ferretcolouredbyintratrialroving.png', dpi=1000)
+        plt.show()
+
         shap.plots.scatter(shap_values2[:, "side"], color=shap_values2[:, "ferret"], show=False,
                            cmap=matplotlib.colormaps[cmapname])
         fig, ax = plt.gcf(), plt.gca()
@@ -474,7 +474,7 @@ def run_correctrxntime_model_for_a_ferret(ferrets, optimization = False, ferret_
             best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
             best_params = best_study_results.best_params
             np.save('optuna_results/best_paramsreleastimemodel_ferretasfeature_'+ ferrets[0]+ '.npy', best_params)
-    xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx, df_use[col], paramsinput=best_params, ferret_as_feature=ferret_as_feature)
+    xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx, df_use[col], paramsinput=best_params, ferret_as_feature=ferret_as_feature, ferret=ferrets[0])
 
 
 def main():
@@ -482,7 +482,7 @@ def main():
     # run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature=True)
 
     for ferret in ferrets:
-        run_correctrxntime_model_for_a_ferret([ferret], optimization = True, ferret_as_feature=False)
+        run_correctrxntime_model_for_a_ferret([ferret], optimization=True, ferret_as_feature=False)
 
 
 
