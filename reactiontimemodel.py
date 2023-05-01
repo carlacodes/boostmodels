@@ -453,6 +453,8 @@ def run_correctrxntime_model_for_a_ferret(ferrets, optimization = False, ferret_
     df_use = extract_release_times_data(ferrets)
     col = 'realRelReleaseTimes'
     dfx = df_use.loc[:, df_use.columns != col]
+    col2 = 'ferret'
+    dfx = dfx.loc[:, dfx.columns != col2]
 
     # remove ferret as possible feature
     if ferret_as_feature == False:
@@ -477,7 +479,10 @@ def run_correctrxntime_model_for_a_ferret(ferrets, optimization = False, ferret_
 
 def main():
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'] #'F2105_Clove'
-    run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature=True)
+    # run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature=True)
+
+    for ferret in ferrets:
+        run_correctrxntime_model_for_a_ferret([ferret], optimization = True, ferret_as_feature=False)
 
 
 
