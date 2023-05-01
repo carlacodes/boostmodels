@@ -411,8 +411,8 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
 
 def extract_release_times_data(ferrets):
     df = behaviouralhelperscg.get_df_behav(ferrets=ferrets, includefaandmiss=False, startdate='04-01-2020', finishdate='01-03-2023')
-    dfuse = df[["pitchoftarg", "pitchofprecur", "pastcatchtrial", "trialNum","talker", "side", "precur_and_targ_same",
-                "timeToTarget", "DaysSinceStart", "AM",
+    dfuse = df[["pitchoftarg", "pastcatchtrial", "trialNum","talker", "side", "precur_and_targ_same",
+                "timeToTarget",
                 "realRelReleaseTimes", "ferret", "pastcorrectresp"]]
     return dfuse
 
@@ -474,15 +474,16 @@ def run_correctrxntime_model_for_a_ferret(ferrets, optimization = False, ferret_
             best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
             best_params = best_study_results.best_params
             np.save('optuna_results/best_paramsreleastimemodel_ferretasfeature_'+ ferrets[0]+ '.npy', best_params)
-    xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx, df_use[col], paramsinput=best_params, ferret_as_feature=ferret_as_feature, ferret=ferrets[0])
+    xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx, df_use[col], paramsinput=best_params, ferret_as_feature=ferret_as_feature, one_ferret=True, ferrets=ferrets[0])
 
 
 def main():
-    ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'] #'F2105_Clove'
+    ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
+    ferrets = ['F1702_Zola']
     # run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature=True)
 
     for ferret in ferrets:
-        run_correctrxntime_model_for_a_ferret([ferret], optimization=True, ferret_as_feature=False)
+        run_correctrxntime_model_for_a_ferret([ferret], optimization=False, ferret_as_feature=False)
 
 
 
