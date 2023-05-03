@@ -190,7 +190,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     if ferret_as_feature:
         if one_ferret:
 
-            fig_savedir = Path('figs/correctrxntimemodel/ferret_as_feature/' + ferrets[0])
+            fig_savedir = Path('figs/correctrxntimemodel/ferret_as_feature/' + ferrets)
             if fig_savedir.exists():
                 pass
             else:
@@ -200,7 +200,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     else:
         if one_ferret:
 
-            fig_savedir = Path('figs/correctrxntimemodel/'+ ferrets[0])
+            fig_savedir = Path('figs/correctrxntimemodel/'+ ferrets)
             if fig_savedir.exists():
                 pass
             else:
@@ -217,7 +217,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     ypred = xg_reg.predict(X_test)
     lgb.plot_importance(xg_reg)
     if one_ferret:
-        plt.title('feature importances for the LGBM Correct Release Times model for' + ferrets[0])
+        plt.title('feature importances for the LGBM Correct Release Times model for' + ferrets)
     else:
         plt.title('feature importances for the LGBM Correct Release Times model')
     plt.show()
@@ -237,6 +237,8 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
 
     feature_importances = np.abs(shap_values).sum(axis=0)
     sorted_indices = np.argsort(feature_importances)
+
+    sorted_indices = sorted_indices[::-1]
     feature_importances = feature_importances[sorted_indices]
     feature_labels = X.columns[sorted_indices]
     cumulative_importances = np.cumsum(feature_importances)
@@ -248,7 +250,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     plt.xlabel('Features')
     plt.ylabel('Cumulative Feature Importance')
     if one_ferret:
-        plt.title('Elbow Plot of Cumulative Feature Importance for Correct Reaction Time Model for' + ferrets[0], fontsize = 20)
+        plt.title('Elbow Plot of Cumulative Feature Importance for Correct Reaction Time Model for' + ferrets, fontsize = 20)
     else:
         plt.title('Elbow Plot of Cumulative Feature Importance for Correct Reaction Time Model', fontsize = 20)
     plt.xticks(rotation=45, ha='right')  # rotate x-axis labels for better readability
@@ -326,7 +328,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     cb_ax.set_ylabel("Pitch of precursor = target", fontsize=12)
     plt.ylabel('SHAP value', fontsize=10)
     if one_ferret:
-        plt.title('Pitch of target \n versus impact in predicted reacton time for' + ferrets[0], fontsize=18)
+        plt.title('Pitch of target \n versus impact in predicted reacton time for' + ferrets, fontsize=18)
     else:
         plt.title('Pitch of target \n versus impact in predicted reacton time', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
@@ -371,7 +373,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         cb_ax.set_ylabel("Precursor = Target pitch ", fontsize=12)
         plt.ylabel('SHAP value', fontsize=10)
         if one_ferret:
-            plt.title('Ferret \n versus impact in predicted reacton time for' + ferrets[0], fontsize=18)
+            plt.title('Ferret \n versus impact in predicted reacton time for' + ferrets, fontsize=18)
         else:
             plt.title('Ferret \n versus impact in predicted reacton time', fontsize=18)
         plt.ylabel('SHAP value', fontsize=16)
@@ -481,7 +483,7 @@ def run_correctrxntime_model_for_a_ferret(ferrets, optimization = False, ferret_
 
 def main():
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    ferrets = ['F1702_Zola']
+    # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
     # run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature=True)
 
     for ferret in ferrets:
