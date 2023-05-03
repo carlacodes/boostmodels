@@ -62,6 +62,7 @@ class behaviouralhelperscg():
             correspondcosinelist = np.empty(shape=(0, 0))
             intra_trial_roving = []
             inter_trial_roving = []
+            control_trial = []
             for i in range(1, len(newdata['realRelReleaseTimes'].values)):
                 chosenresponseindex = chosenresponse.values[i]
                 pastcatchtrialindex = catchtriallist.values[i - 1]
@@ -71,7 +72,16 @@ class behaviouralhelperscg():
 
                 chosentrial = pitchshiftmat.values[i]
                 is_all_zero = np.all((chosentrial == 0))
+                chosentalker = talkerlist.values[i]
+
                 import numbers
+                if isinstance(chosentrial, float) and (chosentalker ==1 or chosentalker ==2):
+                    control_trial.append(1)
+                elif is_all_zero and (chosentalker ==1 or chosentalker ==2):
+                    control_trial.append(1)
+                else:
+                    control_trial.append(0)
+
                 if isinstance(chosentrial, float):
                     print('intra not detected')
                     intra_trial_roving.append(0)
@@ -82,8 +92,9 @@ class behaviouralhelperscg():
                 else:
                     intra_trial_roving.append(1)
 
+
+
                 chosendisttrial = precursorlist.values[i]
-                chosentalker = talkerlist.values[i]
                 if chosentalker == 3 or chosentalker == 5 or chosentalker == 8 or chosentalker == 13:
                     print('inter detected')
                     inter_trial_roving.append(1)
@@ -203,6 +214,7 @@ class behaviouralhelperscg():
             precur_and_targ_same = np.delete(precur_and_targ_same, droplist)
             inter_trial_roving = np.delete(inter_trial_roving, droplist)
             intra_trial_roving = np.delete(intra_trial_roving, droplist)
+            control_trial = np.delete(control_trial, droplist)
 
             correctresp = correctresp.astype(int)
             pastcatchtrial = pastcatchtrial.astype(int)
@@ -216,6 +228,7 @@ class behaviouralhelperscg():
             newdata['talker'] = talkerlist2.tolist()
             newdata['pastcatchtrial'] = pastcatchtrial.tolist()
             newdata['stepval'] = stepval.tolist()
+            newdata['control_trial'] = control_trial.tolist()
             # newdata['realRelReleaseTimes'] = np.log(newdata['realRelReleaseTimes'])
             precur_and_targ_same = precur_and_targ_same.astype(int)
             newdata['precur_and_targ_same'] = precur_and_targ_same.tolist()

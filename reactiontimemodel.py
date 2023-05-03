@@ -415,6 +415,15 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
 
 def extract_release_times_data(ferrets):
     df = behaviouralhelperscg.get_df_behav(ferrets=ferrets, includefaandmiss=False, startdate='04-01-2020', finishdate='01-03-2023')
+    df_intra = df[df['intra_trial_roving'] == 1]
+    df_inter = df[df['intra_trial_roving'] == 1]
+    df_control = df[df['control_trial'] == 1]
+
+    #subsample df_control so it is equal to the length of df_intra, maintain the column values
+    if len(df_control) > len(df_intra):
+        df_control = df_control.sample(n=len(df_intra), random_state=1)
+    #then reconcatenate the three dfs
+    df = pd.concat([df_intra, df_inter, df_control])
     dfuse = df[["pitchoftarg", "pastcatchtrial", "trialNum","talker", "side", "precur_and_targ_same",
                 "timeToTarget",
                 "realRelReleaseTimes", "ferret", "pastcorrectresp"]]
