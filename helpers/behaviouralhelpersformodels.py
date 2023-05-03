@@ -60,7 +60,8 @@ class behaviouralhelperscg():
             droplist = np.empty(shape=(0, 0))
             droplistnew = np.empty(shape=(0, 0))
             correspondcosinelist = np.empty(shape=(0, 0))
-
+            intra_trial_roving = []
+            inter_trial_roving = []
             for i in range(1, len(newdata['realRelReleaseTimes'].values)):
                 chosenresponseindex = chosenresponse.values[i]
                 pastcatchtrialindex = catchtriallist.values[i - 1]
@@ -70,11 +71,25 @@ class behaviouralhelperscg():
 
                 chosentrial = pitchshiftmat.values[i]
                 is_all_zero = np.all((chosentrial == 0))
-                if isinstance(chosentrial, float) or is_all_zero:
-                    chosentrial = talkermat.values[i].astype(int)
+                import numbers
+                if isinstance(chosentrial, float):
+                    print('intra not detected')
+                    intra_trial_roving.append(0)
+                    chosentrial = talkermat.values[i]
+                elif is_all_zero:
+                    print('intra not detected')
+                    intra_trial_roving.append(0)
+                else:
+                    intra_trial_roving.append(1)
 
                 chosendisttrial = precursorlist.values[i]
                 chosentalker = talkerlist.values[i]
+                if chosentalker == 3 or chosentalker == 5 or chosentalker == 8 or chosentalker == 13:
+                    print('inter detected')
+                    inter_trial_roving.append(1)
+                else:
+                    print(chosentalker)
+                    inter_trial_roving.append(0)
                 if chosentalker == 3:
                     chosentalker = 1
                 if chosentalker == 8:
@@ -186,21 +201,25 @@ class behaviouralhelperscg():
             pastcorrectresp = np.delete(pastcorrectresp, droplist)
             pastcatchtrial = np.delete(pastcatchtrial, droplist)
             precur_and_targ_same = np.delete(precur_and_targ_same, droplist)
+            inter_trial_roving = np.delete(inter_trial_roving, droplist)
+            intra_trial_roving = np.delete(intra_trial_roving, droplist)
 
             correctresp = correctresp.astype(int)
             pastcatchtrial = pastcatchtrial.astype(int)
             pastcorrectresp = pastcorrectresp.astype(int)
-            misslist = np.where((correctresp==0)|(correctresp==1), correctresp^1, correctresp)
+            misslist = np.where((correctresp == 0) | (correctresp == 1), correctresp ^ 1, correctresp)
             newdata['misslist'] = misslist.tolist()
             newdata['correctresp'] = correctresp.tolist()
             newdata['pastcorrectresp'] = pastcorrectresp.tolist()
+            newdata['inter_trial_roving'] = inter_trial_roving.tolist()
+            newdata['intra_trial_roving'] = intra_trial_roving.tolist()
             newdata['talker'] = talkerlist2.tolist()
             newdata['pastcatchtrial'] = pastcatchtrial.tolist()
             newdata['stepval'] = stepval.tolist()
             # newdata['realRelReleaseTimes'] = np.log(newdata['realRelReleaseTimes'])
-            newdata['cosinesim'] = correspondcosinelist.tolist()
             precur_and_targ_same = precur_and_targ_same.astype(int)
             newdata['precur_and_targ_same'] = precur_and_targ_same.tolist()
+
             newdata['timeToTarget'] = newdata['timeToTarget'] / 24414.0625
             newdata['AM'] = newdata['AM'].astype(int)
 
@@ -217,11 +236,11 @@ class behaviouralhelperscg():
             if includefaandmiss is True:
                 newdata = newdata[
                     (newdata.response == 0) | (newdata.response == 1) | (newdata.response == 7) | (
-                                newdata.response == 5)]
+                            newdata.response == 5)]
             elif includemissonly is True:
                 newdata = newdata[
                     (newdata.response == 0) | (newdata.response == 1) | (newdata.response == 7) | (
-                                newdata.response == 3)]
+                            newdata.response == 3)]
             else:
                 newdata = newdata[newdata.correctresp == 1]
                 newdata = newdata[(newdata.catchTrial == 0)]
@@ -475,8 +494,9 @@ class behaviouralhelperscg():
             newdata = newdata[(newdata.talker == 1) | (newdata.talker == 2) | (newdata.talker == 3) | (
                     newdata.talker == 4) | (newdata.talker == 5)]
 
-            newdata = newdata[(newdata.pitchofprecur == 1) | (newdata.pitchofprecur == 2) | (newdata.pitchofprecur == 3) | (
-                    newdata.pitchofprecur == 4) | (newdata.pitchofprecur == 5)]
+            newdata = newdata[
+                (newdata.pitchofprecur == 1) | (newdata.pitchofprecur == 2) | (newdata.pitchofprecur == 3) | (
+                        newdata.pitchofprecur == 4) | (newdata.pitchofprecur == 5)]
 
             newdata = newdata[(newdata.pitchoftarg == 1) | (newdata.pitchoftarg == 2) | (newdata.pitchoftarg == 3) | (
                     newdata.pitchoftarg == 4) | (newdata.pitchoftarg == 5)]
@@ -592,7 +612,6 @@ class behaviouralhelperscg():
                 # find where talkerlist.values == 3
 
                 if chosentalker == 3 or chosentalker == 5 or chosentalker == 8 or chosentalker == 13:
-                    print('inter detected')
                     inter_trial_roving.append(1)
                 else:
                     print(chosentalker)
@@ -703,7 +722,6 @@ class behaviouralhelperscg():
             talkerlist2 = np.delete(talkerlist2, 0)
             stepval = np.delete(stepval, 0)
             pitchofprecur = np.delete(pitchofprecur, 0)
-
 
             newdata['pitchoftarg'] = pitchoftarg.tolist()
 
