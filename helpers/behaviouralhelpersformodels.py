@@ -51,7 +51,6 @@ class behaviouralhelperscg():
             pitchoftarg = np.empty(len(pitchshiftmat))
             pitchofprecur = np.empty(len(pitchshiftmat))
             stepval = np.empty(len(pitchshiftmat))
-
             precur_and_targ_same = np.empty(len(pitchshiftmat))
             talkerlist2 = np.empty(len(pitchshiftmat))
 
@@ -65,7 +64,6 @@ class behaviouralhelperscg():
             for i in range(1, len(newdata['realRelReleaseTimes'].values)):
                 chosenresponseindex = chosenresponse.values[i]
                 pastcatchtrialindex = catchtriallist.values[i - 1]
-
                 realrelreleasetime = realrelreleasetimelist.values[i]
                 pastrealrelreleasetime = realrelreleasetimelist.values[i - 1]
                 pastresponseindex = chosenresponse.values[(i - 1)]
@@ -205,8 +203,6 @@ class behaviouralhelperscg():
             newdata['precur_and_targ_same'] = precur_and_targ_same.tolist()
             newdata['timeToTarget'] = newdata['timeToTarget'] / 24414.0625
             newdata['AM'] = newdata['AM'].astype(int)
-            # make male talker lower values because it is lower in pitch
-            # newdata['talker'] = newdata['talker'].replace({2: 0})
 
             # only look at v2 pitches from recent experiments
             newdata = newdata[(newdata.pitchoftarg == 1) | (newdata.pitchoftarg == 2) | (newdata.pitchoftarg == 3) | (
