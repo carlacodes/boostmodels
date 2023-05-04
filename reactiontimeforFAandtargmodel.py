@@ -290,12 +290,12 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
 
 
     sorted_idx = result.importances_mean.argsort()
-    fig, ax = plt.subplots(figsize=(20, 8))
-    ax.barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, width=0.3, color = 'cyan')
+    fig, ax = plt.subplots(figsize=(8, 18))
+    ax.barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, height = 0.3, color = 'cyan')
     #rotate y -axis labels for better readability
     plt.yticks(rotation=45, ha='right')
     #make font size smaller for y tick labels
-    plt.yticks(fontsize=12)
+    plt.yticks(fontsize=10)
     #add whitespace between y tick labels and plot
     plt.tight_layout()
     ax.set_title("Permutation importances on predicting the absolute release time")
