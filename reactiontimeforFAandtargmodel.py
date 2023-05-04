@@ -413,7 +413,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
 
     return xg_reg, ypred, y_test, results
 
-def extract_release_times_data(ferrets):
+def extract_releasedata_withdist(ferrets):
     df = behaviouralhelperscg.get_df_rxntimebydist(ferrets=ferrets, includefa=True, startdate='04-01-2020', finishdate='01-03-2023')
     df_intra = df[df['intra_trial_roving'] == 1]
     df_inter = df[df['intra_trial_roving'] == 1]
@@ -425,12 +425,12 @@ def extract_release_times_data(ferrets):
     df = pd.concat([df_intra, df_inter, df_control])
     dfuse = df[["pitchoftarg", "pastcatchtrial", "trialNum","talker", "side", "precur_and_targ_same",
                 "timeToTarget",
-                "realRelReleaseTimes", "ferret", "pastcorrectresp"]]
+                "centreRelease", "ferret", "pastcorrectresp"]]
     return dfuse
 
 
 def run_correctrxntime_model(ferrets, optimization=False, ferret_as_feature=False):
-    df_use = extract_release_times_data(ferrets)
+    df_use = extract_releasedata_withdist(ferrets)
     col = 'realRelReleaseTimes'
     dfx = df_use.loc[:, df_use.columns != col]
 
@@ -461,8 +461,8 @@ def run_correctrxntime_model(ferrets, optimization=False, ferret_as_feature=Fals
 
 
 def predict_rxn_time_with_dist_model(ferrets, optimization = False, ferret_as_feature = False):
-    df_use = extract_release_times_data(ferrets)
-    col = 'realRelReleaseTimes'
+    df_use = extract_releasedata_withdist(ferrets)
+    col = 'centreRelease'
     dfx = df_use.loc[:, df_use.columns != col]
     col2 = 'ferret'
     dfx = dfx.loc[:, dfx.columns != col2]
