@@ -190,23 +190,23 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     if ferret_as_feature:
         if one_ferret:
 
-            fig_savedir = Path('figs/correctrxntimemodel/ferret_as_feature/' + ferrets)
+            fig_savedir = Path('figs/absolutereleasemodel/ferret_as_feature/' + ferrets)
             if fig_savedir.exists():
                 pass
             else:
                 fig_savedir.mkdir(parents=True, exist_ok=True)
         else:
-            fig_savedir = Path('figs/correctrxntimemodel/ferret_as_feature')
+            fig_savedir = Path('figs/absolutereleasemodel/ferret_as_feature')
     else:
         if one_ferret:
 
-            fig_savedir = Path('figs/correctrxntimemodel/'+ ferrets)
+            fig_savedir = Path('figs/absolutereleasemodel/'+ ferrets)
             if fig_savedir.exists():
                 pass
             else:
                 fig_savedir.mkdir(parents=True, exist_ok=True)
         else:
-            fig_savedir = Path('figs/correctrxntimemodel/')
+            fig_savedir = Path('figs/absolutereleasemodel/')
 
     xg_reg = lgb.LGBMRegressor(random_state=42, verbose=1, **paramsinput)
     # xg_reg = lgb.LGBMRegressor( colsample_bytree=0.3, learning_rate=0.1,
@@ -419,14 +419,20 @@ def extract_releasedata_withdist(ferrets):
     df_inter = df[df['intra_trial_roving'] == 1]
     df_control = df[df['control_trial'] == 1]
     #subsample df_control so it is equal to the length of df_intra, maintain the column values
+    #get names of all columns that start with lowercase dist
+    dist_cols = [col for col in df_control.columns if col.startswith('dist')]
+    #get a dataframe with only these columns
+
     if len(df_control) > len(df_intra):
         df_control = df_control.sample(n=len(df_intra), random_state=1)
     #then reconcatenate the three dfs
     df = pd.concat([df_intra, df_inter, df_control])
-    dfuse = df[["pitchoftarg", "pastcatchtrial", "trialNum","talker", "side", "precur_and_targ_same",
-                "timeToTarget",
-                "centreRelease", "ferret", "pastcorrectresp"]]
-    return dfuse
+    #get a dataframe with only the dist_cols and then combine with two other columns
+    df_dist = df[dist_cols]
+    df_use = pd.concat([df_dist, df['centreRelease']], axis=1)
+    #drop the distractors column
+    df_use = df_use.drop(['distractors'], axis = 1)
+    return df_use
 
 
 def run_correctrxntime_model(ferrets, optimization=False, ferret_as_feature=False):
