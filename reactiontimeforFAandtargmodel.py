@@ -414,7 +414,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     return xg_reg, ypred, y_test, results
 
 def extract_release_times_data(ferrets):
-    df = behaviouralhelperscg.get_df_behav(ferrets=ferrets, includefaandmiss=False, startdate='04-01-2020', finishdate='01-03-2023')
+    df = behaviouralhelperscg.get_df_rxntimebydist(ferrets=ferrets, includefaandmiss=False, startdate='04-01-2020', finishdate='01-03-2023')
     df_intra = df[df['intra_trial_roving'] == 1]
     df_inter = df[df['intra_trial_roving'] == 1]
     df_control = df[df['control_trial'] == 1]

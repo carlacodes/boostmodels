@@ -288,6 +288,11 @@ class behaviouralhelperscg():
             newdata['realRelReleaseTimes'] = newdata['relReleaseTimes'] - newdata['absentTime']
             distractors = newdata['distractors']
             #make new column for each distractor, and put the rxn time in of the absolute release time
+            for i00 in range(0,(55*2)-3):
+                #make an array of nans the length of the dataframe
+                newdata['dist' + str(i00+1)] = np.full((len(distractors)),np.nan)
+
+
             for i0 in range(0, len(distractors)):
                 dist_trial = distractors.values[i0]
                 for dist in dist_trial:
@@ -298,9 +303,11 @@ class behaviouralhelperscg():
                         #need to account that for the male talker they have different distractor labels
                         if newdata['talker'].values[i0] == 2 and dist!=1 and dist!=2 and dist!=3:
                             distlabel = dist + 50
+                        else:
+                            distlabel = dist
                             #now need to figure out which indexes are shared across talkers
-
-                        newdata['dist' + str(distlabel)] = np.cumsum(newdata['dInds'].values[i0][distpos-1])/fs
+                        if np.sum(newdata['dDurs'].values[i0][:distpos-1])/fs <= newdata['centreRelease'].values[i0]:
+                            newdata['dist' + str(distlabel)].values[i0] = np.sum(newdata['dDurs'].values[i0][:distpos-1])/fs
 
 
             talkermat = {}
