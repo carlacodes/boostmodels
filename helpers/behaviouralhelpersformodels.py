@@ -263,7 +263,7 @@ class behaviouralhelperscg():
     def get_df_rxntimebydist(path=None,
                      output=None,
                      ferrets=None,
-                     includefaandmiss=False,
+                     includefa = False,
                      includemissonly=False,
                      startdate=None,
                      finishdate=None):
@@ -332,7 +332,6 @@ class behaviouralhelperscg():
             pastcorrectresp = np.empty(shape=(0, 0))
             pastcatchtrial = np.empty(shape=(0, 0))
             droplist = np.empty(shape=(0, 0))
-            droplistnew = np.empty(shape=(0, 0))
             correspondcosinelist = np.empty(shape=(0, 0))
             intra_trial_roving = []
             inter_trial_roving = []
@@ -420,20 +419,11 @@ class behaviouralhelperscg():
             pitchofprecur = np.delete(pitchofprecur, 0)
             precur_and_targ_same = np.delete(precur_and_targ_same, 0)
 
-            pitchoftarg = np.delete(pitchoftarg, droplist)
-            talkerlist2 = np.delete(talkerlist2, droplist)
-            stepval = np.delete(stepval, droplist)
+
 
             newdata['pitchoftarg'] = pitchoftarg.tolist()
-            pitchofprecur = np.delete(pitchofprecur, droplist)
             newdata['pitchofprecur'] = pitchofprecur.tolist()
-            correctresp = np.delete(correctresp, droplist)
-            pastcorrectresp = np.delete(pastcorrectresp, droplist)
-            pastcatchtrial = np.delete(pastcatchtrial, droplist)
-            precur_and_targ_same = np.delete(precur_and_targ_same, droplist)
-            inter_trial_roving = np.delete(inter_trial_roving, droplist)
-            intra_trial_roving = np.delete(intra_trial_roving, droplist)
-            control_trial = np.delete(control_trial, droplist)
+
 
             correctresp = correctresp.astype(int)
             pastcatchtrial = pastcatchtrial.astype(int)
@@ -442,12 +432,12 @@ class behaviouralhelperscg():
             newdata['misslist'] = misslist.tolist()
             newdata['correctresp'] = correctresp.tolist()
             newdata['pastcorrectresp'] = pastcorrectresp.tolist()
-            newdata['inter_trial_roving'] = inter_trial_roving.tolist()
-            newdata['intra_trial_roving'] = intra_trial_roving.tolist()
+            newdata['inter_trial_roving'] = inter_trial_roving
+            newdata['intra_trial_roving'] = intra_trial_roving
             newdata['talker'] = talkerlist2.tolist()
             newdata['pastcatchtrial'] = pastcatchtrial.tolist()
             newdata['stepval'] = stepval.tolist()
-            newdata['control_trial'] = control_trial.tolist()
+            newdata['control_trial'] = control_trial
             # newdata['realRelReleaseTimes'] = np.log(newdata['realRelReleaseTimes'])
             precur_and_targ_same = precur_and_targ_same.astype(int)
             newdata['precur_and_targ_same'] = precur_and_targ_same.tolist()
@@ -455,19 +445,12 @@ class behaviouralhelperscg():
             newdata['timeToTarget'] = newdata['timeToTarget'] / 24414.0625
             newdata['AM'] = newdata['AM'].astype(int)
 
-            # only look at v2 pitches from recent experiments
-            newdata = newdata[(newdata.pitchoftarg == 1) | (newdata.pitchoftarg == 2) | (newdata.pitchoftarg == 3) | (
-                    newdata.pitchoftarg == 4) | (newdata.pitchoftarg == 5)]
-            newdata = newdata[
-                (newdata.pitchofprecur == 1) | (newdata.pitchofprecur == 2) | (newdata.pitchofprecur == 3) | (
-                        newdata.pitchofprecur == 4) | (newdata.pitchofprecur == 5)]
-
             newdata = newdata[(newdata.correctionTrial == 0)]  # | (allData.response == 7)
             newdata = newdata[(newdata.currAtten == 0)]  # | (allData.response == 7)
 
-            if includefaandmiss is True:
+            if includefa is True:
                 newdata = newdata[
-                    (newdata.response == 0) | (newdata.response == 1) | (newdata.response == 7) | (
+                    (newdata.response == 0) | (newdata.response == 1) |  (
                             newdata.response == 5)]
             elif includemissonly is True:
                 newdata = newdata[
