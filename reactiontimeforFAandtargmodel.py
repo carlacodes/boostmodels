@@ -439,7 +439,9 @@ def extract_releasedata_withdist(ferrets):
     df_dist = df[dist_cols]
     df_use = pd.concat([df_dist, df['centreRelease']], axis=1)
     #drop the distractors column
-    df_use = df_use.drop(['distractors'], axis = 1)
+    df_use = df_use.drop(['distractors'], axis=1)
+    df_use = df_use.drop(['distractorAtten'], axis=1)
+
     return df_use
 
 
