@@ -262,7 +262,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
 
     fig, ax = plt.gcf(), plt.gca()
     if one_ferret:
-        plt.title('Ranked list of features over their impact in predicting reaction time for' + ferrets[0])
+        plt.title('Ranked list of features over their impact in predicting reaction time for' + ferrets)
     else:
         plt.title('Ranked list of features over their impact in predicting reaction time')
     plt.xlabel('SHAP value (impact on model output) on reaction time')
@@ -298,7 +298,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     plt.yticks(fontsize=10)
     #add whitespace between y tick labels and plot
     plt.tight_layout()
-    ax.set_title("Permutation importances on predicting the absolute release time")
+    ax.set_title("Permutation importances on predicting the absolute release time for " + ferrets)
     fig.tight_layout()
     plt.savefig(fig_savedir / 'permutation_importance.png', dpi=500, bbox_inches='tight')
     plt.show()
@@ -440,7 +440,9 @@ def extract_releasedata_withdist(ferrets):
     df_use = pd.concat([df_dist, df['centreRelease']], axis=1)
     #drop the distractors column
     df_use = df_use.drop(['distractors'], axis=1)
-    df_use = df_use.drop(['distractorAtten'], axis=1)
+
+    if 'distractorAtten' in df_use.columns:
+        df_use = df_use.drop(['distractorAtten'], axis=1)
 
     return df_use
 

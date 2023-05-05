@@ -302,7 +302,7 @@ class behaviouralhelperscg():
                         #calculate rxn time of distractor
                         #need to account that for the male talker they have different distractor labels
                         if newdata['talker'].values[i0] == 2 and dist!=1 and dist!=2 and dist!=3:
-                            distlabel = dist + 50
+                            distlabel = dist + 52
                         else:
                             distlabel = dist
                             #now need to figure out which indexes are shared across talkers
