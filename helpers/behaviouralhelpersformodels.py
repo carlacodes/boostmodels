@@ -288,7 +288,7 @@ class behaviouralhelperscg():
             newdata['realRelReleaseTimes'] = newdata['relReleaseTimes'] - newdata['absentTime']
             distractors = newdata['distractors']
             #make new column for each distractor, and put the rxn time in of the absolute release time
-            for i00 in range(0,(57*2)-3):
+            for i00 in range(0,(57*2)-5):
                 #make an array of nans the length of the dataframe
                 newdata['dist' + str(i00+1)] = np.full((len(distractors)),np.nan)
 
@@ -301,7 +301,7 @@ class behaviouralhelperscg():
                         distpos = np.where(dist_trial == dist)[0][0]
                         #calculate rxn time of distractor
                         #need to account that for the male talker they have different distractor labels
-                        if newdata['talker'].values[i0] == 2 and dist!=1 and dist!=2 and dist!=3:
+                        if newdata['talker'].values[i0] == 2 and dist!=1 and dist!=2 and dist!=3  and dist!=56  and dist!=57:
                             distlabel = dist + 54
                         else:
                             distlabel = dist
