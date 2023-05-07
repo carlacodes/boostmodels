@@ -266,7 +266,7 @@ class behaviouralhelperscg():
                      includefa = False,
                      includemissonly=False,
                      startdate=None,
-                     finishdate=None):
+                     finishdate=None, talker_param=1):
         if output is None:
             output = behaviourOutput
         if path is None:
@@ -279,6 +279,7 @@ class behaviouralhelperscg():
         numofferrets = allData['ferret'].unique()
         for ferret in numofferrets:
             newdata = allData[allData['ferret'] == ferret]
+            newdata = newdata[newdata['talker'] != talker_param]
             newdata['targTimes'] = newdata['timeToTarget'] / fs
 
             newdata['centreRelease'] = newdata['lickRelease'] - newdata['startTrialLick']
@@ -286,7 +287,7 @@ class behaviouralhelperscg():
             newdata['realRelReleaseTimes'] = newdata['relReleaseTimes'] - newdata['absentTime']
             distractors = newdata['distractors']
             #make new column for each distractor, and put the rxn time in of the absolute release time
-            for i00 in range(0,(57*2)-5):
+            for i00 in range(0,57):
                 #make an array of nans the length of the dataframe
                 newdata['dist' + str(i00+1)] = np.full((len(distractors)),np.nan)
 
@@ -294,15 +295,12 @@ class behaviouralhelperscg():
             for i0 in range(0, len(distractors)):
                 dist_trial = distractors.values[i0]
                 for dist in dist_trial:
-                    if dist != 0:
+                    if dist <=57:
                         #calculate position of distractor in trial
                         distpos = np.where(dist_trial == dist)[0][0]
                         #calculate rxn time of distractor
-                        #need to account that for the male talker they have different distractor labels
-                        if newdata['talker'].values[i0] == 2 and dist!=1 and dist!=2 and dist!=3  and dist!=56  and dist!=57:
-                            distlabel = dist + 54
-                        else:
-                            distlabel = dist
+
+                        distlabel = dist
                             #now need to figure out which indexes are shared across talkers
                         if np.sum(newdata['dDurs'].values[i0][:distpos-1])/fs <= newdata['centreRelease'].values[i0]:
                             newdata['dist' + str(distlabel)].values[i0] = np.sum(newdata['dDurs'].values[i0][:distpos-1])/fs
@@ -449,7 +447,7 @@ class behaviouralhelperscg():
             if includefa is True:
                 newdata = newdata[
                     (newdata.response == 0) | (newdata.response == 1) |  (
-                            newdata.response == 5)]
+                            newdata.response == 5) ]
             elif includemissonly is True:
                 newdata = newdata[
                     (newdata.response == 0) | (newdata.response == 1) | (newdata.response == 7) | (

@@ -176,7 +176,7 @@ def runlgbreleasetimes_for_a_ferret(data, paramsinput=None, ferret=1, ferret_nam
 
 
 
-def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_ferret=False, ferrets=None):
+def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_ferret=False, ferrets=None, talker = 1):
 
 
     X_train, X_test, y_train, y_test = train_test_split(X,y, test_size=0.2,
@@ -190,23 +190,31 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     if ferret_as_feature:
         if one_ferret:
 
-            fig_savedir = Path('figs/absolutereleasemodel/ferret_as_feature/' + ferrets)
+            fig_savedir = Path('figs/absolutereleasemodel/ferret_as_feature/' + ferrets+'talker'+str(talker))
             if fig_savedir.exists():
                 pass
             else:
                 fig_savedir.mkdir(parents=True, exist_ok=True)
         else:
-            fig_savedir = Path('figs/absolutereleasemodel/ferret_as_feature')
+            fig_savedir = Path('figs/absolutereleasemodel/ferret_as_feature'+'talker'+str(talker))
+            if fig_savedir.exists():
+                pass
+            else:
+                fig_savedir.mkdir(parents=True, exist_ok=True)
     else:
         if one_ferret:
 
-            fig_savedir = Path('figs/absolutereleasemodel/'+ ferrets)
+            fig_savedir = Path('figs/absolutereleasemodel/'+ ferrets +'talker'+str(talker))
             if fig_savedir.exists():
                 pass
             else:
                 fig_savedir.mkdir(parents=True, exist_ok=True)
         else:
-            fig_savedir = Path('figs/absolutereleasemodel/')
+            fig_savedir = Path('figs/absolutereleasemodel/'+'talker'+str(talker))
+            if fig_savedir.exists():
+                pass
+            else:
+                fig_savedir.mkdir(parents=True, exist_ok=True)
 
     xg_reg = lgb.LGBMRegressor(random_state=42, verbose=1, **paramsinput)
     # xg_reg = lgb.LGBMRegressor( colsample_bytree=0.3, learning_rate=0.1,
@@ -243,14 +251,15 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     feature_labels = X.columns[sorted_indices]
     cumulative_importances = np.cumsum(feature_importances)
 
-
+    talkerlist = ['female', 'male'
+    ]
     # Plot the elbow plot
     plt.figure(figsize=(10, 6))
     plt.plot(feature_labels, cumulative_importances, marker='o', color = 'cyan')
     plt.xlabel('Features')
     plt.ylabel('Cumulative Feature Importance')
     if one_ferret:
-        plt.title('Elbow Plot of Cumulative Feature Importance for Correct Reaction Time Model for' + ferrets, fontsize = 20)
+        plt.title('Elbow Plot of Cumulative Feature Importance for Correct Reaction Time Model for' + ferrets + ' talker'+ talkerlist[talker -1], fontsize = 20)
     else:
         plt.title('Elbow Plot of Cumulative Feature Importance for Correct Reaction Time Model', fontsize = 20)
     plt.xticks(rotation=45, ha='right')  # rotate x-axis labels for better readability
@@ -262,7 +271,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
 
     fig, ax = plt.gcf(), plt.gca()
     if one_ferret:
-        plt.title('Ranked list of features over their impact in predicting reaction time for' + ferrets)
+        plt.title('Ranked list of features over their impact in predicting reaction time for' + ferrets+ ' talker' + talkerlist[talker -1])
     else:
         plt.title('Ranked list of features over their impact in predicting reaction time')
     plt.xlabel('SHAP value (impact on model output) on reaction time')
@@ -298,7 +307,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     plt.yticks(fontsize=10)
     #add whitespace between y tick labels and plot
     plt.tight_layout()
-    ax.set_title("Permutation importances on predicting the absolute release time for " + ferrets)
+    ax.set_title("Permutation importances on predicting the absolute release time for " + ferrets+ ' talker' + talkerlist[talker -1])
     fig.tight_layout()
     plt.savefig(fig_savedir / 'permutation_importance.png', dpi=500, bbox_inches='tight')
     plt.show()
@@ -421,8 +430,8 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
 
     return xg_reg, ypred, y_test, results
 
-def extract_releasedata_withdist(ferrets):
-    df = behaviouralhelperscg.get_df_rxntimebydist(ferrets=ferrets, includefa=True, startdate='04-01-2020', finishdate='01-03-2023')
+def extract_releasedata_withdist(ferrets, talker = 1):
+    df = behaviouralhelperscg.get_df_rxntimebydist(ferrets=ferrets, includefa=True, startdate='04-01-2020', finishdate='01-03-2023', talker_param = talker)
     df_intra = df[df['intra_trial_roving'] == 1]
     df_inter = df[df['intra_trial_roving'] == 1]
     df_control = df[df['control_trial'] == 1]
@@ -478,8 +487,8 @@ def run_correctrxntime_model(ferrets, optimization=False, ferret_as_feature=Fals
 
 
 
-def predict_rxn_time_with_dist_model(ferrets, optimization = False, ferret_as_feature = False):
-    df_use = extract_releasedata_withdist(ferrets)
+def predict_rxn_time_with_dist_model(ferrets, optimization = False, ferret_as_feature = False, talker = 1):
+    df_use = extract_releasedata_withdist(ferrets, talker=talker)
     col = 'centreRelease'
     dfx = df_use.loc[:, df_use.columns != col]
     col2 = 'ferret'
@@ -490,7 +499,7 @@ def predict_rxn_time_with_dist_model(ferrets, optimization = False, ferret_as_fe
         col2 = 'ferret'
         dfx = dfx.loc[:, dfx.columns != col2]
         if optimization == False:
-            best_params = np.load('optuna_results/best_paramsreleastime_dist_model_'+ ferrets[0]+ '.npy', allow_pickle=True).item()
+            best_params = np.load('optuna_results/best_paramsreleastime_dist_model_'+ ferrets[0]+'talker'+ str(talker)+'.npy', allow_pickle=True).item()
         else:
             best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
             best_params = best_study_results.best_params
@@ -498,11 +507,11 @@ def predict_rxn_time_with_dist_model(ferrets, optimization = False, ferret_as_fe
     else:
         dfx = dfx
         if optimization == False:
-            best_params = np.load('optuna_results/best_paramsreleastimemodel_dist_ferretasfeature_'+ ferrets[0]+ '.npy', allow_pickle=True).item()
+            best_params = np.load('optuna_results/best_paramsreleastimemodel_dist_ferretasfeature_'+ ferrets[0]+'talker'+'.npy', allow_pickle=True).item()
         else:
             best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
             best_params = best_study_results.best_params
-            np.save('optuna_results/best_paramsreleastimemodel_dist_ferretasfeature_'+ ferrets[0]+ '.npy', best_params)
+            np.save('optuna_results/best_paramsreleastimemodel_dist_ferretasfeature_'+  ferrets[0]+'talker'+ '.npy', best_params)
     xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx, df_use[col], paramsinput=best_params, ferret_as_feature=ferret_as_feature, one_ferret=True, ferrets=ferrets[0])
 
 
@@ -514,7 +523,9 @@ def main():
     # run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature=True)
 
     for ferret in ferrets:
-        predict_rxn_time_with_dist_model([ferret], optimization=True, ferret_as_feature=False)
+        predict_rxn_time_with_dist_model([ferret], optimization=True, ferret_as_feature=False, talker = 1)
+        predict_rxn_time_with_dist_model([ferret], optimization=True, ferret_as_feature=False, talker = 2)
+
 
 
 
