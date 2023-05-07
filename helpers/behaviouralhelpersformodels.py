@@ -4,6 +4,7 @@ from instruments.helpers.extract_helpers import extractAllFerretData
 import pandas as pd
 import numpy as np
 import pandas as pd
+import datetime as dt
 
 
 class behaviouralhelperscg():
@@ -260,6 +261,11 @@ class behaviouralhelperscg():
             bigdata = bigdata.append(newdata)
         return bigdata
 
+    def matlab2datetime(matlab_datenum):
+        day = dt.datetime.fromordinal(int(matlab_datenum))
+        dayfrac = dt.timedelta(days=matlab_datenum % 1) - dt.timedelta(days=366)
+        return day + dayfrac
+
     def get_df_rxntimebydist(path=None,
                      output=None,
                      ferrets=None,
@@ -291,6 +297,8 @@ class behaviouralhelperscg():
                 #make an array of nans the length of the dataframe
                 newdata['dist' + str(i00+1)] = np.full((len(distractors)),np.nan)
 
+            EasyListF = [1, 5, 20, 2, 42, 56, 32, 57, 33, 11];
+            EasyList = [1, 6, 22, 2, 49, 56, 38, 57, 39, 13];
 
             for i0 in range(0, len(distractors)):
                 dist_trial = distractors.values[i0]
@@ -299,9 +307,23 @@ class behaviouralhelperscg():
                         #calculate position of distractor in trial
                         distpos = np.where(dist_trial == dist)[0][0]
                         #calculate rxn time of distractor
+                        #check if string of fname contains 39 or 43, and check the day of the experiment
+                        dateofstart = newdata['startTime'].values[i0]
+                        day = dt.datetime.fromordinal(int(dateofstart))
+                        dayfrac = dt.timedelta(days=dateofstart % 1) - dt.timedelta(days=366)
+                        exdatestart = day + dayfrac
 
-                        distlabel = dist
-                            #now need to figure out which indexes are shared across talkers
+                        if 'level_39' in newdata['fName'].values[i0] or 'level_43' in newdata['fName'].values[i0] and talker_param == 1:
+                            distlabel = EasyListF[dist-1]
+                        elif 'level_39' in newdata['fName'].values[i0] or 'level_43' in newdata['fName'].values[i0]  and talker_param == 2:
+                            distlabel = EasyList[dist-1]
+                        elif dist == 56 and newdata['ferretname'].values[i0] == 'F1702_Zola' and exdatestart >= dt.datetime(2021, 6, 21, 0, 0, 0):
+                            print('pink noise detected')
+                            distlabel = 57
+                        else:
+                            distlabel = dist
+
+
                         if np.sum(newdata['dDurs'].values[i0][:distpos-1])/fs <= newdata['centreRelease'].values[i0]:
                             newdata['dist' + str(distlabel)].values[i0] = np.sum(newdata['dDurs'].values[i0][:distpos-1])/fs
 
@@ -457,6 +479,10 @@ class behaviouralhelperscg():
                 newdata = newdata[(newdata.catchTrial == 0)]
             bigdata = bigdata.append(newdata)
         return bigdata
+    def matlab2datetime(matlab_datenum):
+        day = dt.datetime.fromordinal(int(matlab_datenum))
+        dayfrac = dt.timedelta(days=matlab_datenum % 1) - dt.timedelta(days=366)
+        return day + dayfrac
 
     def get_false_alarm_behavdata(path=None,
                                   output=None,

@@ -493,6 +493,19 @@ def predict_rxn_time_with_dist_model(ferrets, optimization = False, ferret_as_fe
     dfx = df_use.loc[:, df_use.columns != col]
     col2 = 'ferret'
     dfx = dfx.loc[:, dfx.columns != col2]
+    #count the frequencies of each time a value is not nan by column in dfx
+    #count the frequencies of each time a value is not nan by column in dfx
+    counts = dfx.count(axis=0)
+    #get the minimum value in the counts
+    min_count = min(counts)
+    #get the column names of the columns that have the minimum value
+    min_count_cols = counts[counts == min_count].index
+    max_count = max(counts)
+    max_count_cols = counts[counts == max_count].index
+
+    print(dfx.count(axis=0))
+
+
 
     # remove ferret as possible feature
     if ferret_as_feature == False:
@@ -517,7 +530,7 @@ def predict_rxn_time_with_dist_model(ferrets, optimization = False, ferret_as_fe
 
 def main():
     ferrets = ['F2105_Clove', 'F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
-    ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
+    ferrets = ['F1815_Cruella', 'F1702_Zola', 'F1803_Tina', 'F2002_Macaroni',' F2105_Clove']
 
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
     # run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature=True)
