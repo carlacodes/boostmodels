@@ -276,8 +276,6 @@ class behaviouralhelperscg():
                                                 finishDate=finishdate)
         fs = 24414.062500
         bigdata = pd.DataFrame()
-        cosinesimfemale = np.load('D:/Stimuli/cosinesimvectorfemale.npy')
-        cosinesimmale = np.load('D:/Stimuli/cosinesimvectormale.npy')
         numofferrets = allData['ferret'].unique()
         for ferret in numofferrets:
             newdata = allData[allData['ferret'] == ferret]
