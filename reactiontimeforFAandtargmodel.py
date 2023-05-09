@@ -449,7 +449,6 @@ def extract_releasedata_withdist(ferrets, talker = 1):
     df_use = pd.concat([df_dist, df['centreRelease']], axis=1)
     #drop the distractors column
     df_use = df_use.drop(['distractors'], axis=1)
-
     if 'distractorAtten' in df_use.columns:
         df_use = df_use.drop(['distractorAtten'], axis=1)
 
@@ -525,7 +524,7 @@ def predict_rxn_time_with_dist_model(ferrets, optimization = False, ferret_as_fe
             best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
             best_params = best_study_results.best_params
             np.save('optuna_results/best_paramsreleastimemodel_dist_ferretasfeature_'+  ferrets[0]+'talker'+ '.npy', best_params)
-    xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx, df_use[col], paramsinput=best_params, ferret_as_feature=ferret_as_feature, one_ferret=True, ferrets=ferrets[0])
+    xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx, df_use[col], paramsinput=best_params, ferret_as_feature=ferret_as_feature, one_ferret=True, ferrets=ferrets[0], talker = talker)
 
 
 def main():

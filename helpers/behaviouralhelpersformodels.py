@@ -285,7 +285,7 @@ class behaviouralhelperscg():
         numofferrets = allData['ferret'].unique()
         for ferret in numofferrets:
             newdata = allData[allData['ferret'] == ferret]
-            newdata = newdata[newdata['talker'] == talker_param]
+
             newdata['targTimes'] = newdata['timeToTarget'] / fs
 
             newdata['centreRelease'] = newdata['lickRelease'] - newdata['startTrialLick']
@@ -459,12 +459,12 @@ class behaviouralhelperscg():
             # newdata['realRelReleaseTimes'] = np.log(newdata['realRelReleaseTimes'])
             precur_and_targ_same = precur_and_targ_same.astype(int)
             newdata['precur_and_targ_same'] = precur_and_targ_same.tolist()
-
             newdata['timeToTarget'] = newdata['timeToTarget'] / 24414.0625
             newdata['AM'] = newdata['AM'].astype(int)
 
             newdata = newdata[(newdata.correctionTrial == 0)]  # | (allData.response == 7)
-            newdata = newdata[(newdata.currAtten == 0)]  # | (allData.response == 7)
+            newdata = newdata[(newdata.currAtten == 0)]
+            newdata = newdata[(newdata.talker == talker_param)]
 
             if includefa is True:
                 newdata = newdata[
