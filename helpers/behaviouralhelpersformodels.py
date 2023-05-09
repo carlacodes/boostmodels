@@ -285,7 +285,7 @@ class behaviouralhelperscg():
         numofferrets = allData['ferret'].unique()
         for ferret in numofferrets:
             newdata = allData[allData['ferret'] == ferret]
-            newdata = newdata[newdata['talker'] != talker_param]
+            newdata = newdata[newdata['talker'] == talker_param]
             newdata['targTimes'] = newdata['timeToTarget'] / fs
 
             newdata['centreRelease'] = newdata['lickRelease'] - newdata['startTrialLick']
