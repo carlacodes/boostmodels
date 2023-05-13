@@ -276,6 +276,9 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         plt.title('Ranked list of features over their impact in predicting reaction time')
     plt.xlabel('SHAP value (impact on model output) on reaction time')
     labels = [item.get_text() for item in ax.get_yticklabels()]
+    labelinfo = [item for item in ax.get_yticklabels()]
+    #dynamically asign label based on the column name
+
     print(labels)
     # labels[11] = 'trial Number'
     # labels[10] = 'time to target'
@@ -515,15 +518,15 @@ def predict_rxn_time_with_dist_model(ferrets, optimization = False, ferret_as_fe
         else:
             best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
             best_params = best_study_results.best_params
-            np.save('optuna_results/best_paramsreleastime_dist_model_'+ ferrets[0]+ '.npy', best_params)
+            np.save('optuna_results/best_paramsreleastime_dist_model_'+ ferrets[0]+ str(talker)+'.npy', best_params)
     else:
         dfx = dfx
         if optimization == False:
-            best_params = np.load('optuna_results/best_paramsreleastimemodel_dist_ferretasfeature_'+ ferrets[0]+'talker'+'.npy', allow_pickle=True).item()
+            best_params = np.load('optuna_results/best_paramsreleastimemodel_dist_ferretasfeature_'+ ferrets[0]+'talker'+str(talker)+'.npy', allow_pickle=True).item()
         else:
             best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
             best_params = best_study_results.best_params
-            np.save('optuna_results/best_paramsreleastimemodel_dist_ferretasfeature_'+  ferrets[0]+'talker'+ '.npy', best_params)
+            np.save('optuna_results/best_paramsreleastimemodel_dist_ferretasfeature_'+  ferrets[0]+'talker'+str(talker)+ '.npy', best_params)
     xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx, df_use[col], paramsinput=best_params, ferret_as_feature=ferret_as_feature, one_ferret=True, ferrets=ferrets[0], talker = talker)
 
 
