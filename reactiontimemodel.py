@@ -426,7 +426,7 @@ def extract_release_times_data(ferrets):
     dfuse = df[["pitchoftarg", "pastcatchtrial", "trialNum","talker", "side", "precur_and_targ_same",
                 "timeToTarget",
                 "realRelReleaseTimes", "ferret", "pastcorrectresp"]]
-    labels = ['pitch of target', 'past trial was catch', 'trial number', 'talker', 'side', 'precursor = target pitch', 'time to target', 'ferret ID', 'past trial was correct']
+    labels = ['pitch of target', 'past trial was catch', 'trial number', 'talker', 'side', 'precursor = target pitch', 'time to target', 'realRelReleaseTimes', 'ferret ID', 'past trial was correct']
     dfuse = dfuse.rename(columns=dict(zip(dfuse.columns, labels)))
     return dfuse
 
@@ -496,7 +496,7 @@ def main():
     # run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature=True)
 
     for ferret in ferrets:
-        run_correctrxntime_model_for_a_ferret([ferret], optimization=True, ferret_as_feature=False)
+        run_correctrxntime_model_for_a_ferret([ferret], optimization=False, ferret_as_feature=False)
 
 
 
