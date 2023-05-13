@@ -124,7 +124,7 @@ def runlgbreleasetimes_for_a_ferret(data, paramsinput=None, ferret=1, ferret_nam
 
     shap.summary_plot(shap_values, dfx, show=False)
     fig, ax = plt.gcf(), plt.gca()
-    plt.title('Ranked list of features over their impact in predicting reaction time for' + ferret_name)
+    plt.title('Ranked list of features over their impact \n in predicting reaction time for' + ferret_name)
     plt.xlabel('SHAP value (impact on model output) on reaction time' + ferret_name)
 
     labels = [item.get_text() for item in ax.get_yticklabels()]
@@ -328,9 +328,9 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     cb_ax.set_ylabel("Pitch of precursor = target", fontsize=12)
     plt.ylabel('SHAP value', fontsize=10)
     if one_ferret:
-        plt.title('Pitch of target \n versus impact in predicted reacton time for' + ferrets, fontsize=18)
+        plt.title('Pitch of target versus impact \n in predicted reacton time for' + ferrets, fontsize=18)
     else:
-        plt.title('Pitch of target \n versus impact in predicted reacton time', fontsize=18)
+        plt.title('Pitch of target versus impact \n in predicted reacton time', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
     plt.xlabel('Pitch of target', fontsize=16)
     # plt.xticks([1,2,3,4,5], labels=['109', '124', '144 ', '191', '251'], fontsize=15)
@@ -370,12 +370,11 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         cb_ax.tick_params(labelsize=15)
         cb_ax.set_yticks([1, 2, 3, 4, 5])
         # cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
-        cb_ax.set_ylabel("Precursor = Target pitch ", fontsize=12)
         plt.ylabel('SHAP value', fontsize=10)
         if one_ferret:
-            plt.title('Ferret \n versus impact in predicted reaction time for' + ferrets, fontsize=18)
+            plt.title('Ferret versus impact \n in predicted reaction time for ' + ferrets, fontsize=18)
         else:
-            plt.title('Ferret \n versus impact in predicted reaction time', fontsize=18)
+            plt.title('Ferret ersus impact in predicted reaction time', fontsize=18)
         plt.ylabel('SHAP value', fontsize=16)
         plt.xlabel('Ferret', fontsize=16)
         # plt.xticks([1,2,3,4,5], labels=['109', '124', '144 ', '191', '251'], fontsize=15)
