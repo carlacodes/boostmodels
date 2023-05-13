@@ -231,14 +231,14 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput, ferret_as_feature = False):
         # dfuse = df[["pitchoftarg", "pastcatchtrial", "trialNum", "talker", "side", "precur_and_targ_same",
         #             "timeToTarget",
         #             "realRelReleaseTimes", "ferret", "pastcorrectresp"]]
-        labels = ["pitch of precursor", "target times", "ferret ID", "trial number", "talker", "audio side", "intra-trial F0 roving", "past response correct", "past trial catch", "falsealarm"]
+        labels = ["pitch of precursor", "target times", "ferret ID", "trial number", "talker", "audio side", "intra-trial F0 roving", "past response correct", "past trial was catch", "falsealarm"]
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
 
     else:
         df_to_use = dataframe[
             ["pitchofprecur", "targTimes","trialNum", "talker", "side", "intra_trial_roving", "pastcorrectresp", "pastcatchtrial",
              "falsealarm"]]
-        labels = ["pitch of precursor", "target times", "trial number", "talker", "audio side", "intra-trial F0 roving", "past response correct", "past trial catch", "falsealarm"]
+        labels = ["pitch of precursor", "target times", "trial number", "talker", "audio side", "intra-trial F0 roving", "past response correct", "past trial was catch", "falsealarm"]
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
 
     col = 'falsealarm'
