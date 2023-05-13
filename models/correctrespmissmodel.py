@@ -138,7 +138,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
         df_to_use = dataframe[["pitchoftarg", "trialNum", "misslist", "talker", "side", "precur_and_targ_same",
                            "targTimes","pastcorrectresp",
                            "pastcatchtrial", "ferret"]]
-        labels = ['pitch of target', 'trial number','misslist', 'talker', 'audio side', 'precursor = target pitch','target presentation time', 'past response was correct', 'past trial was catch', 'ferret ID']
+        labels = ['pitch of target', 'trial number','misslist', 'talker', 'side of audio', 'precursor = target pitch','target presentation time', 'past response was correct', 'past trial was catch', 'ferret ID']
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
 
         fig_dir = Path('D:/behavmodelfigs/correctresp_or_miss/ferret_as_feature')
@@ -287,7 +287,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     plt.ylabel('SHAP value', fontsize=10)
     plt.title('Pitch of the side of the booth \n versus impact in miss probability', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
-    plt.xlabel('Side of audio presenetation', fontsize=16)
+    plt.xlabel('Side of audio presentation', fontsize=16)
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "pitch of target"], color=shap_values2[:, "precursor = target pitch"], show=False, cmap = cmapcustom)
@@ -373,7 +373,7 @@ def run_correct_responsepipeline(ferrets):
     filepath.parent.mkdir(parents=True, exist_ok=True)
     resultingcr_df.to_csv(filepath)
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbcorrectrespornotwithoptuna(
-        resultingcr_df, optimization=False, ferret_as_feature = True)
+        resultingcr_df, optimization=True, ferret_as_feature = True)
     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
 
@@ -384,7 +384,7 @@ def test_function(ferrets):
     filepath.parent.mkdir(parents=True, exist_ok=True)
     resultingcr_df.to_csv(filepath)
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbcorrectrespornotwithoptuna(
-        resultingcr_df, optimization=False, ferret_as_feature = True)
+        resultingcr_df, optimization=True, ferret_as_feature=True)
     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
 if __name__ == '__main__':
