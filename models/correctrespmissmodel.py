@@ -127,13 +127,6 @@ def run_optuna_study_correctresp(X, y):
         print(f"\t\t{key}: {value}")
     return study
 def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization = False, ferret_as_feature=False):
-    if paramsinput is None:
-        paramsinput = {'colsample_bytree': 0.4253436090928764, 'alpha': 18.500902749816458, 'is_unbalanced': True,
-                       'n_estimators': 8700, 'learning_rate': 0.45629236152754304, 'num_leaves': 670, 'max_depth': 3,
-                       'min_data_in_leaf': 200, 'lambda_l1': 4, 'lambda_l2': 64,
-                       'min_gain_to_split': 0.016768866636887758, 'bagging_fraction': 0.9, 'bagging_freq': 3,
-                       'feature_fraction': 0.2}
-
     if ferret_as_feature == True:
         df_to_use = dataframe[["pitchoftarg", "trialNum", "misslist", "talker", "side", "precur_and_targ_same",
                            "targTimes","pastcorrectresp",

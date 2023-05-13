@@ -328,7 +328,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     fig.tight_layout()
     plt.savefig(fig_dir / 'permutation_importance.png', dpi=500)
     plt.show()
-    shap.dependence_plot("pitchofprecur", shap_values1[0], X_train)  #
+    shap.dependence_plot("pitch of precursor", shap_values1[0], X_train)  #
     plt.show()
 
     # partial dependency plots
@@ -341,7 +341,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.tight_layout()
     plt.subplots_adjust(left=-10, right=0.5)
 
-    shap.plots.scatter(shap_values2[:, "pitchofprecur"], color=shap_values2[:, "intra_trial_roving"], show=False,
+    shap.plots.scatter(shap_values2[:, "pitch of precursor"], color=shap_values2[:, "intra_trial_roving"], show=False,
                        cmap=cmapcustom)
     fig, ax = plt.gcf(), plt.gca()
     cb_ax = fig.axes[1]
@@ -354,7 +354,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.xticks([1, 2, 3, 4, 5], labels=['109 Hz', '124 Hz', '144 Hz', '191 Hz', '251 Hz'], fontsize=15)
     plt.ylabel('SHAP value', fontsize=16)
     plt.xlabel('Pitch of precursor word', fontsize=16)
-    plt.savefig(fig_dir / 'pitchofprecurintratrialrove.png', dpi=500)
+    plt.savefig(fig_dir / 'pitch of precursorintratrialrove.png', dpi=500)
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "targTimes"], color=shap_values2[:, "trialNum"], show=False, cmap=cmapcustom)
@@ -371,7 +371,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.savefig(fig_dir / 'targtimescolouredbytrialnumber.png', dpi=1000)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "targTimes"], color=shap_values2[:, "pitchofprecur"], show=False,
+    shap.plots.scatter(shap_values2[:, "targTimes"], color=shap_values2[:, "pitch of precursor"], show=False,
                        cmap=cmapcustom)
     fig, ax = plt.gcf(), plt.gca()
     # Get colorbar
@@ -459,7 +459,7 @@ def runlgbfaornot(dataframe):
     plt.savefig('D:/behavmodelfigs/fa_or_not_model/ranked_features.png', dpi=1000, bbox_inches="tight")
     plt.show()
 
-    shap.dependence_plot("pitchofprecur", shap_values1[0], dfx)  #
+    shap.dependence_plot("pitch of precursor", shap_values1[0], dfx)  #
     plt.show()
     result = permutation_importance(xg_reg, X_test, y_test, n_repeats=10,
                                     random_state=123, n_jobs=2)
@@ -480,10 +480,10 @@ def runlgbfaornot(dataframe):
     plt.subplots_adjust(left=-10, right=0.5)
 
     plt.show()
-    shap.plots.scatter(shap_values2[:, "pitchofprecur"], color=shap_values2[:, "talker"])
+    shap.plots.scatter(shap_values2[:, "pitch of precursor"], color=shap_values2[:, "talker"])
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "pitchofprecur"], color=shap_values2[:, "intra_trial_roving"], show=False)
+    shap.plots.scatter(shap_values2[:, "pitch of precursor"], color=shap_values2[:, "intra_trial_roving"], show=False)
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "intra_trial_roving"], color=shap_values2[:, "talker"])
@@ -921,7 +921,7 @@ if __name__ == '__main__':
     # # test_df2 = run_reaction_time_fa_pipleine_male(ferrets)
     #
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(
-        ferrets, optimization=True, ferret_as_feature=True)
+        ferrets, optimization=False, ferret_as_feature=True)
     #
 
     # plot_reaction_times_intra(ferrets)
