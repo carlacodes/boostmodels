@@ -250,9 +250,9 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     plt.xlabel('Features')
     plt.ylabel('Cumulative Feature Importance')
     if one_ferret:
-        plt.title('Elbow Plot of Cumulative Feature Importance for Correct Reaction Time Model for' + ferrets, fontsize = 20)
+        plt.title('Elbow Plot of Cumulative Feature Importance \n for the Reaction Time Model \n for ' + ferrets, fontsize = 20)
     else:
-        plt.title('Elbow Plot of Cumulative Feature Importance for Correct Reaction Time Model', fontsize = 20)
+        plt.title('Elbow Plot of Cumulative Feature Importance for the Reaction Time Model', fontsize = 20)
     plt.xticks(rotation=45, ha='right')  # rotate x-axis labels for better readability
     plt.savefig(fig_savedir / 'elbowplot.png', dpi=500, bbox_inches='tight')
     plt.show()
@@ -295,12 +295,12 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     plt.savefig(fig_savedir / 'permutation_importance.png', dpi=500)
     plt.show()
 
-    shap.dependence_plot("timeToTarget", shap_values, X)  #
+    shap.dependence_plot("time to target", shap_values, X)  #
     explainer = shap.Explainer(xg_reg, X)
     shap_values2 = explainer(X_train)
 
 
-    shap.plots.scatter(shap_values2[:, "timeToTarget"], color=shap_values2[:, "trialNum"], show=False, cmap = matplotlib.colormaps[cmapname])
+    shap.plots.scatter(shap_values2[:, "time to target"], color=shap_values2[:, "trial number"], show=False, cmap = matplotlib.colormaps[cmapname])
     fig, ax = plt.gcf(), plt.gca()
     # Get colorbar
     cb_ax = fig.axes[1]
@@ -317,7 +317,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     plt.savefig(fig_savedir /'targtimescolouredbytrialnumber.png', dpi=1000)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "pitchoftarg"], color=shap_values2[:, "precur_and_targ_same"], show=False, cmap = matplotlib.colormaps[cmapname])
+    shap.plots.scatter(shap_values2[:, "pitch of target"], color=shap_values2[:, "precursor = target pitch"], show=False, cmap = matplotlib.colormaps[cmapname])
     fig, ax = plt.gcf(), plt.gca()
     # Get colorbar
     cb_ax = fig.axes[1]
@@ -338,7 +338,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     plt.show()
 
     if one_ferret == False:
-        shap.plots.scatter(shap_values2[:, "ferret"], color=shap_values2[:, "timeToTarget"], show=False, cmap = matplotlib.colormaps[cmapname])
+        shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "time to target"], show=False, cmap = matplotlib.colormaps[cmapname])
         fig, ax = plt.gcf(), plt.gca()
         # Get colorbar
         cb_ax = fig.axes[1]
@@ -361,7 +361,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         plt.savefig( fig_savedir /'ferretcolouredbytargtimes.png', dpi=1000)
         plt.show()
 
-        shap.plots.scatter(shap_values2[:, "ferret"], color=shap_values2[:, "pitchofprecur"], show=False,
+        shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "precursor = target pitch"], show=False,
                            cmap=matplotlib.colormaps[cmapname])
         fig, ax = plt.gcf(), plt.gca()
         # Get colorbar
@@ -373,9 +373,9 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         cb_ax.set_ylabel("Precursor = Target pitch ", fontsize=12)
         plt.ylabel('SHAP value', fontsize=10)
         if one_ferret:
-            plt.title('Ferret \n versus impact in predicted reacton time for' + ferrets, fontsize=18)
+            plt.title('Ferret \n versus impact in predicted reaction time for' + ferrets, fontsize=18)
         else:
-            plt.title('Ferret \n versus impact in predicted reacton time', fontsize=18)
+            plt.title('Ferret \n versus impact in predicted reaction time', fontsize=18)
         plt.ylabel('SHAP value', fontsize=16)
         plt.xlabel('Ferret', fontsize=16)
         # plt.xticks([1,2,3,4,5], labels=['109', '124', '144 ', '191', '251'], fontsize=15)
