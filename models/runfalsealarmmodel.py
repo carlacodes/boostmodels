@@ -336,12 +336,12 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     shap_values2 = explainer(X_train)
     fig, ax = plt.subplots(figsize=(15, 15))
     # Plot the scatter plot with the colormap
-    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "intra_trial_roving"], cmap=cmapcustom)
+    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "intra-trial F0 roving"], cmap=cmapcustom)
     plt.show()
     plt.tight_layout()
     plt.subplots_adjust(left=-10, right=0.5)
 
-    shap.plots.scatter(shap_values2[:, "pitch of precursor"], color=shap_values2[:, "intra_trial_roving"], show=False,
+    shap.plots.scatter(shap_values2[:, "pitch of precursor"], color=shap_values2[:, "intra-trial F0 roving"], show=False,
                        cmap=cmapcustom)
     fig, ax = plt.gcf(), plt.gca()
     cb_ax = fig.axes[1]
@@ -474,7 +474,7 @@ def runlgbfaornot(dataframe):
     explainer = shap.Explainer(xg_reg, dfx)
     shap_values2 = explainer(X_train)
     fig, ax = plt.subplots(figsize=(15, 15))
-    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "intra_trial_roving"])
+    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "intra-trial F0 roving"])
     fig.tight_layout()
     plt.tight_layout()
     plt.subplots_adjust(left=-10, right=0.5)
@@ -483,10 +483,10 @@ def runlgbfaornot(dataframe):
     shap.plots.scatter(shap_values2[:, "pitch of precursor"], color=shap_values2[:, "talker"])
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "pitch of precursor"], color=shap_values2[:, "intra_trial_roving"], show=False)
+    shap.plots.scatter(shap_values2[:, "pitch of precursor"], color=shap_values2[:, "intra-trial F0 roving"], show=False)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "intra_trial_roving"], color=shap_values2[:, "talker"])
+    shap.plots.scatter(shap_values2[:, "intra-trial F0 roving"], color=shap_values2[:, "talker"])
     plt.show()
 
     fig, ax = plt.subplots(figsize=(15, 15))
@@ -496,13 +496,13 @@ def runlgbfaornot(dataframe):
     plt.show()
 
     fig, ax = plt.subplots(figsize=(15, 15))
-    shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "intra_trial_roving"], show=False)
+    shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "intra-trial F0 roving"], show=False)
     plt.title('False alarm model - SHAP values as a function of cosine similarity \n, coloured by intra trial roving')
     fig.tight_layout()
     plt.savefig('D:/behavmodelfigs/cosinesimdepenencyplot.png', dpi=500)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "intra_trial_roving"], color=shap_values2[:, "cosinesim"], show=False)
+    shap.plots.scatter(shap_values2[:, "intra-trial F0 roving"], color=shap_values2[:, "cosinesim"], show=False)
     plt.savefig('D:/behavmodelfigs/intratrialrovingcosinecolor.png', dpi=500)
 
     plt.show()
