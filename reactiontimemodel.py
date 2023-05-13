@@ -422,7 +422,7 @@ def extract_release_times_data(ferrets):
         df_control = df_control.sample(n=len(df_intra), random_state=1)
     #then reconcatenate the three dfs
     df = pd.concat([df_intra, df_inter, df_control])
-    dfuse = df[["pitchoftarg", "pastcatchtrial", "trialNum","talker", "side", "precur_and_targ_same",
+    dfuse = df[["pitchoftarg", "pastcatchtrial", "trialNum", "talker", "side", "precur_and_targ_same",
                 "timeToTarget",
                 "realRelReleaseTimes", "ferret", "pastcorrectresp"]]
     labels = ['pitch of target', 'past trial was catch', 'trial number', 'talker', 'side', 'precursor = target pitch', 'time to target', 'realRelReleaseTimes', 'ferret ID', 'past trial was correct']

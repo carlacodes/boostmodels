@@ -226,12 +226,20 @@ def run_optuna_study_correctresponse(dataframe, y):
 def runlgbfaornotwithoptuna(dataframe, paramsinput, ferret_as_feature = False):
     if ferret_as_feature:
         df_to_use = dataframe[
-            ["targTimes", "ferret", "trialNum",  "pitchofprecur", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
-             "falsealarm", "temporalsim", "pastcorrectresp", "pastcatchtrial", "cosinesim",]]
+            ["targTimes", "ferret", "trialNum", "talker", "side", "intra_trial_roving", "pastcorrectresp", "pastcatchtrial",
+             "falsealarm"]]
+        # dfuse = df[["pitchoftarg", "pastcatchtrial", "trialNum", "talker", "side", "precur_and_targ_same",
+        #             "timeToTarget",
+        #             "realRelReleaseTimes", "ferret", "pastcorrectresp"]]
+        labels = ["target times", "ferret ID", "trial number", "talker", "audio side", "intra-trial F0 roving", "past response correct", "past trial catch", "falsealarm"]
+        df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
+
     else:
         df_to_use = dataframe[
-            ["targTimes", "trialNum", "pitchofprecur", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
-             "falsealarm", "temporalsim", "pastcorrectresp", "pastcatchtrial", "cosinesim", ]]
+            ["targTimes","trialNum", "talker", "side", "intra_trial_roving", "pastcorrectresp", "pastcatchtrial",
+             "falsealarm"]]
+        labels = ["target times", "trial number", "talker", "audio side", "intra-trial F0 roving", "past response correct", "past trial catch", "falsealarm"]
+        df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
 
     col = 'falsealarm'
     dfx = df_to_use.loc[:, df_to_use.columns != col]
