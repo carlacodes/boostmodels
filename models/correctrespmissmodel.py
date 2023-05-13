@@ -269,7 +269,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     cb_ax.set_yticks([1, 2, 3,4, 5])
     cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
     cb_ax.set_ylabel("precursor = target pitch", fontsize=15)
-    plt.title('Trial number and its effet on the \n miss probability', fontsize = 18)
+    plt.title('Trial number and its effect on the \n miss probability', fontsize = 18)
     plt.xlabel('Trial number', fontsize = 15)
     plt.ylabel('SHAP value', fontsize = 15)
     plt.savefig( fig_dir / 'trialnum_vs_precurpitch.png', dpi=1000, bbox_inches = "tight")
