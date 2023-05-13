@@ -437,7 +437,7 @@ def run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature = 
 
     # remove ferret as possible feature
     if ferret_as_feature == False:
-        col2 = 'ferret'
+        col2 = 'ferret ID'
         dfx = dfx.loc[:, dfx.columns != col2]
         if optimization == False:
             best_params = np.load('optuna_results/best_paramsreleastimemodel_allferrets.npy', allow_pickle=True).item()
