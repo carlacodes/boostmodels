@@ -426,6 +426,8 @@ def extract_release_times_data(ferrets):
     dfuse = df[["pitchoftarg", "pastcatchtrial", "trialNum","talker", "side", "precur_and_targ_same",
                 "timeToTarget",
                 "realRelReleaseTimes", "ferret", "pastcorrectresp"]]
+    labels = ['pitch of target', 'past trial was catch', 'trial number', 'talker', 'side', 'precursor = target pitch', 'time to target', 'ferret ID', 'past trial was correct']
+    dfuse = dfuse.rename(columns=dict(zip(dfuse.columns, labels)))
     return dfuse
 
 
