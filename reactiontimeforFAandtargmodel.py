@@ -528,8 +528,7 @@ def predict_rxn_time_with_dist_model(ferrets, optimization = False, ferret_as_fe
 
 
 def main():
-    ferrets = ['F2105_Clove', 'F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
-    ferrets = ['F2105_Clove']
+    ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni'] #, 'F2105_Clove']
 
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
     # run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature=True)

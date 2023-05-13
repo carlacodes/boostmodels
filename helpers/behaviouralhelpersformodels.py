@@ -178,7 +178,7 @@ class behaviouralhelperscg():
 
 
                 except:
-                    indexdrop = newdata.iloc[i].name
+                    indexdrop = nfewdata.iloc[i].name
                     droplist = np.append(droplist, i - 1)
                     # arrays START AT 0, but the index starts at 1, so the index is 1 less than the array
                     droplistnew = np.append(droplistnew, indexdrop)
