@@ -104,17 +104,17 @@ def runlgbreleasetimes_for_a_ferret(data, paramsinput=None, ferret=1, ferret_nam
     #     cumulative_importances_list.append(cumulative_importances)
 
     # Calculate the combined cumulative sum of feature importances
-    cumulative_importances_combined = np.sum(np.abs(shap_values), axis=0)
-    feature_labels = dfx.columns
-    # Plot the elbow plot
-    plt.figure(figsize=(10, 6))
-    plt.plot(feature_labels, cumulative_importances_combined, marker='o', color = 'slategray')
-    plt.xlabel('Features')
-    plt.ylabel('Cumulative Feature Importance')
-    plt.title('Elbow Plot of Cumulative Feature Importance for False Alarm Model')
-    plt.xticks(rotation=45, ha='right')  # rotate x-axis labels for better readability
-    plt.savefig('D:/behavmodelfigs/fa_or_not_model/elbowplot.png', dpi=500, bbox_inches='tight')
-    plt.show()
+    # cumulative_importances_combined = np.sum(np.abs(shap_values), axis=0)
+    # feature_labels = dfx.columns
+    # # Plot the elbow plot
+    # plt.figure(figsize=(10, 6))
+    # plt.plot(feature_labels, cumulative_importances_combined, marker='o', color = 'slategray')
+    # plt.xlabel('Features')
+    # plt.ylabel('Cumulative Feature Importance')
+    # plt.title('Elbow Plot of Cumulative Feature Importance for False Alarm Model')
+    # plt.xticks(rotation=45, ha='right')  # rotate x-axis labels for better readability
+    # plt.savefig('D:/behavmodelfigs/fa_or_not_model/elbowplot.png', dpi=500, bbox_inches='tight')
+    # plt.show()
 
     fig, ax = plt.subplots(figsize=(15, 15))
     # title kwargs still does nothing so need this workaround for summary plots
@@ -252,7 +252,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     if one_ferret:
         plt.title('Elbow Plot of Cumulative Feature Importance \n for the Reaction Time Model \n for ' + ferrets, fontsize = 20)
     else:
-        plt.title('Elbow Plot of Cumulative Feature Importance for the Reaction Time Model', fontsize = 20)
+        plt.title('Elbow Plot of Cumulative Feature Importance \n for the Reaction Time Model', fontsize = 20)
     plt.xticks(rotation=45, ha='right')  # rotate x-axis labels for better readability
     plt.savefig(fig_savedir / 'elbowplot.png', dpi=500, bbox_inches='tight')
     plt.show()

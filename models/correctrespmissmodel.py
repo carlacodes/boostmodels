@@ -143,12 +143,12 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
         dfx = df_to_use.loc[:, df_to_use.columns != col]
         if optimization == False:
             # load the saved params
-            paramsinput = np.load('optuna_results/correctresponse_optunaparams_ferretasfeature.npy', allow_pickle=True).item()
+            paramsinput = np.load('../optuna_results/correctresponse_optunaparams_ferretasfeature.npy', allow_pickle=True).item()
         else:
             study = run_optuna_study_correctresp(dfx.to_numpy(), df_to_use['misslist'].to_numpy())
             print(study.best_params)
             paramsinput = study.best_params
-            np.save('optuna_results/correctresponse_optunaparams_ferretasfeature.npy', study.best_params)
+            np.save('../optuna_results/correctresponse_optunaparams_ferretasfeature.npy', study.best_params)
 
     else:
         df_to_use = dataframe[["pitchoftarg", "trialNum", "misslist", "pitchofprecur", "talker", "side", "precur_and_targ_same",
@@ -159,12 +159,12 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
         dfx = df_to_use.loc[:, df_to_use.columns != col]
         if optimization == False:
             # load the saved params
-            paramsinput = np.load('optuna_results/correctresponse_optunaparams.npy', allow_pickle=True).item()
+            paramsinput = np.load('../optuna_results/correctresponse_optunaparams.npy', allow_pickle=True).item()
         else:
             study = run_optuna_study_correctresp(dfx.to_numpy(), df_to_use['misslist'].to_numpy())
             print(study.best_params)
             paramsinput = study.best_params
-            np.save('optuna_results/correctresponse_optunaparams.npy', study.best_params)
+            np.save('../optuna_results/correctresponse_optunaparams.npy', study.best_params)
 
 
 
