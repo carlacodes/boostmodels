@@ -570,6 +570,27 @@ def runfalsealarmpipeline(ferrets, optimization=False, ferret_as_feature=False, 
 
         len_of_data_male_inter[ferrets[i]] = len(interdata[(interdata['ferret'] == i) & (interdata['talker'] == 2.0)])
         len_of_data_male_intra[ferrets[i]] = len(intradata[(intradata['ferret'] == i) & (intradata['talker'] == 2.0)])
+    df_intra = resultingfa_df[resultingfa_df['intra_trial_roving'] == 1]
+    df_inter = resultingfa_df[resultingfa_df['intra_trial_roving'] == 1]
+    df_control = resultingfa_df[resultingfa_df['control_trial'] == 1]
+
+    # now we need to balance the data, if it's a fifth more than the other, we need to sample it down
+    if len(df_intra) > len(df_inter)*1.2:
+        df_intra = df_intra.sample(n=len(df_inter), random_state=123)
+    elif len(df_inter) > len(df_intra)*1.2:
+        df_inter = df_inter.sample(n=len(df_intra), random_state=123)
+
+    if len(df_control) > len(df_intra)*1.2:
+        df_control = df_control.sample(n=len(df_intra), random_state=123)
+    elif len(df_control) > len(df_inter)*1.2:
+        df_control = df_control.sample(n=len(df_inter), random_state=123)
+
+
+
+
+    #then reconcatenate the three dfs
+    resultingfa_df = pd.concat([df_intra, df_inter, df_control])
+
 
     filepath = Path('D:/dfformixedmodels/falsealarmmodel_dfuse.csv')
     filepath.parent.mkdir(parents=True, exist_ok=True)

@@ -443,8 +443,16 @@ def extract_releasedata_withdist(ferrets, talker = 1):
     dist_cols = [col for col in df_control.columns if col.startswith('dist')]
     #get a dataframe with only these columns
 
-    if len(df_control) > len(df_intra):
-        df_control = df_control.sample(n=len(df_intra), random_state=1)
+    if len(df_intra) > len(df_inter)*1.2:
+        df_intra = df_intra.sample(n=len(df_inter), random_state=123)
+    elif len(df_inter) > len(df_intra)*1.2:
+        df_inter = df_inter.sample(n=len(df_intra), random_state=123)
+
+    if len(df_control) > len(df_intra)*1.2:
+        df_control = df_control.sample(n=len(df_intra), random_state=123)
+    elif len(df_control) > len(df_inter)*1.2:
+        df_control = df_control.sample(n=len(df_inter), random_state=123)
+
     #then reconcatenate the three dfs
     df = pd.concat([df_intra, df_inter, df_control])
     #get a dataframe with only the dist_cols and then combine with two other columns

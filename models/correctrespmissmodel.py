@@ -391,8 +391,16 @@ def run_correct_responsepipeline(ferrets):
     df_inter = resultingcr_df[resultingcr_df['intra_trial_roving'] == 1]
     df_control = resultingcr_df[resultingcr_df['control_trial'] == 1]
     #subsample df_control so it is equal to the length of df_intra, maintain the column values
-    if len(df_control) > len(df_intra):
+    if len(df_intra) > len(df_inter)*1.2:
+        df_intra = df_intra.sample(n=len(df_inter), random_state=123)
+    elif len(df_inter) > len(df_intra)*1.2:
+        df_inter = df_inter.sample(n=len(df_intra), random_state=123)
+
+    if len(df_control) > len(df_intra)*1.2:
         df_control = df_control.sample(n=len(df_intra), random_state=123)
+    elif len(df_control) > len(df_inter)*1.2:
+        df_control = df_control.sample(n=len(df_inter), random_state=123)
+
     #then reconcatenate the three dfs
     resultingcr_df = pd.concat([df_intra, df_inter, df_control])
 
