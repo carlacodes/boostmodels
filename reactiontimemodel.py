@@ -481,11 +481,11 @@ def run_correctrxntime_model_for_a_ferret(ferrets, optimization = False, ferret_
     else:
         dfx = dfx
         if optimization == False:
-            best_params = np.load('optuna_results/best_paramsreleastimemodel_ferretasfeature_'+ ferrets[0]+ '.npy', allow_pickle=True).item()
+            best_params = np.load('optuna_results/best_paramsreleastimemodel_ferretasfeature_'+ '.npy', allow_pickle=True).item()
         else:
             best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
             best_params = best_study_results.best_params
-            np.save('optuna_results/best_paramsreleastimemodel_ferretasfeature_'+ ferrets[0]+ '.npy', best_params)
+            np.save('optuna_results/best_paramsreleastimemodel_ferretasfeature_'+ '.npy', best_params)
     xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx, df_use[col], paramsinput=best_params, ferret_as_feature=ferret_as_feature, one_ferret=True, ferrets=ferrets[0])
 
 

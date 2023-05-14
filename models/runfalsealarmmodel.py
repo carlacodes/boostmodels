@@ -220,7 +220,7 @@ def run_optuna_study_correctresponse(dataframe, y):
     return study
 
 
-def runlgbfaornotwithoptuna(dataframe, paramsinput, ferret_as_feature=False):
+def runlgbfaornotwithoptuna(dataframe, paramsinput, ferret_as_feature=False, one_ferret = False):
     if ferret_as_feature:
         df_to_use = dataframe[
             ["pitchofprecur", "targTimes", "ferret", "trialNum", "talker", "side", "intra_trial_roving",
@@ -267,17 +267,34 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput, ferret_as_feature=False):
     print('Balanced Accuracy: %.2f%%' % (np.mean(bal_accuracy) * 100.0))
 
     plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test, bal_accuracy, dfx,
-                        ferret_as_feature=ferret_as_feature)
+                        ferret_as_feature=ferret_as_feature, one_ferret=one_ferret)
 
     return xg_reg, ypred, y_test, results, X_train, y_train, X_test, bal_accuracy, dfx
 
 
 def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test, bal_accuracy, dfx,
-                        ferret_as_feature=False):
+                        ferret_as_feature=False, one_ferret=False):
+
     if ferret_as_feature:
-        fig_dir = Path('D:/behavmodelfigs/fa_or_not_model/ferret_as_feature')
+        if one_ferret:
+
+            fig_savedir = Path('D:/behavmodelfigs/fa_or_not_model/ferret_as_feature/' + ferrets)
+            if fig_savedir.exists():
+                pass
+            else:
+                fig_savedir.mkdir(parents=True, exist_ok=True)
+        else:
+            fig_savedir = Path('D:/behavmodelfigs/fa_or_not_model/ferret_as_feature')
     else:
-        fig_dir = Path('D:/behavmodelfigs/fa_or_not_model')
+        if one_ferret:
+
+            fig_savedir = Path('D:/behavmodelfigs/fa_or_not_model/'+ ferrets)
+            if fig_savedir.exists():
+                pass
+            else:
+                fig_savedir.mkdir(parents=True, exist_ok=True)
+        else:
+            fig_savedir = Path('D:/behavmodelfigs/fa_or_not_model/')
 
     shap_values1 = shap.TreeExplainer(xg_reg).shap_values(X_train)
     plt.subplots(figsize=(25, 25))
@@ -528,7 +545,7 @@ def runlgbfaornot(dataframe):
     return xg_reg, ypred, y_test, results, shap_values1, X_train, y_train, bal_accuracy, shap_values2
 
 
-def runfalsealarmpipeline(ferrets, optimization=False, ferret_as_feature=False):
+def runfalsealarmpipeline(ferrets, optimization=False, ferret_as_feature=False, one_ferret =False):
     resultingfa_df = behaviouralhelperscg.get_false_alarm_behavdata(ferrets=ferrets, startdate='04-01-2020',
                                                                     finishdate='01-03-2023')
     len_of_data_male = {}
@@ -569,7 +586,7 @@ def runfalsealarmpipeline(ferrets, optimization=False, ferret_as_feature=False):
 
     resultingfa_df.to_csv(filepath)
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbfaornotwithoptuna(
-        resultingfa_df, params, ferret_as_feature=ferret_as_feature)
+        resultingfa_df, params, ferret_as_feature=ferret_as_feature, one_ferret=one_ferret)
     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
 
@@ -922,6 +939,16 @@ if __name__ == '__main__':
     #
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(
         ferrets, optimization=False, ferret_as_feature=True)
+    for i in ferrets:
+        if len(i) == 1:
+            ferret_as_feature = False
+            one_ferret = True
+        xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(
+            i, optimization=False, ferret_as_feature=ferret_as_feature, one_ferret=one_ferret)
+        print('ferret ' + str(i))
+        print('mean shap value: ' + str(np.mean(shap_values2[i])))
+        print('std shap value: ' + str(np.std(shap_values2[i])))
+
     #
 
     # plot_reaction_times_intra(ferrets)
