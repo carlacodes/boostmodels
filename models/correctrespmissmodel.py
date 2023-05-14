@@ -390,6 +390,7 @@ def run_correct_responsepipeline(ferrets):
     df_intra = resultingcr_df[resultingcr_df['intra_trial_roving'] == 1]
     df_inter = resultingcr_df[resultingcr_df['intra_trial_roving'] == 1]
     df_control = resultingcr_df[resultingcr_df['control_trial'] == 1]
+
     #subsample df_control so it is equal to the length of df_intra, maintain the column values
     if len(df_intra) > len(df_inter)*1.2:
         df_intra = df_intra.sample(n=len(df_inter), random_state=123)
@@ -406,11 +407,13 @@ def run_correct_responsepipeline(ferrets):
 
     if len(ferrets) == 1:
         one_ferret = True
+        ferret_as_feature = False
     else:
         one_ferret = False
+        ferret_as_feature = True
 
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbcorrectrespornotwithoptuna(
-        resultingcr_df, optimization=True, ferret_as_feature = True, one_ferret=one_ferret)
+        resultingcr_df, optimization=True, ferret_as_feature = ferret_as_feature, one_ferret=one_ferret)
     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
 
@@ -424,8 +427,16 @@ def run_correct_responsepipeline(ferrets):
 #         resultingcr_df, optimization=True, ferret_as_feature=True)
 #     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
+def run_models_for_all_or_one_ferret(run_individual_ferret_models):
+    if run_individual_ferret_models:
+        ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
+        for ferret in ferrets:
+            xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = run_correct_responsepipeline(
+                [ferret])
+    else:
+        xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = run_correct_responsepipeline(
+            ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'])
+
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'] #'F2105_Clove'
-
-    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = run_correct_responsepipeline(ferrets)
-
+    run_models_for_all_or_one_ferret(run_individual_ferret_models=True)
