@@ -357,7 +357,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.savefig(fig_dir / 'pitch of precursorintratrialrove.png', dpi=500)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "targTimes"], color=shap_values2[:, "trialNum"], show=False, cmap=cmapcustom)
+    shap.plots.scatter(shap_values2[:, "target times"], color=shap_values2[:, "trial number"], show=False, cmap=cmapcustom)
     fig, ax = plt.gcf(), plt.gca()
     # Get colorbar
     cb_ax = fig.axes[1]
@@ -371,7 +371,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.savefig(fig_dir / 'targtimescolouredbytrialnumber.png', dpi=1000)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "targTimes"], color=shap_values2[:, "pitch of precursor"], show=False,
+    shap.plots.scatter(shap_values2[:, "target times"], color=shap_values2[:, "pitch of precursor"], show=False,
                        cmap=cmapcustom)
     fig, ax = plt.gcf(), plt.gca()
     # Get colorbar
