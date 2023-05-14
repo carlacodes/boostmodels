@@ -324,52 +324,32 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
 
     shap.plots.scatter(shap_values2[:, "precursor = target pitch"], color=shap_values2[:, "talker"])
     plt.show()
-    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"], show=False)
+    shap.plots.scatter(shap_values2[:, "trial number"], color=shap_values2[:, "talker"], show=False)
     plt.title('trial number \n vs. SHAP value impact')
     plt.ylabel('SHAP value', fontsize=18)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "precursor = target pitch"], show=False)
-    plt.title('Cosine similarity \n vs. SHAP value impact')
-    plt.ylabel('SHAP value', fontsize=18)
-    # plt.savefig('D:/behavmodelfigs/correctrespmodel/cosinesimdepenencyplot.png', dpi=500)
-    plt.show()
-
-    shap.plots.scatter(shap_values2[:, "precursor = target pitch"], color=shap_values2[:, "cosinesim"], show=False)
-
-    plt.title('Intra trial roving \n versus SHAP value impact', fontsize=18)
-    plt.ylabel('SHAP value', fontsize=18)
-    plt.show()
-
-    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "target times"], show=False)
-    plt.title('CR model - Trial number versus SHAP value, \n colored by target presentation time', fontsize=18)
+    shap.plots.scatter(shap_values2[:, "trial number"], color=shap_values2[:, "target presentation time"], show=False)
+    plt.title('Trial number versus SHAP value for miss probability, \n colored by target presentation time', fontsize=18)
     plt.ylabel('SHAP value', fontsize=18)
     plt.xlabel('Trial number', fontsize=15)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "target times"], color=shap_values2[:, "trialNum"], show=False)
-    plt.title('CR model - Target times versus SHAP value, \n colored by trial number', fontsize=18)
+    shap.plots.scatter(shap_values2[:, "target presentation time"], color=shap_values2[:, "trial number"], show=False)
+    plt.title('target presentation time versus SHAP value for miss probability, \n colored by trial number', fontsize=18)
     plt.ylabel('SHAP value', fontsize=18)
     plt.xlabel('Target presentation time', fontsize=15)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "target times"], show=False)
-    plt.title('Cosine Similarity as a function \n of SHAP values coloured by targTimes')
-    plt.show()
-
-    shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "pitch of target"], show=False)
-    plt.title('Cosine similarity as a function \n of SHAP values, coloured by the target pitch', fontsize=18)
-    plt.ylabel('SHAP value', fontsize=18)
-    plt.show()
     fig, ax = plt.subplots(figsize=(15, 35))
-    shap.plots.scatter(shap_values2[:, "side"], color=shap_values2[:, "trialNum"], show=False)
+    shap.plots.scatter(shap_values2[:, "audio side"], color=shap_values2[:, "trial number"], show=False)
     plt.title('SHAP values as a function of the side of the audio, \n coloured by the trial number', fontsize=18)
     plt.ylabel('SHAP value', fontsize=18)
     plt.xticks([0, 1], ['Left', 'Right'], fontsize=18)
     plt.show()
 
     fig, ax = plt.subplots(figsize=(15, 55))
-    shap.plots.scatter(shap_values2[:, "pitch of target"], color=shap_values2[:, "target times"], show=False)
+    shap.plots.scatter(shap_values2[:, "pitch of target"], color=shap_values2[:, "target presentation time"], show=False)
     plt.title('SHAP values as a function of the pitch of the target, \n coloured by the target presentation time',
               fontsize=18)
     plt.ylabel('SHAP value', fontsize=18)
@@ -413,7 +393,7 @@ def run_correct_responsepipeline(ferrets):
         ferret_as_feature = True
 
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbcorrectrespornotwithoptuna(
-        resultingcr_df, optimization=False, ferret_as_feature = ferret_as_feature, one_ferret=one_ferret, ferrets=ferrets)
+        resultingcr_df, optimization=True, ferret_as_feature = ferret_as_feature, one_ferret=one_ferret, ferrets=ferrets)
     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
 
@@ -430,7 +410,7 @@ def run_correct_responsepipeline(ferrets):
 def run_models_for_all_or_one_ferret(run_individual_ferret_models):
     if run_individual_ferret_models:
         ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-        ferrets = ['F1702_Zola']
+        ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
         for ferret in ferrets:
             xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = run_correct_responsepipeline(
                 ferrets = [ferret])
