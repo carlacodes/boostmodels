@@ -545,9 +545,11 @@ def runlgbfaornot(dataframe):
     return xg_reg, ypred, y_test, results, shap_values1, X_train, y_train, bal_accuracy, shap_values2
 
 
-def runfalsealarmpipeline(ferrets, optimization=False, ferret_as_feature=False, one_ferret =False):
+def runfalsealarmpipeline(ferrets, optimization=False, ferret_as_feature=False):
     resultingfa_df = behaviouralhelperscg.get_false_alarm_behavdata(ferrets=ferrets, startdate='04-01-2020',
-                                                                    finishdate='01-03-2023')
+                                                                   finishdate='01-03-2023')
+    if len(ferrets) == 1:
+        one_ferret = True
     len_of_data_male = {}
     len_of_data_female = {}
     len_of_data_female_intra = {}
@@ -961,14 +963,9 @@ if __name__ == '__main__':
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(
         ferrets, optimization=False, ferret_as_feature=True)
     for i in ferrets:
-        if len(i) == 1:
-            ferret_as_feature = False
-            one_ferret = True
         xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(
-            i, optimization=False, ferret_as_feature=ferret_as_feature, one_ferret=one_ferret)
-        print('ferret ' + str(i))
-        print('mean shap value: ' + str(np.mean(shap_values2[i])))
-        print('std shap value: ' + str(np.std(shap_values2[i])))
+            i, optimization=False, ferret_as_feature=False)
+
 
     #
 
