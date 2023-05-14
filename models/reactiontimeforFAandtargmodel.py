@@ -468,19 +468,19 @@ def run_correctrxntime_model(ferrets, optimization=False, ferret_as_feature=Fals
         col2 = 'ferret'
         dfx = dfx.loc[:, dfx.columns != col2]
         if optimization == False:
-            best_params = np.load('optuna_results/best_paramsreleastimemodel_allferrets.npy', allow_pickle=True).item()
+            best_params = np.load('../optuna_results/best_paramsreleastimemodel_allferrets.npy', allow_pickle=True).item()
         else:
             best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
             best_params = best_study_results.best_params
-            np.save('optuna_results/best_paramsreleastimemodel_allferrets.npy', best_params)
+            np.save('../optuna_results/best_paramsreleastimemodel_allferrets.npy', best_params)
     else:
         dfx = dfx
         if optimization == False:
-            best_params = np.load('optuna_results/best_paramsreleastimemodel_allferrets_ferretasfeature.npy', allow_pickle=True).item()
+            best_params = np.load('../optuna_results/best_paramsreleastimemodel_allferrets_ferretasfeature.npy', allow_pickle=True).item()
         else:
             best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
             best_params = best_study_results.best_params
-            np.save('optuna_results/best_paramsreleastimemodel_allferrets_ferretasfeature.npy', best_params)
+            np.save('../optuna_results/best_paramsreleastimemodel_allferrets_ferretasfeature.npy', best_params)
 
 
 

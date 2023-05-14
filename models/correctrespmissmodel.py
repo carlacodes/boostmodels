@@ -126,7 +126,7 @@ def run_optuna_study_correctresp(X, y):
     for key, value in study.best_params.items():
         print(f"\t\t{key}: {value}")
     return study
-def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization = False, ferret_as_feature=False):
+def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization = False, ferret_as_feature=False, one_ferret = False):
     if ferret_as_feature == True:
         df_to_use = dataframe[["pitchoftarg", "trialNum", "misslist", "talker", "side", "precur_and_targ_same",
                            "targTimes","pastcorrectresp",
@@ -171,6 +171,27 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     X_train, X_test, y_train, y_test = train_test_split(dfx, df_to_use['misslist'], test_size=0.2, random_state=123)
     print(X_train.shape)
     print(X_test.shape)
+
+    if ferret_as_feature:
+        if one_ferret:
+
+            fig_savedir = Path('D:/behavmodelfigs/correctresp_or_miss//ferret_as_feature/' + ferrets)
+            if fig_savedir.exists():
+                pass
+            else:
+                fig_savedir.mkdir(parents=True, exist_ok=True)
+        else:
+            fig_savedir = Path('D:/behavmodelfigs/correctresp_or_miss//ferret_as_feature')
+    else:
+        if one_ferret:
+
+            fig_savedir = Path('D:/behavmodelfigs/correctresp_or_miss/'+ ferrets)
+            if fig_savedir.exists():
+                pass
+            else:
+                fig_savedir.mkdir(parents=True, exist_ok=True)
+        else:
+            fig_savedir = Path('D:/behavmodelfigs/correctresp_or_miss//')
 
     xg_reg = lgb.LGBMClassifier(objective="binary", random_state=123,
                                 **paramsinput)
@@ -365,20 +386,26 @@ def run_correct_responsepipeline(ferrets):
     filepath = Path('D:/dfformixedmodels/correctresponsemodel_dfuse.csv')
     filepath.parent.mkdir(parents=True, exist_ok=True)
     resultingcr_df.to_csv(filepath)
+
+    if len(ferrets) == 1:
+        one_ferret = True
+    else:
+        one_ferret = False
+
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbcorrectrespornotwithoptuna(
-        resultingcr_df, optimization=True, ferret_as_feature = True)
+        resultingcr_df, optimization=True, ferret_as_feature = True, one_ferret=one_ferret)
     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
 
-def test_function(ferrets):
-    resultingcr_df = behaviouralhelperscg.get_df_behav(ferrets=ferrets, includefaandmiss=False, includemissonly=True, startdate='04-01-2020',
-                                  finishdate='03-01-2023')
-    filepath = Path('D:/dfformixedmodels/correctresponsemodel_dfuse.csv')
-    filepath.parent.mkdir(parents=True, exist_ok=True)
-    resultingcr_df.to_csv(filepath)
-    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbcorrectrespornotwithoptuna(
-        resultingcr_df, optimization=True, ferret_as_feature=True)
-    return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
+# def test_function(ferrets):
+#     resultingcr_df = behaviouralhelperscg.get_df_behav(ferrets=ferrets, includefaandmiss=False, includemissonly=True, startdate='04-01-2020',
+#                                   finishdate='03-01-2023')
+#     filepath = Path('D:/dfformixedmodels/correctresponsemodel_dfuse.csv')
+#     filepath.parent.mkdir(parents=True, exist_ok=True)
+#     resultingcr_df.to_csv(filepath)
+#     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbcorrectrespornotwithoptuna(
+#         resultingcr_df, optimization=True, ferret_as_feature=True)
+#     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'] #'F2105_Clove'
