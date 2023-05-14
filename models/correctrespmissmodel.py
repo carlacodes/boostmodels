@@ -175,7 +175,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     if ferret_as_feature:
         if one_ferret:
 
-            fig_savedir = Path('D:/behavmodelfigs/correctresp_or_miss//ferret_as_feature/' + ferrets)
+            fig_savedir = Path('D:/behavmodelfigs/correctresp_or_miss//ferret_as_feature/' + ferrets[0])
             if fig_savedir.exists():
                 pass
             else:
@@ -185,7 +185,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     else:
         if one_ferret:
 
-            fig_savedir = Path('D:/behavmodelfigs/correctresp_or_miss/'+ ferrets)
+            fig_savedir = Path('D:/behavmodelfigs/correctresp_or_miss/'+ ferrets[0])
             if fig_savedir.exists():
                 pass
             else:
@@ -290,7 +290,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     plt.show()
 
     fig, ax = plt.subplots(figsize=(10, 10))
-    shap.plots.scatter(shap_values2[:, "side of audio"], color=shap_values2[:, "precursor = target pitch"], ax=ax, cmap = cmapcustom, show = False)
+    shap.plots.scatter(shap_values2[:, "audio side"], color=shap_values2[:, "precursor = target pitch"], ax=ax, cmap = cmapcustom, show = False)
     fig, ax = plt.gcf(), plt.gca()
     cb_ax = fig.axes[1]
     # Modifying color bar parameters
