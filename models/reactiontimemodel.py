@@ -196,7 +196,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
             else:
                 fig_savedir.mkdir(parents=True, exist_ok=True)
         else:
-            fig_savedir = Path('figs/correctrxntimemodel/ferret_as_feature')
+            fig_savedir = Path('../figs/correctrxntimemodel/ferret_as_feature')
     else:
         if one_ferret:
 
@@ -206,7 +206,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
             else:
                 fig_savedir.mkdir(parents=True, exist_ok=True)
         else:
-            fig_savedir = Path('figs/correctrxntimemodel/')
+            fig_savedir = Path('../figs/correctrxntimemodel/')
 
     xg_reg = lgb.LGBMRegressor(random_state=42, verbose=1, **paramsinput)
     # xg_reg = lgb.LGBMRegressor( colsample_bytree=0.3, learning_rate=0.1,
@@ -440,19 +440,19 @@ def run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature = 
         col2 = 'ferret ID'
         dfx = dfx.loc[:, dfx.columns != col2]
         if optimization == False:
-            best_params = np.load('optuna_results/best_paramsreleastimemodel_allferrets.npy', allow_pickle=True).item()
+            best_params = np.load('../optuna_results/best_paramsreleastimemodel_allferrets.npy', allow_pickle=True).item()
         else:
             best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
             best_params = best_study_results.best_params
-            np.save('optuna_results/best_paramsreleastimemodel_allferrets.npy', best_params)
+            np.save('../optuna_results/best_paramsreleastimemodel_allferrets.npy', best_params)
     else:
         dfx = dfx
         if optimization == False:
-            best_params = np.load('optuna_results/best_paramsreleastimemodel_allferrets_ferretasfeature.npy', allow_pickle=True).item()
+            best_params = np.load('../optuna_results/best_paramsreleastimemodel_allferrets_ferretasfeature.npy', allow_pickle=True).item()
         else:
             best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
             best_params = best_study_results.best_params
-            np.save('optuna_results/best_paramsreleastimemodel_allferrets_ferretasfeature.npy', best_params)
+            np.save('../optuna_results/best_paramsreleastimemodel_allferrets_ferretasfeature.npy', best_params)
 
 
 
