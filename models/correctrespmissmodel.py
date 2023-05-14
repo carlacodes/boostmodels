@@ -271,7 +271,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     plt.show()
 
 
-    explainer = shap.Explainer(xg_reg, X_train)
+    explainer = shap.Explainer(xg_reg, X_train.to_numpy(), feature_names=X_train.columns)
     shap_values2 = explainer(X_train)
 
     fig, ax = plt.subplots()
