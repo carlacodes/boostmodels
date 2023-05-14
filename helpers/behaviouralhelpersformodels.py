@@ -533,11 +533,8 @@ class behaviouralhelperscg():
             pitchofprecur = np.empty(len(pitchshiftmat))
             stepval = np.empty(len(pitchshiftmat))
             distractor_or_fa = np.empty(len(pitchshiftmat))
-            gradinpitch = np.empty(len(pitchshiftmat))
-            gradinpitchprecur = np.empty(len(pitchshiftmat))
-            timetotarglist = np.empty(len(pitchshiftmat))
-
             precur_and_targ_same = np.empty(len(pitchshiftmat))
+
             intra_trial_roving = []
             inter_trial_roving = []
             control_trial = []

@@ -387,6 +387,15 @@ def run_correct_responsepipeline(ferrets):
     filepath.parent.mkdir(parents=True, exist_ok=True)
     resultingcr_df.to_csv(filepath)
 
+    df_intra = resultingcr_df[resultingcr_df['intra_trial_roving'] == 1]
+    df_inter = resultingcr_df[resultingcr_df['intra_trial_roving'] == 1]
+    df_control = resultingcr_df[resultingcr_df['control_trial'] == 1]
+    #subsample df_control so it is equal to the length of df_intra, maintain the column values
+    if len(df_control) > len(df_intra):
+        df_control = df_control.sample(n=len(df_intra), random_state=123)
+    #then reconcatenate the three dfs
+    resultingcr_df = pd.concat([df_intra, df_inter, df_control])
+
     if len(ferrets) == 1:
         one_ferret = True
     else:
