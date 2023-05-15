@@ -507,7 +507,9 @@ class behaviouralhelperscg():
         numofferrets = allData['ferret'].unique()
         for ferret in numofferrets:
             print(ferret)
+
             newdata = allData[allData['ferret'] == ferret]
+            # newdata = newdata[newdata['catchTrial'] == 0]
             newdata['targTimes'] = newdata['timeToTarget'] / fs
 
             newdata['centreRelease'] = newdata['lickRelease'] - newdata['startTrialLick']
@@ -537,6 +539,8 @@ class behaviouralhelperscg():
             intra_trial_roving = []
             inter_trial_roving = []
             control_trial = []
+            pitchoftarg = []
+            pitchofprecur = []
             talkerlist2 = np.empty(len(pitchshiftmat))
 
             falsealarm = np.empty(shape=(0, 0))
@@ -605,28 +609,35 @@ class behaviouralhelperscg():
                     pastcatchtrial = np.append(pastcatchtrial, 1)
                 else:
                     pastcatchtrial = np.append(pastcatchtrial, 0)
+
+
                 targpos = np.where(chosendisttrial == 1)
-                precur_pos = targpos[0] - 1
+                try:
+                    targpos = int(targpos[0])
+                    precur_pos = targpos - 1
 
-                if np.sum(newdata['dDurs'].values[i0][:targpos - 1]) / fs <= newdata['centreRelease'].values[i0]:
-                    if chosentrial[targpos[0]] == 8.0:
-                        pitchoftarg[i] == 3.0
+                    if np.sum(newdata['dDurs'].values[i0][:targpos - 1]) / fs <= newdata['centreRelease'].values[i0]:
+                        if chosentrial[targpos] == 8.0:
+                            pitchoftarg.append(3)
+                        else:
+                            pitchoftarg.append( chosentrial[targpos])
                     else:
-                        pitchoftarg[i] = chosentrial[targpos[0]]
+                        pitchoftarg.append(float("nan"))
 
-                    if chosentrial[targpos[0] - 1] == 8.0:
-                        pitchofprecur[i] == 3
+                    if np.sum(newdata['dDurs'].values[i0][:precur_pos - 1]) / fs <= newdata['centreRelease'].values[i0]:
+                        if chosentrial[precur_pos] == 8.0:
+                            pitchofprecur.append(3)
+
+                        else:
+                            pitchofprecur.append(chosentrial[precur_pos])
                     else:
-                        pitchofprecur[i] = chosentrial[targpos[0] - 1]
-                else:
-                    pitchoftarg[i] = np.nan()
-                if np.sum(newdata['dDurs'].values[i0][:precur_pos - 1]) / fs <= newdata['centreRelease'].values[i0]:
-                    if chosentrial[precur_pos] == 8.0:
-                        pitchofprecur[i] == 3
-                    else:
-                        pitchofprecur[i] = chosentrial[precur_pos]
-                else:
-                    pitchofprecur[i] = np.nan()
+                        pitchofprecur.append(float("nan"))
+                except:
+                    pitchoftarg.append(float("nan"))
+                    pitchofprecur.append(float("nan"))
+                # except:
+                #     pitchoftarg[i] = float("nan")
+                #     pitchofprecur[i] = float("nan")
 
                 # 1 is 191, 2 is 124, 3 is 144hz female, 5 is 251, 8 is 144hz male, 13 is109hz male
                         # pitchof targ 1 is 124hz male, pitchoftarg4 is 109Hz Male
@@ -696,16 +707,15 @@ class behaviouralhelperscg():
                          axis=0,
                          inplace=True)
 
-            pitchoftarg = pitchoftarg.astype(int)
-            pitchofprecur = pitchofprecur.astype(int)
+            # pitchoftarg = pitchoftarg.astype(int)
+            # pitchofprecur = pitchofprecur.astype(int)
             falsealarm = falsealarm[~np.isnan(falsealarm)]
             correctresp = correctresp[~np.isnan(correctresp)]
 
-            pitchoftarg = np.delete(pitchoftarg, 0)
             talkerlist2 = np.delete(talkerlist2, 0)
             distractor_or_fa = np.delete(distractor_or_fa, 0)
             stepval = np.delete(stepval, 0)
-            pitchofprecur = np.delete(pitchofprecur, 0)
+
 
             newdata['pitchoftarg'] = pitchoftarg.tolist()
             newdata['pitchofprecur'] = pitchofprecur.tolist()
