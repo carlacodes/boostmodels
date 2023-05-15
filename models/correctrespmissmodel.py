@@ -368,10 +368,9 @@ def run_correct_responsepipeline(ferrets):
     resultingcr_df.to_csv(filepath)
 
     df_intra = resultingcr_df[resultingcr_df['intra_trial_roving'] == 1]
-    df_inter = resultingcr_df[resultingcr_df['intra_trial_roving'] == 1]
+    df_inter = resultingcr_df[resultingcr_df['inter_trial_roving'] == 1]
     df_control = resultingcr_df[resultingcr_df['control_trial'] == 1]
 
-    #subsample df_control so it is equal to the length of df_intra, maintain the column values
     if len(df_intra) > len(df_inter)*1.2:
         df_intra = df_intra.sample(n=len(df_inter), random_state=123)
     elif len(df_inter) > len(df_intra)*1.2:
@@ -383,7 +382,9 @@ def run_correct_responsepipeline(ferrets):
         df_control = df_control.sample(n=len(df_inter), random_state=123)
 
     #then reconcatenate the three dfs
-    resultingcr_df = pd.concat([df_intra, df_inter, df_control])
+    #reconcatenate the three dfs but preserve the order of the rows:
+
+    resultingcr_df = pd.concat([df_intra, df_inter, df_control], axis=0)
 
     if len(ferrets) == 1:
         one_ferret = True
