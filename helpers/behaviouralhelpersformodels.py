@@ -429,7 +429,6 @@ class behaviouralhelperscg():
             pitchofprecur = pitchofprecur.astype(int)
 
             correctresp = correctresp[~np.isnan(correctresp)]
-            correspondcosinelist = correspondcosinelist[~np.isnan(correspondcosinelist)]
 
             pitchoftarg = np.delete(pitchoftarg, 0)
             talkerlist2 = np.delete(talkerlist2, 0)
@@ -606,6 +605,8 @@ class behaviouralhelperscg():
                     pastcatchtrial = np.append(pastcatchtrial, 1)
                 else:
                     pastcatchtrial = np.append(pastcatchtrial, 0)
+
+
                 try:
                     targpos = np.where(chosendisttrial == 1)
                     distractor_or_fa[i] = chosendisttrial[targpos[0] - 1]
@@ -648,7 +649,6 @@ class behaviouralhelperscg():
 
 
                 except:
-                    indexdrop = newdata.iloc[i].name
 
                     pitchoftarg[i] = np.nan
                     if isinstance(chosentrial, int):
@@ -671,7 +671,6 @@ class behaviouralhelperscg():
             newdata.drop(index=newdata.index[0],
                          axis=0,
                          inplace=True)
-            droplist = [int(x) for x in droplist]  # drop corrupted metdata trials
 
             pitchoftarg = pitchoftarg.astype(int)
             pitchofprecur = pitchofprecur.astype(int)
@@ -683,7 +682,6 @@ class behaviouralhelperscg():
             distractor_or_fa = np.delete(distractor_or_fa, 0)
             stepval = np.delete(stepval, 0)
             pitchofprecur = np.delete(pitchofprecur, 0)
-            # intra_trial_roving = np.delete(intra_trial_roving, 0)
 
             newdata['pitchoftarg'] = pitchoftarg.tolist()
             newdata['pitchofprecur'] = pitchofprecur.tolist()

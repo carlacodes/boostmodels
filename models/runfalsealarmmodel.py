@@ -225,20 +225,20 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput, ferret_as_feature=False, one
         df_to_use = dataframe[
             ["pitchofprecur", "targTimes", "ferret", "trialNum", "talker", "side", "intra_trial_roving",
              "pastcorrectresp", "pastcatchtrial",
-             "falsealarm"]]
+             "falsealarm", "DaysSinceStart", "AM"]]
         # dfuse = df[["pitchoftarg", "pastcatchtrial", "trialNum", "talker", "side", "precur_and_targ_same",
         #             "timeToTarget",
         #             "realRelReleaseTimes", "ferret", "pastcorrectresp"]]
         labels = ["pitch of precursor", "target times", "ferret ID", "trial number", "talker", "audio side",
-                  "intra-trial F0 roving", "past response correct", "past trial was catch", "falsealarm"]
+                  "intra-trial F0 roving", "past response correct", "past trial was catch", "falsealarm", "DaysSinceStart", "AM"]
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
     else:
         df_to_use = dataframe[
             ["pitchofprecur", "targTimes", "trialNum", "talker", "side", "intra_trial_roving", "pastcorrectresp",
              "pastcatchtrial",
-             "falsealarm"]]
+             "falsealarm", "DaysSinceStart", "AM"]]
         labels = ["pitch of precursor", "target times", "trial number", "talker", "audio side", "intra-trial F0 roving",
-                  "past response correct", "past trial was catch", "falsealarm"]
+                  "past response correct", "past trial was catch", "falsealarm", "DaysSinceStart", "AM"]
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
 
     col = 'falsealarm'
@@ -947,7 +947,8 @@ def plot_reaction_times_interandintra(ferrets):
 
 
 if __name__ == '__main__':
-    ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']  # 'F2105_Clove'
+    ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
+    ferrets = ['F2105_Clove']# 'F2105_Clove'
     # df_by_ferretdict = plot_reaction_times(ferrets)
     # #
     # plot_reaction_times_interandintra(ferrets)
