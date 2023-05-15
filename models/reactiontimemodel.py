@@ -415,9 +415,9 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
 def extract_release_times_data(ferrets):
     df = behaviouralhelperscg.get_df_behav(ferrets=ferrets, includefaandmiss=False, startdate='04-01-2020', finishdate='01-03-2023')
     df_intra = df[df['intra_trial_roving'] == 1]
-    df_inter = df[df['intra_trial_roving'] == 1]
+    df_inter = df[df['inter_trial_roving'] == 1]
     df_control = df[df['control_trial'] == 1]
-    #subsample df_control so it is equal to the length of df_intra, maintain the column values
+
     if len(df_intra) > len(df_inter)*1.2:
         df_intra = df_intra.sample(n=len(df_inter), random_state=123)
     elif len(df_inter) > len(df_intra)*1.2:
@@ -427,9 +427,8 @@ def extract_release_times_data(ferrets):
         df_control = df_control.sample(n=len(df_intra), random_state=123)
     elif len(df_control) > len(df_inter)*1.2:
         df_control = df_control.sample(n=len(df_inter), random_state=123)
-
-    #then reconcatenate the three dfs
-    df = pd.concat([df_intra, df_inter, df_control])
+        
+    df = pd.concat([df_intra, df_inter, df_control], axis = 0)
     dfuse = df[["pitchoftarg", "pastcatchtrial", "trialNum", "talker", "side", "precur_and_targ_same",
                 "timeToTarget",
                 "realRelReleaseTimes", "ferret", "pastcorrectresp"]]

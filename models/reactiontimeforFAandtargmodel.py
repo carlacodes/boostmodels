@@ -436,7 +436,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
 def extract_releasedata_withdist(ferrets, talker = 1):
     df = behaviouralhelperscg.get_df_rxntimebydist(ferrets=ferrets, includefa=True, startdate='04-01-2020', finishdate='01-03-2023', talker_param = talker)
     df_intra = df[df['intra_trial_roving'] == 1]
-    df_inter = df[df['intra_trial_roving'] == 1]
+    df_inter = df[df['inter_trial_roving'] == 1]
     df_control = df[df['control_trial'] == 1]
     #subsample df_control so it is equal to the length of df_intra, maintain the column values
     #get names of all columns that start with lowercase dist
@@ -454,7 +454,7 @@ def extract_releasedata_withdist(ferrets, talker = 1):
         df_control = df_control.sample(n=len(df_inter), random_state=123)
 
     #then reconcatenate the three dfs
-    df = pd.concat([df_intra, df_inter, df_control])
+    df = pd.concat([df_intra, df_inter, df_control], axis = 0)
     #get a dataframe with only the dist_cols and then combine with two other columns
     df_dist = df[dist_cols]
     df_use = pd.concat([df_dist, df['centreRelease']], axis=1)
