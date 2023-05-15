@@ -397,7 +397,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
     cb_ax.set_ylabel("Pitch of precursor", fontsize=12)
     plt.ylabel('SHAP value', fontsize=10)
-    plt.title('Target presentation \n versus impact in predicting a false alarm', fontsize=18)
+    plt.title('Target presentation versus \n impact on false alarm probability', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
     plt.xlabel('Target presentation time', fontsize=16)
     plt.savefig(fig_dir / 'trialtime_colouredbyprecur.png', dpi=1000)
@@ -962,7 +962,7 @@ if __name__ == '__main__':
     #     ferrets, optimization=False, ferret_as_feature=True)
     for i in ferrets:
         xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(
-            [i], optimization=False, ferret_as_feature=False)
+            [i], optimization=True, ferret_as_feature=False)
 
 
     #
