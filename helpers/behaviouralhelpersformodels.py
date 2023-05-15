@@ -635,7 +635,6 @@ class behaviouralhelperscg():
                             pitchofprecur.append(float(1))
                         elif chosentrial[precur_pos] == 1.0:
                             pitchofprecur.append(float(4))
-
                         else:
                             pitchofprecur.append(float(chosentrial[precur_pos]))
                     else:
@@ -774,9 +773,9 @@ class behaviouralhelperscg():
             #
             # newdata = newdata[(newdata.pitchoftarg == 1) | (newdata.pitchoftarg == 2) | (newdata.pitchoftarg == 3) | (
             #         newdata.pitchoftarg == 4) | (newdata.pitchoftarg == 5)]
-            # newdata = newdata[
-            #     (newdata.pitchofprecur == 1) | (newdata.pitchofprecur == 2) | (newdata.pitchofprecur == 3) | (
-            #             newdata.pitchofprecur == 4) | (newdata.pitchofprecur == 5)]
+            newdata = newdata[
+                (newdata.pitchofprecur == 1) | (newdata.pitchofprecur == 2) | (newdata.pitchofprecur == 3) | (
+                        newdata.pitchofprecur == 4) | (newdata.pitchofprecur == 5) | (newdata.pitchofprecur.isnull())]
 
             newdata = newdata[(newdata.correctionTrial == 0)]  # | (allData.response == 7)
             newdata = newdata[(newdata.currAtten == 0)]  # | (allData.response == 7)
