@@ -179,12 +179,23 @@ def run_optuna_study_falsealarm(dataframe, y, ferret_as_feature=False):
     study = optuna.create_study(direction="minimize", study_name="LGBM Classifier")
     if ferret_as_feature:
         df_to_use = dataframe[
-            ["cosinesim", "ferret", "pitchofprecur", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
-             "falsealarm", "pastcorrectresp", "temporalsim", "pastcatchtrial", "trialNum", "targTimes", ]]
+            ["pitchofprecur", "targTimes", "ferret", "trialNum", "talker", "side", "intra_trial_roving",
+             "pastcorrectresp", "pastcatchtrial",
+             "falsealarm"]]
+        # dfuse = df[["pitchoftarg", "pastcatchtrial", "trialNum", "talker", "side", "precur_and_targ_same",
+        #             "timeToTarget",
+        #             "realRelReleaseTimes", "ferret", "pastcorrectresp"]]
+        labels = ["pitch of precursor", "target times", "ferret ID", "trial number", "talker", "audio side",
+                  "intra-trial F0 roving", "past response correct", "past trial was catch", "falsealarm"]
+        df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
     else:
         df_to_use = dataframe[
-            ["cosinesim", "pitchofprecur", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
-             "falsealarm", "pastcorrectresp", "temporalsim", "pastcatchtrial", "trialNum", "targTimes", ]]
+            ["pitchofprecur", "targTimes", "trialNum", "talker", "side", "intra_trial_roving", "pastcorrectresp",
+             "pastcatchtrial",
+             "falsealarm"]]
+        labels = ["pitch of precursor", "target times", "trial number", "talker", "audio side", "intra-trial F0 roving",
+                  "past response correct", "past trial was catch", "falsealarm"]
+        df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
 
     col = 'falsealarm'
     X = df_to_use.loc[:, df_to_use.columns != col]
@@ -225,20 +236,20 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput, ferret_as_feature=False, one
         df_to_use = dataframe[
             ["pitchofprecur", "targTimes", "ferret", "trialNum", "talker", "side", "intra_trial_roving",
              "pastcorrectresp", "pastcatchtrial",
-             "falsealarm", "DaysSinceStart", "AM"]]
+             "falsealarm"]]
         # dfuse = df[["pitchoftarg", "pastcatchtrial", "trialNum", "talker", "side", "precur_and_targ_same",
         #             "timeToTarget",
         #             "realRelReleaseTimes", "ferret", "pastcorrectresp"]]
         labels = ["pitch of precursor", "target times", "ferret ID", "trial number", "talker", "audio side",
-                  "intra-trial F0 roving", "past response correct", "past trial was catch", "falsealarm", "DaysSinceStart", "AM"]
+                  "intra-trial F0 roving", "past response correct", "past trial was catch", "falsealarm"]
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
     else:
         df_to_use = dataframe[
             ["pitchofprecur", "targTimes", "trialNum", "talker", "side", "intra_trial_roving", "pastcorrectresp",
              "pastcatchtrial",
-             "falsealarm", "DaysSinceStart", "AM"]]
+             "falsealarm"]]
         labels = ["pitch of precursor", "target times", "trial number", "talker", "audio side", "intra-trial F0 roving",
-                  "past response correct", "past trial was catch", "falsealarm", "DaysSinceStart", "AM"]
+                  "past response correct", "past trial was catch", "falsealarm"]
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
 
     col = 'falsealarm'
@@ -948,7 +959,7 @@ def plot_reaction_times_interandintra(ferrets):
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    ferrets = ['F2105_Clove']# 'F2105_Clove'
+    # ferrets = ['F2105_Clove']# 'F2105_Clove'
     # df_by_ferretdict = plot_reaction_times(ferrets)
     # #
     # plot_reaction_times_interandintra(ferrets)
