@@ -509,7 +509,7 @@ class behaviouralhelperscg():
             print(ferret)
 
             newdata = allData[allData['ferret'] == ferret]
-            # newdata = newdata[newdata['catchTrial'] == 0]
+            newdata = newdata[newdata['catchTrial'] == 0]
             newdata['targTimes'] = newdata['timeToTarget'] / fs
 
             newdata['centreRelease'] = newdata['lickRelease'] - newdata['startTrialLick']
@@ -616,17 +616,25 @@ class behaviouralhelperscg():
                     targpos = int(targpos[0])
                     precur_pos = targpos - 1
 
-                    if np.sum(newdata['dDurs'].values[i0][:targpos - 1]) / fs <= newdata['centreRelease'].values[i0]:
+                    if np.sum(newdata['dDurs'].values[i][:targpos - 1]) / fs <= newdata['centreRelease'].values[i] - newdata['absentTime'].values[i]:
                         if chosentrial[targpos] == 8.0:
                             pitchoftarg.append(3)
+                        elif chosentrial[targpos] == 13.0:
+                            pitchoftarg.append(1)
+                        elif chosentrial[targpos] == 1.0:
+                            pitchoftarg.append(4)
                         else:
                             pitchoftarg.append( chosentrial[targpos])
                     else:
                         pitchoftarg.append(float("nan"))
 
-                    if np.sum(newdata['dDurs'].values[i0][:precur_pos - 1]) / fs <= newdata['centreRelease'].values[i0]:
+                    if np.sum(newdata['dDurs'].values[i][:precur_pos - 1]) / fs <= newdata['centreRelease'].values[i]- newdata['absentTime'].values[i]:
                         if chosentrial[precur_pos] == 8.0:
                             pitchofprecur.append(3)
+                        elif chosentrial[precur_pos] == 13.0:
+                            pitchofprecur.append(1)
+                        elif chosentrial[precur_pos] == 1.0:
+                            pitchofprecur.append(4)
 
                         else:
                             pitchofprecur.append(chosentrial[precur_pos])
@@ -717,8 +725,8 @@ class behaviouralhelperscg():
             stepval = np.delete(stepval, 0)
 
 
-            newdata['pitchoftarg'] = pitchoftarg.tolist()
-            newdata['pitchofprecur'] = pitchofprecur.tolist()
+            newdata['pitchoftarg'] = pitchoftarg
+            newdata['pitchofprecur'] = pitchofprecur
 
             falsealarm = falsealarm.astype(int)
             pastcatchtrial = pastcatchtrial.astype(int)
