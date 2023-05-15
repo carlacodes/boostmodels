@@ -589,7 +589,7 @@ def runfalsealarmpipeline(ferrets, optimization=False, ferret_as_feature=False):
 
 
     #then reconcatenate the three dfs
-    resultingfa_df = pd.concat([df_intra, df_inter, df_control], axis = 0)
+    # resultingfa_df = pd.concat([df_intra, df_inter, df_control], axis = 0)
 
 
     filepath = Path('D:/dfformixedmodels/falsealarmmodel_dfuse.csv')
