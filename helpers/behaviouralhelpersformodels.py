@@ -605,12 +605,10 @@ class behaviouralhelperscg():
                     pastcatchtrial = np.append(pastcatchtrial, 1)
                 else:
                     pastcatchtrial = np.append(pastcatchtrial, 0)
+                targpos = np.where(chosendisttrial == 1)
+                precur_pos = targpos[0] - 1
 
-
-                try:
-                    targpos = np.where(chosendisttrial == 1)
-                    distractor_or_fa[i] = chosendisttrial[targpos[0] - 1]
-
+                if np.sum(newdata['dDurs'].values[i0][:targpos - 1]) / fs <= newdata['centreRelease'].values[i0]:
                     if chosentrial[targpos[0]] == 8.0:
                         pitchoftarg[i] == 3.0
                     else:
@@ -620,54 +618,80 @@ class behaviouralhelperscg():
                         pitchofprecur[i] == 3
                     else:
                         pitchofprecur[i] = chosentrial[targpos[0] - 1]
-                        # 1 is 191, 2 is 124, 3 is 144hz female, 5 is 251, 8 is 144hz male, 13 is109hz male
+                else:
+                    pitchoftarg[i] = np.nan()
+                if np.sum(newdata['dDurs'].values[i0][:precur_pos - 1]) / fs <= newdata['centreRelease'].values[i0]:
+                    if chosentrial[precur_pos] == 8.0:
+                        pitchofprecur[i] == 3
+                    else:
+                        pitchofprecur[i] = chosentrial[precur_pos]
+                else:
+                    pitchofprecur[i] = np.nan()
+
+                # 1 is 191, 2 is 124, 3 is 144hz female, 5 is 251, 8 is 144hz male, 13 is109hz male
                         # pitchof targ 1 is 124hz male, pitchoftarg4 is 109Hz Male
 
-                    if chosentrial[targpos[0] - 1] == 3.0:
-                        stepval[i] = 1.0
-                    elif chosentrial[targpos[0] - 1] == 8.0:
-                        stepval[i] = -1.0
-                    elif chosentrial[targpos[0] - 1] == 13.0:
-                        stepval[i] = 1.0
-                    elif chosentrial[targpos[0] - 1] == 5.0:
-                        stepval[i] = -1.0
-                    else:
-                        stepval[i] = 0.0
-
-                    if pitchofprecur[i] == 1.0:
-                        pitchofprecur[i] = 4.0
-
-                    if pitchofprecur[i] == 13.0:
-                        pitchofprecur[i] = 1.0
-
-                    if pitchoftarg[i] == 1.0:
-                        pitchoftarg[i] = 4.0
-
-                    if pitchoftarg[i] == 13.0:
-                        pitchoftarg[i] = 1.0
-
-
-
-                except:
-
-                    pitchoftarg[i] = np.nan
-                    if isinstance(chosentrial, int):
-                        pitchofprecur[i] = chosentrial
-                    else:
-                        pitchofprecur[i] = chosentrial[-1]
-                    if pitchofprecur[i] == 1.0:
-                        pitchofprecur[i] = 4.0
-
-                    if pitchofprecur[i] == 13.0:
-                        pitchofprecur[i] = 1.0
-
-                    if pitchoftarg[i] == 1.0:
-                        pitchoftarg[i] = 4.0
-
-                    if pitchoftarg[i] == 13.0:
-                        pitchoftarg[i] = 1.0
-                    distractor_or_fa[i] = chosendisttrial[-1]
-                    continue
+            # try:
+                #     targpos = np.where(chosendisttrial == 1)
+                #     distractor_or_fa[i] = chosendisttrial[targpos[0] - 1]
+                #
+                #     if chosentrial[targpos[0]] == 8.0:
+                #         pitchoftarg[i] == 3.0
+                #     else:
+                #         pitchoftarg[i] = chosentrial[targpos[0]]
+                #
+                #     if chosentrial[targpos[0] - 1] == 8.0:
+                #         pitchofprecur[i] == 3
+                #     else:
+                #         pitchofprecur[i] = chosentrial[targpos[0] - 1]
+                #         # 1 is 191, 2 is 124, 3 is 144hz female, 5 is 251, 8 is 144hz male, 13 is109hz male
+                #         # pitchof targ 1 is 124hz male, pitchoftarg4 is 109Hz Male
+                #
+                #     if chosentrial[targpos[0] - 1] == 3.0:
+                #         stepval[i] = 1.0
+                #     elif chosentrial[targpos[0] - 1] == 8.0:
+                #         stepval[i] = -1.0
+                #     elif chosentrial[targpos[0] - 1] == 13.0:
+                #         stepval[i] = 1.0
+                #     elif chosentrial[targpos[0] - 1] == 5.0:
+                #         stepval[i] = -1.0
+                #     else:
+                #         stepval[i] = 0.0
+                #
+                #     if pitchofprecur[i] == 1.0:
+                #         pitchofprecur[i] = 4.0
+                #
+                #     if pitchofprecur[i] == 13.0:
+                #         pitchofprecur[i] = 1.0
+                #
+                #     if pitchoftarg[i] == 1.0:
+                #         pitchoftarg[i] = 4.0
+                #
+                #     if pitchoftarg[i] == 13.0:
+                #         pitchoftarg[i] = 1.0
+                #
+                #
+                #
+                # except:
+                #
+                #     pitchoftarg[i] = np.nan
+                #     if isinstance(chosentrial, int):
+                #         pitchofprecur[i] = chosentrial
+                #     else:
+                #         pitchofprecur[i] = chosentrial[-1]
+                #     if pitchofprecur[i] == 1.0:
+                #         pitchofprecur[i] = 4.0
+                #
+                #     if pitchofprecur[i] == 13.0:
+                #         pitchofprecur[i] = 1.0
+                #
+                #     if pitchoftarg[i] == 1.0:
+                #         pitchoftarg[i] = 4.0
+                #
+                #     if pitchoftarg[i] == 13.0:
+                #         pitchoftarg[i] = 1.0
+                #     distractor_or_fa[i] = chosendisttrial[-1]
+                #     continue
             newdata.drop(index=newdata.index[0],
                          axis=0,
                          inplace=True)
@@ -726,12 +750,12 @@ class behaviouralhelperscg():
             newdata = newdata[(newdata.talker == 1) | (newdata.talker == 2) | (newdata.talker == 3) | (
                     newdata.talker == 4) | (newdata.talker == 5)]
 
-            newdata = newdata[
-                (newdata.pitchofprecur == 1) | (newdata.pitchofprecur == 2) | (newdata.pitchofprecur == 3) | (
-                        newdata.pitchofprecur == 4) | (newdata.pitchofprecur == 5)]
-
-            newdata = newdata[(newdata.pitchoftarg == 1) | (newdata.pitchoftarg == 2) | (newdata.pitchoftarg == 3) | (
-                    newdata.pitchoftarg == 4) | (newdata.pitchoftarg == 5)]
+            # newdata = newdata[
+            #     (newdata.pitchofprecur == 1) | (newdata.pitchofprecur == 2) | (newdata.pitchofprecur == 3) | (
+            #             newdata.pitchofprecur == 4) | (newdata.pitchofprecur == 5)]
+            #
+            # newdata = newdata[(newdata.pitchoftarg == 1) | (newdata.pitchoftarg == 2) | (newdata.pitchoftarg == 3) | (
+            #         newdata.pitchoftarg == 4) | (newdata.pitchoftarg == 5)]
             # newdata = newdata[
             #     (newdata.pitchofprecur == 1) | (newdata.pitchofprecur == 2) | (newdata.pitchofprecur == 3) | (
             #             newdata.pitchofprecur == 4) | (newdata.pitchofprecur == 5)]
