@@ -220,7 +220,7 @@ def run_optuna_study_correctresponse(dataframe, y):
     return study
 
 
-def runlgbfaornotwithoptuna(dataframe, paramsinput, ferret_as_feature=False, one_ferret = False):
+def runlgbfaornotwithoptuna(dataframe, paramsinput, ferret_as_feature=False, one_ferret = False, ferrets = None):
     if ferret_as_feature:
         df_to_use = dataframe[
             ["pitchofprecur", "targTimes", "ferret", "trialNum", "talker", "side", "intra_trial_roving",
@@ -267,13 +267,13 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput, ferret_as_feature=False, one
     print('Balanced Accuracy: %.2f%%' % (np.mean(bal_accuracy) * 100.0))
 
     plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test, bal_accuracy, dfx,
-                        ferret_as_feature=ferret_as_feature, one_ferret=one_ferret)
+                        ferret_as_feature=ferret_as_feature, ferrets = ferrets, one_ferret=one_ferret)
 
     return xg_reg, ypred, y_test, results, X_train, y_train, X_test, bal_accuracy, dfx
 
 
 def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test, bal_accuracy, dfx,
-                        ferret_as_feature=False, one_ferret=False):
+                        ferret_as_feature=False, ferrets = None, one_ferret=False):
 
     if ferret_as_feature:
         if one_ferret:
@@ -609,7 +609,7 @@ def runfalsealarmpipeline(ferrets, optimization=False, ferret_as_feature=False):
 
     resultingfa_df.to_csv(filepath)
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbfaornotwithoptuna(
-        resultingfa_df, params, ferret_as_feature=ferret_as_feature, one_ferret=one_ferret)
+        resultingfa_df, params, ferret_as_feature=ferret_as_feature, ferrets = ferrets,  one_ferret=one_ferret)
     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
 
@@ -960,11 +960,11 @@ if __name__ == '__main__':
     # #
     # # test_df2 = run_reaction_time_fa_pipleine_male(ferrets)
     #
-    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(
-        ferrets, optimization=False, ferret_as_feature=True)
+    # xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(
+    #     ferrets, optimization=False, ferret_as_feature=True)
     for i in ferrets:
         xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(
-            i, optimization=False, ferret_as_feature=False)
+            [i], optimization=False, ferret_as_feature=False)
 
 
     #

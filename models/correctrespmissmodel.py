@@ -411,7 +411,7 @@ def run_correct_responsepipeline(ferrets):
 def run_models_for_all_or_one_ferret(run_individual_ferret_models):
     if run_individual_ferret_models:
         ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-        ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
+        ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
         for ferret in ferrets:
             xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = run_correct_responsepipeline(
                 ferrets = [ferret])
