@@ -618,26 +618,26 @@ class behaviouralhelperscg():
 
                     if np.sum(newdata['dDurs'].values[i][:targpos - 1]) / fs <= newdata['centreRelease'].values[i] - newdata['absentTime'].values[i]:
                         if chosentrial[targpos] == 8.0:
-                            pitchoftarg.append(3)
+                            pitchoftarg.append(float(3))
                         elif chosentrial[targpos] == 13.0:
-                            pitchoftarg.append(1)
+                            pitchoftarg.append(float(1))
                         elif chosentrial[targpos] == 1.0:
-                            pitchoftarg.append(4)
+                            pitchoftarg.append(float(4))
                         else:
-                            pitchoftarg.append( chosentrial[targpos])
+                            pitchoftarg.append( float(chosentrial[targpos]))
                     else:
                         pitchoftarg.append(np.nan)
 
                     if np.sum(newdata['dDurs'].values[i][:precur_pos - 1]) / fs <= newdata['centreRelease'].values[i]- newdata['absentTime'].values[i]:
                         if chosentrial[precur_pos] == 8.0:
-                            pitchofprecur.append(3)
+                            pitchofprecur.append(float(3))
                         elif chosentrial[precur_pos] == 13.0:
-                            pitchofprecur.append(1)
+                            pitchofprecur.append(float(1))
                         elif chosentrial[precur_pos] == 1.0:
-                            pitchofprecur.append(4)
+                            pitchofprecur.append(float(4))
 
                         else:
-                            pitchofprecur.append(chosentrial[precur_pos])
+                            pitchofprecur.append(float(chosentrial[precur_pos]))
                     else:
                         pitchofprecur.append(np.nan)
                 except:
