@@ -277,24 +277,22 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
 
     if ferret_as_feature:
         if one_ferret:
-
-            fig_savedir = Path('D:/behavmodelfigs/fa_or_not_model/ferret_as_feature/' + ferrets)
-            if fig_savedir.exists():
+            fig_dir = Path('D:/behavmodelfigs/fa_or_not_model/ferret_as_feature/' + ferrets[0])
+            if fig_dir.exists():
                 pass
             else:
-                fig_savedir.mkdir(parents=True, exist_ok=True)
+                fig_dir.mkdir(parents=True, exist_ok=True)
         else:
-            fig_savedir = Path('D:/behavmodelfigs/fa_or_not_model/ferret_as_feature')
+            fig_dir = Path('D:/behavmodelfigs/fa_or_not_model/ferret_as_feature')
     else:
         if one_ferret:
-
-            fig_savedir = Path('D:/behavmodelfigs/fa_or_not_model/'+ ferrets)
-            if fig_savedir.exists():
+            fig_dir = Path('D:/behavmodelfigs/fa_or_not_model/'+ ferrets[0])
+            if fig_dir.exists():
                 pass
             else:
-                fig_savedir.mkdir(parents=True, exist_ok=True)
+                fig_dir.mkdir(parents=True, exist_ok=True)
         else:
-            fig_savedir = Path('D:/behavmodelfigs/fa_or_not_model/')
+            fig_dir = Path('D:/behavmodelfigs/fa_or_not_model/')
 
     shap_values1 = shap.TreeExplainer(xg_reg).shap_values(X_train)
     plt.subplots(figsize=(25, 25))
