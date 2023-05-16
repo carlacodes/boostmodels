@@ -137,7 +137,7 @@ class behaviouralhelperscg():
                     targpos = int(targpos[0])
                     precur_pos = targpos - 1
 
-                    if np.sum(newdata['dDurs'].values[i][:targpos - 1]) / fs <= newdata['centreRelease'].values[i] - \
+                    if np.sum(newdata['dDurs'].values[i][:targpos]) / fs <= newdata['centreRelease'].values[i] - \
                             newdata['absentTime'].values[i] or newdata['response'].values[i] == 7:
                         if chosentrial[targpos] == 8.0:
                             pitchoftarg.append(float(3))
@@ -152,7 +152,7 @@ class behaviouralhelperscg():
                     else:
                         pitchoftarg.append(np.nan)
 
-                    if np.sum(newdata['dDurs'].values[i][:precur_pos - 1]) / fs <= newdata['centreRelease'].values[i] - \
+                    if np.sum(newdata['dDurs'].values[i][:precur_pos]) / fs <= newdata['centreRelease'].values[i] - \
                             newdata['absentTime'].values[i] or newdata['response'].values[i] == 7:
                         if chosentrial[precur_pos] == 8.0:
                             pitchofprecur.append(float(3))
