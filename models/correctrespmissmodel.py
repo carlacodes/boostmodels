@@ -271,7 +271,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     plt.show()
 
 
-    explainer = shap.Explainer(xg_reg, X_train.to_numpy(), feature_names=X_train.columns)
+    explainer = shap.Explainer(xg_reg, X_train, feature_names=X_train.columns)
     shap_values2 = explainer(X_train)
 
     fig, ax = plt.subplots()
@@ -388,6 +388,14 @@ def run_correct_responsepipeline(ferrets):
 
     df_miss = resultingcr_df[resultingcr_df['misslist'] == 1]
     df_nomiss = resultingcr_df[resultingcr_df['misslist'] == 0]
+
+    if len(df_nomiss) > len(df_miss)*1.2:
+        df_nomiss = df_nomiss.sample(n=len(df_miss), random_state=123)
+    elif len(df_miss) > len(df_nomiss)*1.2:
+        df_miss = df_miss.sample(n=len(df_nomiss), random_state=123)
+
+    resultingcr_df = pd.concat([df_nomiss, df_miss], axis=0)
+
 
 
 
