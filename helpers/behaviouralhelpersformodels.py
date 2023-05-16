@@ -49,8 +49,8 @@ class behaviouralhelperscg():
             catchtriallist = newdata['catchTrial']
             chosenresponse = newdata['response']
             realrelreleasetimelist = newdata['realRelReleaseTimes']
-            pitchoftarg = np.empty(len(pitchshiftmat))
-            pitchofprecur = np.empty(len(pitchshiftmat))
+            pitchoftarg =[]
+            pitchofprecur = []
             stepval = np.empty(len(pitchshiftmat))
             precur_and_targ_same = np.empty(len(pitchshiftmat))
             talkerlist2 = np.empty(len(pitchshiftmat))
@@ -112,7 +112,6 @@ class behaviouralhelperscg():
                     chosentalker = 1
                 talkerlist2[i] = chosentalker
 
-                targpos = np.where(chosendisttrial == 1)
                 if ((
                             chosenresponseindex == 0 or chosenresponseindex == 1) and realrelreleasetime >= 0) or chosenresponseindex == 3:
                     correctresp = np.append(correctresp, 1)
@@ -130,59 +129,39 @@ class behaviouralhelperscg():
                 else:
                     pastcatchtrial = np.append(pastcatchtrial, 0)
 
+                targpos = np.where(chosendisttrial == 1)
                 try:
-                    if newdata['talker'].values[i] == 1:
-                        correspondcosinelist = np.append(correspondcosinelist,
-                                                         cosinesimfemale[int(chosendisttrial[targpos[0] - 1])])
+                    targpos = int(targpos[0])
+                    precur_pos = targpos - 1
+
+                    if np.sum(newdata['dDurs'].values[i][:targpos - 1]) / fs <= newdata['centreRelease'].values[i] - \
+                            newdata['absentTime'].values[i]:
+                        if chosentrial[targpos] == 8.0:
+                            pitchoftarg.append(float(3))
+                        elif chosentrial[targpos] == 13.0:
+                            pitchoftarg.append(float(1))
+                        elif chosentrial[targpos] == 1.0:
+                            pitchoftarg.append(float(4))
+                        else:
+                            pitchoftarg.append(float(chosentrial[targpos]))
                     else:
-                        correspondcosinelist = np.append(correspondcosinelist,
-                                                         cosinesimmale[int(chosendisttrial[targpos[0] - 1])])
-                    if chosentrial[targpos[0]] == 8.0:
-                        pitchoftarg[i] == 3.0
+                        pitchoftarg.append(np.nan)
+
+                    if np.sum(newdata['dDurs'].values[i][:precur_pos - 1]) / fs <= newdata['centreRelease'].values[i] - \
+                            newdata['absentTime'].values[i]:
+                        if chosentrial[precur_pos] == 8.0:
+                            pitchofprecur.append(float(3))
+                        elif chosentrial[precur_pos] == 13.0:
+                            pitchofprecur.append(float(1))
+                        elif chosentrial[precur_pos] == 1.0:
+                            pitchofprecur.append(float(4))
+                        else:
+                            pitchofprecur.append(float(chosentrial[precur_pos]))
                     else:
-                        pitchoftarg[i] = chosentrial[targpos[0]]
-
-                    if chosentrial[targpos[0] - 1] == 8.0:
-                        pitchofprecur[i] == 3
-                    else:
-                        pitchofprecur[i] = chosentrial[targpos[0] - 1]
-                        # 1 is 191, 2 is 124, 3 is 144hz female, 5 is 251, 8 is 144hz male, 13 is109hz male
-                        # pitchof targ 1 is 124hz male, pitchoftarg4 is 109Hz Male
-
-                    if chosentrial[targpos[0] - 1] == 3.0:
-                        stepval[i] = 1.0
-                    elif chosentrial[targpos[0] - 1] == 8.0:
-                        stepval[i] = -1.0
-                    elif chosentrial[targpos[0] - 1] == 13.0:
-                        stepval[i] = 1.0
-                    elif chosentrial[targpos[0] - 1] == 5.0:
-                        stepval[i] = -1.0
-                    else:
-                        stepval[i] = 0.0
-
-                    if pitchoftarg[i] == pitchofprecur[i]:
-                        precur_and_targ_same[i] = 1
-                    else:
-                        precur_and_targ_same[i] = 0
-                    if pitchofprecur[i] == 1.0:
-                        pitchofprecur[i] = 4.0
-
-                    if pitchofprecur[i] == 13.0:
-                        pitchofprecur[i] = 1.0
-
-                    if pitchoftarg[i] == 1.0:
-                        pitchoftarg[i] = 4.0
-
-                    if pitchoftarg[i] == 13.0:
-                        pitchoftarg[i] = 1.0
-
-
+                        pitchofprecur.append(np.nan)
                 except:
-                    indexdrop = newdata.iloc[i].name
-                    droplist = np.append(droplist, i - 1)
-                    # arrays START AT 0, but the index starts at 1, so the index is 1 less than the array
-                    droplistnew = np.append(droplistnew, indexdrop)
-                    continue
+                    pitchoftarg.append(np.nan)
+                    pitchofprecur.append(np.nan)
 
             newdata.drop(index=newdata.index[0],
                          axis=0,
@@ -194,21 +173,17 @@ class behaviouralhelperscg():
             pitchofprecur = pitchofprecur.astype(int)
 
             correctresp = correctresp[~np.isnan(correctresp)]
-            correspondcosinelist = correspondcosinelist[~np.isnan(correspondcosinelist)]
 
-            pitchoftarg = np.delete(pitchoftarg, 0)
             talkerlist2 = np.delete(talkerlist2, 0)
             stepval = np.delete(stepval, 0)
-            pitchofprecur = np.delete(pitchofprecur, 0)
             precur_and_targ_same = np.delete(precur_and_targ_same, 0)
 
             pitchoftarg = np.delete(pitchoftarg, droplist)
             talkerlist2 = np.delete(talkerlist2, droplist)
             stepval = np.delete(stepval, droplist)
 
-            newdata['pitchoftarg'] = pitchoftarg.tolist()
-            pitchofprecur = np.delete(pitchofprecur, droplist)
-            newdata['pitchofprecur'] = pitchofprecur.tolist()
+            newdata['pitchoftarg'] = pitchoftarg
+            newdata['pitchofprecur'] = pitchofprecur
             correctresp = np.delete(correctresp, droplist)
             pastcorrectresp = np.delete(pastcorrectresp, droplist)
             pastcatchtrial = np.delete(pastcatchtrial, droplist)
@@ -534,7 +509,6 @@ class behaviouralhelperscg():
             pitchofprecur = np.empty(len(pitchshiftmat))
             stepval = np.empty(len(pitchshiftmat))
             distractor_or_fa = np.empty(len(pitchshiftmat))
-            precur_and_targ_same = np.empty(len(pitchshiftmat))
 
             intra_trial_roving = []
             inter_trial_roving = []
@@ -547,8 +521,7 @@ class behaviouralhelperscg():
             correctresp = np.empty(shape=(0, 0))
             pastcorrectresp = np.empty(shape=(0, 0))
             pastcatchtrial = np.empty(shape=(0, 0))
-            droplist = np.empty(shape=(0, 0))
-            droplistnew = np.empty(shape=(0, 0))
+
 
             for i in range(1, len(newdata['realRelReleaseTimes'].values)):
                 chosenresponseindex = chosenresponse.values[i]

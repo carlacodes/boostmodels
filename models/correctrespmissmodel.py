@@ -386,6 +386,11 @@ def run_correct_responsepipeline(ferrets):
 
     resultingcr_df = pd.concat([df_intra, df_inter, df_control], axis=0)
 
+    df_miss = resultingcr_df[resultingcr_df['misslist'] == 1]
+    df_nomiss = resultingcr_df[resultingcr_df['misslist'] == 0]
+
+
+
     if len(ferrets) == 1:
         one_ferret = True
         ferret_as_feature = False
