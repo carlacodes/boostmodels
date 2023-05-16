@@ -90,6 +90,8 @@ class behaviouralhelperscg():
                 elif is_all_zero:
                     print('intra not detected')
                     intra_trial_roving.append(0)
+                    chosentrial = talkermat.values[i]
+
                 else:
                     intra_trial_roving.append(1)
 
@@ -101,6 +103,7 @@ class behaviouralhelperscg():
                     inter_trial_roving.append(1)
                 else:
                     print(chosentalker)
+                    chosentrial = talkermat.values[i]
                     inter_trial_roving.append(0)
                 if chosentalker == 3:
                     chosentalker = 1
@@ -135,7 +138,7 @@ class behaviouralhelperscg():
                     precur_pos = targpos - 1
 
                     if np.sum(newdata['dDurs'].values[i][:targpos - 1]) / fs <= newdata['centreRelease'].values[i] - \
-                            newdata['absentTime'].values[i] or newdata['centreRelease'].values[i].isnull():
+                            newdata['absentTime'].values[i] or newdata['response'].values[i] == 7:
                         if chosentrial[targpos] == 8.0:
                             pitchoftarg.append(float(3))
                         elif chosentrial[targpos] == 13.0:
@@ -144,11 +147,13 @@ class behaviouralhelperscg():
                             pitchoftarg.append(float(4))
                         else:
                             pitchoftarg.append(float(chosentrial[targpos]))
+
+
                     else:
                         pitchoftarg.append(np.nan)
 
                     if np.sum(newdata['dDurs'].values[i][:precur_pos - 1]) / fs <= newdata['centreRelease'].values[i] - \
-                            newdata['absentTime'].values[i] or newdata['centreRelease'].values[i].isnull():
+                            newdata['absentTime'].values[i] or newdata['response'].values[i] == 7:
                         if chosentrial[precur_pos] == 8.0:
                             pitchofprecur.append(float(3))
                         elif chosentrial[precur_pos] == 13.0:
@@ -157,6 +162,7 @@ class behaviouralhelperscg():
                             pitchofprecur.append(float(4))
                         else:
                             pitchofprecur.append(float(chosentrial[precur_pos]))
+
                     else:
                         pitchofprecur.append(np.nan)
                 except:
