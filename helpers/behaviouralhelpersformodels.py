@@ -214,10 +214,10 @@ class behaviouralhelperscg():
 
             # only look at v2 pitches from recent experiments
             newdata = newdata[(newdata.pitchoftarg == 1) | (newdata.pitchoftarg == 2) | (newdata.pitchoftarg == 3) | (
-                    newdata.pitchoftarg == 4) | (newdata.pitchoftarg == 5)]
+                    newdata.pitchoftarg == 4) | (newdata.pitchoftarg == 5)| (newdata.pitchofprecur.isnull())]
             newdata = newdata[
                 (newdata.pitchofprecur == 1) | (newdata.pitchofprecur == 2) | (newdata.pitchofprecur == 3) | (
-                        newdata.pitchofprecur == 4) | (newdata.pitchofprecur == 5)]
+                        newdata.pitchofprecur == 4) | (newdata.pitchofprecur == 5) | (newdata.pitchofprecur.isnull())]
 
             newdata = newdata[(newdata.correctionTrial == 0)]  # | (allData.response == 7)
             newdata = newdata[(newdata.currAtten == 0)]  # | (allData.response == 7)
@@ -229,7 +229,7 @@ class behaviouralhelperscg():
             elif includemissonly is True:
                 newdata = newdata[
                     (newdata.response == 0) | (newdata.response == 1) | (newdata.response == 7) | (
-                            newdata.response == 3)]
+                            newdata.response == 3 | (newdata.response == 5))]
             else:
                 newdata = newdata[newdata.correctresp == 1]
                 newdata = newdata[(newdata.catchTrial == 0)]
