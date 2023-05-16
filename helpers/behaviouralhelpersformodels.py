@@ -135,7 +135,7 @@ class behaviouralhelperscg():
                     precur_pos = targpos - 1
 
                     if np.sum(newdata['dDurs'].values[i][:targpos - 1]) / fs <= newdata['centreRelease'].values[i] - \
-                            newdata['absentTime'].values[i]:
+                            newdata['absentTime'].values[i] or newdata['centreRelease'].values[i].isnull():
                         if chosentrial[targpos] == 8.0:
                             pitchoftarg.append(float(3))
                         elif chosentrial[targpos] == 13.0:
@@ -148,7 +148,7 @@ class behaviouralhelperscg():
                         pitchoftarg.append(np.nan)
 
                     if np.sum(newdata['dDurs'].values[i][:precur_pos - 1]) / fs <= newdata['centreRelease'].values[i] - \
-                            newdata['absentTime'].values[i]:
+                            newdata['absentTime'].values[i] or newdata['centreRelease'].values[i].isnull():
                         if chosentrial[precur_pos] == 8.0:
                             pitchofprecur.append(float(3))
                         elif chosentrial[precur_pos] == 13.0:
@@ -169,8 +169,7 @@ class behaviouralhelperscg():
             newdata.drop(droplistnew, axis=0, inplace=True)
             droplist = [int(x) for x in droplist]  # drop corrupted metdata trials
 
-            pitchoftarg = pitchoftarg.astype(int)
-            pitchofprecur = pitchofprecur.astype(int)
+
 
             correctresp = correctresp[~np.isnan(correctresp)]
 
