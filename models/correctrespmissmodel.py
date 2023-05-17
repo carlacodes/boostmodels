@@ -143,7 +143,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
 
     xg_reg = lgb.LGBMClassifier(objective="binary", random_state=123,
                                 **paramsinput)
-    xg_reg.fit(X_train, y_train, eval_metric="binary")
+    xg_reg.fit(X_train, y_train, eval_metric="auc")
     ypred = xg_reg.predict_proba(X_test)
 
     kfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=123)
