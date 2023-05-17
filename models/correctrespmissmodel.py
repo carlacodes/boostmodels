@@ -17,31 +17,26 @@ import matplotlib.colors as mcolors
 import sklearn
 from sklearn.model_selection import train_test_split
 from helpers.behaviouralhelpersformodels import *
+import sklearn.metrics as metrics
 
 
 
 
 def objective(trial, X, y):
     param_grid = {
-        # "device_type": trial.suggest_categorical("device_type", ['gpu']),
         "colsample_bytree": trial.suggest_float("colsample_bytree", 0.3, 1),
-        "alpha": trial.suggest_float("alpha", 1, 20),
-        "is_unbalanced": trial.suggest_categorical("is_unbalanced", [True]),
-        "n_estimators": trial.suggest_int("n_estimators", 100, 10000, step=100),
+        "subsample": trial.suggest_float("subsample", 0.5, 1),
         "learning_rate": trial.suggest_float("learning_rate", 0.001, 0.5),
-        "num_leaves": trial.suggest_int("num_leaves", 20, 3000, step=10),
+        "num_leaves": trial.suggest_int("num_leaves", 20, 300),
         "max_depth": trial.suggest_int("max_depth", 3, 20),
-        "min_data_in_leaf": trial.suggest_int("min_data_in_leaf", 200, 10000, step=100),
-        "lambda_l1": trial.suggest_int("lambda_l1", 0, 100, step=2),
-        "lambda_l2": trial.suggest_int("lambda_l2", 0, 100, step=2),
-        "min_gain_to_split": trial.suggest_float("min_gain_to_split", 0, 15),
-        "bagging_fraction": trial.suggest_float(
-            "bagging_fraction", 0.2, 0.95, step=0.1
-        ),
-        "bagging_freq": trial.suggest_int("bagging_freq", 1, 20, step=1),
-        "feature_fraction": trial.suggest_float(
-            "feature_fraction", 0.2, 0.95, step=0.1
-        ),
+        "min_child_samples": trial.suggest_int("min_child_samples", 1, 100),
+        "reg_alpha": trial.suggest_float("reg_alpha", 0, 10),
+        "reg_lambda": trial.suggest_float("reg_lambda", 0, 10),
+        "min_split_gain": trial.suggest_float("min_split_gain", 0, 10),
+        "bagging_fraction": trial.suggest_float("bagging_fraction", 0.5, 1),
+        "bagging_freq": trial.suggest_int("bagging_freq", 1, 20),
+        "feature_fraction": trial.suggest_float("feature_fraction", 0.5, 1),
+        "scale_pos_weight": trial.suggest_float("scale_pos_weight", 1, 10),
     }
 
     cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=123)
@@ -56,61 +51,14 @@ def objective(trial, X, y):
             X_train,
             y_train,
             eval_set=[(X_test, y_test)],
-            eval_metric="binary_logloss",
+            eval_metric="auc",
             early_stopping_rounds=100,
             callbacks=[
-                LightGBMPruningCallback(trial, "binary_logloss")
+                LightGBMPruningCallback(trial, "auc")
             ],  # Add a pruning callback
         )
-        preds = model.predict_proba(X_test)
-        cv_scores[idx] = sklearn.metrics.log_loss(y_test, preds)
-
-    return np.mean(cv_scores)
-
-
-def objective(trial, X, y):
-    param_grid = {
-        # "device_type": trial.suggest_categorical("device_type", ['gpu']),
-        "colsample_bytree": trial.suggest_float("colsample_bytree", 0.3, 1),
-        "alpha": trial.suggest_float("alpha", 1, 20),
-        "is_unbalanced": trial.suggest_categorical("is_unbalanced", [True]),
-        "n_estimators": trial.suggest_int("n_estimators", 100, 10000, step=100),
-        "learning_rate": trial.suggest_float("learning_rate", 0.001, 0.5),
-        "num_leaves": trial.suggest_int("num_leaves", 20, 3000, step=10),
-        "max_depth": trial.suggest_int("max_depth", 3, 20),
-        "min_data_in_leaf": trial.suggest_int("min_data_in_leaf", 200, 10000, step=100),
-        "lambda_l1": trial.suggest_int("lambda_l1", 0, 100, step=2),
-        "lambda_l2": trial.suggest_int("lambda_l2", 0, 100, step=2),
-        "min_gain_to_split": trial.suggest_float("min_gain_to_split", 0, 15),
-        "bagging_fraction": trial.suggest_float(
-            "bagging_fraction", 0.2, 0.95, step=0.1
-        ),
-        "bagging_freq": trial.suggest_int("bagging_freq", 1, 20, step=1),
-        "feature_fraction": trial.suggest_float(
-            "feature_fraction", 0.2, 0.95, step=0.1
-        ),
-    }
-
-    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=123)
-
-    cv_scores = np.empty(5)
-    for idx, (train_idx, test_idx) in enumerate(cv.split(X, y)):
-        X_train, X_test = X[train_idx], X[test_idx]
-        y_train, y_test = y[train_idx], y[test_idx]
-
-        model = lgb.LGBMClassifier(objective="binary", random_state=123, **param_grid)
-        model.fit(
-            X_train,
-            y_train,
-            eval_set=[(X_test, y_test)],
-            eval_metric="binary_logloss",
-            early_stopping_rounds=100,
-            callbacks=[
-                LightGBMPruningCallback(trial, "binary_logloss")
-            ],  # Add a pruning callback
-        )
-        preds = model.predict_proba(X_test)
-        cv_scores[idx] = sklearn.metrics.log_loss(y_test, preds)
+        preds = model.predict_proba(X_test)[:, 1]  # Use probabilities of the positive class
+        cv_scores[idx] = metrics.roc_auc_score(y_test, preds)
 
     return np.mean(cv_scores)
 
@@ -128,7 +76,7 @@ def run_optuna_study_correctresp(X, y):
     return study
 def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization = False, ferret_as_feature=False, one_ferret = False, ferrets = None):
     if ferret_as_feature == True:
-        df_to_use = dataframe[["pitchoftarg", "trialNum", "misslist", "talker", "side", "precur_and_targ_same",
+        df_to_use = dataframe[["pitchoftarg", "pitchofprecur", "AM", "trialNum", "misslist", "talker", "side", "precur_and_targ_same",
                            "targTimes","pastcorrectresp",
                            "pastcatchtrial", "ferret"]]
         # labels = ['pitch of target', 'trial number','misslist', 'talker', 'side of audio', 'precursor = target pitch','target presentation time', 'past response was correct', 'past trial was catch', 'ferret ID']
@@ -147,9 +95,9 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
             np.save('../optuna_results/correctresponse_optunaparams_ferretasfeature.npy', study.best_params)
 
     else:
-        df_to_use = dataframe[["pitchoftarg", "trialNum", "misslist", "talker", "side", "precur_and_targ_same",
+        df_to_use =  dataframe[["pitchoftarg", "pitchofprecur", "AM", "trialNum", "misslist", "talker", "side", "precur_and_targ_same",
                            "targTimes","pastcorrectresp",
-                           "pastcatchtrial", ]]
+                           "pastcatchtrial"]]
         #
         # labels = ['pitch of target', 'trial number','misslist', 'talker', 'audio side', 'precursor = target pitch','target presentation time', 'past response was correct', 'past trial was catch']
         # df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
@@ -195,7 +143,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
 
     xg_reg = lgb.LGBMClassifier(objective="binary", random_state=123,
                                 **paramsinput)
-    xg_reg.fit(X_train, y_train, eval_metric="cross_entropy_lambda", verbose=1000)
+    xg_reg.fit(X_train, y_train, eval_metric="binary")
     ypred = xg_reg.predict_proba(X_test)
 
     kfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=123)
@@ -205,7 +153,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     print(results)
     print('Balanced Accuracy: %.2f%%' % (np.mean(bal_accuracy) * 100.0))
 
-    shap_values1 = shap.TreeExplainer(xg_reg).shap_values(X_train)
+    shap_values1 = shap.TreeExplainer(xg_reg).shap_values(dfx)
 
 
     custom_colors = ['gold',  'peru', "purple"]  # Add more colors as needed
@@ -389,12 +337,15 @@ def run_correct_responsepipeline(ferrets):
     df_miss = resultingcr_df[resultingcr_df['misslist'] == 1]
     df_nomiss = resultingcr_df[resultingcr_df['misslist'] == 0]
 
-    if len(df_nomiss) > len(df_miss)*1.2:
-        df_nomiss = df_nomiss.sample(n=len(df_miss), random_state=123)
-    elif len(df_miss) > len(df_nomiss)*1.2:
-        df_miss = df_miss.sample(n=len(df_nomiss), random_state=123)
-
-    resultingcr_df = pd.concat([df_nomiss, df_miss], axis=0)
+    # if len(df_nomiss) > len(df_miss)*1.2:
+    #     df_nomiss = df_nomiss.sample(n=len(df_miss), random_state=123)
+    # elif len(df_miss) > len(df_nomiss)*1.2:
+    #     df_miss = df_miss.sample(n=len(df_nomiss), random_state=123)
+    #
+    # resultingcr_df = pd.concat([df_nomiss, df_miss], axis=0)
+    #
+    # #shuffle the rows
+    # resultingcr_df = resultingcr_df.sample(frac=1).reset_index(drop=True)
 
 
 
@@ -407,7 +358,7 @@ def run_correct_responsepipeline(ferrets):
         ferret_as_feature = True
 
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbcorrectrespornotwithoptuna(
-        resultingcr_df, optimization=True, ferret_as_feature = ferret_as_feature, one_ferret=one_ferret, ferrets=ferrets)
+        resultingcr_df, optimization=False, ferret_as_feature = ferret_as_feature, one_ferret=one_ferret, ferrets=ferrets)
     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
 
