@@ -24,24 +24,23 @@ import sklearn.metrics as metrics
 
 def objective(trial, X, y):
     param_grid = {
-        "colsample_bytree": trial.suggest_float("colsample_bytree", 0.3, 1),
-        "subsample": trial.suggest_float("subsample", 0.5, 1),
-        "learning_rate": trial.suggest_float("learning_rate", 0.001, 0.5),
-        "num_leaves": trial.suggest_int("num_leaves", 20, 300),
+        "colsample_bytree": trial.suggest_float("colsample_bytree", 0.1, 1),
+        "subsample": trial.suggest_float("subsample", 0.1, 1),
+        "learning_rate": trial.suggest_float("learning_rate", 0.0001, 0.5),
+        "num_leaves": trial.suggest_int("num_leaves", 20, 500),
         "max_depth": trial.suggest_int("max_depth", 3, 20),
-        "min_child_samples": trial.suggest_int("min_child_samples", 1, 100),
-        "reg_alpha": trial.suggest_float("reg_alpha", 0, 10),
-        "reg_lambda": trial.suggest_float("reg_lambda", 0, 10),
-        "min_split_gain": trial.suggest_float("min_split_gain", 0, 10),
-        "bagging_fraction": trial.suggest_float("bagging_fraction", 0.5, 1),
+        "min_child_samples": trial.suggest_int("min_child_samples", 1, 200),
+        "reg_alpha": trial.suggest_float("reg_alpha", 0.1, 5),
+        "reg_lambda": trial.suggest_float("reg_lambda", 0.1, 5),
+        "min_split_gain": trial.suggest_float("min_split_gain", 0, 20),
         "bagging_freq": trial.suggest_int("bagging_freq", 1, 20),
         "feature_fraction": trial.suggest_float("feature_fraction", 0.5, 1),
-        "scale_pos_weight": trial.suggest_float("scale_pos_weight", 1, 10),
+        "scale_pos_weight": trial.suggest_float("scale_pos_weight", 1, 5),
     }
 
     cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=123)
 
-    cv_scores = np.empty(5)
+    cv_scores = []
     for idx, (train_idx, test_idx) in enumerate(cv.split(X, y)):
         X_train, X_test = X[train_idx], X[test_idx]
         y_train, y_test = y[train_idx], y[test_idx]
@@ -51,16 +50,15 @@ def objective(trial, X, y):
             X_train,
             y_train,
             eval_set=[(X_test, y_test)],
-            eval_metric="-auc",
+            eval_metric="binary_logloss",
             early_stopping_rounds=100,
-            callbacks=[
-                LightGBMPruningCallback(trial, "-auc", "minimize")
-            ],  # Add a pruning callback
+            verbose=False,  # Set verbose to False to avoid printing evaluation results
         )
         preds = model.predict_proba(X_test)[:, 1]  # Use probabilities of the positive class
-        cv_scores[idx] = metrics.roc_auc_score(y_test, preds)
+        cv_scores.append(metrics.roc_auc_score(y_test, preds))
 
-    return np.mean(cv_scores)
+    return -np.mean(cv_scores)  # Return negative mean CV score
+
 
 
 def run_optuna_study_correctresp(X, y):
@@ -76,11 +74,11 @@ def run_optuna_study_correctresp(X, y):
     return study
 def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization = False, ferret_as_feature=False, one_ferret = False, ferrets = None):
     if ferret_as_feature == True:
-        df_to_use = dataframe[["pitchoftarg", "pitchofprecur", "AM", "trialNum", "misslist", "talker", "side", "precur_and_targ_same",
-                           "targTimes","pastcorrectresp",
-                           "pastcatchtrial", "ferret"]]
-        # labels = ['pitch of target', 'trial number','misslist', 'talker', 'side of audio', 'precursor = target pitch','target presentation time', 'past response was correct', 'past trial was catch', 'ferret ID']
-        # df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
+        df_to_use = dataframe[["trialNum", "misslist", "talker", "side", "precur_and_targ_same",
+                               "targTimes", "pastcorrectresp",
+                               "pastcatchtrial", "ferret"]]
+        labels = ['trial number','misslist', 'talker', 'audio side', 'precursor = target pitch','target presentation time', 'past response was correct', 'past trial was catch', 'ferret']
+        df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
 
         fig_dir = Path('D:/behavmodelfigs/correctresp_or_miss/ferret_as_feature')
         col = 'misslist'
@@ -95,12 +93,12 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
             np.save('../optuna_results/correctresponse_optunaparams_ferretasfeature.npy', study.best_params)
 
     else:
-        df_to_use =  dataframe[["pitchoftarg", "pitchofprecur", "AM", "trialNum", "misslist", "talker", "side", "precur_and_targ_same",
+        df_to_use =  dataframe[["trialNum", "misslist", "talker", "side", "precur_and_targ_same",
                            "targTimes","pastcorrectresp",
                            "pastcatchtrial"]]
         #
-        # labels = ['pitch of target', 'trial number','misslist', 'talker', 'audio side', 'precursor = target pitch','target presentation time', 'past response was correct', 'past trial was catch']
-        # df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
+        labels = ['trial number','misslist', 'talker', 'audio side', 'precursor = target pitch','target presentation time', 'past response was correct', 'past trial was catch']
+        df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
 
         fig_dir = Path('D:/behavmodelfigs/correctresp_or_miss/')
         col = 'misslist'
@@ -141,9 +139,14 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
         else:
             fig_savedir = Path('D:/behavmodelfigs/correctresp_or_miss//')
 
-    xg_reg = lgb.LGBMClassifier(objective="binary", random_state=123,
-                                **paramsinput)
-    xg_reg.fit(X_train, y_train, eval_metric="-auc")
+    xg_reg = lgb.LGBMClassifier(objective="binary", random_state=123, **paramsinput)
+    xg_reg.fit(
+        X_train,
+        y_train,
+        eval_set=[(X_test, y_test)],
+        eval_metric="binary_logloss",
+        early_stopping_rounds=100,
+    )
     ypred = xg_reg.predict_proba(X_test)
 
     kfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=123)
@@ -337,12 +340,12 @@ def run_correct_responsepipeline(ferrets):
     df_miss = resultingcr_df[resultingcr_df['misslist'] == 1]
     df_nomiss = resultingcr_df[resultingcr_df['misslist'] == 0]
 
-    # if len(df_nomiss) > len(df_miss)*1.2:
-    #     df_nomiss = df_nomiss.sample(n=len(df_miss), random_state=123)
-    # elif len(df_miss) > len(df_nomiss)*1.2:
-    #     df_miss = df_miss.sample(n=len(df_nomiss), random_state=123)
-    #
-    # resultingcr_df = pd.concat([df_nomiss, df_miss], axis=0)
+    if len(df_nomiss) > len(df_miss)*1.2:
+        df_nomiss = df_nomiss.sample(n=len(df_miss), random_state=123)
+    elif len(df_miss) > len(df_nomiss)*1.2:
+        df_miss = df_miss.sample(n=len(df_nomiss), random_state=123)
+
+    resultingcr_df = pd.concat([df_nomiss, df_miss], axis=0)
     #
     # #shuffle the rows
     # resultingcr_df = resultingcr_df.sample(frac=1).reset_index(drop=True)
@@ -384,4 +387,4 @@ def run_models_for_all_or_one_ferret(run_individual_ferret_models):
             ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'])
 
 if __name__ == '__main__':
-    run_models_for_all_or_one_ferret(run_individual_ferret_models=True)
+    run_models_for_all_or_one_ferret(run_individual_ferret_models=False)
