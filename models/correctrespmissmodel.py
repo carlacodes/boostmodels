@@ -51,10 +51,10 @@ def objective(trial, X, y):
             X_train,
             y_train,
             eval_set=[(X_test, y_test)],
-            eval_metric="auc",
+            eval_metric="-auc",
             early_stopping_rounds=100,
             callbacks=[
-                LightGBMPruningCallback(trial, "auc")
+                LightGBMPruningCallback(trial, "-auc", "minimize")
             ],  # Add a pruning callback
         )
         preds = model.predict_proba(X_test)[:, 1]  # Use probabilities of the positive class
@@ -68,7 +68,7 @@ def run_optuna_study_correctresp(X, y):
     func = lambda trial: objective(trial, X, y)
     study.optimize(func, n_trials=1000)
     print("Number of finished trials: ", len(study.trials))
-    print(f"\tBest value of binary log loss: {study.best_value:.5f}")
+    print(f"\tBest value of - auc: {study.best_value:.5f}")
     print(f"\tBest params:")
 
     for key, value in study.best_params.items():
@@ -143,7 +143,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
 
     xg_reg = lgb.LGBMClassifier(objective="binary", random_state=123,
                                 **paramsinput)
-    xg_reg.fit(X_train, y_train, eval_metric="auc")
+    xg_reg.fit(X_train, y_train, eval_metric="-auc")
     ypred = xg_reg.predict_proba(X_test)
 
     kfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=123)
@@ -358,7 +358,7 @@ def run_correct_responsepipeline(ferrets):
         ferret_as_feature = True
 
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbcorrectrespornotwithoptuna(
-        resultingcr_df, optimization=False, ferret_as_feature = ferret_as_feature, one_ferret=one_ferret, ferrets=ferrets)
+        resultingcr_df, optimization=True, ferret_as_feature = ferret_as_feature, one_ferret=one_ferret, ferrets=ferrets)
     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
 
