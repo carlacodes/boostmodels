@@ -131,8 +131,8 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
         df_to_use = dataframe[["pitchoftarg", "trialNum", "misslist", "talker", "side", "precur_and_targ_same",
                            "targTimes","pastcorrectresp",
                            "pastcatchtrial", "ferret"]]
-        labels = ['pitch of target', 'trial number','misslist', 'talker', 'side of audio', 'precursor = target pitch','target presentation time', 'past response was correct', 'past trial was catch', 'ferret ID']
-        df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
+        # labels = ['pitch of target', 'trial number','misslist', 'talker', 'side of audio', 'precursor = target pitch','target presentation time', 'past response was correct', 'past trial was catch', 'ferret ID']
+        # df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
 
         fig_dir = Path('D:/behavmodelfigs/correctresp_or_miss/ferret_as_feature')
         col = 'misslist'
@@ -150,9 +150,9 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
         df_to_use = dataframe[["pitchoftarg", "trialNum", "misslist", "talker", "side", "precur_and_targ_same",
                            "targTimes","pastcorrectresp",
                            "pastcatchtrial", ]]
-
-        labels = ['pitch of target', 'trial number','misslist', 'talker', 'audio side', 'precursor = target pitch','target presentation time', 'past response was correct', 'past trial was catch']
-        df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
+        #
+        # labels = ['pitch of target', 'trial number','misslist', 'talker', 'audio side', 'precursor = target pitch','target presentation time', 'past response was correct', 'past trial was catch']
+        # df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
 
         fig_dir = Path('D:/behavmodelfigs/correctresp_or_miss/')
         col = 'misslist'

@@ -25,8 +25,7 @@ class behaviouralhelperscg():
                                                 finishDate=finishdate)
         fs = 24414.062500
         bigdata = pd.DataFrame()
-        cosinesimfemale = np.load('D:/Stimuli/cosinesimvectorfemale.npy')
-        cosinesimmale = np.load('D:/Stimuli/cosinesimvectormale.npy')
+
         numofferrets = allData['ferret'].unique()
         for ferret in numofferrets:
             newdata = allData[allData['ferret'] == ferret]
@@ -52,7 +51,7 @@ class behaviouralhelperscg():
             pitchoftarg =[]
             pitchofprecur = []
             stepval = np.empty(len(pitchshiftmat))
-            precur_and_targ_same = np.empty(len(pitchshiftmat))
+            precur_and_targ_same = []
             talkerlist2 = np.empty(len(pitchshiftmat))
 
             correctresp = np.empty(shape=(0, 0))
@@ -60,7 +59,6 @@ class behaviouralhelperscg():
             pastcatchtrial = np.empty(shape=(0, 0))
             droplist = np.empty(shape=(0, 0))
             droplistnew = np.empty(shape=(0, 0))
-            correspondcosinelist = np.empty(shape=(0, 0))
             intra_trial_roving = []
             inter_trial_roving = []
             control_trial = []
@@ -83,7 +81,7 @@ class behaviouralhelperscg():
                 else:
                     control_trial.append(0)
 
-                if isinstance(chosentrial, float):
+                if isinstance(pitchshiftmat.values[i], float):
                     print('intra not detected')
                     intra_trial_roving.append(0)
                     chosentrial = talkermat.values[i]
@@ -102,9 +100,8 @@ class behaviouralhelperscg():
                     print('inter detected')
                     inter_trial_roving.append(1)
                 else:
-                    print(chosentalker)
-                    chosentrial = talkermat.values[i]
                     inter_trial_roving.append(0)
+
                 if chosentalker == 3:
                     chosentalker = 1
                 if chosentalker == 8:
@@ -139,6 +136,11 @@ class behaviouralhelperscg():
 
                     if np.sum(newdata['dDurs'].values[i][:targpos]) / fs <= newdata['centreRelease'].values[i] - \
                             newdata['absentTime'].values[i] or newdata['response'].values[i] == 7:
+                        if chosentrial[targpos] == chosentrial[targpos -1 ]:
+                            precur_and_targ_same.append(1)
+                        else:
+                            precur_and_targ_same.append(0)
+
                         if chosentrial[targpos] == 8.0:
                             pitchoftarg.append(float(3))
                         elif chosentrial[targpos] == 13.0:
@@ -151,6 +153,7 @@ class behaviouralhelperscg():
 
                     else:
                         pitchoftarg.append(np.nan)
+                        precur_and_targ_same.append(np.nan)
 
                     if np.sum(newdata['dDurs'].values[i][:precur_pos]) / fs <= newdata['centreRelease'].values[i] - \
                             newdata['absentTime'].values[i] or newdata['response'].values[i] == 7:
@@ -168,6 +171,7 @@ class behaviouralhelperscg():
                 except:
                     pitchoftarg.append(np.nan)
                     pitchofprecur.append(np.nan)
+                    precur_and_targ_same.append(np.nan)
 
             newdata.drop(index=newdata.index[0],
                          axis=0,
@@ -181,7 +185,6 @@ class behaviouralhelperscg():
 
             talkerlist2 = np.delete(talkerlist2, 0)
             stepval = np.delete(stepval, 0)
-            precur_and_targ_same = np.delete(precur_and_targ_same, 0)
 
             pitchoftarg = np.delete(pitchoftarg, droplist)
             talkerlist2 = np.delete(talkerlist2, droplist)
@@ -210,9 +213,10 @@ class behaviouralhelperscg():
             newdata['pastcatchtrial'] = pastcatchtrial.tolist()
             newdata['stepval'] = stepval.tolist()
             newdata['control_trial'] = control_trial.tolist()
+
             # newdata['realRelReleaseTimes'] = np.log(newdata['realRelReleaseTimes'])
-            precur_and_targ_same = precur_and_targ_same.astype(int)
-            newdata['precur_and_targ_same'] = precur_and_targ_same.tolist()
+            # precur_and_targ_same = precur_and_targ_same.astype(int)
+            newdata['precur_and_targ_same'] = precur_and_targ_same
 
             newdata['timeToTarget'] = newdata['timeToTarget'] / 24414.0625
             newdata['AM'] = newdata['AM'].astype(int)
