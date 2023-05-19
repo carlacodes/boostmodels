@@ -206,8 +206,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     fig.tight_layout()
     plt.savefig(fig_dir / 'shap_summary_correctresp.png', dpi=1000, bbox_inches = "tight")
 
-
-    shap.dependence_plot("precursor = target pitch", shap_values1[0], X_train)  #
+    shap.dependence_plot("precursor = target pitch", shap_values1[0], dfx)  #
     plt.show()
 
     result = permutation_importance(xg_reg, X_test, y_test, n_repeats=100,
