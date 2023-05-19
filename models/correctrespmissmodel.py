@@ -18,8 +18,7 @@ import sklearn
 from sklearn.model_selection import train_test_split
 from helpers.behaviouralhelpersformodels import *
 import sklearn.metrics as metrics
-
-
+import random
 
 
 def objective(trial, X, y):
@@ -311,6 +310,27 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     return xg_reg, ypred, y_test, results, shap_values1, X_train, y_train, bal_accuracy, shap_values2
 
 
+
+
+
+def reservoir_sampling_dataframe(df, k):
+    reservoir = []
+    n = 0
+    for index, row in df.iterrows():
+        n += 1
+        if len(reservoir) < k:
+            reservoir.append(row.copy())
+        else:
+            # Randomly replace rows in the reservoir with decreasing probability
+            replace_index = random.randint(0, n - 1)
+            if replace_index < k:
+                reservoir[replace_index] = row.copy()
+
+    # Create a new DataFrame from the reservoir
+    sampled_df = pd.DataFrame(reservoir)
+
+    return sampled_df
+
 def run_correct_responsepipeline(ferrets):
     resultingcr_df = behaviouralhelperscg.get_df_behav(ferrets=ferrets, includefaandmiss=False, includemissonly=True, startdate='04-01-2020',
                                   finishdate='03-01-2023')
@@ -339,18 +359,18 @@ def run_correct_responsepipeline(ferrets):
 
     df_miss = resultingcr_df[resultingcr_df['misslist'] == 1]
     df_nomiss = resultingcr_df[resultingcr_df['misslist'] == 0]
+    #subsample from the distribution of df_miss
 
-    if len(df_nomiss) > len(df_miss)*1.2:
-        df_nomiss = df_nomiss.sample(n=len(df_miss), random_state=123)
-    elif len(df_miss) > len(df_nomiss)*1.2:
-        df_miss = df_miss.sample(n=len(df_nomiss), random_state=123)
+    #find the middle point between the length of df_miss and df_nomiss
+    difference =abs(len(df_miss) - len(df_nomiss))/ 2
+    middlepoint = min(len(df_miss), len(df_nomiss)) + difference
+
+    #reservoir sample from the larger df
+    if len(df_nomiss) > 1.2*len(df_miss):
+        df_miss = reservoir_sampling_dataframe(df_miss, int(middlepoint))
+        df_nomiss = reservoir_sampling_dataframe(df_nomiss, int(middlepoint))
 
     resultingcr_df = pd.concat([df_nomiss, df_miss], axis=0)
-    #
-    # #shuffle the rows
-    # resultingcr_df = resultingcr_df.sample(frac=1).reset_index(drop=True)
-
-
 
 
     if len(ferrets) == 1:
