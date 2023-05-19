@@ -37,14 +37,14 @@ def objective(trial, X, y):
         "scale_pos_weight": trial.suggest_float("scale_pos_weight", 1, 5),
     }
 
-    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=123)
+    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 
     cv_scores = []
     for idx, (train_idx, test_idx) in enumerate(cv.split(X, y)):
         X_train, X_test = X[train_idx], X[test_idx]
         y_train, y_test = y[train_idx], y[test_idx]
 
-        model = lgb.LGBMClassifier(objective="binary", random_state=123, **param_grid)
+        model = lgb.LGBMClassifier(objective="binary", random_state=42, **param_grid)
         model.fit(
             X_train,
             y_train,
@@ -113,7 +113,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
 
 
 
-    X_train, X_test, y_train, y_test = train_test_split(dfx, df_to_use['misslist'], test_size=0.2, random_state=123)
+    X_train, X_test, y_train, y_test = train_test_split(dfx, df_to_use['misslist'], test_size=0.2, random_state=42)
     print(X_train.shape)
     print(X_test.shape)
 
@@ -138,7 +138,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
         else:
             fig_savedir = Path('D:/behavmodelfigs/correctresp_or_miss//')
 
-    xg_reg = lgb.LGBMClassifier(objective="binary", random_state=123, **paramsinput)
+    xg_reg = lgb.LGBMClassifier(objective="binary", random_state=42, **paramsinput)
     xg_reg.fit(
         X_train,
         y_train,
@@ -148,7 +148,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     )
     ypred = xg_reg.predict_proba(X_test)
 
-    kfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=123)
+    kfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
     results = cross_val_score(xg_reg, X_test, y_test, scoring='accuracy', cv=kfold)
     bal_accuracy = cross_val_score(xg_reg, X_test, y_test, scoring='balanced_accuracy', cv=kfold)
     print("Accuracy: %.2f%%" % (np.mean(results) * 100.0))
@@ -210,7 +210,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     plt.show()
 
     result = permutation_importance(xg_reg, X_test, y_test, n_repeats=100,
-                                    random_state=123, n_jobs=2)
+                                    random_state=42, n_jobs=2)
     sorted_idx = result.importances_mean.argsort()
     fig, ax = plt.subplots()
     ax.barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, color = 'peru')
@@ -342,14 +342,14 @@ def run_correct_responsepipeline(ferrets):
     df_control = resultingcr_df[resultingcr_df['control_trial'] == 1]
 
     if len(df_intra) > len(df_inter)*1.2:
-        df_intra = df_intra.sample(n=len(df_inter), random_state=123)
+        df_intra = df_intra.sample(n=len(df_inter), random_state=42)
     elif len(df_inter) > len(df_intra)*1.2:
-        df_inter = df_inter.sample(n=len(df_intra), random_state=123)
+        df_inter = df_inter.sample(n=len(df_intra), random_state=42)
 
     if len(df_control) > len(df_intra)*1.2:
-        df_control = df_control.sample(n=len(df_intra), random_state=123)
+        df_control = df_control.sample(n=len(df_intra), random_state=42)
     elif len(df_control) > len(df_inter)*1.2:
-        df_control = df_control.sample(n=len(df_inter), random_state=123)
+        df_control = df_control.sample(n=len(df_inter), random_state=42)
 
     #then reconcatenate the three dfs
     #reconcatenate the three dfs but preserve the order of the rows:
@@ -364,9 +364,9 @@ def run_correct_responsepipeline(ferrets):
 
 
     if len(df_nomiss) > len(df_miss)*1.2:
-        df_nomiss = df_nomiss.sample(n=len(df_miss), random_state=123)
+        df_nomiss = df_nomiss.sample(n=len(df_miss), random_state=42)
     elif len(df_miss) > len(df_nomiss)*1.2:
-        df_miss = df_miss.sample(n=len(df_nomiss), random_state=123)
+        df_miss = df_miss.sample(n=len(df_nomiss), random_state=42)
 
     resultingcr_df = pd.concat([df_nomiss, df_miss], axis=0)
     #
