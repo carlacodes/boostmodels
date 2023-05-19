@@ -632,6 +632,11 @@ def runfalsealarmpipeline(ferrets, optimization=False, ferret_as_feature=False):
         np.save('../optuna_results/falsealarm_optunaparams.npy', study.best_params)
 
     resultingfa_df.to_csv(filepath)
+
+    if len(ferrets) == 1:
+        one_ferret = True
+    else:
+        one_ferret = False
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbfaornotwithoptuna(
         resultingfa_df, params, ferret_as_feature=ferret_as_feature, ferrets = ferrets,  one_ferret=one_ferret)
     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
@@ -976,7 +981,7 @@ if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
 
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(
-        ferrets, optimization=True, ferret_as_feature=True)
+        ferrets, optimization=False, ferret_as_feature=True)
     # ferrets = ['F2105_Clove']# 'F2105_Clove'
     # df_by_ferretdict = plot_reaction_times(ferrets)
     # #
