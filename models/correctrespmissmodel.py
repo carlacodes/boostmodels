@@ -21,6 +21,44 @@ import sklearn.metrics as metrics
 import random
 
 
+# def objective(trial, X, y):
+#     param_grid = {
+#         "colsample_bytree": trial.suggest_float("colsample_bytree", 0.1, 1),
+#         "subsample": trial.suggest_float("subsample", 0.1, 1),
+#         "learning_rate": trial.suggest_float("learning_rate", 0.0001, 0.5),
+#         "num_leaves": trial.suggest_int("num_leaves", 20, 500),
+#         "max_depth": trial.suggest_int("max_depth", 3, 20),
+#         "min_child_samples": trial.suggest_int("min_child_samples", 1, 200),
+#         "reg_alpha": trial.suggest_float("reg_alpha", 0.1, 5),
+#         "reg_lambda": trial.suggest_float("reg_lambda", 0.1, 5),
+#         "min_split_gain": trial.suggest_float("min_split_gain", 0, 20),
+#         "bagging_freq": trial.suggest_int("bagging_freq", 1, 20),
+#         "feature_fraction": trial.suggest_float("feature_fraction", 0.5, 1),
+#         "scale_pos_weight": trial.suggest_float("scale_pos_weight", 1, 5),
+#     }
+#
+#     cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+#
+#     cv_scores = []
+#     for idx, (train_idx, test_idx) in enumerate(cv.split(X, y)):
+#         X_train, X_test = X[train_idx], X[test_idx]
+#         y_train, y_test = y[train_idx], y[test_idx]
+#
+#         model = lgb.LGBMClassifier(objective="binary", random_state=42, **param_grid)
+#         model.fit(
+#             X_train,
+#             y_train,
+#             eval_set=[(X_test, y_test)],
+#             eval_metric="binary_logloss",
+#             early_stopping_rounds=100,
+#             verbose=False,  # Set verbose to False to avoid printing evaluation results
+#         )
+#         preds = model.predict_proba(X_test)[:, 1]  # Use probabilities of the positive class
+#         cv_scores.append(metrics.roc_auc_score(y_test, preds))
+#
+#     return -np.mean(cv_scores)
+#
+# Return negative mean CV score
 def objective(trial, X, y):
     param_grid = {
         "colsample_bytree": trial.suggest_float("colsample_bytree", 0.1, 1),
@@ -35,6 +73,10 @@ def objective(trial, X, y):
         "bagging_freq": trial.suggest_int("bagging_freq", 1, 20),
         "feature_fraction": trial.suggest_float("feature_fraction", 0.5, 1),
         "scale_pos_weight": trial.suggest_float("scale_pos_weight", 1, 5),
+        "min_child_weight": trial.suggest_float("min_child_weight", 0.001, 10),
+        "max_bin": trial.suggest_int("max_bin", 100, 1000),
+        "min_data_in_leaf": trial.suggest_int("min_data_in_leaf", 10, 200),
+        "min_sum_hessian_in_leaf": trial.suggest_float("min_sum_hessian_in_leaf", 0.1, 50),
     }
 
     cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
@@ -51,19 +93,19 @@ def objective(trial, X, y):
             eval_set=[(X_test, y_test)],
             eval_metric="binary_logloss",
             early_stopping_rounds=100,
-            verbose=False,  # Set verbose to False to avoid printing evaluation results
+            verbose=False,
         )
-        preds = model.predict_proba(X_test)[:, 1]  # Use probabilities of the positive class
-        cv_scores.append(metrics.roc_auc_score(y_test, preds))
+        preds = model.predict_proba(X_test)[:, 1]
+        cv_scores.append(metrics.log_loss(y_test, preds))
 
-    return -np.mean(cv_scores)  # Return negative mean CV score
+    return np.mean(cv_scores)
 
 
 
 def run_optuna_study_correctresp(X, y):
     study = optuna.create_study(direction="minimize", study_name="LGBM Classifier")
     func = lambda trial: objective(trial, X, y)
-    study.optimize(func, n_trials=1000)
+    study.optimize(func, n_trials=10000)
     print("Number of finished trials: ", len(study.trials))
     print(f"\tBest value of - auc: {study.best_value:.5f}")
     print(f"\tBest params:")
