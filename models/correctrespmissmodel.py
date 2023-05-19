@@ -361,17 +361,20 @@ def run_correct_responsepipeline(ferrets):
     df_nomiss = resultingcr_df[resultingcr_df['misslist'] == 0]
     #subsample from the distribution of df_miss
 
-    #find the middle point between the length of df_miss and df_nomiss
-    difference =abs(len(df_miss) - len(df_nomiss))/ 2
-    middlepoint = min(len(df_miss), len(df_nomiss)) + difference
+    #find the middle point between the length of df
 
-    #reservoir sample from the larger df
-    if len(df_nomiss) > 1.2*len(df_miss):
-        df_nomiss = reservoir_sampling_dataframe(df_nomiss, len(df_miss))
-    elif len(df_miss) > 1.2*len(df_nomiss):
-        df_miss = reservoir_sampling_dataframe(df_miss, len(df_nomiss))
+
+    if len(df_nomiss) > len(df_miss)*1.2:
+        df_nomiss = df_nomiss.sample(n=len(df_miss), random_state=123)
+    elif len(df_miss) > len(df_nomiss)*1.2:
+        df_miss = df_miss.sample(n=len(df_nomiss), random_state=123)
 
     resultingcr_df = pd.concat([df_nomiss, df_miss], axis=0)
+    #
+    # #shuffle the rows
+    # resultingcr_df = resultingcr_df.sample(frac=1).reset_index(drop=True)
+
+
 
 
     if len(ferrets) == 1:
