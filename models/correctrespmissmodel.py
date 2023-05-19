@@ -367,8 +367,9 @@ def run_correct_responsepipeline(ferrets):
 
     #reservoir sample from the larger df
     if len(df_nomiss) > 1.2*len(df_miss):
-        df_miss = reservoir_sampling_dataframe(df_miss, int(middlepoint))
-        df_nomiss = reservoir_sampling_dataframe(df_nomiss, int(middlepoint))
+        df_nomiss = reservoir_sampling_dataframe(df_nomiss, len(df_miss))
+    elif len(df_miss) > 1.2*len(df_nomiss):
+        df_miss = reservoir_sampling_dataframe(df_miss, len(df_nomiss))
 
     resultingcr_df = pd.concat([df_nomiss, df_miss], axis=0)
 
