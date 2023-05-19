@@ -599,8 +599,23 @@ def runfalsealarmpipeline(ferrets, optimization=False, ferret_as_feature=False):
 
 
 
+
+
     #then reconcatenate the three dfs
-    # resultingfa_df = pd.concat([df_intra, df_inter, df_control], axis = 0)
+    resultingfa_df = pd.concat([df_intra, df_inter, df_control], axis = 0)
+
+    df_fa = resultingfa_df[resultingfa_df['falsealarm'] == 1]
+    df_nofa = resultingfa_df[resultingfa_df['falsealarm'] == 0]
+    # subsample from the distribution of df_miss
+
+    # find the middle point between the length of df
+
+    if len(df_nofa) > len(df_fa) * 1.2:
+        df_nofa = df_nofa.sample(n=len(df_fa), random_state=123)
+    elif len(df_fa) > len(df_nofa) * 1.2:
+        df_miss = df_fa.sample(n=len(df_nofa), random_state=123)
+
+    resultingfa_df = pd.concat([df_nofa, df_fa], axis=0)
 
 
     filepath = Path('D:/dfformixedmodels/falsealarmmodel_dfuse.csv')
@@ -959,6 +974,9 @@ def plot_reaction_times_interandintra(ferrets):
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
+
+    xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(
+        ferrets, optimization=True, ferret_as_feature=True)
     # ferrets = ['F2105_Clove']# 'F2105_Clove'
     # df_by_ferretdict = plot_reaction_times(ferrets)
     # #
@@ -972,9 +990,9 @@ if __name__ == '__main__':
     #
     # xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(
     #     ferrets, optimization=False, ferret_as_feature=True)
-    for i in ferrets:
-        xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(
-            [i], optimization=True, ferret_as_feature=False)
+    # for i in ferrets:
+    #     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(
+    #         [i], optimization=True, ferret_as_feature=False)
 
 
     #
