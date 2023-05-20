@@ -262,9 +262,9 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
 
     fig, ax = plt.gcf(), plt.gca()
     if one_ferret:
-        plt.title('Ranked list of features over their impact in predicting reaction time for' + ferrets[0])
+        plt.title('Features over impact in reaction time for ' + ferrets)
     else:
-        plt.title('Ranked list of features over their impact in predicting reaction time')
+        plt.title('RFeatures over impact in reaction time')
     plt.xlabel('SHAP value (impact on model output) on reaction time')
     labels = [item.get_text() for item in ax.get_yticklabels()]
     print(labels)
@@ -291,9 +291,10 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     fig, ax = plt.subplots()
     ax.barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, color = 'cyan')
     if one_ferret:
-        ax.set_title('Permutation Importances \n for the Reaction Time Model \n for ' + ferrets, fontsize = 20)
+        ax.set_title('Permutation Importances of the \n Reaction Time Model for ' + ferrets, fontsize = 13)
     else:
-        ax.set_title('Permutation Importances  \n for the Reaction Time Model', fontsize = 20)
+        ax.set_title('Permutation Importances of the Reaction Time Model', fontsize = 13)
+    plt.xlabel('Permutation Importance')
     fig.tight_layout()
     plt.savefig(fig_savedir / 'permutation_importance.png', dpi=500, bbox_inches='tight')
     plt.show()
@@ -312,9 +313,9 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     cb_ax.set_ylabel("Trial number", fontsize=12)
     plt.ylabel('SHAP value', fontsize=10)
     if one_ferret:
-        plt.title('Target presentation time \n versus impact in predicted reacton time for' + ferrets[0], fontsize=18)
+        plt.title('Target presentation time \n versus impact on reacton time for' + ferrets[0], fontsize=18)
     else:
-        plt.title('Target presentation time \n versus impact in predicted reacton time', fontsize=18)
+        plt.title('Target presentation time \n versus impact on reacton time', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
     plt.xlabel('Target presentation time', fontsize=16)
     plt.savefig(fig_savedir /'targtimescolouredbytrialnumber.png', dpi=1000)
@@ -336,7 +337,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         plt.title('Pitch of target versus impact \n in predicted reacton time', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
     plt.xlabel('Pitch of target', fontsize=16)
-    # plt.xticks([1,2,3,4,5], labels=['109', '124', '144 ', '191', '251'], fontsize=15)
+    plt.xticks([1,2,3,4,5], labels=['109', '124', '144 ', '191', '251'], fontsize=15)
     plt.savefig( fig_savedir /'pitchoftargcolouredbyprecur.png', dpi=1000)
     plt.show()
 
