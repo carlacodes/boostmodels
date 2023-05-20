@@ -126,12 +126,12 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
         dfx = df_to_use.loc[:, df_to_use.columns != col]
         if optimization == False:
             # load the saved params
-            paramsinput = np.load('../optuna_results/correctresponse_optunaparams_ferretasfeature.npy', allow_pickle=True).item()
+            paramsinput = np.load('../optuna_results/correctresponse_optunaparams_ferretasfeature_2105.npy', allow_pickle=True).item()
         else:
             study = run_optuna_study_correctresp(dfx.to_numpy(), df_to_use['misslist'].to_numpy())
             print(study.best_params)
             paramsinput = study.best_params
-            np.save('../optuna_results/correctresponse_optunaparams_ferretasfeature.npy', study.best_params)
+            np.save('../optuna_results/correctresponse_optunaparams_ferretasfeature_2105.npy', study.best_params)
 
     else:
         df_to_use =  dataframe[["trialNum", "misslist", "talker", "side", "precur_and_targ_same",
@@ -147,21 +147,20 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
         if optimization == False:
             # load the saved params
             if one_ferret:
-                paramsinput = np.load('../optuna_results/correctresponse_optunaparams_2005'+ferrets+'.npy', allow_pickle=True).item()
+                paramsinput = np.load('../optuna_results/correctresponse_optunaparams'+ferrets+'_2005.npy', allow_pickle=True).item()
             else:
-                paramsinput = np.load('../optuna_results/correctresponse_optunaparams_2005.npy', allow_pickle=True).item()
+                paramsinput = np.load('../optuna_results/correctresponse_optunaparams_2005_2.npy', allow_pickle=True).item()
         else:
             study = run_optuna_study_correctresp(dfx.to_numpy(), df_to_use['misslist'].to_numpy())
             print(study.best_params)
             paramsinput = study.best_params
             if one_ferret:
-                np.save('../optuna_results/correctresponse_optunaparams_2005'+ferrets+'.npy', study.best_params)
+                np.save('../optuna_results/correctresponse_optunaparams_2005'+ferrets+'_2.npy', study.best_params)
             else:
-                np.save('../optuna_results/correctresponse_optunaparams_2005.npy', study.best_params)
+                np.save('../optuna_results/correctresponse_optunaparams_2005_2.npy', study.best_params)
 
 
-
-    X_train, X_test, y_train, y_test = train_test_split(dfx, df_to_use['misslist'], test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(dfx, df_to_use['misslist'], test_size=0.2, random_state=123)
     print(X_train.shape)
     print(X_test.shape)
 
@@ -186,7 +185,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
         else:
             fig_savedir = Path('D:/behavmodelfigs/correctresp_or_miss//')
 
-    xg_reg = lgb.LGBMClassifier(objective="binary", random_state=42, **paramsinput)
+    xg_reg = lgb.LGBMClassifier(objective="binary", random_state=123, **paramsinput)
     xg_reg.fit(
         X_train,
         y_train,
@@ -196,7 +195,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     )
     ypred = xg_reg.predict_proba(X_test)
 
-    kfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+    kfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=123)
     results = cross_val_score(xg_reg, X_test, y_test, scoring='accuracy', cv=kfold)
     bal_accuracy = cross_val_score(xg_reg, X_test, y_test, scoring='balanced_accuracy', cv=kfold)
     print("Accuracy: %.2f%%" % (np.mean(results) * 100.0))
@@ -258,7 +257,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     plt.show()
 
     result = permutation_importance(xg_reg, X_test, y_test, n_repeats=100,
-                                    random_state=42, n_jobs=2)
+                                    random_state=123, n_jobs=2)
     sorted_idx = result.importances_mean.argsort()
     fig, ax = plt.subplots()
     ax.barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, color = 'peru')
@@ -385,22 +384,6 @@ def run_correct_responsepipeline(ferrets):
     filepath.parent.mkdir(parents=True, exist_ok=True)
     resultingcr_df.to_csv(filepath)
 
-    df_intra = resultingcr_df[resultingcr_df['intra_trial_roving'] == 1]
-    df_inter = resultingcr_df[resultingcr_df['inter_trial_roving'] == 1]
-    df_control = resultingcr_df[resultingcr_df['control_trial'] == 1]
-
-    if len(df_intra) > len(df_inter)*1.2:
-        df_intra = df_intra.sample(n=len(df_inter), random_state=42)
-    elif len(df_inter) > len(df_intra)*1.2:
-        df_inter = df_inter.sample(n=len(df_intra), random_state=42)
-
-    if len(df_control) > len(df_intra)*1.2:
-        df_control = df_control.sample(n=len(df_intra), random_state=42)
-    elif len(df_control) > len(df_inter)*1.2:
-        df_control = df_control.sample(n=len(df_inter), random_state=42)
-
-    resultingcr_df = pd.concat([df_control, df_intra, df_inter], axis = 0)
-
     # df_pitchtargsame = resultingcr_df[resultingcr_df['precur_and_targ_same'] == 1]
     # df_pitchtargdiff = resultingcr_df[resultingcr_df['precur_and_targ_same'] == 0]
     # if len(df_pitchtargsame) > len(df_pitchtargdiff)*1.2:
@@ -409,19 +392,34 @@ def run_correct_responsepipeline(ferrets):
     #     df_pitchtargdiff = df_pitchtargdiff.sample(n=len(df_pitchtargsame), random_state=123)
     # resultingcr_df = pd.concat([df_pitchtargsame, df_pitchtargdiff], axis = 0)
 
+
+    df_intra = resultingcr_df[resultingcr_df['intra_trial_roving'] == 1]
+    df_inter = resultingcr_df[resultingcr_df['inter_trial_roving'] == 1]
+    df_control = resultingcr_df[resultingcr_df['control_trial'] == 1]
+
+    if len(df_intra) > len(df_inter)*1.2:
+        df_intra = df_intra.sample(n=len(df_inter), random_state=123)
+    elif len(df_inter) > len(df_intra)*1.2:
+        df_inter = df_inter.sample(n=len(df_intra), random_state=123)
+
+    if len(df_control) > len(df_intra)*1.2:
+        df_control = df_control.sample(n=len(df_intra), random_state=123)
+    elif len(df_control) > len(df_inter)*1.2:
+        df_control = df_control.sample(n=len(df_inter), random_state=123)
+
+    resultingcr_df = pd.concat([df_control, df_intra, df_inter], axis=0)
+
+
     df_miss = resultingcr_df[resultingcr_df['misslist'] == 1]
     df_nomiss = resultingcr_df[resultingcr_df['misslist'] == 0]
-    # #subsample from the distribution of df_miss
-    #
-    # #find the middle point between the length of df
-    #
-    #
+
     if len(df_nomiss) > len(df_miss)*1.2:
-        df_nomiss = df_nomiss.sample(n=len(df_miss), random_state=42)
+        df_nomiss = df_nomiss.sample(n=len(df_miss), random_state=123)
     elif len(df_miss) > len(df_nomiss)*1.2:
-        df_miss = df_miss.sample(n=len(df_nomiss), random_state=42)
+        df_miss = df_miss.sample(n=len(df_nomiss), random_state=123)
 
     resultingcr_df = pd.concat([df_nomiss, df_miss], axis=0)
+
     # #
     # #shuffle the rows
     # resultingcr_df = resultingcr_df.sample(frac=1).reset_index(drop=True)
