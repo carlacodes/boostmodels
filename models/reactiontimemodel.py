@@ -264,7 +264,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     if one_ferret:
         plt.title('Features over impact in reaction time for ' + ferrets)
     else:
-        plt.title('RFeatures over impact in reaction time')
+        plt.title('Features over impact in reaction time')
     plt.xlabel('SHAP value (impact on model output) on reaction time')
     labels = [item.get_text() for item in ax.get_yticklabels()]
     print(labels)
@@ -313,12 +313,29 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     cb_ax.set_ylabel("Trial number", fontsize=12)
     plt.ylabel('SHAP value', fontsize=10)
     if one_ferret:
-        plt.title('Target presentation time \n versus impact on reacton time for' + ferrets, fontsize=18)
+        plt.title('Target presentation time  versus impact \n on reacton time for ' + ferrets, fontsize=18)
     else:
-        plt.title('Target presentation time \n versus impact on reacton time', fontsize=18)
+        plt.title('Target presentation time versus impact on reacton time', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
     plt.xlabel('Target presentation time', fontsize=16)
     plt.savefig(fig_savedir /'targtimescolouredbytrialnumber.png', dpi=1000)
+    plt.show()
+
+    shap.plots.scatter(shap_values2[:, "precursor = target pitch"], color=shap_values2[:, "trial number"], show=False, cmap = matplotlib.colormaps[cmapname])
+    fig, ax = plt.gcf(), plt.gca()
+    # Get colorbar
+    cb_ax = fig.axes[1]
+    # Modifying color bar parameters
+    cb_ax.tick_params(labelsize=15)
+    cb_ax.set_ylabel("Trial number", fontsize=12)
+    plt.ylabel('SHAP value', fontsize=10)
+    if one_ferret:
+        plt.title('Precursor = target pitch \n over reacton time impact for ' + ferrets, fontsize=18)
+    else:
+        plt.title('Precursor = target pitch over reaction time impact', fontsize=18)
+    plt.ylabel('SHAP value', fontsize=16)
+    plt.xlabel('Target presentation time', fontsize=16)
+    plt.savefig(fig_savedir /'pitchofprecur_equals_target_colouredbytrialnumber.png', dpi=1000)
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "pitch of target"], color=shap_values2[:, "precursor = target pitch"], show=False, cmap = matplotlib.colormaps[cmapname])
