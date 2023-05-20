@@ -290,8 +290,10 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     sorted_idx = result.importances_mean.argsort()
     fig, ax = plt.subplots()
     ax.barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, color = 'cyan')
-    ax.set_title("Permutation importances on predicting the reaction time")
-    fig.tight_layout()
+    if one_ferret:
+        ax.set_title('Permutation Importances \n for the Reaction Time Model \n for ' + ferrets, fontsize = 20)
+    else:
+        ax.set_title('Permutation Importances  \n for the Reaction Time Model', fontsize = 20)    fig.tight_layout()
     plt.savefig(fig_savedir / 'permutation_importance.png', dpi=500)
     plt.show()
 
@@ -323,12 +325,12 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     cb_ax = fig.axes[1]
     # Modifying color bar parameters
     cb_ax.tick_params(labelsize=15)
-    cb_ax.set_yticks([1, 2, 3,4, 5])
+    # cb_ax.set_yticks([1, 2, 3,4, 5])
     # cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
     cb_ax.set_ylabel("Pitch of precursor = target", fontsize=12)
     plt.ylabel('SHAP value', fontsize=10)
     if one_ferret:
-        plt.title('Pitch of target versus impact \n in predicted reacton time for' + ferrets, fontsize=18)
+        plt.title('Pitch of target versus impact \n in predicted reacton time for ' + ferrets, fontsize=18)
     else:
         plt.title('Pitch of target versus impact \n in predicted reacton time', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
