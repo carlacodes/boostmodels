@@ -293,8 +293,9 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     if one_ferret:
         ax.set_title('Permutation Importances \n for the Reaction Time Model \n for ' + ferrets, fontsize = 20)
     else:
-        ax.set_title('Permutation Importances  \n for the Reaction Time Model', fontsize = 20)    fig.tight_layout()
-    plt.savefig(fig_savedir / 'permutation_importance.png', dpi=500)
+        ax.set_title('Permutation Importances  \n for the Reaction Time Model', fontsize = 20)
+    fig.tight_layout()
+    plt.savefig(fig_savedir / 'permutation_importance.png', dpi=500, bbox_inches='tight')
     plt.show()
 
     shap.dependence_plot("time to target", shap_values, X)  #
