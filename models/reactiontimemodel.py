@@ -308,7 +308,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     if one_ferret:
         ax.set_title('Permutation Importances of the \n Reaction Time Model for ' + ferrets, fontsize = 13)
     else:
-        ax.set_title('Permutation Importances of the Reaction Time Model', fontsize = 13)
+        ax.set_title('Permutation Importances of the \n Reaction Time Model', fontsize = 13)
     plt.xlabel('Permutation Importance')
     fig.tight_layout()
     plt.savefig(fig_savedir / 'permutation_importance.png', dpi=500, bbox_inches='tight')
@@ -336,7 +336,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     plt.savefig(fig_savedir /'targtimescolouredbytrialnumber.png', dpi=1000)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "precursor = target pitch"], color=shap_values2[:, "trial number"], show=False, cmap = matplotlib.colormaps[cmapname])
+    shap.plots.scatter(shap_values2[:, "precursor = target pitch"], color=shap_values2[:, "talker"], show=False, cmap = matplotlib.colormaps[cmapname])
     fig, ax = plt.gcf(), plt.gca()
     # Get colorbar
     cb_ax = fig.axes[1]
@@ -345,12 +345,12 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     cb_ax.set_ylabel("Trial number", fontsize=12)
     plt.ylabel('SHAP value', fontsize=10)
     if one_ferret:
-        plt.title('Precursor = target pitch \n over reacton time impact for ' + ferrets, fontsize=18)
+        plt.title('Precursor = target F0 \n over reacton time impact for ' + ferrets, fontsize=18)
     else:
-        plt.title('Precursor = target pitch over reaction time impact', fontsize=18)
+        plt.title('Precursor = target F0 over reaction time impact', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
     plt.xlabel('Target presentation time', fontsize=16)
-    plt.savefig(fig_savedir /'pitchofprecur_equals_target_colouredbytrialnumber.png', dpi=1000)
+    plt.savefig(fig_savedir /'pitchofprecur_equals_target_colouredbytalker.png', dpi=1000)
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "pitch of target"], color=shap_values2[:, "precursor = target pitch"], show=False, cmap = matplotlib.colormaps[cmapname])
@@ -572,7 +572,7 @@ def run_correctrxntime_model_for_a_ferret(ferrets, optimization = False, ferret_
 def main():
     ferrets = ['F2105_Clove', 'F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    run_correctrxntime_model(ferrets, optimization = True, ferret_as_feature=True)
+    run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature=True)
 
     # for ferret in ferrets:
     #     run_correctrxntime_model_for_a_ferret([ferret], optimization=False, ferret_as_feature=False)

@@ -399,13 +399,13 @@ def run_correct_responsepipeline(ferrets):
     # elif len(df_control) > len(df_inter)*1.2:
     #     df_control = df_control.sample(n=len(df_inter), random_state=42)
 
-    df_pitchtargsame = resultingcr_df[resultingcr_df['precur_and_targ_same'] == 1]
-    df_pitchtargdiff = resultingcr_df[resultingcr_df['precur_and_targ_same'] == 0]
-    if len(df_pitchtargsame) > len(df_pitchtargdiff)*1.2:
-        df_pitchtargsame = df_pitchtargsame.sample(n=len(df_pitchtargdiff), random_state=123)
-    elif len(df_pitchtargdiff) > len(df_pitchtargsame)*1.2:
-        df_pitchtargdiff = df_pitchtargdiff.sample(n=len(df_pitchtargsame), random_state=123)
-    resultingcr_df = pd.concat([df_pitchtargsame, df_pitchtargdiff], axis = 0)
+    # df_pitchtargsame = resultingcr_df[resultingcr_df['precur_and_targ_same'] == 1]
+    # df_pitchtargdiff = resultingcr_df[resultingcr_df['precur_and_targ_same'] == 0]
+    # if len(df_pitchtargsame) > len(df_pitchtargdiff)*1.2:
+    #     df_pitchtargsame = df_pitchtargsame.sample(n=len(df_pitchtargdiff), random_state=123)
+    # elif len(df_pitchtargdiff) > len(df_pitchtargsame)*1.2:
+    #     df_pitchtargdiff = df_pitchtargdiff.sample(n=len(df_pitchtargsame), random_state=123)
+    # resultingcr_df = pd.concat([df_pitchtargsame, df_pitchtargdiff], axis = 0)
 
     df_miss = resultingcr_df[resultingcr_df['misslist'] == 1]
     df_nomiss = resultingcr_df[resultingcr_df['misslist'] == 0]
