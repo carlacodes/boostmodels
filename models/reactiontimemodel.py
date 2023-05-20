@@ -372,7 +372,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         if one_ferret:
             plt.title('Ferret \n versus impact in predicted reacton time for' + ferrets[0], fontsize=18)
         else:
-            plt.title('Ferret \n versus impact in predicted reacton time', fontsize=18)
+            plt.title('Ferret versus impact on reaction time', fontsize=18)
         plt.ylabel('SHAP value', fontsize=16)
         plt.xlabel('Ferret', fontsize=16)
         # plt.xticks([1,2,3,4,5], labels=['109', '124', '144 ', '191', '251'], fontsize=15)
@@ -406,6 +406,32 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
             plt.savefig(fig_savedir / 'ferretcolouredbyintratrialroving.png', dpi=1000)
             plt.show()
 
+            shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "side of audio"], show=False,
+                               cmap=matplotlib.colormaps[cmapname])
+            fig, ax = plt.gcf(), plt.gca()
+            # Get colorbar
+            cb_ax = fig.axes[1]
+            # Modifying color bar parameters
+            cb_ax.tick_params(labelsize=15)
+            cb_ax.set_yticks([0, 1])
+            cb_ax.set_yticklabels(['Left', 'Right'])
+            # cb_ax.set_ylabel("Target presentation time ", fontsize=12)
+            plt.ylabel('SHAP value', fontsize=10)
+            if one_ferret:
+                plt.title('Ferret \n versus impact in predicted reacton time for' + ferrets[0], fontsize=18)
+            else:
+                plt.title('Ferret versus impact on reaction time', fontsize=18)
+            plt.ylabel('SHAP value', fontsize=16)
+            plt.xlabel('Ferret', fontsize=16)
+            # plt.xticks([1,2,3,4,5], labels=['109', '124', '144 ', '191', '251'], fontsize=15)
+            plt.xticks([0, 1, 2, 3, 4],
+                       labels=['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'],
+                       fontsize=15)
+            # rotate xtick labels:
+            plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
+            plt.savefig(fig_savedir / 'ferretcolouredbysideofaudio.png', dpi=1000)
+            plt.show()
+
         shap.plots.scatter(shap_values2[:, "side of audio"], color=shap_values2[:, "ferret ID"], show=False,
                            cmap=matplotlib.colormaps[cmapname])
         fig, ax = plt.gcf(), plt.gca()
@@ -420,7 +446,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         #            fontsize=15)
         plt.ylabel('SHAP value', fontsize=10)
 
-        plt.title('Ferret \n versus impact in predicted reaction time', fontsize=18)
+        plt.title('Side of audio versus impact on reaction time', fontsize=18)
 
         # plt.ylabel('SHAP value', fontsize=16)
         plt.xlabel('side', fontsize=16)
@@ -453,7 +479,7 @@ def extract_release_times_data(ferrets):
         df_control = df_control.sample(n=len(df_inter), random_state=123)
         
     df = pd.concat([df_intra, df_inter, df_control], axis = 0)
-    dfuse = df[["pitchoftarg", "pastcatchtrial", "trialNum", "talker", "side of audio", "precur_and_targ_same",
+    dfuse = df[["pitchoftarg", "pastcatchtrial", "trialNum", "talker", "side", "precur_and_targ_same",
                 "timeToTarget",
                 "realRelReleaseTimes", "ferret", "pastcorrectresp"]]
     labels = ['pitch of target', 'past trial was catch', 'trial number', 'talker', 'side of audio', 'precursor = target pitch', 'time to target', 'realRelReleaseTimes', 'ferret ID', 'past trial was correct']
