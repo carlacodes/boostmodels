@@ -124,7 +124,7 @@ def runlgbreleasetimes_for_a_ferret(data, paramsinput=None, ferret=1, ferret_nam
 
     shap.summary_plot(shap_values, dfx, show=False)
     fig, ax = plt.gcf(), plt.gca()
-    plt.title('Ranked list of features over their impact \n in predicting reaction time for' + ferret_name)
+    plt.title('Features over their impact \n on reaction time for ' + ferret_name)
     plt.xlabel('SHAP value (impact on model output) on reaction time' + ferret_name)
 
     labels = [item.get_text() for item in ax.get_yticklabels()]
