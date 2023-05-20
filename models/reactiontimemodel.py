@@ -313,7 +313,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     cb_ax.set_ylabel("Trial number", fontsize=12)
     plt.ylabel('SHAP value', fontsize=10)
     if one_ferret:
-        plt.title('Target presentation time \n versus impact on reacton time for' + ferrets[0], fontsize=18)
+        plt.title('Target presentation time \n versus impact on reacton time for' + ferrets, fontsize=18)
     else:
         plt.title('Target presentation time \n versus impact on reacton time', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)

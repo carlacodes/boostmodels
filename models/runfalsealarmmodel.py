@@ -129,26 +129,44 @@ def runxgboostreleasetimes(df_use):
 
 
 def objective(trial, X, y):
+    # param_grid = {
+    #     # "device_type": trial.suggest_categorical("device_type", ['gpu']),
+    #     "colsample_bytree": trial.suggest_float("colsample_bytree", 0.3, 1),
+    #     "alpha": trial.suggest_float("alpha", 1, 20),
+    #     "is_unbalanced": trial.suggest_categorical("is_unbalanced", [True]),
+    #     "n_estimators": trial.suggest_int("n_estimators", 100, 10000, step=100),
+    #     "learning_rate": trial.suggest_float("learning_rate", 0.001, 0.5),
+    #     "num_leaves": trial.suggest_int("num_leaves", 20, 3000, step=10),
+    #     "max_depth": trial.suggest_int("max_depth", 3, 20),
+    #     "min_data_in_leaf": trial.suggest_int("min_data_in_leaf", 200, 10000, step=100),
+    #     "lambda_l1": trial.suggest_int("lambda_l1", 0, 100, step=2),
+    #     "lambda_l2": trial.suggest_int("lambda_l2", 0, 100, step=2),
+    #     "min_gain_to_split": trial.suggest_float("min_gain_to_split", 0, 15),
+    #     "bagging_fraction": trial.suggest_float(
+    #         "bagging_fraction", 0.2, 0.95, step=0.1
+    #     ),
+    #     "bagging_freq": trial.suggest_int("bagging_freq", 1, 20, step=1),
+    #     "feature_fraction": trial.suggest_float(
+    #         "feature_fraction", 0.2, 0.95, step=0.1
+    #     ),
+    # }
     param_grid = {
-        # "device_type": trial.suggest_categorical("device_type", ['gpu']),
-        "colsample_bytree": trial.suggest_float("colsample_bytree", 0.3, 1),
-        "alpha": trial.suggest_float("alpha", 1, 20),
-        "is_unbalanced": trial.suggest_categorical("is_unbalanced", [True]),
-        "n_estimators": trial.suggest_int("n_estimators", 100, 10000, step=100),
-        "learning_rate": trial.suggest_float("learning_rate", 0.001, 0.5),
-        "num_leaves": trial.suggest_int("num_leaves", 20, 3000, step=10),
+        "colsample_bytree": trial.suggest_float("colsample_bytree", 0.1, 1),
+        "subsample": trial.suggest_float("subsample", 0.1, 1),
+        "learning_rate": trial.suggest_float("learning_rate", 0.0001, 0.5),
+        "num_leaves": trial.suggest_int("num_leaves", 20, 500),
         "max_depth": trial.suggest_int("max_depth", 3, 20),
-        "min_data_in_leaf": trial.suggest_int("min_data_in_leaf", 200, 10000, step=100),
-        "lambda_l1": trial.suggest_int("lambda_l1", 0, 100, step=2),
-        "lambda_l2": trial.suggest_int("lambda_l2", 0, 100, step=2),
-        "min_gain_to_split": trial.suggest_float("min_gain_to_split", 0, 15),
-        "bagging_fraction": trial.suggest_float(
-            "bagging_fraction", 0.2, 0.95, step=0.1
-        ),
-        "bagging_freq": trial.suggest_int("bagging_freq", 1, 20, step=1),
-        "feature_fraction": trial.suggest_float(
-            "feature_fraction", 0.2, 0.95, step=0.1
-        ),
+        "min_child_samples": trial.suggest_int("min_child_samples", 1, 200),
+        "reg_alpha": trial.suggest_float("reg_alpha", 0.1, 5),
+        "reg_lambda": trial.suggest_float("reg_lambda", 0.1, 5),
+        "min_split_gain": trial.suggest_float("min_split_gain", 0, 20),
+        "bagging_freq": trial.suggest_int("bagging_freq", 1, 20),
+        "feature_fraction": trial.suggest_float("feature_fraction", 0.5, 1),
+        "scale_pos_weight": trial.suggest_float("scale_pos_weight", 1, 5),
+        "min_child_weight": trial.suggest_float("min_child_weight", 0.001, 10),
+        "max_bin": trial.suggest_int("max_bin", 100, 1000),
+        "min_data_in_leaf": trial.suggest_int("min_data_in_leaf", 10, 200),
+        "min_sum_hessian_in_leaf": trial.suggest_float("min_sum_hessian_in_leaf", 0.1, 50),
     }
 
     cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=123)
@@ -623,13 +641,13 @@ def runfalsealarmpipeline(ferrets, optimization=False, ferret_as_feature=False):
 
     if optimization == False:
         # load the saved params
-        params = np.load('../optuna_results/falsealarm_optunaparams.npy', allow_pickle=True).item()
+        params = np.load('../optuna_results/falsealarm_optunaparams_2005.npy', allow_pickle=True).item()
     else:
         study = run_optuna_study_falsealarm(resultingfa_df, resultingfa_df['falsealarm'].to_numpy(),
                                             ferret_as_feature=ferret_as_feature)
         print(study.best_params)
         params = study.best_params
-        np.save('../optuna_results/falsealarm_optunaparams.npy', study.best_params)
+        np.save('../optuna_results/falsealarm_optunaparams_2005.npy', study.best_params)
 
     resultingfa_df.to_csv(filepath)
 
@@ -981,7 +999,7 @@ if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
 
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(
-        ferrets, optimization=False, ferret_as_feature=True)
+        ferrets, optimization=True, ferret_as_feature=True)
     # ferrets = ['F2105_Clove']# 'F2105_Clove'
     # df_by_ferretdict = plot_reaction_times(ferrets)
     # #
