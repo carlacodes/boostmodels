@@ -385,19 +385,21 @@ def run_correct_responsepipeline(ferrets):
     filepath.parent.mkdir(parents=True, exist_ok=True)
     resultingcr_df.to_csv(filepath)
 
-    # df_intra = resultingcr_df[resultingcr_df['intra_trial_roving'] == 1]
-    # df_inter = resultingcr_df[resultingcr_df['inter_trial_roving'] == 1]
-    # df_control = resultingcr_df[resultingcr_df['control_trial'] == 1]
-    #
-    # if len(df_intra) > len(df_inter)*1.2:
-    #     df_intra = df_intra.sample(n=len(df_inter), random_state=42)
-    # elif len(df_inter) > len(df_intra)*1.2:
-    #     df_inter = df_inter.sample(n=len(df_intra), random_state=42)
-    #
-    # if len(df_control) > len(df_intra)*1.2:
-    #     df_control = df_control.sample(n=len(df_intra), random_state=42)
-    # elif len(df_control) > len(df_inter)*1.2:
-    #     df_control = df_control.sample(n=len(df_inter), random_state=42)
+    df_intra = resultingcr_df[resultingcr_df['intra_trial_roving'] == 1]
+    df_inter = resultingcr_df[resultingcr_df['inter_trial_roving'] == 1]
+    df_control = resultingcr_df[resultingcr_df['control_trial'] == 1]
+
+    if len(df_intra) > len(df_inter)*1.2:
+        df_intra = df_intra.sample(n=len(df_inter), random_state=42)
+    elif len(df_inter) > len(df_intra)*1.2:
+        df_inter = df_inter.sample(n=len(df_intra), random_state=42)
+
+    if len(df_control) > len(df_intra)*1.2:
+        df_control = df_control.sample(n=len(df_intra), random_state=42)
+    elif len(df_control) > len(df_inter)*1.2:
+        df_control = df_control.sample(n=len(df_inter), random_state=42)
+
+    resultingcr_df = pd.concat([df_control, df_intra, df_inter], axis = 0)
 
     # df_pitchtargsame = resultingcr_df[resultingcr_df['precur_and_targ_same'] == 1]
     # df_pitchtargdiff = resultingcr_df[resultingcr_df['precur_and_targ_same'] == 0]
@@ -409,18 +411,18 @@ def run_correct_responsepipeline(ferrets):
 
     df_miss = resultingcr_df[resultingcr_df['misslist'] == 1]
     df_nomiss = resultingcr_df[resultingcr_df['misslist'] == 0]
-    #subsample from the distribution of df_miss
-
-    #find the middle point between the length of df
-
-
+    # #subsample from the distribution of df_miss
+    #
+    # #find the middle point between the length of df
+    #
+    #
     if len(df_nomiss) > len(df_miss)*1.2:
         df_nomiss = df_nomiss.sample(n=len(df_miss), random_state=42)
     elif len(df_miss) > len(df_nomiss)*1.2:
         df_miss = df_miss.sample(n=len(df_nomiss), random_state=42)
 
     resultingcr_df = pd.concat([df_nomiss, df_miss], axis=0)
-    #
+    # #
     # #shuffle the rows
     # resultingcr_df = resultingcr_df.sample(frac=1).reset_index(drop=True)
 

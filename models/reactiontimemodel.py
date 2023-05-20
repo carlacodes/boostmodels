@@ -292,7 +292,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     # labels[5] = 'trial took place in AM'
     # labels[4] = 'past trial catch'
     # labels[3] = 'male/female talker'
-    # labels[2] = 'precursor = target pitch'
+    # labels[2] = 'precursor = target F0'
     # labels[1] = 'change in pitch value'
     # labels[0] = 'past trial was correct'
     #
@@ -336,24 +336,24 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     plt.savefig(fig_savedir /'targtimescolouredbytrialnumber.png', dpi=1000)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "precursor = target pitch"], color=shap_values2[:, "talker"], show=False, cmap = matplotlib.colormaps[cmapname])
+    shap.plots.scatter(shap_values2[:, "precursor = target F0"], color=shap_values2[:, "talker"], show=False, cmap = matplotlib.colormaps[cmapname])
     fig, ax = plt.gcf(), plt.gca()
     # Get colorbar
     cb_ax = fig.axes[1]
     # Modifying color bar parameters
     cb_ax.tick_params(labelsize=15)
-    cb_ax.set_ylabel("Trial number", fontsize=12)
+    cb_ax.set_ylabel("talker", fontsize=12)
     plt.ylabel('SHAP value', fontsize=10)
     if one_ferret:
         plt.title('Precursor = target F0 \n over reacton time impact for ' + ferrets, fontsize=18)
     else:
         plt.title('Precursor = target F0 over reaction time impact', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
-    plt.xlabel('Target presentation time', fontsize=16)
+    plt.xlabel('Precursor = target F0', fontsize=16)
     plt.savefig(fig_savedir /'pitchofprecur_equals_target_colouredbytalker.png', dpi=1000)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "pitch of target"], color=shap_values2[:, "precursor = target pitch"], show=False, cmap = matplotlib.colormaps[cmapname])
+    shap.plots.scatter(shap_values2[:, "pitch of target"], color=shap_values2[:, "precursor = target F0"], show=False, cmap = matplotlib.colormaps[cmapname])
     fig, ax = plt.gcf(), plt.gca()
     # Get colorbar
     cb_ax = fig.axes[1]
@@ -397,7 +397,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         plt.savefig( fig_savedir /'ferretcolouredbytargtimes.png', dpi=1000)
         plt.show()
         if ferret_as_feature:
-            shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "precursor = target pitch"], show=False,
+            shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "precursor = target F0"], show=False,
                                cmap=matplotlib.colormaps[cmapname])
             fig, ax = plt.gcf(), plt.gca()
             # Get colorbar
@@ -505,7 +505,7 @@ def extract_release_times_data(ferrets):
     dfuse = df[[ "pitchoftarg", "pastcatchtrial", "trialNum", "talker", "side", "precur_and_targ_same",
                 "timeToTarget",
                 "realRelReleaseTimes", "ferret", "pastcorrectresp"]]
-    labels = ['pitch of target', 'past trial was catch', 'trial number', 'talker', 'side of audio', 'precursor = target pitch', 'time to target', 'realRelReleaseTimes', 'ferret ID', 'past trial was correct']
+    labels = ['pitch of target', 'past trial was catch', 'trial number', 'talker', 'side of audio', 'precursor = target F0', 'time to target', 'realRelReleaseTimes', 'ferret ID', 'past trial was correct']
     dfuse = dfuse.rename(columns=dict(zip(dfuse.columns, labels)))
     return dfuse
 
