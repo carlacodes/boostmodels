@@ -406,7 +406,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
             plt.savefig(fig_savedir / 'ferretcolouredbyintratrialroving.png', dpi=1000)
             plt.show()
 
-        shap.plots.scatter(shap_values2[:, "side"], color=shap_values2[:, "ferret"], show=False,
+        shap.plots.scatter(shap_values2[:, "side of audio"], color=shap_values2[:, "ferret ID"], show=False,
                            cmap=matplotlib.colormaps[cmapname])
         fig, ax = plt.gcf(), plt.gca()
         # Get colorbar
@@ -420,7 +420,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         #            fontsize=15)
         plt.ylabel('SHAP value', fontsize=10)
 
-        plt.title('Ferret \n versus impact in predicted reacton time', fontsize=18)
+        plt.title('Ferret \n versus impact in predicted reaction time', fontsize=18)
 
         # plt.ylabel('SHAP value', fontsize=16)
         plt.xlabel('side', fontsize=16)
@@ -453,10 +453,10 @@ def extract_release_times_data(ferrets):
         df_control = df_control.sample(n=len(df_inter), random_state=123)
         
     df = pd.concat([df_intra, df_inter, df_control], axis = 0)
-    dfuse = df[["pitchoftarg", "pastcatchtrial", "trialNum", "talker", "side", "precur_and_targ_same",
+    dfuse = df[["pitchoftarg", "pastcatchtrial", "trialNum", "talker", "side of audio", "precur_and_targ_same",
                 "timeToTarget",
                 "realRelReleaseTimes", "ferret", "pastcorrectresp"]]
-    labels = ['pitch of target', 'past trial was catch', 'trial number', 'talker', 'side', 'precursor = target pitch', 'time to target', 'realRelReleaseTimes', 'ferret ID', 'past trial was correct']
+    labels = ['pitch of target', 'past trial was catch', 'trial number', 'talker', 'side of audio', 'precursor = target pitch', 'time to target', 'realRelReleaseTimes', 'ferret ID', 'past trial was correct']
     dfuse = dfuse.rename(columns=dict(zip(dfuse.columns, labels)))
     return dfuse
 
@@ -523,10 +523,10 @@ def run_correctrxntime_model_for_a_ferret(ferrets, optimization = False, ferret_
 def main():
     ferrets = ['F2105_Clove', 'F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    # run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature=True)
+    run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature=True)
 
-    for ferret in ferrets:
-        run_correctrxntime_model_for_a_ferret([ferret], optimization=False, ferret_as_feature=False)
+    # for ferret in ferrets:
+    #     run_correctrxntime_model_for_a_ferret([ferret], optimization=False, ferret_as_feature=False)
 
 
 
