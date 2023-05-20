@@ -33,19 +33,34 @@ def run_optuna_study_releasetimes(X, y):
     return study
 
 def objective_releasetimes(trial, X, y):
+    # param_grid = {
+    #     # "device_type": trial.suggest_categorical("device_type", ['gpu']),
+    # #     colsample_bytree = 0.3, learning_rate = 0.1,
+    # # max_depth = 10, alpha = 10, n_estimators = 10, random_state = 42, verbose = 1
+    #     "colsample_bytree": trial.suggest_float("colsample_bytree", 0.1, 0.6),
+    #     "alpha": trial.suggest_float("alpha", 5, 15),
+    #     "n_estimators": trial.suggest_int("n_estimators", 2, 100, step=2),
+    #     "learning_rate": trial.suggest_float("learning_rate", 0.01, 0.3),
+    #     "max_depth": trial.suggest_int("max_depth", 5, 20),
+    #     "bagging_fraction": trial.suggest_float(
+    #         "bagging_fraction", 0.1, 0.95, step=0.1
+    #     ),
+    #     "bagging_freq": trial.suggest_int("bagging_freq", 0, 30, step=1),
+    # }
     param_grid = {
-        # "device_type": trial.suggest_categorical("device_type", ['gpu']),
-    #     colsample_bytree = 0.3, learning_rate = 0.1,
-    # max_depth = 10, alpha = 10, n_estimators = 10, random_state = 42, verbose = 1
-        "colsample_bytree": trial.suggest_float("colsample_bytree", 0.1, 0.6),
+        "colsample_bytree": trial.suggest_float("colsample_bytree", 0.1, 1.0),
         "alpha": trial.suggest_float("alpha", 5, 15),
-        "n_estimators": trial.suggest_int("n_estimators", 2, 100, step=2),
-        "learning_rate": trial.suggest_float("learning_rate", 0.01, 0.3),
+        "n_estimators": trial.suggest_int("n_estimators", 50, 300, step=10),
+        "learning_rate": trial.suggest_float("learning_rate", 0.001, 0.3),
         "max_depth": trial.suggest_int("max_depth", 5, 20),
-        "bagging_fraction": trial.suggest_float(
-            "bagging_fraction", 0.1, 0.95, step=0.1
-        ),
-        "bagging_freq": trial.suggest_int("bagging_freq", 0, 30, step=1),
+        "bagging_fraction": trial.suggest_float("bagging_fraction", 0.1, 1.0, step=0.1),
+        "bagging_freq": trial.suggest_int("bagging_freq", 0, 30),
+        "lambda": trial.suggest_float("lambda", 0.0, 0.5),
+        "subsample": trial.suggest_float("subsample", 0.5, 1.0),
+        "min_child_samples": trial.suggest_int("min_child_samples", 1, 20),
+        "min_child_weight": trial.suggest_float("min_child_weight", 0.1, 10.0),
+        "gamma": trial.suggest_float("gamma", 0.0, 1.0),
+        "subsample_for_bin": trial.suggest_int("subsample_for_bin", 100, 10000, step=100),
     }
 
     cv = KFold(n_splits=5, shuffle=True, random_state=42)
@@ -463,23 +478,31 @@ def extract_release_times_data(ferrets):
     df = behaviouralhelperscg.get_df_behav(ferrets=ferrets, includefaandmiss=False, startdate='04-01-2020', finishdate='01-03-2023')
     #switch talker values so 1 is 2, and 2 is 1 simultaneously
     df['talker'] = df['talker'].replace({1: 2, 2: 1})
+    #
+    # df_intra = df[df['intra_trial_roving'] == 1]
+    # df_inter = df[df['inter_trial_roving'] == 1]
+    # df_control = df[df['control_trial'] == 1]
+    #
+    # if len(df_intra) > len(df_inter)*1.2:
+    #     df_intra = df_intra.sample(n=len(df_inter), random_state=123)
+    # elif len(df_inter) > len(df_intra)*1.2:
+    #     df_inter = df_inter.sample(n=len(df_intra), random_state=123)
+    #
+    # if len(df_control) > len(df_intra)*1.2:
+    #     df_control = df_control.sample(n=len(df_intra), random_state=123)
+    # elif len(df_control) > len(df_inter)*1.2:
+    #     df_control = df_control.sample(n=len(df_inter), random_state=123)
+    #
 
-    df_intra = df[df['intra_trial_roving'] == 1]
-    df_inter = df[df['inter_trial_roving'] == 1]
-    df_control = df[df['control_trial'] == 1]
-
-    if len(df_intra) > len(df_inter)*1.2:
-        df_intra = df_intra.sample(n=len(df_inter), random_state=123)
-    elif len(df_inter) > len(df_intra)*1.2:
-        df_inter = df_inter.sample(n=len(df_intra), random_state=123)
-
-    if len(df_control) > len(df_intra)*1.2:
-        df_control = df_control.sample(n=len(df_intra), random_state=123)
-    elif len(df_control) > len(df_inter)*1.2:
-        df_control = df_control.sample(n=len(df_inter), random_state=123)
-        
-    df = pd.concat([df_intra, df_inter, df_control], axis = 0)
-    dfuse = df[["pitchoftarg", "pastcatchtrial", "trialNum", "talker", "side", "precur_and_targ_same",
+    df_pitchtargsame = df[df['precur_and_targ_same'] == 1]
+    df_pitchtargdiff = df[df['precur_and_targ_same'] == 0]
+    if len(df_pitchtargsame) > len(df_pitchtargdiff)*1.2:
+        df_pitchtargsame = df_pitchtargsame.sample(n=len(df_pitchtargdiff), random_state=123)
+    elif len(df_pitchtargdiff) > len(df_pitchtargsame)*1.2:
+        df_pitchtargdiff = df_pitchtargdiff.sample(n=len(df_pitchtargsame), random_state=123)
+    df = pd.concat([df_pitchtargsame, df_pitchtargdiff], axis = 0)
+    # df = pd.concat([df_intra, df_inter, df_control], axis = 0)
+    dfuse = df[[ "pitchoftarg", "pastcatchtrial", "trialNum", "talker", "side", "precur_and_targ_same",
                 "timeToTarget",
                 "realRelReleaseTimes", "ferret", "pastcorrectresp"]]
     labels = ['pitch of target', 'past trial was catch', 'trial number', 'talker', 'side of audio', 'precursor = target pitch', 'time to target', 'realRelReleaseTimes', 'ferret ID', 'past trial was correct']
@@ -549,7 +572,7 @@ def run_correctrxntime_model_for_a_ferret(ferrets, optimization = False, ferret_
 def main():
     ferrets = ['F2105_Clove', 'F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature=True)
+    run_correctrxntime_model(ferrets, optimization = True, ferret_as_feature=True)
 
     # for ferret in ferrets:
     #     run_correctrxntime_model_for_a_ferret([ferret], optimization=False, ferret_as_feature=False)

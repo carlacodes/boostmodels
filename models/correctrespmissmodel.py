@@ -146,12 +146,18 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
         dfx = df_to_use.loc[:, df_to_use.columns != col]
         if optimization == False:
             # load the saved params
-            paramsinput = np.load('../optuna_results/correctresponse_optunaparams.npy', allow_pickle=True).item()
+            if one_ferret:
+                paramsinput = np.load('../optuna_results/correctresponse_optunaparams_2005'+ferrets+'.npy', allow_pickle=True).item()
+            else:
+                paramsinput = np.load('../optuna_results/correctresponse_optunaparams_2005.npy', allow_pickle=True).item()
         else:
             study = run_optuna_study_correctresp(dfx.to_numpy(), df_to_use['misslist'].to_numpy())
             print(study.best_params)
             paramsinput = study.best_params
-            np.save('../optuna_results/correctresponse_optunaparams.npy', study.best_params)
+            if one_ferret:
+                np.save('../optuna_results/correctresponse_optunaparams_2005'+ferrets+'.npy', study.best_params)
+            else:
+                np.save('../optuna_results/correctresponse_optunaparams_2005.npy', study.best_params)
 
 
 
@@ -379,24 +385,27 @@ def run_correct_responsepipeline(ferrets):
     filepath.parent.mkdir(parents=True, exist_ok=True)
     resultingcr_df.to_csv(filepath)
 
-    df_intra = resultingcr_df[resultingcr_df['intra_trial_roving'] == 1]
-    df_inter = resultingcr_df[resultingcr_df['inter_trial_roving'] == 1]
-    df_control = resultingcr_df[resultingcr_df['control_trial'] == 1]
+    # df_intra = resultingcr_df[resultingcr_df['intra_trial_roving'] == 1]
+    # df_inter = resultingcr_df[resultingcr_df['inter_trial_roving'] == 1]
+    # df_control = resultingcr_df[resultingcr_df['control_trial'] == 1]
+    #
+    # if len(df_intra) > len(df_inter)*1.2:
+    #     df_intra = df_intra.sample(n=len(df_inter), random_state=42)
+    # elif len(df_inter) > len(df_intra)*1.2:
+    #     df_inter = df_inter.sample(n=len(df_intra), random_state=42)
+    #
+    # if len(df_control) > len(df_intra)*1.2:
+    #     df_control = df_control.sample(n=len(df_intra), random_state=42)
+    # elif len(df_control) > len(df_inter)*1.2:
+    #     df_control = df_control.sample(n=len(df_inter), random_state=42)
 
-    if len(df_intra) > len(df_inter)*1.2:
-        df_intra = df_intra.sample(n=len(df_inter), random_state=42)
-    elif len(df_inter) > len(df_intra)*1.2:
-        df_inter = df_inter.sample(n=len(df_intra), random_state=42)
-
-    if len(df_control) > len(df_intra)*1.2:
-        df_control = df_control.sample(n=len(df_intra), random_state=42)
-    elif len(df_control) > len(df_inter)*1.2:
-        df_control = df_control.sample(n=len(df_inter), random_state=42)
-
-    #then reconcatenate the three dfs
-    #reconcatenate the three dfs but preserve the order of the rows:
-
-    resultingcr_df = pd.concat([df_intra, df_inter, df_control], axis=0)
+    df_pitchtargsame = resultingcr_df[resultingcr_df['precur_and_targ_same'] == 1]
+    df_pitchtargdiff = resultingcr_df[resultingcr_df['precur_and_targ_same'] == 0]
+    if len(df_pitchtargsame) > len(df_pitchtargdiff)*1.2:
+        df_pitchtargsame = df_pitchtargsame.sample(n=len(df_pitchtargdiff), random_state=123)
+    elif len(df_pitchtargdiff) > len(df_pitchtargsame)*1.2:
+        df_pitchtargdiff = df_pitchtargdiff.sample(n=len(df_pitchtargsame), random_state=123)
+    resultingcr_df = pd.concat([df_pitchtargsame, df_pitchtargdiff], axis = 0)
 
     df_miss = resultingcr_df[resultingcr_df['misslist'] == 1]
     df_nomiss = resultingcr_df[resultingcr_df['misslist'] == 0]
