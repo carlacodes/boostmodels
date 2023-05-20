@@ -414,6 +414,9 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
 
 def extract_release_times_data(ferrets):
     df = behaviouralhelperscg.get_df_behav(ferrets=ferrets, includefaandmiss=False, startdate='04-01-2020', finishdate='01-03-2023')
+    #switch talker values so 1 is 2, and 2 is 1 simultaneously
+    df['talker'] = df['talker'].replace({1: 2, 2: 1})
+
     df_intra = df[df['intra_trial_roving'] == 1]
     df_inter = df[df['inter_trial_roving'] == 1]
     df_control = df[df['control_trial'] == 1]
@@ -480,19 +483,20 @@ def run_correctrxntime_model_for_a_ferret(ferrets, optimization = False, ferret_
         col2 = 'ferret'
         dfx = dfx.loc[:, dfx.columns != col2]
         if optimization == False:
-            best_params = np.load('optuna_results/best_paramsreleastimemodel_'+ ferrets[0]+ '.npy', allow_pickle=True).item()
+            best_params = np.load('D:\mixedeffectmodelsbehavioural\optuna_results/best_paramsreleastimemodel_'+ ferrets[0]+ '.npy', allow_pickle=True).item()
         else:
             best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
             best_params = best_study_results.best_params
-            np.save('optuna_results/best_paramsreleastimemodel_'+ ferrets[0]+ '.npy', best_params)
+            np.save('D:\mixedeffectmodelsbehavioural\optuna_results/best_paramsreleastimemodel_'+ ferrets[0]+ '.npy', best_params)
     else:
         dfx = dfx
         if optimization == False:
-            best_params = np.load('optuna_results/best_paramsreleastimemodel_ferretasfeature_'+ '.npy', allow_pickle=True).item()
+            best_params = np.load('D:\mixedeffectmodelsbehavioural\optuna_results/best_paramsreleastimemodel_ferretasfeature_'+ '.npy', allow_pickle=True).item()
         else:
             best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
             best_params = best_study_results.best_params
-            np.save('optuna_results/best_paramsreleastimemodel_ferretasfeature_'+ '.npy', best_params)
+
+            np.save('D:\mixedeffectmodelsbehavioural\optuna_results/best_paramsreleastimemodel_ferretasfeature_'+ '.npy', best_params)
     xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx, df_use[col], paramsinput=best_params, ferret_as_feature=ferret_as_feature, one_ferret=True, ferrets=ferrets[0])
 
 
