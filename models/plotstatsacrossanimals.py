@@ -23,11 +23,8 @@ from sklearn.model_selection import train_test_split
 from helpers.behaviouralhelpersformodels import *
 from helpers.calculate_stats import *
 
-def run_stats_calc(stats_dict, pitch_param = 'control_trial'):
-    ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    df = behaviouralhelperscg.get_stats_df(ferrets=ferrets, startdate='04-01-2016',
+def run_stats_calc(df, ferrets, stats_dict, pitch_param = 'control_trial'):
 
-                                                             finishdate='01-03-2023')
     df_noncatchnoncorrection = df[(df['catchTrial'] == 0) & (df['correctionTrial'] == 0) & (df[pitch_param] == 1)]
     df_catchnoncorrection = df[(df['catchTrial'] == 1)]
     count = int(0)
@@ -49,10 +46,11 @@ def run_stats_calc(stats_dict, pitch_param = 'control_trial'):
     false_alarms = np.mean(df_noncatchnoncorrection['falsealarm'])
     correct_rejections = np.mean(df_catchnoncorrection['response'] == 3)
     stats_dict_all = {}
-    stats_dict_all[pitch_param]['hits'] = {}
+    stats_dict_all[pitch_param]= {}
     stats_dict_all[pitch_param]['hits'] = hits
     stats_dict_all[pitch_param]['false_alarms'] = {}
     stats_dict_all[pitch_param]['false_alarms'] = false_alarms
+    stats_dict_all[pitch_param]['correct_rejections'] = correct_rejections
 
     return stats_dict_all, stats_dict
 
@@ -72,5 +70,11 @@ def plot_stats(stats_dict_all, stats_dict):
 
 if __name__ == '__main__':
     stats_dict = {}
+    ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
+    df = behaviouralhelperscg.get_stats_df(ferrets=ferrets, startdate='04-01-2016',
 
-    run_stats_calc(stats_dict, pitch_param='inter_trial_roving')
+                                                             finishdate='01-03-2023')
+
+    pitch_type_list = ['control_trial', 'inter_trial_roving', 'intra_trial_roving']
+    for pitch in pitch_type_list:
+        stats_dict_all, stats_dict =  run_stats_calc(df, ferrets, stats_dict, pitch_param=pitch)
