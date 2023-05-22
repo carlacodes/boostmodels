@@ -26,8 +26,8 @@ from helpers.behaviouralhelpersformodels import *\
 def main():
     ferrets = ['F2105_Clove', 'F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
 
-    resultingdf = behaviouralhelperscg.get_reactiontime_data(ferrets=ferrets, startdate='04-01-2020',
-                                                             finishdate='01-10-2022')
+    df = behaviouralhelperscg.get_stats_df(ferrets=ferrets, startdate='04-01-2020',
+                                                             finishdate='01-03-2023')
 
 
 
