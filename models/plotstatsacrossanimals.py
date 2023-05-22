@@ -29,6 +29,9 @@ def main():
     df = behaviouralhelperscg.get_stats_df(ferrets=ferrets, startdate='04-01-2020',
                                                              finishdate='01-03-2023')
 
+    #get proportion of hits and false alarms for the dataframe
+
+
 
 
 if __name__ == '__main__':
