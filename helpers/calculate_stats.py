@@ -90,7 +90,7 @@ class CalculateStats:
         stats['correcTrialFracL'] = correctionTrialFracL
         stats['correctionTrialFrac'] = correctionTrialFrac
 
-        stats['hits'] = np.mean([(t >= 0 + absentTime) & (t <= 2) for t in dataNonCorrectionNonCatch['realRelReleaseTimes']])
+        stats['hits'] = np.mean([(t >= 0 ) & (t <= 2) for t in dataNonCorrectionNonCatch['realRelReleaseTimes']])
         stats['nTrialsForHits'] = len(dataNonCorrectionNonCatch)
         stats['leftHits'] = np.mean([(t >= 0 + absentTime) & (t <= 2) for t in dataLeftNonCorrNonCatch['realRelReleaseTimes']])
         stats['rightHits'] = np.mean(
