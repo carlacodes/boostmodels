@@ -1,6 +1,21 @@
-
+import pandas as pd
+import numpy as np
+import math
+from scipy.stats import norm
 
 class CalculateStats:
+
+    def dprime(pHit, pFA):
+
+        # Convert to Z scores
+        zHit = norm.ppf(pHit)
+        zFA = norm.ppf(pFA)
+
+        # Calculate d-prime
+        d = zHit - zFA
+
+        return d
+
     def get_stats(currData,
                  respTimeWind=[],
                  TargTimeWind=[],
