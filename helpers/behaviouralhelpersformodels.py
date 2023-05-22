@@ -823,11 +823,12 @@ class behaviouralhelperscg():
             pitchoftarg = []
             pitchofprecur = []
             talkerlist2 = np.empty(len(pitchshiftmat))
-
             falsealarm = np.empty(shape=(0, 0))
             correctresp = np.empty(shape=(0, 0))
-            pastcorrectresp = np.empty(shape=(0, 0))
-            pastcatchtrial = np.empty(shape=(0, 0))
+
+            #classify hits as realRelRelease times between 0 and 2s
+            newdata['hit'] = (newdata['realRelReleaseTimes'] >= 0) & (newdata['realRelReleaseTimes'] <= 2)
+
 
 
             for i in range(0, len(newdata['realRelReleaseTimes'].values)):
@@ -915,8 +916,7 @@ class behaviouralhelperscg():
             newdata['pitchofprecur'] = pitchofprecur
 
             falsealarm = falsealarm.astype(int)
-            pastcatchtrial = pastcatchtrial.astype(int)
-            pastcorrectresp = pastcorrectresp.astype(int)
+
 
             newdata['falsealarm'] = falsealarm.tolist()
             newdata['intra_trial_roving'] = intra_trial_roving

@@ -41,9 +41,9 @@ class CalculateStats:
         currData['targTimes'] = currData['timeToTarget'] / fs
 
         currData['centreRelease'] = currData['lickRelease'] - currData['startTrialLick']
-        currData['relReleaseTimes'] = currData['centreRelease'] - currData['targTimes']
-        currData['realRelReleaseTimes'] = currData['relReleaseTimes'] - currData['absentTime']
-        # currData['relReleaseTimes'] = currData['realRelReleaseTimes']
+        currData['realRelReleaseTimes'] = currData['centreRelease'] - currData['targTimes']
+        currData['realRelReleaseTimes'] = currData['realRelReleaseTimes'] - currData['absentTime']
+        # currData['realRelReleaseTimes'] = currData['realRelReleaseTimes']
 
         dataNonCorrectionNonCatch = currData[(currData['correctionTrial'] != 1)
                                              & (currData['catchTrial'] != 1)]
@@ -71,54 +71,54 @@ class CalculateStats:
         np.histogram(dataTimesClean['targTimes'], bins=stats['timing']['edges1'])[0]
 
         if not TargTimeWind:
-            stats['timing']['edges2'] = np.arange(-np.ceil(max(abs(dataTimesClean['relReleaseTimes']))),
-                                                  np.ceil(max(abs(dataTimesClean['relReleaseTimes']))) + 0.1, 0.1).round(1)
+            stats['timing']['edges2'] = np.arange(-np.ceil(max(abs(dataTimesClean['realRelReleaseTimes']))),
+                                                  np.ceil(max(abs(dataTimesClean['realRelReleaseTimes']))) + 0.1, 0.1).round(1)
         else:
             stats['timing']['edges2'] = np.linspace(TargTimeWind[0], TargTimeWind[1], int((TargTimeWind[1] + 0.2) / 0.2))
 
         stats['timing']['releaseTimeDistribution'] = \
-        np.histogram(dataTimesClean['relReleaseTimes'] - dataTimesClean['absentTime'], bins=stats['timing']['edges2'])[0]
+        np.histogram(dataTimesClean['realRelReleaseTimes'] - dataTimesClean['absentTime'], bins=stats['timing']['edges2'])[0]
         timeInds = np.digitize(dataTimesClean['targTimes'], stats['timing']['edges1'])
         stats['timing']['binProb'] = {}
         for i in range(len(stats['timing']['edges1'])):
             tempInds = np.where(timeInds == i)
             stats['timing']['binProb'][i] = np.mean(
-                [(k > 0) & (k < 2) for k in dataTimesClean['relReleaseTimes'].iloc[tempInds]])
+                [(k > 0) & (k < 2) for k in dataTimesClean['realRelReleaseTimes'].iloc[tempInds]])
 
         # Calculate hits, false alarms and correct rejections
         stats['correcTrialFracR'] = correctionTrialFracR
         stats['correcTrialFracL'] = correctionTrialFracL
         stats['correctionTrialFrac'] = correctionTrialFrac
 
-        stats['hits'] = np.mean([(t >= 0 + absentTime) & (t <= 2) for t in dataNonCorrectionNonCatch['relReleaseTimes']])
+        stats['hits'] = np.mean([(t >= 0 + absentTime) & (t <= 2) for t in dataNonCorrectionNonCatch['realRelReleaseTimes']])
         stats['nTrialsForHits'] = len(dataNonCorrectionNonCatch)
-        stats['leftHits'] = np.mean([(t >= 0 + absentTime) & (t <= 2) for t in dataLeftNonCorrNonCatch['relReleaseTimes']])
+        stats['leftHits'] = np.mean([(t >= 0 + absentTime) & (t <= 2) for t in dataLeftNonCorrNonCatch['realRelReleaseTimes']])
         stats['rightHits'] = np.mean(
-            [(t >= 0 + absentTime) & (t <= 2) for t in dataRightNonCorrNonCatch['relReleaseTimes']])
+            [(t >= 0 + absentTime) & (t <= 2) for t in dataRightNonCorrNonCatch['realRelReleaseTimes']])
         stats['firstTalkerHits'] = np.mean([(t >= 0 + absentTime) & (t <= 2) for t in
                                             dataNonCorrectionNonCatch[dataNonCorrectionNonCatch['talker'] == 1][
-                                                'relReleaseTimes']])
+                                                'realRelReleaseTimes']])
         stats['secondTalkerHits'] = np.mean([(t >= 0 + absentTime) & (t <= 2) for t in
                                              dataNonCorrectionNonCatch[dataNonCorrectionNonCatch['talker'] == 2][
-                                                 'relReleaseTimes']])
+                                                 'realRelReleaseTimes']])
 
         dataHits = dataNonCorrectionNonCatch[
-            (dataNonCorrectionNonCatch['relReleaseTimes'] >= 0) & (dataNonCorrectionNonCatch['relReleaseTimes'] <= 2)]
+            (dataNonCorrectionNonCatch['realRelReleaseTimes'] >= 0) & (dataNonCorrectionNonCatch['realRelReleaseTimes'] <= 2)]
         stats['correctLateralisation'] = np.mean(
             [response == side for (response, side) in zip(dataHits['response'], dataHits['side'])])
         stats['lateralhits'] = np.mean([response == side for (response, side) in
                                         zip(dataNonCorrectionNonCatch['response'], dataNonCorrectionNonCatch['side'])])
-        stats['bufferhits'] = np.mean([t == np.inf for t in dataCatchNonCorr['relReleaseTimes']])
+        stats['bufferhits'] = np.mean([t == np.inf for t in dataCatchNonCorr['realRelReleaseTimes']])
         stats['catchtrialFA'] = np.mean([t != np.inf for t in dataCatchNonCorr['lickRelease']])
         stats['nTrialsForCatchTrialFA'] = len(dataCatchNonCorr)
 
-        stats['allHits'] = np.mean([not (math.isnan(t)) for t in dataNonCorrectionNonCatch['relReleaseTimes']])
-        stats['allFA'] = np.mean(currData.loc[currData['response'] == 5, 'relReleaseTimes'])
+        stats['allHits'] = np.mean([not (math.isnan(t)) for t in dataNonCorrectionNonCatch['realRelReleaseTimes']])
+        stats['allFA'] = np.mean(currData.loc[currData['response'] == 5, 'realRelReleaseTimes'])
         stats['midFA'] = np.mean(
-            [(t - absentTime >= -2) & (t - absentTime < 0) for t in dataNonCorrectionNonCatch['relReleaseTimes']])
+            [(t - absentTime >= -2) & (t - absentTime < 0) for t in dataNonCorrectionNonCatch['realRelReleaseTimes']])
         stats['badhits'] = math.nan
-        # stats['firstTalkerCatchFA']=np.mean([(t>=-2)&(t<0) for t in dataCatchNonCorr[dataCatchNonCorr['talker']==1]['relReleaseTimes']])
-        # stats['secondTalkerCatchFA']=np.mean([(t>=-2)&(t<0) for t in dataCatchNonCorr[dataCatchNonCorr['talker']==2]['relReleaseTimes']])
+        # stats['firstTalkerCatchFA']=np.mean([(t>=-2)&(t<0) for t in dataCatchNonCorr[dataCatchNonCorr['talker']==1]['realRelReleaseTimes']])
+        # stats['secondTalkerCatchFA']=np.mean([(t>=-2)&(t<0) for t in dataCatchNonCorr[dataCatchNonCorr['talker']==2]['realRelReleaseTimes']])
         stats['firstTalkerCatchFA'] = np.mean(
             [t != np.inf for t in dataCatchNonCorr[dataCatchNonCorr['talker'] == 1]['lickRelease']])
         stats['secondTalkerCatchFA'] = np.mean(
