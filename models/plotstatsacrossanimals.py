@@ -32,12 +32,18 @@ def run_stats_calc(stats_dict, pitch_param = 'control_trial'):
     df_noncatchnoncorrection = df[(df['catchTrial'] == 0) & (df['correctionTrial'] == 0) & (df[pitch_param] == 1)]
     df_catchnoncorrection = df[(df['catchTrial'] == 1) & (df['correctionTrial'] == 0) & (df[pitch_param] == 1)]
     count = 0
+
+    stats_dict[pitch_param]['hits'] = {}
+    stats_dict[pitch_param]['false_alarms'] = {}
+    stats_dict[pitch_param]['correct_rejections'] = {}
     for ferret in ferrets:
 
         selected_ferret = df_noncatchnoncorrection[df_noncatchnoncorrection['ferret'] == count]
-        stats_dict[pitch_param]['hits'][ferret] = np.mean(df_noncatchnoncorrection['hit'])
-        stats_dict[pitch_param]['false_alarms'][ferret] = np.mean(df_noncatchnoncorrection['falsealarm'])
-        stats_dict[pitch_param]['correct_rejections'][ferret] = np.mean(df_catchnoncorrection['response'] == 3)
+        selected_ferret_catch = df_catchnoncorrection[df_catchnoncorrection['ferret'] == count]
+
+        stats_dict[pitch_param]['hits'][ferret] = np.mean(selected_ferret['hit'])
+        stats_dict[pitch_param]['false_alarms'][ferret] = np.mean(selected_ferret['falsealarm'])
+        stats_dict[pitch_param]['correct_rejections'][ferret] = np.mean(selected_ferret_catch['response'] == 3)
         count += 1
 
     hits = np.mean(df_noncatchnoncorrection['hit'])
