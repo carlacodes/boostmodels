@@ -142,57 +142,6 @@ class CalculateStats:
                     tempData = dataNonCorrectionNonCatch[dataNonCorrectionNonCatch['currAtten'] > 0]
                     tempDataCatch = dataCatchNonCorr[dataCatchNonCorr['currAtten'] > 0]
 
-                noisebreakdown[atten] = {}
-                for noise in np.unique(dataNonCorrectionTrial['noiseType']):
-                    noisebreakdown[atten][noise] = {}
-                    for noiseAtten in np.unique(dataNonCorrectionTrial['currNoiseAtten']):
-                        if noiseAtten < silenceThresh:
-                            noisebreakdown[atten][noise][noiseAtten] = {}
-                            tempDataNoise = tempData[
-                                (tempData['noiseType'] == noise) & (tempData['currNoiseAtten'] == noiseAtten)]
-                            tempDataNoiseCatch = tempDataCatch[
-                                (tempDataCatch['noiseType'] == noise) & (tempDataCatch['currNoiseAtten'] == noiseAtten)]
-
-                            noisebreakdown[atten][noise][noiseAtten]['hits'] = np.mean(
-                                [(t - absentTime >= 0) & (t <= 2) for t in tempDataNoise['relReleaseTimes']])
-                            noisebreakdown[atten][noise][noiseAtten]['nbforhits'] = len(tempDataNoise)
-                            noisebreakdown[atten][noise][noiseAtten]['catchtrialFA'] = np.mean(
-                                [(t - absentTime >= -2) & (t - absentTime < 0) for t in
-                                 tempDataNoiseCatch['realRelReleaseTimes']])
-                            noisebreakdown[atten][noise][noiseAtten]['nbforcatchtrialFA'] = len(tempDataNoiseCatch)
-
-                tempdataSilence = tempData[tempData['currNoiseAtten'] >= silenceThresh]
-                tempdataSilenceCatch = tempDataCatch[tempDataCatch['currNoiseAtten'] >= silenceThresh]
-
-                noisebreakdown[atten]['Silence'] = {}
-                noisebreakdown[atten]['Silence']['hits'] = np.mean(
-                    [(t - absentTime >= 0) & (t <= 2) for t in tempdataSilence['realRelReleaseTimes']])
-                noisebreakdown[atten]['Silence']['nbforhits'] = len(tempdataSilence)
-                noisebreakdown[atten]['Silence']['catchtrialFA'] = np.mean(
-                    [(t - absentTime >= -2) & (t - absentTime < 0) for t in tempdataSilenceCatch['realRelReleaseTimes']])
-                noisebreakdown[atten]['Silence']['nbforcatchtrialFA'] = len(tempdataSilenceCatch)
-
-            stats['noisebreakdown'] = noisebreakdown
-
-            dataNoiseNonAtten = dataNonCorrectionNonCatch[
-                (dataNonCorrectionNonCatch['currNoiseAtten'] <= 60) & (dataNonCorrectionNonCatch['currAtten'] == 0)]
-            dataNoiseAtten = dataNonCorrectionNonCatch[
-                (dataNonCorrectionNonCatch['currNoiseAtten'] <= 60) & (dataNonCorrectionNonCatch['currAtten'] != 0)]
-            dataNoiseNonAttenCatch = dataCatchNonCorr[
-                (dataCatchNonCorr['currNoiseAtten'] <= 60) & (dataCatchNonCorr['currAtten'] == 0)]
-            dataNoiseAttenCatch = dataCatchNonCorr[
-                (dataCatchNonCorr['currNoiseAtten'] <= 60) & (dataCatchNonCorr['currAtten'] != 0)]
-
-            dataNonNoiseNonAtten = dataNonCorrectionNonCatch[
-                (dataNonCorrectionNonCatch['currNoiseAtten'] > 60) & (dataNonCorrectionNonCatch['currAtten'] == 0)]
-            dataNonNoiseAtten = dataNonCorrectionNonCatch[
-                (dataNonCorrectionNonCatch['currNoiseAtten'] > 60) & (dataNonCorrectionNonCatch['currAtten'] != 0)]
-            dataNonNoiseNonAttenCatch = dataCatchNonCorr[
-                (dataCatchNonCorr['currNoiseAtten'] > 60) & (dataCatchNonCorr['currAtten'] == 0)]
-            dataNonNoiseAttenCatch = dataCatchNonCorr[
-                (dataCatchNonCorr['currNoiseAtten'] > 60) & (dataCatchNonCorr['currAtten'] != 0)]
-
-         
 
 
         # std error for hits
