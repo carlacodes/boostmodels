@@ -25,14 +25,13 @@ from helpers.calculate_stats import *
 
 def run_stats_calc(stats_dict, pitch_param = 'control_trial'):
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-
-    df = behaviouralhelperscg.get_stats_df(ferrets=ferrets, startdate='04-01-2020',
+    df = behaviouralhelperscg.get_stats_df(ferrets=ferrets, startdate='04-01-2016',
 
                                                              finishdate='01-03-2023')
     df_noncatchnoncorrection = df[(df['catchTrial'] == 0) & (df['correctionTrial'] == 0) & (df[pitch_param] == 1)]
-    df_catchnoncorrection = df[(df['catchTrial'] == 1) & (df['correctionTrial'] == 0) & (df[pitch_param] == 1)]
-    count = 0
-
+    df_catchnoncorrection = df[(df['catchTrial'] == 1)]
+    count = int(0)
+    stats_dict[pitch_param] = {}
     stats_dict[pitch_param]['hits'] = {}
     stats_dict[pitch_param]['false_alarms'] = {}
     stats_dict[pitch_param]['correct_rejections'] = {}
@@ -49,7 +48,17 @@ def run_stats_calc(stats_dict, pitch_param = 'control_trial'):
     hits = np.mean(df_noncatchnoncorrection['hit'])
     false_alarms = np.mean(df_noncatchnoncorrection['falsealarm'])
     correct_rejections = np.mean(df_catchnoncorrection['response'] == 3)
-    stats = CalculateStats.get_stats(df)
+    stats_dict_all = {}
+    stats_dict_all[pitch_param]['hits'] = {}
+    stats_dict_all[pitch_param]['hits'] = hits
+    stats_dict_all[pitch_param]['false_alarms'] = {}
+    stats_dict_all[pitch_param]['false_alarms'] = false_alarms
+
+    return stats_dict_all, stats_dict
+
+def plot_stats(stats_dict_all, stats_dict):
+
+
 
 
     #get proportion of hits and false alarms for the dataframe
