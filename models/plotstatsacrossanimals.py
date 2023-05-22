@@ -20,14 +20,19 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import sklearn
 from sklearn.model_selection import train_test_split
-from helpers.behaviouralhelpersformodels import *\
-
+from helpers.behaviouralhelpersformodels import *
+from helpers.calculate_stats import *
 
 def main():
     ferrets = ['F2105_Clove', 'F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
 
     df = behaviouralhelperscg.get_stats_df(ferrets=ferrets, startdate='04-01-2020',
                                                              finishdate='01-03-2023')
+    stats = CalculateStats.get_stats(df)
+
+    #get proportion of hits and false alarms for the dataframe
+    fig, ax = plt.subplots()
+    sns.barplot(x='ferret', y='hits', hue='type', data=stats, ax=ax)
 
     #get proportion of hits and false alarms for the dataframe
 

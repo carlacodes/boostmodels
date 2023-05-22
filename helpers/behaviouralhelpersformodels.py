@@ -924,9 +924,7 @@ class behaviouralhelperscg():
             newdata['control_trial'] = control_trial
             newdata['correctresp'] = correctresp.tolist()
             newdata['distractor_or_fa'] = distractor_or_fa.tolist()
-            newdata['pastcorrectresp'] = pastcorrectresp.tolist()
             newdata['talker'] = talkerlist2.tolist()
-            newdata['pastcatchtrial'] = pastcatchtrial.tolist()
             newdata['stepval'] = stepval.tolist()
             newdata['timeToTarget'] = newdata['timeToTarget'] / 24414.0625
             newdata['AM'] = newdata['AM'].astype(int)
