@@ -123,10 +123,11 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
                 np.where(np.array(list(measurement.keys())) == talker)[0][0])  # Assign color based on label
             rects = ax.bar(offset, measurement_data['hits'], width, label=talker, color=color)
             #scatter plot the corresponding individual ferret data, each ferret is a different marker shape
-            marker_list = ['o', 'x', 'v', 's', 'p']
+            marker_list = ['o', 's', '<', 'd', "*"]
             count = 0
             for ferret, ferret_data in stats_dict_combined[attribute][talker]['hits'].items():
                 #add jitter to offset
+                print('ferret', ferret)
                 print('ferret data', ferret_data)
                 offset_jitter = offset + np.random.uniform(-0.05, 0.05)
                 ax.scatter(offset_jitter, ferret_data, color=color, marker=marker_list[count], edgecolors='black')
@@ -135,12 +136,13 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
             multiplier += 1
 
     plt.ylim(0, 1)
-    plt.legend(['control F0', 'inter F0', 'intra F0'])
+    plt.legend()
     plt.ylabel('Proportion of hits')
     plt.title('Proportion of hits across all ferrets')
     plt.show()
 
     fig, ax = plt.subplots(layout='constrained')
+    plt.xticks([0.25, 1.25], ['Female', 'Male'])
 
     color_map = plt.cm.get_cmap('tab10')  # Choose a colormap
 
@@ -169,8 +171,10 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
 
     plt.ylim(0, 1)
     plt.legend()
-    plt.ylabel('Proportion of hits')
-    plt.title('Proportion of hits across all ferrets')
+    plt.xticks([0.25, 1.25], ['Female', 'Male'])
+
+    plt.ylabel('Proportion of false alarms')
+    plt.title('Proportion of false alarms across all ferrets')
     plt.show()
 
 
@@ -194,6 +198,7 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
             count = 0
             for ferret, ferret_data in stats_dict_combined[attribute][talker]['correct_rejections'].items():
                 #add jitter to offset
+                print('ferret', ferret)
                 print('ferret data', ferret_data)
                 offset_jitter = offset + np.random.uniform(-0.05, 0.05)
                 ax.scatter(offset_jitter, ferret_data, color=color, marker=marker_list[count], edgecolors='black')
@@ -203,6 +208,8 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
 
     plt.ylim(0, 1)
     plt.legend()
+    plt.xticks([3.4, 4.2], ['Female', 'Male'])
+
     plt.ylabel('Proportion of correct rejections')
     plt.title('Proportion of correct rejections across all ferrets')
     plt.show()
