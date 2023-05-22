@@ -298,6 +298,24 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     plt.title('Pitch of the side of the booth \n versus impact in miss probability', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
     plt.xlabel('Side of audio presentation', fontsize=16)
+    plt.savefig(fig_dir / 'side_vs_precurpitch.png', dpi=1000, bbox_inches = "tight")
+    plt.show()
+
+
+    fig, ax = plt.subplots(figsize=(10, 10))
+    shap.plots.scatter(shap_values2[:, "precursor = target pitch"], color=shap_values2[:, "trial number"], ax=ax, cmap = cmapcustom, show = False)
+    fig, ax = plt.gcf(), plt.gca()
+    cb_ax = fig.axes[1]
+    # Modifying color bar parameters
+    cb_ax.tick_params(labelsize=15)
+    cb_ax.set_ylabel("precursor = target pitch word", fontsize=15)
+
+    plt.xticks([0, 1 ], labels = ['Precursor = target F0', ' Precursor ≠ target F0'], fontsize =15)
+    plt.ylabel('SHAP value', fontsize=10)
+    plt.title('Precusor = target F0 \n versus impact in miss probability', fontsize=18)
+    plt.ylabel('SHAP value', fontsize=16)
+    plt.xlabel('Side of audio presentation', fontsize=16)
+    plt.savefig(fig_dir / 'precursortargpitchintrialnumber.png', dpi=1000, bbox_inches = "tight")
     plt.show()
     #
     # shap.plots.scatter(shap_values2[:, "pitch of target"], color=shap_values2[:, "precursor = target pitch"], show=False, cmap = cmapcustom)
@@ -435,7 +453,7 @@ def run_correct_responsepipeline(ferrets):
         ferret_as_feature = True
 
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbcorrectrespornotwithoptuna(
-        resultingcr_df, optimization=True, ferret_as_feature = ferret_as_feature, one_ferret=one_ferret, ferrets=ferrets)
+        resultingcr_df, optimization=False, ferret_as_feature = ferret_as_feature, one_ferret=one_ferret, ferrets=ferrets)
     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
 
