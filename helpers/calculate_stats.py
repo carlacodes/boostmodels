@@ -1,10 +1,11 @@
 import pandas as pd
 import numpy as np
 import math
+
+from instruments.helpers.analysis_helpers import dprime
 from scipy.stats import norm
 
 class CalculateStats:
-
     def dprime(pHit, pFA):
 
         # Convert to Z scores
@@ -157,7 +158,7 @@ class CalculateStats:
                             noisebreakdown[atten][noise][noiseAtten]['nbforhits'] = len(tempDataNoise)
                             noisebreakdown[atten][noise][noiseAtten]['catchtrialFA'] = np.mean(
                                 [(t - absentTime >= -2) & (t - absentTime < 0) for t in
-                                 tempDataNoiseCatch['relReleaseTimes']])
+                                 tempDataNoiseCatch['realRelReleaseTimes']])
                             noisebreakdown[atten][noise][noiseAtten]['nbforcatchtrialFA'] = len(tempDataNoiseCatch)
 
                 tempdataSilence = tempData[tempData['currNoiseAtten'] >= silenceThresh]
@@ -165,17 +166,14 @@ class CalculateStats:
 
                 noisebreakdown[atten]['Silence'] = {}
                 noisebreakdown[atten]['Silence']['hits'] = np.mean(
-                    [(t - absentTime >= 0) & (t <= 2) for t in tempdataSilence['relReleaseTimes']])
+                    [(t - absentTime >= 0) & (t <= 2) for t in tempdataSilence['realRelReleaseTimes']])
                 noisebreakdown[atten]['Silence']['nbforhits'] = len(tempdataSilence)
                 noisebreakdown[atten]['Silence']['catchtrialFA'] = np.mean(
-                    [(t - absentTime >= -2) & (t - absentTime < 0) for t in tempdataSilenceCatch['relReleaseTimes']])
+                    [(t - absentTime >= -2) & (t - absentTime < 0) for t in tempdataSilenceCatch['realRelReleaseTimes']])
                 noisebreakdown[atten]['Silence']['nbforcatchtrialFA'] = len(tempdataSilenceCatch)
 
             stats['noisebreakdown'] = noisebreakdown
 
-            # Should be deleted and replaced by something more elegant
-            # But other functions (ExtractByParams for tracking behaviour weekly)
-            # are using this messy structure so it will do for now:
             dataNoiseNonAtten = dataNonCorrectionNonCatch[
                 (dataNonCorrectionNonCatch['currNoiseAtten'] <= 60) & (dataNonCorrectionNonCatch['currAtten'] == 0)]
             dataNoiseAtten = dataNonCorrectionNonCatch[
@@ -194,66 +192,8 @@ class CalculateStats:
             dataNonNoiseAttenCatch = dataCatchNonCorr[
                 (dataCatchNonCorr['currNoiseAtten'] > 60) & (dataCatchNonCorr['currAtten'] != 0)]
 
-            stats['hitNoiseNonAtten'] = np.mean([(t >= 0) & (t <= 2) for t in dataNoiseNonAtten['relReleaseTimes']])
-            stats['nbNoiseNonAtten'] = len(dataNoiseNonAtten)
+         
 
-            stats['hitNoiseAtten'] = np.mean([(t >= 0) & (t <= 2) for t in dataNoiseAtten['relReleaseTimes']])
-            stats['nbNoiseAtten'] = len(dataNoiseAtten)
-
-            stats['hitNonNoiseNonAtten'] = np.mean([(t >= 0) & (t <= 2) for t in dataNonNoiseNonAtten['relReleaseTimes']])
-            stats['nbNonNoiseNonAtten'] = len(dataNonNoiseNonAtten)
-            stats['FANonNoiseNonAtten'] = np.mean([t != np.inf for t in dataNonNoiseNonAttenCatch['lickRelease']])
-            stats['nbCatchNonNoiseNonAtten'] = len(dataNonNoiseNonAttenCatch)
-
-            stats['hitNonNoiseAtten'] = np.mean([(t >= 0) & (t <= 2) for t in dataNonNoiseAtten['relReleaseTimes']])
-            stats['nbNonNoiseAtten'] = len(dataNonNoiseAtten)
-            stats['FANonNoiseAtten'] = np.mean([t != np.inf for t in dataNonNoiseAttenCatch['lickRelease']])
-            stats['nbCatchNonNoiseAtten'] = len(dataNonNoiseAttenCatch)
-
-            # dataWhiteNoiseNonAtten = dataNoiseNonAtten[dataNoiseNonAtten['noiseType']=='WhiteNoise']
-            # dataWhiteNoiseAtten = dataNoiseAtten[dataNoiseAtten['noiseType']=='WhiteNoise']
-            # dataWhiteNoiseNonAttenCatch = dataNoiseNonAttenCatch[dataNoiseNonAttenCatch['noiseType']=='WhiteNoise']
-            # dataWhiteNoiseAttenCatch = dataNoiseAttenCatch[dataNoiseAttenCatch['noiseType']=='WhiteNoise']
-
-            # stats['hitWhiteNoiseNonAtten']=np.mean([(t>=0)&(t<=2) for t in dataWhiteNoiseNonAtten['relReleaseTimes']])
-            # stats['nbWhiteNoiseNonAtten']=len(dataWhiteNoiseNonAtten)
-            # stats['FAWhiteNoiseNonAtten']=np.mean([t!=np.inf for t in dataWhiteNoiseNonAttenCatch['lickRelease']])
-            # stats['nbCatchWhiteNoiseNonAtten']=len(dataWhiteNoiseNonAttenCatch)
-
-            # stats['hitWhiteNoiseAtten']=np.mean([(t>=0)&(t<=2) for t in dataWhiteNoiseAtten['relReleaseTimes']])
-            # stats['nbWhiteNoiseAtten']=len(dataWhiteNoiseAtten)
-            # stats['FAWhiteNoiseAtten']=np.mean([t!=np.inf for t in dataWhiteNoiseAttenCatch['lickRelease']])
-            # stats['nbCatchWhiteNoiseAtten']=len(dataWhiteNoiseAttenCatch)
-
-            # dataPinkNoiseNonAtten = dataNoiseNonAtten[dataNoiseNonAtten['noiseType']=='PinkNoise']
-            # dataPinkNoiseAtten = dataNoiseAtten[dataNoiseAtten['noiseType']=='PinkNoise']
-            # dataPinkNoiseNonAttenCatch = dataNoiseNonAttenCatch[dataNoiseNonAttenCatch['noiseType']=='PinkNoise']
-            # dataPinkNoiseAttenCatch = dataNoiseAttenCatch[dataNoiseAttenCatch['noiseType']=='PinkNoise']
-
-            # stats['hitPinkNoiseNonAtten']=np.mean([(t>=0)&(t<=2) for t in dataPinkNoiseNonAtten['relReleaseTimes']])
-            # stats['nbPinkNoiseNonAtten']=len(dataPinkNoiseNonAtten)
-            # stats['FAPinkNoiseNonAtten']=np.mean([t!=np.inf for t in dataPinkNoiseNonAttenCatch['lickRelease']])
-            # stats['nbCatchPinkNoiseNonAtten']=len(dataPinkNoiseNonAttenCatch)
-
-            # stats['hitPinkNoiseAtten']=np.mean([(t>=0)&(t<=2) for t in dataPinkNoiseAtten['relReleaseTimes']])
-            # stats['nbPinkNoiseAtten']=len(dataPinkNoiseAtten)
-            # stats['FAPinkNoiseAtten']=np.mean([t!=np.inf for t in dataPinkNoiseAttenCatch['lickRelease']])
-            # stats['nbCatchPinkNoiseAtten']=len(dataPinkNoiseAttenCatch)
-
-            # dataSSNNonAtten = dataNoiseNonAtten[dataNoiseNonAtten['noiseType']=='SSN']
-            # dataSSNAtten = dataNoiseAtten[dataNoiseAtten['noiseType']=='SSN']
-            # dataSSNNonAttenCatch = dataNoiseNonAttenCatch[dataNoiseNonAttenCatch['noiseType']=='SSN']
-            # dataSSNAttenCatch = dataNoiseAttenCatch[dataNoiseAttenCatch['noiseType']=='SSN']
-
-            # stats['hitSSNNonAtten']=np.mean([(t>=0)&(t<=2) for t in dataSSNNonAtten['relReleaseTimes']])
-            # stats['nbSSNNonAtten']=len(dataSSNNonAtten)
-            # stats['FASSNNonAtten']=np.mean([t!=np.inf for t in dataSSNNonAttenCatch['lickRelease']])
-            # stats['nbCatchSSNNonAtten']=len(dataSSNNonAttenCatch)
-
-            # stats['hitSSNAtten']=np.mean([(t>=0)&(t<=2) for t in dataSSNAtten['relReleaseTimes']])
-            # stats['nbSSNAtten']=len(dataSSNAtten)
-            # stats['FASSNAtten']=np.mean([t!=np.inf for t in dataSSNAttenCatch['lickRelease']])
-            # stats['nbCatchSSNAtten']=len(dataSSNAttenCatch)
 
         # std error for hits
         stats['stderrorhits'] = np.sqrt((stats['hits'] * (1 - stats['hits'])) / len(dataNonCorrectionNonCatch))
@@ -263,19 +203,18 @@ class CalculateStats:
         stats['stderrorcatchtrialFA'] = np.sqrt(
             (stats['catchtrialFA'] * (1 - stats['catchtrialFA'])) / len(dataCatchNonCorr))
 
-        stats['corrRej'] = np.mean([t == np.inf for t in dataCatchNonCorr['relReleaseTimes']])
+        stats['corrRej'] = np.mean([t == np.inf for t in dataCatchNonCorr['realRelReleaseTimes']])
 
-        # stats['d'] = dprime(stats['hits'],stats['allFA'])
         stats['MidD'] = dprime(stats['hits'], stats['midFA'])
         stats['d'] = dprime(stats['hits'], stats['catchtrialFA'])
-        # stats['alld'] = dprime(stats['allHits'],stats['allFA'])
 
-        out = [stats, currData['relReleaseTimes']]
+        out = [stats, currData['realRelReleaseTimes']]
 
         if returnhitTrials:
             hitTrials = dataNonCorrectionNonCatch[
-                (dataNonCorrectionNonCatch['relReleaseTimes'] >= 0) & (dataNonCorrectionNonCatch['relReleaseTimes'] <= 2)]
+                (dataNonCorrectionNonCatch['realRelReleaseTimes'] >= 0) & (dataNonCorrectionNonCatch['realRelReleaseTimes'] <= 2)]
             out.append(hitTrials)
 
         return (out)
+
 
