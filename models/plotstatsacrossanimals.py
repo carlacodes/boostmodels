@@ -30,6 +30,7 @@ def run_stats_calc(df, ferrets, stats_dict, pitch_param = 'control_trial'):
 
     df_noncatchnoncorrection = df[(df['catchTrial'] == 0) & (df['correctionTrial'] == 0) & (df[pitch_param] == 1)]
     df_catchnoncorrection = df[(df['catchTrial'] == 1) & (df['correctionTrial'] == 0) & (df[pitch_param] == 1)]
+    df_noncorrection = df[(df['correctionTrial'] == 0) & (df[pitch_param] == 1)]
     count = int(0)
     # stats_dict[pitch_param] = {}
     # stats_dict[pitch_param]['hits'] = {}
@@ -57,16 +58,18 @@ def run_stats_calc(df, ferrets, stats_dict, pitch_param = 'control_trial'):
 
         selected_ferret = df_noncatchnoncorrection[df_noncatchnoncorrection['ferret'] == count]
         selected_ferret_catch = df_catchnoncorrection[df_catchnoncorrection['ferret'] == count]
+        selected_ferret_all = df_noncorrection[df_noncorrection['ferret'] == count]
         for talker in talkers:
             selected_ferret_talker = selected_ferret[selected_ferret['talker'] == talker]
+            selected_ferret_all_talker = selected_ferret_all[selected_ferret_all['talker'] == talker]
 
             selected_ferret_talker_hitrate = selected_ferret_talker[selected_ferret_talker['response'] != 5]
 
             selected_ferret_catch_talker = selected_ferret_catch[selected_ferret_catch['talker'] == talker]
 
             stats_dict[talker][pitch_param]['hits'][ferret] = np.mean(selected_ferret_talker_hitrate['hit'])
-            stats_dict[talker][pitch_param]['false_alarms'][ferret] = np.mean(selected_ferret_talker['falsealarm'])
-            stats_dict[talker][pitch_param]['dprime'][ferret] = CalculateStats.dprime(np.mean(selected_ferret_talker['hit']), np.mean(selected_ferret_talker['falsealarm']))
+            stats_dict[talker][pitch_param]['false_alarms'][ferret] = np.mean(selected_ferret_all_talker['falsealarm'])
+            stats_dict[talker][pitch_param]['dprime'][ferret] = CalculateStats.dprime(np.mean(selected_ferret_talker_hitrate['hit']), np.mean(selected_ferret_all_talker['falsealarm']))
 
             #%Correct(hit + CR / hits + misses + CR + FA)
             stats_dict[talker][pitch_param]['correct_response'][ferret] = (len(selected_ferret_talker['hit']==True) + len(selected_ferret_catch_talker['response'] == 3))/ (len(selected_ferret_talker) + len(selected_ferret_catch_talker))
@@ -80,17 +83,18 @@ def run_stats_calc(df, ferrets, stats_dict, pitch_param = 'control_trial'):
 
     for talker in talkers:
         df_noncatchnoncorrection_talker = df_noncatchnoncorrection[df_noncatchnoncorrection['talker'] == talker]
+        df_noncorrection_talker = df_noncorrection[df_noncorrection['talker'] == talker]
         df_noncatchnoncorrection_talker_hitrate = df_noncatchnoncorrection_talker[df_noncatchnoncorrection_talker['response'] != 5]
 
         df_catchnoncorrection_talker = df_catchnoncorrection[df_catchnoncorrection['talker'] == talker]
         hits = np.mean(df_noncatchnoncorrection_talker_hitrate['hit'])
-        false_alarms = np.mean(df_noncatchnoncorrection_talker['falsealarm'])
+        false_alarms = np.mean(df_noncorrection_talker['falsealarm'])
         correct_rejections = np.mean(df_catchnoncorrection_talker['response'] == 3)
-        correct_response =  (len(df_noncatchnoncorrection_talker['hit']==True) + len(df_catchnoncorrection_talker['response'] == 3))/ (len(df_noncatchnoncorrection_talker) + len(df_catchnoncorrection_talker))
+        correct_response =  (len(df_noncatchnoncorrection_talker['hit']==True) + len(df_catchnoncorrection_talker['response'] == 3))/ (len(df_noncorrection_talker))
 
         stats_dict_all[talker][pitch_param]['hits'] = hits
         stats_dict_all[talker][pitch_param]['false_alarms'] = false_alarms
-        stats_dict_all[talker][pitch_param]['correct_response'] = correct_rejections
+        stats_dict_all[talker][pitch_param]['correct_response'] = correct_response
         stats_dict_all[talker][pitch_param]['dprime'] = CalculateStats.dprime(hits, false_alarms)
 
     return stats_dict_all, stats_dict
