@@ -237,8 +237,7 @@ class behaviouralhelperscg():
                             newdata.response == 5)]
             elif includemissonly is True:
                 newdata = newdata[
-                    (newdata.response == 0) | (newdata.response == 1) | (newdata.response == 7) | (
-                            newdata.response == 3 | (newdata.response == 5))]
+                    (newdata.response == 0) | (newdata.response == 1) | (newdata.response == 7) ]
             else:
                 newdata = newdata[newdata.correctresp == 1]
                 newdata = newdata[(newdata.catchTrial == 0)]
