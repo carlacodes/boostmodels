@@ -56,7 +56,7 @@ def run_stats_calc(df, ferrets, stats_dict, pitch_param = 'control_trial'):
 
             stats_dict[talker][pitch_param]['hits'][ferret] = np.mean(selected_ferret_talker['hit'])
             stats_dict[talker][pitch_param]['false_alarms'][ferret] = np.mean(selected_ferret_talker['falsealarm'])
-            stats_dict[talker][pitch_param]['correct_rejections'][ferret] = np.mean(selected_ferret_catch_talker['response'] ==3)
+            stats_dict[talker][pitch_param]['correct_rejections'][ferret] = np.mean(selected_ferret_catch_talker['response'] == 3)
         count += 1
     stats_dict_all = {}
     stats_dict_all[1] ={}
@@ -189,12 +189,12 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
 
             multiplier += 1
 
-    ax2.set_ylim(0, 1)
-    ax2.legend(['control', 'inter F0', 'intra F0'])
-    ax2.set_xticks([0.25, 1.25], ['Female', 'Male'])
+    ax3.set_ylim(0, 1)
+    ax3.legend(['control', 'inter F0', 'intra F0'])
+    ax3.set_xticks([0.25, 1.25], ['Female', 'Male'])
 
-    ax2.set_ylabel('Proportion of correct rejections')
-    ax2.set_title('Proportion of correct rejections by talker')
+    ax3.set_ylabel('Proportion of correct rejections')
+    ax3.set_title('Proportion of correct rejections by talker')
     plt.show()
 
 
