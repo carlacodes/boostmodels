@@ -83,31 +83,12 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
     #generate bar plots
     stats = pd.DataFrame.from_dict(stats_dict_all_combined)
     x = np.arange(len(stats_dict_all_combined))  # the label locations
-    #plot bar plots
-
-    width = 0.15  # the width of the bars
-    multiplier = 0
-    #
-    # fig, ax = plt.subplots(layout='constrained')
-    #
-    # for attribute, measurement in stats_dict_all_combined.items():
-    #     for talker, measurement in measurement.items():
-    #         print(measurement)
-    #         offset = width * multiplier
-    #         rects = ax.bar(offset, measurement['hits'], width, label=talker)
-    #         # ax.bar_label(rects, padding=3)
-    #         multiplier += 1
-    #
-    # plt.ylim(0, 1)
-    # plt.ylabel('Proportion of hits')
-    # plt.title('Proportion of hits across all ferrets')
-    # plt.legend()
-    # plt.show()
     width = 0.25  # the width of the bars
     multiplier = 0
     gap_width = 0.2  # Width of the gap between series
 
-    fig, ax = plt.subplots(layout='constrained')
+    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2,2, layout='constrained',figsize=(5,5))
+    #make a panel for the subplots to go into
 
     color_map = plt.cm.get_cmap('tab10')  # Choose a colormap
 
@@ -121,7 +102,7 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
 
             color = color_map(
                 np.where(np.array(list(measurement.keys())) == talker)[0][0])  # Assign color based on label
-            rects = ax.bar(offset, measurement_data['hits'], width, label=talker, color=color)
+            rects = ax1.bar(offset, measurement_data['hits'], width, label=talker, color=color)
             #scatter plot the corresponding individual ferret data, each ferret is a different marker shape
             marker_list = ['o', 's', '<', 'd', "*"]
             count = 0
@@ -130,21 +111,21 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
                 print('ferret', ferret)
                 print('ferret data', ferret_data)
                 offset_jitter = offset + np.random.uniform(-0.05, 0.05)
-                ax.scatter(offset_jitter, ferret_data, color=color, marker=marker_list[count],label='_nolegend_', edgecolors='black')
+                ax1.scatter(offset_jitter, ferret_data, color=color, marker=marker_list[count],label='_nolegend_', edgecolors='black')
                 count += 1
 
             multiplier += 1
 
-    plt.ylim(0, 1)
-    plt.legend()
-    plt.ylabel('Proportion of hits')
-    plt.title('Proportion of hits across all ferrets')
-    plt.show()
+    ax1.set_ylim(0, 1)
+    ax1.set_ylabel('Proportion of hits')
+    ax1.set_title('Proportion of hits by talker')
+
     width = 0.25  # the width of the bars
     multiplier = 0
     gap_width = 0.2
-    fig, ax = plt.subplots(layout='constrained')
-    plt.xticks([0.25, 1.25], ['Female', 'Male'])
+
+
+    ax1.set_xticks([0.25, 1.25], ['Female', 'Male'])
 
     color_map = plt.cm.get_cmap('tab10')  # Choose a colormap
 
@@ -158,33 +139,30 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
 
             color = color_map(
                 np.where(np.array(list(measurement.keys())) == talker)[0][0])  # Assign color based on label
-            rects = ax.bar(offset, measurement_data['false_alarms'], width, label=talker, color=color)
+            rects = ax2.bar(offset, measurement_data['false_alarms'], width, label=talker, color=color)
             #scatter plot the corresponding individual ferret data, each ferret is a different marker shape
             marker_list = ['o', 's', '<', 'd', "*"]
+
             count = 0
             for ferret, ferret_data in stats_dict_combined[attribute][talker]['false_alarms'].items():
                 #add jitter to offset
                 print('ferret data', ferret_data)
                 offset_jitter = offset + np.random.uniform(-0.05, 0.05)
-                ax.scatter(offset_jitter, ferret_data, color=color, marker=marker_list[count],label='_nolegend_', edgecolors='black')
+                ax2.scatter(offset_jitter, ferret_data, color=color, marker=marker_list[count],label='_nolegend_', edgecolors='black')
                 count += 1
 
             multiplier += 1
 
-    plt.ylim(0, 1)
-    plt.legend()
-    plt.xticks([0.25, 1.25], ['Female', 'Male'])
+    ax2.set_ylim(0, 1)
+    ax2.set_xticks([0.25, 1.25], ['Female', 'Male'])
 
-    plt.ylabel('Proportion of false alarms')
-    plt.title('Proportion of false alarms across all ferrets')
-    plt.show()
+    ax2.set_ylabel('Proportion of false alarms')
+    ax2.set_title('Proportion of false alarms by talker')
 
 
-    width = 0.25  # the width of the bars
     multiplier = 0
     gap_width = 0.2
 
-    fig, ax = plt.subplots(layout='constrained')
     color_map = plt.cm.get_cmap('tab10')  # Choose a colormap
 
     for attribute, measurement in stats_dict_all_combined.items():
@@ -197,7 +175,7 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
 
             color = color_map(
                 np.where(np.array(list(measurement.keys())) == talker)[0][0])  # Assign color based on label
-            rects = ax.bar(offset, measurement_data['correct_rejections'], width, label=talker, color=color)
+            rects = ax3.bar(offset, measurement_data['correct_rejections'], width, label=talker, color=color)
             #scatter plot the corresponding individual ferret data, each ferret is a different marker shape
             marker_list = ['o', 's', '<', 'd', "*"]
             count = 0
@@ -206,17 +184,17 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
                 print('ferret', ferret)
                 print('ferret data', ferret_data)
                 offset_jitter = offset + np.random.uniform(-0.05, 0.05)
-                ax.scatter(offset_jitter, ferret_data, color=color, marker=marker_list[count],  label='_nolegend_', edgecolors='black')
+                ax3.scatter(offset_jitter, ferret_data, color=color, marker=marker_list[count],  label='_nolegend_', edgecolors='black')
                 count += 1
 
             multiplier += 1
 
-    plt.ylim(0, 1)
-    plt.legend(['control', 'inter F0', 'intra F0'])
-    plt.xticks([0.25, 1.25], ['Female', 'Male'])
+    ax2.set_ylim(0, 1)
+    ax2.legend(['control', 'inter F0', 'intra F0'])
+    ax2.set_xticks([0.25, 1.25], ['Female', 'Male'])
 
-    plt.ylabel('Proportion of correct rejections')
-    plt.title('Proportion of correct rejections across all ferrets')
+    ax2.set_ylabel('Proportion of correct rejections')
+    ax2.set_title('Proportion of correct rejections by talker')
     plt.show()
 
 
