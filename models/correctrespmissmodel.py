@@ -117,8 +117,8 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     if ferret_as_feature == True:
         df_to_use = dataframe[["trialNum", "misslist", "talker", "side", "precur_and_targ_same",
                                "targTimes", "pastcorrectresp",
-                               "pastcatchtrial", "ferret"]]
-        labels = ['trial number','misslist', 'talker', 'audio side', 'precursor = target pitch','target presentation time', 'past response was correct', 'past trial was catch', 'ferret']
+                               "pastcatchtrial", "pitchoftarg", "ferret"]]
+        labels = ['trial number','misslist', 'talker', 'audio side', 'precursor = target pitch','target presentation time', 'past response was correct', 'past trial was catch',"target F0", 'ferret']
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
 
         fig_dir = Path('D:/behavmodelfigs/correctresp_or_miss/ferret_as_feature')
@@ -136,9 +136,9 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     else:
         df_to_use =  dataframe[["trialNum", "misslist", "talker", "side", "precur_and_targ_same",
                            "targTimes","pastcorrectresp",
-                           "pastcatchtrial"]]
+                           "pastcatchtrial", "pitchoftarg"]]
         #
-        labels = ['trial number','misslist', 'talker', 'audio side', 'precursor = target pitch','target presentation time', 'past response was correct', 'past trial was catch']
+        labels = ['trial number','misslist', 'talker', 'audio side', 'precursor = target F0','target presentation time', 'past response was correct', 'past trial was catch', 'target F0']
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
 
         fig_dir = Path('D:/behavmodelfigs/correctresp_or_miss/')
@@ -147,17 +147,17 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
         if optimization == False:
             # load the saved params
             if one_ferret:
-                paramsinput = np.load('../optuna_results/correctresponse_optunaparams'+ferrets+'_2005.npy', allow_pickle=True).item()
+                paramsinput = np.load('../optuna_results/correctresponse_optunaparams'+ferrets+'_2305.npy', allow_pickle=True).item()
             else:
-                paramsinput = np.load('../optuna_results/correctresponse_optunaparams_2005_2.npy', allow_pickle=True).item()
+                paramsinput = np.load('../optuna_results/correctresponse_optunaparams_2305.npy', allow_pickle=True).item()
         else:
             study = run_optuna_study_correctresp(dfx.to_numpy(), df_to_use['misslist'].to_numpy())
             print(study.best_params)
             paramsinput = study.best_params
             if one_ferret:
-                np.save('../optuna_results/correctresponse_optunaparams_2005'+ferrets+'_2.npy', study.best_params)
+                np.save('../optuna_results/correctresponse_optunaparams_2305'+ferrets+'.npy', study.best_params)
             else:
-                np.save('../optuna_results/correctresponse_optunaparams_2005_2.npy', study.best_params)
+                np.save('../optuna_results/correctresponse_optunaparams_2305.npy', study.best_params)
 
 
     X_train, X_test, y_train, y_test = train_test_split(dfx, df_to_use['misslist'], test_size=0.2, random_state=123)
@@ -238,7 +238,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     # print(labels)
     # labels[12] = 'side of audio presentation'
     # labels[11] = 'trial number'
-    # labels[10] = 'precursor = target pitch'
+    # labels[10] = 'precursor = target F0'
     # labels[9] = 'target presentation time'
     # labels[8] = 'pitch of target'
     # labels[7] = 'session occured in the morning'
@@ -253,7 +253,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     fig.tight_layout()
     plt.savefig(fig_dir / 'shap_summary_correctresp.png', dpi=1000, bbox_inches = "tight")
 
-    shap.dependence_plot("precursor = target pitch", shap_values1[0], dfx)  #
+    shap.dependence_plot("precursor = target F0", shap_values1[0], dfx)  #
     plt.show()
 
     result = permutation_importance(xg_reg, X_test, y_test, n_repeats=100,
@@ -271,14 +271,14 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     shap_values2 = explainer(X_train)
 
     fig, ax = plt.subplots()
-    shap.plots.scatter(shap_values2[:, "trial number"], color=shap_values2[:, "precursor = target pitch"], ax=ax, cmap = cmapcustom, show = False)
+    shap.plots.scatter(shap_values2[:, "trial number"], color=shap_values2[:, "precursor = target F0"], ax=ax, cmap = cmapcustom, show = False)
     fig, ax = plt.gcf(), plt.gca()
     cb_ax = fig.axes[1]
     # Modifying color bar parameters
     cb_ax.tick_params(labelsize=15)
     # cb_ax.set_yticks([1, 2, 3,4, 5])
     # cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
-    cb_ax.set_ylabel("precursor = target pitch", fontsize=15)
+    cb_ax.set_ylabel("precursor = target F0", fontsize=15)
     plt.title('Trial number and its effect on the \n miss probability', fontsize = 18)
     plt.xlabel('Trial number', fontsize = 15)
     plt.ylabel('SHAP value', fontsize = 15)
@@ -286,12 +286,12 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     plt.show()
 
     fig, ax = plt.subplots(figsize=(10, 10))
-    shap.plots.scatter(shap_values2[:, "audio side"], color=shap_values2[:, "precursor = target pitch"], ax=ax, cmap = cmapcustom, show = False)
+    shap.plots.scatter(shap_values2[:, "audio side"], color=shap_values2[:, "precursor = target F0"], ax=ax, cmap = cmapcustom, show = False)
     fig, ax = plt.gcf(), plt.gca()
     cb_ax = fig.axes[1]
     # Modifying color bar parameters
     cb_ax.tick_params(labelsize=15)
-    cb_ax.set_ylabel("precursor = target pitch word", fontsize=15)
+    cb_ax.set_ylabel("precursor = target F0 word", fontsize=15)
 
     plt.xticks([0, 1 ], labels = ['left', 'right'], fontsize =15)
     plt.ylabel('SHAP value', fontsize=10)
@@ -303,12 +303,12 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
 
 
     fig, ax = plt.subplots(figsize=(10, 10))
-    shap.plots.scatter(shap_values2[:, "precursor = target pitch"], color=shap_values2[:, "trial number"], ax=ax, cmap = cmapcustom, show = False)
+    shap.plots.scatter(shap_values2[:, "precursor = target F0"], color=shap_values2[:, "trial number"], ax=ax, cmap = cmapcustom, show = False)
     fig, ax = plt.gcf(), plt.gca()
     cb_ax = fig.axes[1]
     # Modifying color bar parameters
     cb_ax.tick_params(labelsize=15)
-    cb_ax.set_ylabel("precursor = target pitch word", fontsize=15)
+    cb_ax.set_ylabel("precursor = target F0 word", fontsize=15)
 
     plt.xticks([0, 1 ], labels = ['Precursor = target F0', ' Precursor ≠ target F0'], fontsize =15)
     plt.ylabel('SHAP value', fontsize=10)
@@ -318,7 +318,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     plt.savefig(fig_dir / 'precursortargpitchintrialnumber.png', dpi=1000, bbox_inches = "tight")
     plt.show()
     #
-    # shap.plots.scatter(shap_values2[:, "pitch of target"], color=shap_values2[:, "precursor = target pitch"], show=False, cmap = cmapcustom)
+    # shap.plots.scatter(shap_values2[:, "pitch of target"], color=shap_values2[:, "precursor = target F0"], show=False, cmap = cmapcustom)
     # fig, ax = plt.gcf(), plt.gca()
     # # Get colorbar
     # cb_ax = fig.axes[1]
@@ -326,7 +326,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     # cb_ax.tick_params(labelsize=15)
     # cb_ax.set_yticks([1, 2, 3,4, 5])
     # # cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
-    # cb_ax.set_ylabel("precursor = target pitch", fontsize=12)
+    # cb_ax.set_ylabel("precursor = target F0", fontsize=12)
     # # cb_ax.set_yticklabels( ['109 Hz', '124 Hz', '144 Hz', '191 Hz', '251 Hz'], fontsize=15)
     # plt.ylabel('SHAP value', fontsize=10)
     # plt.title('Pitch of target \n versus impact in miss probability', fontsize=18)
@@ -336,7 +336,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     # plt.show()
 
 
-    shap.plots.scatter(shap_values2[:, "precursor = target pitch"], color=shap_values2[:, "talker"])
+    shap.plots.scatter(shap_values2[:, "precursor = target F0"], color=shap_values2[:, "talker"])
     plt.show()
     shap.plots.scatter(shap_values2[:, "trial number"], color=shap_values2[:, "talker"], show=False)
     plt.title('trial number \n vs. SHAP value impact')
@@ -363,7 +363,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     plt.show()
 
     fig, ax = plt.subplots(figsize=(15, 55))
-    shap.plots.scatter(shap_values2[:, "precursor = target pitch"], color=shap_values2[:, "trial number"], show=False)
+    shap.plots.scatter(shap_values2[:, "precursor = target F0"], color=shap_values2[:, "trial number"], show=False)
     plt.title('SHAP values as a function of the pitch of the target, \n coloured by the target presentation time',
               fontsize=18)
     plt.ylabel('SHAP value', fontsize=18)
@@ -453,7 +453,7 @@ def run_correct_responsepipeline(ferrets):
         ferret_as_feature = True
 
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbcorrectrespornotwithoptuna(
-        resultingcr_df, optimization=False, ferret_as_feature = ferret_as_feature, one_ferret=one_ferret, ferrets=ferrets)
+        resultingcr_df, optimization=True, ferret_as_feature = ferret_as_feature, one_ferret=one_ferret, ferrets=ferrets)
     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
 
