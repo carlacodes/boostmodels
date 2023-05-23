@@ -118,7 +118,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
         df_to_use = dataframe[["trialNum", "misslist", "talker", "side", "precur_and_targ_same",
                                "targTimes", "pastcorrectresp",
                                "pastcatchtrial", "pitchoftarg", "ferret"]]
-        labels = ['trial number','misslist', 'talker', 'audio side', 'precursor = target pitch','target presentation time', 'past response was correct', 'past trial was catch',"target F0", 'ferret']
+        labels = ['trial number','misslist', 'talker', 'audio side', 'precursor = target F0','target presentation time', 'past response was correct', 'past trial was catch',"target F0", 'ferret']
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
 
         fig_dir = Path('D:/behavmodelfigs/correctresp_or_miss/ferret_as_feature')
