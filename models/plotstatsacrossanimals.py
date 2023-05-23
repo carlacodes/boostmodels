@@ -144,7 +144,7 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
             multiplier += 1
 
     ax1.set_ylim(0, 1)
-    ax1.set_ylabel('P(hits)')
+    ax1.set_ylabel('p(hits)')
     ax1.set_title('Hits')
 
     width = 0.25  # the width of the bars
@@ -185,7 +185,7 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
 
     ax2.set_xticks([0.25, 1.25], ['Female', 'Male'])
 
-    ax2.set_ylabel('P(FA)')
+    ax2.set_ylabel('p(FA)')
     ax2.set_title('False alarms')
 
 
@@ -220,7 +220,7 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
     ax3.set_ylim(0, 1)
     ax3.set_xticks([0.25, 1.25], ['Female', 'Male'])
 
-    ax3.set_ylabel('P(CR)')
+    ax3.set_ylabel('p(correct)')
     ax3.set_title('Correct responses')
     multiplier = 0
     for attribute, measurement in stats_dict_all_combined.items():
@@ -249,7 +249,7 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
 
     ax4.set_xticks([0.25, 1.25], ['Female', 'Male'])
 
-    ax4.set_ylabel('P(d\')')
+    ax4.set_ylabel('d\'')
     ax4.set_title('d\'')
 
     def get_axis_limits(ax, scale=1):
