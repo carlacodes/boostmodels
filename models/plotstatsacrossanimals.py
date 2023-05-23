@@ -87,10 +87,16 @@ def run_stats_calc(df, ferrets, stats_dict, pitch_param = 'control_trial'):
         df_noncatchnoncorrection_talker_hitrate = df_noncatchnoncorrection_talker[df_noncatchnoncorrection_talker['response'] != 5]
 
         df_catchnoncorrection_talker = df_catchnoncorrection[df_catchnoncorrection['talker'] == talker]
-        hits = np.mean(df_noncatchnoncorrection_talker_hitrate['hit'])
-        false_alarms = np.mean(df_noncorrection_talker['falsealarm'])
-        correct_rejections = np.mean(df_catchnoncorrection_talker['response'] == 3)
-        correct_response =  (len(df_noncatchnoncorrection_talker[df_noncatchnoncorrection_talker['hit']==True]) + len(df_catchnoncorrection_talker[df_catchnoncorrection_talker['response'] == 3]))/ (len(df_noncorrection_talker))
+        # hits = np.mean(df_noncatchnoncorrection_talker_hitrate['hit'])
+        # false_alarms = np.mean(df_noncorrection_talker['falsealarm'])
+        # correct_rejections = np.mean(df_catchnoncorrection_talker['response'] == 3)
+        # correct_response =  (len(df_noncatchnoncorrection_talker[df_noncatchnoncorrection_talker['hit']==True]) + len(df_catchnoncorrection_talker[df_catchnoncorrection_talker['response'] == 3]))/ (len(df_noncorrection_talker))
+        #take mean of all the values in the dictionary
+
+
+        correct_response = np.mean(list(stats_dict[talker][pitch_param]['correct_response'].values()))
+        hits = np.mean(list(stats_dict[talker][pitch_param]['hits'].values()))
+        false_alarms = np.mean(list(stats_dict[talker][pitch_param]['false_alarms'].values()))
 
         stats_dict_all[talker][pitch_param]['hits'] = hits
         stats_dict_all[talker][pitch_param]['false_alarms'] = false_alarms
@@ -263,7 +269,7 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
     ax3.annotate('c)', xy=get_axis_limits(ax3), xytext=(-0.1, ax3.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
     ax4.annotate('d)', xy=get_axis_limits(ax4), xytext=(-0.1, ax4.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
 
-    plt.suptitle('Proportion of hits, false alarms, correct responses and d\' by talker')
+    plt.suptitle('Proportion of hits, false alarms,\n correct responses and d\' by talker')
     plt.savefig('figs/proportion_hits_falsealarms_correctresp_dprime_bytalker.png', dpi = 500, bbox_inches='tight')
     plt.show()
 
