@@ -120,14 +120,14 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
                 print('ferret', ferret)
                 print('ferret data', ferret_data)
                 offset_jitter = offset + np.random.uniform(-0.05, 0.05)
-                ax1.scatter(offset_jitter, ferret_data, color=color, marker=marker_list[count],label='_nolegend_', edgecolors='black')
+                ax1.scatter(offset_jitter, ferret_data, 15, color=color, marker=marker_list[count],label='_nolegend_', edgecolors='black')
                 count += 1
 
             multiplier += 1
 
     ax1.set_ylim(0, 1)
-    ax1.set_ylabel('Proportion of hits')
-    ax1.set_title('Proportion of hits by talker')
+    ax1.set_ylabel('P(hits)')
+    ax1.set_title('Hits')
 
     width = 0.25  # the width of the bars
     multiplier = 0
@@ -165,8 +165,8 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
     ax2.set_ylim(0, 1)
     ax2.set_xticks([0.25, 1.25], ['Female', 'Male'])
 
-    ax2.set_ylabel('Proportion of false alarms')
-    ax2.set_title('Proportion of false alarms by talker')
+    ax2.set_ylabel('P(FA)')
+    ax2.set_title('False alarms')
 
 
     multiplier = 0
@@ -200,9 +200,9 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
     ax3.set_ylim(0, 1)
     ax3.set_xticks([0.25, 1.25], ['Female', 'Male'])
 
-    ax3.set_ylabel('Proportion of correct rejections')
-    ax3.set_title('Proportion of correct rejections by talker')
-
+    ax3.set_ylabel('P(CR)')
+    ax3.set_title('Correct rejections')
+    multiplier = 0
     for attribute, measurement in stats_dict_all_combined.items():
         for talker, measurement_data in measurement.items():
             print(measurement_data)
@@ -222,17 +222,18 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
                 print('ferret', ferret)
                 print('ferret data', ferret_data)
                 offset_jitter = offset + np.random.uniform(-0.05, 0.05)
-                ax4.scatter(offset_jitter, ferret_data, color=color, marker=marker_list[count],  label='_nolegend_', edgecolors='black')
+                ax4.scatter(offset_jitter, ferret_data, 15, color=color, marker=marker_list[count],  label='_nolegend_', edgecolors='black')
                 count += 1
 
             multiplier += 1
 
-    ax4.set_ylim(0, 1)
     ax4.legend(['control', 'inter F0', 'intra F0'])
     ax4.set_xticks([0.25, 1.25], ['Female', 'Male'])
 
-    ax4.set_ylabel('P(d'')')
-    ax4.set_title('d'' by talker')
+    ax4.set_ylabel('P(d")')
+    ax4.set_title('d"')
+    plt.suptitle('Proportion of hits, false alarms and d" by talker')
+    plt.savefig('figs/proportion_hits_falsealarms_dprime_bytalker.png', dpi = 500, bbox_inches='tight')
     plt.show()
 
 
