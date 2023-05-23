@@ -23,10 +23,13 @@ from sklearn.model_selection import train_test_split
 from helpers.behaviouralhelpersformodels import *
 from helpers.calculate_stats import *
 
+
+
+
 def run_stats_calc(df, ferrets, stats_dict, pitch_param = 'control_trial'):
 
     df_noncatchnoncorrection = df[(df['catchTrial'] == 0) & (df['correctionTrial'] == 0) & (df[pitch_param] == 1)]
-    df_catchnoncorrection = df[(df['catchTrial'] == 1)]
+    df_catchnoncorrection = df[(df['catchTrial'] == 1) & (df['correctionTrial'] == 0) & (df[pitch_param] == 1)]
     count = int(0)
     # stats_dict[pitch_param] = {}
     # stats_dict[pitch_param]['hits'] = {}
@@ -41,10 +44,14 @@ def run_stats_calc(df, ferrets, stats_dict, pitch_param = 'control_trial'):
     stats_dict[1][pitch_param]['hits'] = {}
     stats_dict[1][pitch_param]['false_alarms']= {}
     stats_dict[1][pitch_param]['correct_rejections']= {}
+    stats_dict[1][pitch_param]['dprime']= {}
+
 
     stats_dict[2][pitch_param]['hits'] ={}
     stats_dict[2][pitch_param]['false_alarms'] = {}
     stats_dict[2][pitch_param]['correct_rejections'] = {}
+    stats_dict[2][pitch_param]['dprime']= {}
+
     count = 0
     for ferret in ferrets:
 
@@ -56,6 +63,7 @@ def run_stats_calc(df, ferrets, stats_dict, pitch_param = 'control_trial'):
 
             stats_dict[talker][pitch_param]['hits'][ferret] = np.mean(selected_ferret_talker['hit'])
             stats_dict[talker][pitch_param]['false_alarms'][ferret] = np.mean(selected_ferret_talker['falsealarm'])
+            stats_dict[talker][pitch_param]['dprime'][ferret] = CalculateStats.dprime(np.mean(selected_ferret_talker['hit']), np.mean(selected_ferret_talker['falsealarm']))
             stats_dict[talker][pitch_param]['correct_rejections'][ferret] = np.mean(selected_ferret_catch_talker['response'] == 3)
         count += 1
     stats_dict_all = {}
@@ -75,6 +83,7 @@ def run_stats_calc(df, ferrets, stats_dict, pitch_param = 'control_trial'):
         stats_dict_all[talker][pitch_param]['hits'] = hits
         stats_dict_all[talker][pitch_param]['false_alarms'] = false_alarms
         stats_dict_all[talker][pitch_param]['correct_rejections'] = correct_rejections
+        stats_dict_all[talker][pitch_param]['dprime'] = CalculateStats.dprime(hits, false_alarms)
 
     return stats_dict_all, stats_dict
 
@@ -163,7 +172,6 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
     multiplier = 0
     gap_width = 0.2
 
-    color_map = plt.cm.get_cmap('tab10')  # Choose a colormap
 
     for attribute, measurement in stats_dict_all_combined.items():
         for talker, measurement_data in measurement.items():
@@ -190,11 +198,41 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
             multiplier += 1
 
     ax3.set_ylim(0, 1)
-    ax3.legend(['control', 'inter F0', 'intra F0'])
     ax3.set_xticks([0.25, 1.25], ['Female', 'Male'])
 
     ax3.set_ylabel('Proportion of correct rejections')
     ax3.set_title('Proportion of correct rejections by talker')
+
+    for attribute, measurement in stats_dict_all_combined.items():
+        for talker, measurement_data in measurement.items():
+            print(measurement_data)
+            if multiplier < 3:
+                offset = width * multiplier
+            else:
+                offset = (gap_width) + (width * multiplier)  # Add gap offset for the second series
+
+            color = color_map(
+                np.where(np.array(list(measurement.keys())) == talker)[0][0])  # Assign color based on label
+            rects = ax4.bar(offset, measurement_data['dprime'], width, label=talker, color=color)
+            #scatter plot the corresponding individual ferret data, each ferret is a different marker shape
+            marker_list = ['o', 's', '<', 'd', "*"]
+            count = 0
+            for ferret, ferret_data in stats_dict_combined[attribute][talker]['dprime'].items():
+                #add jitter to offset
+                print('ferret', ferret)
+                print('ferret data', ferret_data)
+                offset_jitter = offset + np.random.uniform(-0.05, 0.05)
+                ax4.scatter(offset_jitter, ferret_data, color=color, marker=marker_list[count],  label='_nolegend_', edgecolors='black')
+                count += 1
+
+            multiplier += 1
+
+    ax4.set_ylim(0, 1)
+    ax4.legend(['control', 'inter F0', 'intra F0'])
+    ax4.set_xticks([0.25, 1.25], ['Female', 'Male'])
+
+    ax4.set_ylabel('P(d'')')
+    ax4.set_title('d'' by talker')
     plt.show()
 
 
