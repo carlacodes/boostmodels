@@ -120,7 +120,7 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
                 print('ferret', ferret)
                 print('ferret data', ferret_data)
                 offset_jitter = offset + np.random.uniform(-0.05, 0.05)
-                ax1.scatter(offset_jitter, ferret_data, 15, color=color, marker=marker_list[count],label='_nolegend_', edgecolors='black')
+                ax1.scatter(offset_jitter, ferret_data, 25, color=color, marker=marker_list[count],label='_nolegend_', edgecolors='black')
                 count += 1
 
             multiplier += 1
@@ -157,12 +157,14 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
                 #add jitter to offset
                 print('ferret data', ferret_data)
                 offset_jitter = offset + np.random.uniform(-0.05, 0.05)
-                ax2.scatter(offset_jitter, ferret_data, color=color, marker=marker_list[count],label='_nolegend_', edgecolors='black')
+                ax2.scatter(offset_jitter, ferret_data, 25, color=color, marker=marker_list[count],label='_nolegend_', edgecolors='black')
                 count += 1
 
             multiplier += 1
 
     ax2.set_ylim(0, 1)
+    ax2.legend(['control', 'inter F0', 'intra F0'])
+
     ax2.set_xticks([0.25, 1.25], ['Female', 'Male'])
 
     ax2.set_ylabel('P(FA)')
@@ -192,7 +194,7 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
                 print('ferret', ferret)
                 print('ferret data', ferret_data)
                 offset_jitter = offset + np.random.uniform(-0.05, 0.05)
-                ax3.scatter(offset_jitter, ferret_data, color=color, marker=marker_list[count],  label='_nolegend_', edgecolors='black')
+                ax3.scatter(offset_jitter, ferret_data, 25, color=color, marker=marker_list[count],  label='_nolegend_', edgecolors='black')
                 count += 1
 
             multiplier += 1
@@ -222,17 +224,34 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
                 print('ferret', ferret)
                 print('ferret data', ferret_data)
                 offset_jitter = offset + np.random.uniform(-0.05, 0.05)
-                ax4.scatter(offset_jitter, ferret_data, 15, color=color, marker=marker_list[count],  label='_nolegend_', edgecolors='black')
+                ax4.scatter(offset_jitter, ferret_data, 25, color=color, marker=marker_list[count],  label='_nolegend_', edgecolors='black')
                 count += 1
 
             multiplier += 1
 
-    ax4.legend(['control', 'inter F0', 'intra F0'])
     ax4.set_xticks([0.25, 1.25], ['Female', 'Male'])
 
-    ax4.set_ylabel('P(d")')
-    ax4.set_title('d"')
-    plt.suptitle('Proportion of hits, false alarms and d" by talker')
+    ax4.set_ylabel('P(d\')')
+    ax4.set_title('d\'')
+
+    def get_axis_limits(ax, scale=1):
+        return ax.get_xlim()[0] * scale, (ax.get_ylim()[1] * scale)
+
+    import matplotlib.font_manager as fm
+
+    # ax1.annotate('a)', xy=get_axis_limits(ax1))
+    # ax2.annotate('b)', xy=get_axis_limits(ax2))
+    # ax3.annotate('c)', xy=get_axis_limits(ax3))
+    # ax4.annotate('d)', xy=get_axis_limits(ax4))
+    title_y = ax1.title.get_position()[1]  # Get the y-coordinate of the title
+    font_props = fm.FontProperties(weight='bold')
+
+    ax1.annotate('a)', xy=get_axis_limits(ax1), xytext=(-0.1, ax1.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props, zorder=10)
+    ax2.annotate('b)', xy=get_axis_limits(ax2), xytext=(-0.1, ax2.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+    ax3.annotate('c)', xy=get_axis_limits(ax3), xytext=(-0.1, ax3.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+    ax4.annotate('d)', xy=get_axis_limits(ax4), xytext=(-0.1, ax4.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+
+    plt.suptitle('Proportion of hits, false alarms and d\' by talker')
     plt.savefig('figs/proportion_hits_falsealarms_dprime_bytalker.png', dpi = 500, bbox_inches='tight')
     plt.show()
 
