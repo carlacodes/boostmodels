@@ -22,7 +22,8 @@ import sklearn
 from sklearn.model_selection import train_test_split
 from helpers.behaviouralhelpersformodels import *\
 
-
+def get_axis_limits(ax, scale=1):
+    return ax.get_xlim()[0] * scale, (ax.get_ylim()[1] * scale)
 def run_optuna_study_releasetimes(X, y):
     study = optuna.create_study(direction="minimize", study_name="LGBM regressor")
     func = lambda trial: objective_releasetimes(trial, X, y)
@@ -250,6 +251,8 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     # title kwargs still does nothing so need this workaround for summary plots
     cmapname = "viridis"
 
+
+
     feature_importances = np.abs(shap_values).sum(axis=0)
     sorted_indices = np.argsort(feature_importances)
 
@@ -272,7 +275,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     plt.savefig(fig_savedir / 'elbowplot.png', dpi=500, bbox_inches='tight')
     plt.show()
 
-    fig, ax = plt.subplots(figsize=(15, 15))
+    fig, ax = plt.subplots(figsize=(9, 12))
     shap.summary_plot(shap_values, X, show=False, cmap = matplotlib.colormaps[cmapname])
 
     fig, ax = plt.gcf(), plt.gca()
@@ -283,22 +286,17 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     plt.xlabel('SHAP value (impact on model output) on reaction time')
     labels = [item.get_text() for item in ax.get_yticklabels()]
     print(labels)
-    # labels[11] = 'trial Number'
-    # labels[10] = 'time to target'
-    # labels[9] = 'side of audio presentation'
-    # labels[8] = 'pitch of target'
-    # labels[7] = 'pitch of precursor'
-    # labels[6] = 'day since start of week'
-    # labels[5] = 'trial took place in AM'
-    # labels[4] = 'past trial catch'
-    # labels[3] = 'male/female talker'
-    # labels[2] = 'precursor = target F0'
-    # labels[1] = 'change in pitch value'
-    # labels[0] = 'past trial was correct'
-    #
-    # ax.set_yticklabels(labels)
     plt.savefig(fig_savedir / 'shapsummaryplot_allanimals2.png', dpi=1000, bbox_inches='tight')
     plt.show()
+    import matplotlib.image as mpimg
+    summary_plot_file = 'summary_plot.png'
+    shap.summary_plot(shap_values, X, show=False, color= matplotlib.colormaps[cmapname])
+    fig, ax = plt.gcf(), plt.gca()
+
+    fig.set_size_inches(9, 12)
+    ax.set_xlabel('SHAP Value (impact on model output)', fontsize=18)
+    ax.set_ylabel('Features', fontsize=18)
+
 
     result = permutation_importance(xg_reg, X_test, y_test, n_repeats=100,
                                     random_state=123, n_jobs=2)
@@ -471,6 +469,69 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
         plt.savefig(fig_savedir / 'sidecolouredbyferret.png', dpi=1000)
         plt.show()
+
+
+    mosaic = ['A', 'B', 'C'], ['D', 'B', 'E']
+    fig = plt.figure(figsize=(24, 10))
+    ax_dict = fig.subplot_mosaic(mosaic)
+
+    # Plot the elbow plot
+    ax_dict['A'].plot(feature_labels, cumulative_importances, marker='o', color='gold')
+    ax_dict['A'].set_xlabel('Features')
+    ax_dict['A'].set_ylabel('Cumulative Feature Importance')
+    ax_dict['A'].set_title('Elbow Plot of Cumulative Feature Importance for Rxn Time Prediction')
+    ax_dict['A'].set_xticklabels(feature_labels, rotation=45, ha='right')  # rotate x-axis labels for better readability
+
+    # rotate x-axis labels for better readability
+    summary_img = mpimg.imread(fig_savedir / 'shapsummaryplot_allanimals2.png')
+    ax_dict['B'].imshow(summary_img, aspect='auto', )
+    ax_dict['B'].axis('off')  # Turn off axis ticks and labels
+    ax_dict['B'].set_title('Ranked list of features over their \n impact on reaction time', fontsize=13)
+
+
+    ax_dict['D'].barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, color='peru')
+    ax_dict['D'].set_title("Permutation importances on reaction time")
+    ax_dict['D'].set_xlabel("Permutation importance")
+
+
+    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "precursor = target F0"], ax=ax_dict['E'],
+                       cmap=matplotlib.colormaps[cmapname], show=False)
+    fig, ax = plt.gcf(), plt.gca()
+    cb_ax = fig.axes[1]
+    # Modifying color bar parameters
+    cb_ax.tick_params(labelsize=15)
+    cb_ax.set_ylabel("precursor = target F0 word", fontsize=15)
+    ax_dict['E'].set_ylabel('SHAP value', fontsize=10)
+    ax_dict['E'].set_title('Ferret ID versus impact on reaction time', fontsize=18)
+    ax_dict['E'].set_xlabel('Ferret ID', fontsize=16)
+
+    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "target F0"], ax=ax_dict['C'],
+                       cmap = matplotlib.colormaps[cmapname], show=False)
+    fig, ax = plt.gcf(), plt.gca()
+    cb_ax = fig.axes[1]
+    cb_ax.set_yticks([1, 2, 3,4, 5])
+    cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
+    cb_ax.tick_params(labelsize=15)
+    cb_ax.set_ylabel("target F0 (Hz)", fontsize=15)
+
+    # Modifying color bar parameters
+    cb_ax.tick_params(labelsize=15)
+    ax_dict['C'].set_ylabel('SHAP value', fontsize=10)
+    ax_dict['C'].set_xlabel('Ferret ID', fontsize=16)
+    # ax_dict['C'].set_title('Ferret ID and precursor = target F0 versus SHAP value on miss probability', fontsize=18)
+    #remove padding outside the figures
+    font_props = fm.FontProperties(weight='bold', size=17)
+
+    ax_dict['A'].annotate('a)', xy=get_axis_limits(ax_dict['A']), xytext=(-0.1, ax_dict['A'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props, zorder=10)
+    ax_dict['B'].annotate('b)', xy=get_axis_limits(ax_dict['B']), xytext=(-0.1, ax_dict['B'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+    ax_dict['C'].annotate('c)', xy=get_axis_limits(ax_dict['C']), xytext=(-0.1, ax_dict['C'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+    ax_dict['D'].annotate('d)', xy=get_axis_limits(ax_dict['D']), xytext=(-0.1, ax_dict['D'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+    ax_dict['E'].annotate('e)', xy=get_axis_limits(ax_dict['E']), xytext=(-0.1, ax_dict['E'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+
+
+    plt.tight_layout()
+    plt.savefig(fig_savedir / 'big_summary_plot.png', dpi=1000, bbox_inches="tight")
+    plt.show()
 
     return xg_reg, ypred, y_test, results
 
