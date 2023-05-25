@@ -470,7 +470,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     ax_dict['E'].set_title('Ferret ID versus impact on false alarm probability', fontsize=18)
     ax_dict['E'].set_xlabel('Ferret ID', fontsize=16)
 
-    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "target F0"], ax=ax_dict['C'],
+    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "precursor F0"], ax=ax_dict['C'],
                        cmap =cmapsummary, show=False)
     fig, ax = plt.gcf(), plt.gca()
     cb_ax = fig.axes[1]
