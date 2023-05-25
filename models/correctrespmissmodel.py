@@ -138,7 +138,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
             np.save('../optuna_results/correctresponse_optunaparams_ferretasfeature_2105.npy', study.best_params)
 
     else:
-        df_to_use =  dataframe[["trialNum", "misslist", "talker", "side", "precur_and_targ_same",
+        df_to_use = dataframe[["trialNum", "misslist", "talker", "side", "precur_and_targ_same",
                            "targTimes","pastcorrectresp",
                            "pastcatchtrial", "pitchoftarg"]]
         #
