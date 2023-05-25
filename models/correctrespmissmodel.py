@@ -212,112 +212,60 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     #take the absolute sum of shap_values1 across the class types
     feature_importances = np.abs(shap_values1).sum(axis=1).sum(axis=0)
     sorted_indices = np.argsort(feature_importances)
-    #
-    # # Make a mosaic subplot
-    #
-    #
-    # x = np.arange(0, 7, 0.01)
-    #
-    # plt.subplot(2, 1, 1)
-    # plt.plot(x, np.sin(x))
-    #
-    # plt.subplot(2, 2, 3)
-    # plt.plot(x, np.cos(x))
-    #
-    # plt.subplot(2, 2, 4)
-    # plt.plot(x, np.sin(x) * np.cos(x))
-    # ax_dict = fig.subplot_mosaic(mosaic)
 
 
     sorted_indices = sorted_indices[::-1]
     feature_importances = feature_importances[sorted_indices]
     feature_labels = dfx.columns[sorted_indices]
     cumulative_importances = np.cumsum(feature_importances)
-
-
     result = permutation_importance(xg_reg, X_test, y_test, n_repeats=100,
                                     random_state=123, n_jobs=2)
     sorted_idx = result.importances_mean.argsort()
-
     explainer = shap.Explainer(xg_reg, X_train, feature_names=X_train.columns)
     shap_values2 = explainer(X_train)
+
+
     # Create a single figure
-    import matplotlib.gridspec as gridspec
     import matplotlib.image as mpimg
     summary_plot_file = 'summary_plot.png'
     shap.summary_plot(shap_values1, X_train, show=False, color=cmapsummary)
+    fig, ax = plt.gcf(), plt.gca()
+
+    fig.set_size_inches(9, 12)
+    ax.set_xlabel('SHAP Value (impact on model output)', fontsize=18)
+    ax.set_ylabel('Features', fontsize=18)
+
+    #make the y labels smaller
+
     plt.savefig(summary_plot_file, dpi = 1000, bbox_inches='tight')
 
-    # fig = plt.figure(figsize=(20, 10))
-    # gs = gridspec.GridSpec(2, 4, figure=fig, width_ratios=[1, 1, 2, 1])
-    # # Plot the elbow plot
-    # ax1 = fig.add_subplot(gs[0, :2])
-    # ax1.plot(feature_labels, cumulative_importances, marker='o', color='gold')
-    # ax1.set_xlabel('Features')
-    # ax1.set_ylabel('Cumulative Feature Importance')
-    # ax1.set_title('Elbow Plot of Cumulative Feature Importance for Miss Model')
-    # ax1.tick_params(axis='x', rotation=90)
-    #
-    # # Plot the permutation importances
-    # ax2 = fig.add_subplot(gs[1, :2])
-    # ax2.barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, color='peru')
-    # ax2.set_title('Permutation importances on predicting a miss')
-    #
-    # # Load and display the summary plot image in the subplot
-    # ax3 = fig.add_subplot(gs[:, 2:3])
-    # summary_img = mpimg.imread(summary_plot_file)
-    # ax3.imshow(summary_img)
-    # ax3.axis('off')  # Turn off axis ticks and labels
-    #
-    # # Plot the scatter plot
-    # ax4 = fig.add_subplot(gs[1, 3])
-    # shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "precursor = target F0"],
-    #                    cmap=cmapcustom, ax=ax4)
-    # ax4.set_xlabel('ferret ID')
-    # ax4.set_ylabel('SHAP value')
-    #
-    # ax5 = fig.add_subplot(gs[0, 3])
-    # shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "target F0"],
-    #                    cmap=cmapcustom, ax=ax5)
-    # ax5.set_xlabel('ferret ID')
-    # ax5.set_ylabel('SHAP value')
-    #
-    #
-    # # Adjust the layout and display the figure
-    # plt.tight_layout(pad=2.0)
-    # plt.subplots_adjust(top=0.9)
-    # plt.show()
+    plt.show()
+
+
+
 
     mosaic = ['A', 'B', 'C'], ['D', 'B', 'E']
-
-    fig = plt.figure(figsize=(20, 30))
+    fig = plt.figure(figsize=(25, 10))
     ax_dict = fig.subplot_mosaic(mosaic)
 
-    sorted_indices = sorted_indices[::-1]
-    feature_importances = feature_importances[sorted_indices]
-    feature_labels = dfx.columns[sorted_indices]
-    cumulative_importances = np.cumsum(feature_importances)
-
     # Plot the elbow plot
-
     ax_dict['A'].plot(feature_labels, cumulative_importances, marker='o', color='gold')
     ax_dict['A'].set_xlabel('Features')
     ax_dict['A'].set_ylabel('Cumulative Feature Importance')
     ax_dict['A'].set_title('Elbow Plot of Cumulative Feature Importance for Miss Model')
-    ax_dict['A'].tick_params(axis="x", direction="in", )  # rotate x-axis labels for better readability
+    ax_dict['A'].tick_params(axis="x", direction="in" )
+
+    # rotate x-axis labels for better readability
     summary_img = mpimg.imread(summary_plot_file)
-    ax_dict['B'].imshow(summary_img)
+    ax_dict['B'].imshow(summary_img, aspect='auto', )
+    ax_dict['B'].axis('off')  # Turn off axis ticks and labels
+    ax_dict['B'].set_title('Ranked list of features over their \n impact on miss probability', fontsize=13)
 
-    ax_dict['B'].set_title('Ranked list of features over their \n impact in predicting a miss', fontsize=18)
-
-    result = permutation_importance(xg_reg, X_test, y_test, n_repeats=100,
-                                    random_state=123, n_jobs=2)
-    sorted_idx = result.importances_mean.argsort()
 
     ax_dict['D'].barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, color='peru')
     ax_dict['D'].set_title("Permutation importances on predicting a miss")
-    explainer = shap.Explainer(xg_reg, X_train, feature_names=X_train.columns)
-    shap_values2 = explainer(X_train)
+    ax_dict['D'].set_xlabel("Permutation importance")
+
 
     shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "precursor = target F0"], ax=ax_dict['E'],
                        cmap=cmapcustom, show=False)
@@ -326,17 +274,22 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     # Modifying color bar parameters
     cb_ax.tick_params(labelsize=15)
     cb_ax.set_ylabel("precursor = target F0 word", fontsize=15)
-    ax_dict['E'].y_label('SHAP value', fontsize=10)
+    ax_dict['E'].set_ylabel('SHAP value', fontsize=10)
     ax_dict['E'].set_xlabel('Ferret ID', fontsize=16)
 
     shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "target F0"], ax=ax_dict['C'],
                        cmap=cmapcustom, show=False)
     fig, ax = plt.gcf(), plt.gca()
     cb_ax = fig.axes[1]
+    cb_ax.tick_params(labelsize=15)
+    cb_ax.set_ylabel("target F0 word", fontsize=15)
+
     # Modifying color bar parameters
     cb_ax.tick_params(labelsize=15)
-    ax_dict['C'].y_label('SHAP value', fontsize=10)
+    ax_dict['C'].set_ylabel('SHAP value', fontsize=10)
     ax_dict['C'].set_xlabel('Ferret ID', fontsize=16)
+    #remove padding outside the figures
+    plt.tight_layout()
     plt.show()
     # Plot the scatter plot for trial number and precursor pitch
     fig, ax = plt.subplots()
