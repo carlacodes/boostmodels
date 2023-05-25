@@ -270,7 +270,7 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
     ax4.annotate('d)', xy=get_axis_limits(ax4), xytext=(-0.1, ax4.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
 
     plt.suptitle('Proportion of hits, false alarms,\n correct responses and d\' by talker')
-    plt.savefig('figs/proportion_hits_falsealarms_correctresp_dprime_bytalker.png', dpi = 500, bbox_inches='tight')
+    plt.savefig('../figs/proportion_hits_falsealarms_correctresp_dprime_bytalker.png', dpi = 500, bbox_inches='tight')
     plt.show()
 
 
