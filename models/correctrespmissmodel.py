@@ -9,6 +9,8 @@ import shap
 import matplotlib
 import lightgbm as lgb
 import optuna
+import matplotlib.font_manager as fm
+
 from optuna.integration import LightGBMPruningCallback
 from sklearn.model_selection import StratifiedKFold
 
@@ -101,6 +103,8 @@ def objective(trial, X, y):
     return np.mean(cv_scores)
 
 
+def get_axis_limits(ax, scale=1):
+    return ax.get_xlim()[0] * scale, (ax.get_ylim()[1] * scale)
 
 def run_optuna_study_correctresp(X, y):
     study = optuna.create_study(direction="minimize", study_name="LGBM Classifier")
@@ -245,7 +249,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
 
 
     mosaic = ['A', 'B', 'C'], ['D', 'B', 'E']
-    fig = plt.figure(figsize=(25, 10))
+    fig = plt.figure(figsize=(24, 10))
     ax_dict = fig.subplot_mosaic(mosaic)
 
     # Plot the elbow plot
@@ -253,7 +257,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     ax_dict['A'].set_xlabel('Features')
     ax_dict['A'].set_ylabel('Cumulative Feature Importance')
     ax_dict['A'].set_title('Elbow Plot of Cumulative Feature Importance for Miss Model')
-    ax_dict['A'].tick_params(axis="x", direction="in" )
+    ax_dict['A'].set_xticklabels(feature_labels, rotation=45, ha='right')  # rotate x-axis labels for better readability
 
     # rotate x-axis labels for better readability
     summary_img = mpimg.imread(summary_plot_file)
@@ -275,21 +279,36 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     cb_ax.tick_params(labelsize=15)
     cb_ax.set_ylabel("precursor = target F0 word", fontsize=15)
     ax_dict['E'].set_ylabel('SHAP value', fontsize=10)
+    ax_dict['E'].set_title('Ferret ID versus impact on miss probability', fontsize=18)
+
     ax_dict['E'].set_xlabel('Ferret ID', fontsize=16)
 
     shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "target F0"], ax=ax_dict['C'],
                        cmap=cmapcustom, show=False)
     fig, ax = plt.gcf(), plt.gca()
     cb_ax = fig.axes[1]
+    cb_ax.set_yticks([1, 2, 3,4, 5])
+    cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
     cb_ax.tick_params(labelsize=15)
-    cb_ax.set_ylabel("target F0 word", fontsize=15)
+    cb_ax.set_ylabel("target F0 (Hz)", fontsize=15)
 
     # Modifying color bar parameters
     cb_ax.tick_params(labelsize=15)
     ax_dict['C'].set_ylabel('SHAP value', fontsize=10)
     ax_dict['C'].set_xlabel('Ferret ID', fontsize=16)
+    # ax_dict['C'].set_title('Ferret ID and precursor = target F0 versus SHAP value on miss probability', fontsize=18)
     #remove padding outside the figures
+    font_props = fm.FontProperties(weight='bold', size=17)
+
+    ax_dict['A'].annotate('a)', xy=get_axis_limits(ax_dict['A']), xytext=(-0.1, ax_dict['A'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props, zorder=10)
+    ax_dict['B'].annotate('b)', xy=get_axis_limits(ax_dict['B']), xytext=(-0.1, ax_dict['B'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+    ax_dict['C'].annotate('c)', xy=get_axis_limits(ax_dict['C']), xytext=(-0.1, ax_dict['C'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+    ax_dict['D'].annotate('d)', xy=get_axis_limits(ax_dict['D']), xytext=(-0.1, ax_dict['D'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+    ax_dict['E'].annotate('e)', xy=get_axis_limits(ax_dict['E']), xytext=(-0.1, ax_dict['E'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+
+
     plt.tight_layout()
+    plt.savefig(fig_dir / 'big_summary_plot.png', dpi=1000, bbox_inches="tight")
     plt.show()
     # Plot the scatter plot for trial number and precursor pitch
     fig, ax = plt.subplots()
