@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import optuna
 import seaborn as sns
 import shap
+import matplotlib.image as mpimg
 import sklearn
 import sklearn.metrics
 import xgboost as xgb
@@ -19,7 +20,10 @@ from sklearn.model_selection import train_test_split
 from helpers.behaviouralhelpersformodels import *
 from instruments.behaviouralAnalysis import reactionTimeAnalysis  # outputbehaviordf
 from instruments.io.BehaviourIO import BehaviourDataSet
+import matplotlib.font_manager as fm
 
+def get_axis_limits(ax, scale=1):
+    return ax.get_xlim()[0] * scale, (ax.get_ylim()[1] * scale)
 
 def cli_reaction_time(path=None,
                       output=None,
@@ -432,6 +436,67 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.savefig(fig_dir / 'trialtime_colouredbyprecur.png', dpi=1000)
     plt.show()
 
+    mosaic = ['A', 'B', 'C'], ['D', 'B', 'E']
+    fig = plt.figure(figsize=(24, 10))
+    ax_dict = fig.subplot_mosaic(mosaic)
+
+    # Plot the elbow plot
+    ax_dict['A'].plot(feature_labels, cumulative_importances, marker='o', color='gold')
+    ax_dict['A'].set_xlabel('Features')
+    ax_dict['A'].set_ylabel('Cumulative Feature Importance')
+    ax_dict['A'].set_title('Elbow Plot of Cumulative Feature Importance for Rxn Time Prediction')
+    ax_dict['A'].set_xticklabels(feature_labels, rotation=45, ha='right')  # rotate x-axis labels for better readability
+
+    # rotate x-axis labels for better readability
+    summary_img = mpimg.imread(fig_dir / 'ranked_features.png')
+    ax_dict['B'].imshow(summary_img, aspect='auto', )
+    ax_dict['B'].axis('off')  # Turn off axis ticks and labels
+    ax_dict['B'].set_title('Ranked list of features over their \n impact on false alarm probability', fontsize=13)
+
+
+    ax_dict['D'].barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, color='peru')
+    ax_dict['D'].set_title("Permutation importances on false alarm probability")
+    ax_dict['D'].set_xlabel("Permutation importance")
+
+
+    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "precursor = target F0"], ax=ax_dict['E'],
+                       cmap=cmapsummary, show=False)
+    fig, ax = plt.gcf(), plt.gca()
+    cb_ax = fig.axes[1]
+    # Modifying color bar parameters
+    cb_ax.tick_params(labelsize=15)
+    cb_ax.set_ylabel("precursor = target F0 word", fontsize=15)
+    ax_dict['E'].set_ylabel('SHAP value', fontsize=10)
+    ax_dict['E'].set_title('Ferret ID versus impact on false alarm probability', fontsize=18)
+    ax_dict['E'].set_xlabel('Ferret ID', fontsize=16)
+
+    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "target F0"], ax=ax_dict['C'],
+                       cmap =cmapsummary, show=False)
+    fig, ax = plt.gcf(), plt.gca()
+    cb_ax = fig.axes[1]
+    cb_ax.set_yticks([1, 2, 3,4, 5])
+    cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
+    cb_ax.tick_params(labelsize=15)
+    cb_ax.set_ylabel("target F0 (Hz)", fontsize=15)
+
+    # Modifying color bar parameters
+    cb_ax.tick_params(labelsize=15)
+    ax_dict['C'].set_ylabel('SHAP value', fontsize=10)
+    ax_dict['C'].set_xlabel('Ferret ID', fontsize=16)
+    # ax_dict['C'].set_title('Ferret ID and precursor = target F0 versus SHAP value on miss probability', fontsize=18)
+    #remove padding outside the figures
+    font_props = fm.FontProperties(weight='bold', size=17)
+
+    ax_dict['A'].annotate('a)', xy=get_axis_limits(ax_dict['A']), xytext=(-0.1, ax_dict['A'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props, zorder=10)
+    ax_dict['B'].annotate('b)', xy=get_axis_limits(ax_dict['B']), xytext=(-0.1, ax_dict['B'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+    ax_dict['C'].annotate('c)', xy=get_axis_limits(ax_dict['C']), xytext=(-0.1, ax_dict['C'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+    ax_dict['D'].annotate('d)', xy=get_axis_limits(ax_dict['D']), xytext=(-0.1, ax_dict['D'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+    ax_dict['E'].annotate('e)', xy=get_axis_limits(ax_dict['E']), xytext=(-0.1, ax_dict['E'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+
+
+    plt.tight_layout()
+    plt.savefig(fig_dir / 'big_summary_plot.png', dpi=1000, bbox_inches="tight")
+    plt.show()
     return xg_reg, ypred, y_test, results, shap_values1, X_train, y_train, bal_accuracy, shap_values2
 
 

@@ -5,6 +5,7 @@ from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import KFold
 from sklearn.model_selection import cross_val_score
 from sklearn.inspection import permutation_importance
+import matplotlib.font_manager as fm
 
 import shap
 import matplotlib
@@ -351,7 +352,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     plt.savefig(fig_savedir /'pitchofprecur_equals_target_colouredbytalker.png', dpi=1000)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "pitch of target"], color=shap_values2[:, "precursor = target F0"], show=False, cmap = matplotlib.colormaps[cmapname])
+    shap.plots.scatter(shap_values2[:, "target F0"], color=shap_values2[:, "precursor = target F0"], show=False, cmap = matplotlib.colormaps[cmapname])
     fig, ax = plt.gcf(), plt.gca()
     # Get colorbar
     cb_ax = fig.axes[1]
@@ -362,11 +363,11 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     cb_ax.set_ylabel("Pitch of precursor = target", fontsize=12)
     plt.ylabel('SHAP value', fontsize=10)
     if one_ferret:
-        plt.title('Pitch of target versus impact \n in predicted reacton time for ' + ferrets, fontsize=18)
+        plt.title('target F0 versus impact \n in predicted reacton time for ' + ferrets, fontsize=18)
     else:
-        plt.title('Pitch of target versus impact \n in predicted reacton time', fontsize=18)
+        plt.title('target F0 versus impact \n in predicted reacton time', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
-    plt.xlabel('Pitch of target', fontsize=16)
+    plt.xlabel('target F0', fontsize=16)
     plt.xticks([1,2,3,4,5], labels=['109', '124', '144 ', '191', '251'], fontsize=15)
     plt.savefig( fig_savedir /'pitchoftargcolouredbyprecur.png', dpi=1000)
     plt.show()
@@ -566,7 +567,7 @@ def extract_release_times_data(ferrets):
     dfuse = df[[ "pitchoftarg", "pastcatchtrial", "trialNum", "talker", "side", "precur_and_targ_same",
                 "timeToTarget",
                 "realRelReleaseTimes", "ferret", "pastcorrectresp"]]
-    labels = ['pitch of target', 'past trial was catch', 'trial number', 'talker', 'side of audio', 'precursor = target F0', 'time to target', 'realRelReleaseTimes', 'ferret ID', 'past trial was correct']
+    labels = ['target F0', 'past trial was catch', 'trial number', 'talker', 'side of audio', 'precursor = target F0', 'time to target', 'realRelReleaseTimes', 'ferret ID', 'past trial was correct']
     dfuse = dfuse.rename(columns=dict(zip(dfuse.columns, labels)))
     return dfuse
 
