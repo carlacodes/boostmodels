@@ -208,7 +208,6 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
 
     shap_values1 = shap.TreeExplainer(xg_reg).shap_values(dfx)
 
-
     custom_colors = ['gold',  'peru', "purple"]  # Add more colors as needed
     cmapcustom = mcolors.LinearSegmentedColormap.from_list('my_custom_cmap', custom_colors, N=1000)
     custom_colors_summary = ['peru', 'gold',]  # Add more colors as needed
