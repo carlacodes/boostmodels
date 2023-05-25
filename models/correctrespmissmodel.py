@@ -212,13 +212,86 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     #take the absolute sum of shap_values1 across the class types
     feature_importances = np.abs(shap_values1).sum(axis=1).sum(axis=0)
     sorted_indices = np.argsort(feature_importances)
+    #
+    # # Make a mosaic subplot
+    #
+    #
+    # x = np.arange(0, 7, 0.01)
+    #
+    # plt.subplot(2, 1, 1)
+    # plt.plot(x, np.sin(x))
+    #
+    # plt.subplot(2, 2, 3)
+    # plt.plot(x, np.cos(x))
+    #
+    # plt.subplot(2, 2, 4)
+    # plt.plot(x, np.sin(x) * np.cos(x))
+    # ax_dict = fig.subplot_mosaic(mosaic)
 
-    # Make a mosaic subplot
-    mosaic =    ['A', 'B', 'C'],['D','B' ,'E']
 
-    fig = plt.figure(figsize=(20,30))
+    sorted_indices = sorted_indices[::-1]
+    feature_importances = feature_importances[sorted_indices]
+    feature_labels = dfx.columns[sorted_indices]
+    cumulative_importances = np.cumsum(feature_importances)
+
+
+    result = permutation_importance(xg_reg, X_test, y_test, n_repeats=100,
+                                    random_state=123, n_jobs=2)
+    sorted_idx = result.importances_mean.argsort()
+
+    explainer = shap.Explainer(xg_reg, X_train, feature_names=X_train.columns)
+    shap_values2 = explainer(X_train)
+    # Create a single figure
+    import matplotlib.gridspec as gridspec
+    import matplotlib.image as mpimg
+    summary_plot_file = 'summary_plot.png'
+    shap.summary_plot(shap_values1, X_train, show=False, color=cmapsummary)
+    plt.savefig(summary_plot_file, dpi = 1000, bbox_inches='tight')
+
+    # fig = plt.figure(figsize=(20, 10))
+    # gs = gridspec.GridSpec(2, 4, figure=fig, width_ratios=[1, 1, 2, 1])
+    # # Plot the elbow plot
+    # ax1 = fig.add_subplot(gs[0, :2])
+    # ax1.plot(feature_labels, cumulative_importances, marker='o', color='gold')
+    # ax1.set_xlabel('Features')
+    # ax1.set_ylabel('Cumulative Feature Importance')
+    # ax1.set_title('Elbow Plot of Cumulative Feature Importance for Miss Model')
+    # ax1.tick_params(axis='x', rotation=90)
+    #
+    # # Plot the permutation importances
+    # ax2 = fig.add_subplot(gs[1, :2])
+    # ax2.barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, color='peru')
+    # ax2.set_title('Permutation importances on predicting a miss')
+    #
+    # # Load and display the summary plot image in the subplot
+    # ax3 = fig.add_subplot(gs[:, 2:3])
+    # summary_img = mpimg.imread(summary_plot_file)
+    # ax3.imshow(summary_img)
+    # ax3.axis('off')  # Turn off axis ticks and labels
+    #
+    # # Plot the scatter plot
+    # ax4 = fig.add_subplot(gs[1, 3])
+    # shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "precursor = target F0"],
+    #                    cmap=cmapcustom, ax=ax4)
+    # ax4.set_xlabel('ferret ID')
+    # ax4.set_ylabel('SHAP value')
+    #
+    # ax5 = fig.add_subplot(gs[0, 3])
+    # shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "target F0"],
+    #                    cmap=cmapcustom, ax=ax5)
+    # ax5.set_xlabel('ferret ID')
+    # ax5.set_ylabel('SHAP value')
+    #
+    #
+    # # Adjust the layout and display the figure
+    # plt.tight_layout(pad=2.0)
+    # plt.subplots_adjust(top=0.9)
+    # plt.show()
+
+    mosaic = ['A', 'B', 'C'], ['D', 'B', 'E']
+
+    fig = plt.figure(figsize=(20, 30))
     ax_dict = fig.subplot_mosaic(mosaic)
-
 
     sorted_indices = sorted_indices[::-1]
     feature_importances = feature_importances[sorted_indices]
@@ -227,32 +300,21 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
 
     # Plot the elbow plot
 
-    ax_dict['A'].plot(feature_labels, cumulative_importances, marker='o', color = 'gold')
+    ax_dict['A'].plot(feature_labels, cumulative_importances, marker='o', color='gold')
     ax_dict['A'].set_xlabel('Features')
     ax_dict['A'].set_ylabel('Cumulative Feature Importance')
     ax_dict['A'].set_title('Elbow Plot of Cumulative Feature Importance for Miss Model')
-    #rotate subplot xticks
+    ax_dict['A'].tick_params(axis="x", direction="in", )  # rotate x-axis labels for better readability
+    summary_img = mpimg.imread(summary_plot_file)
+    ax_dict['B'].imshow(summary_img)
 
-    ax_dict['A'].tick_params(axis="x", direction="in",)  # rotate x-axis labels for better readability
-    # ax_dict['A'].savefig(fig_dir / 'elbowplot.png', dpi=500, bbox_inches='tight')
-
-
-    shap.summary_plot(shap_values1, X_train, show = False, color=cmapsummary)
-    fig, ax_dict['B'] = plt.gcf(), plt.gca()
-    ax_dict['B'].set_title('Ranked list of features over their \n impact in predicting a miss', fontsize = 18)
-    # Get the plot's Patch objects
-    labels = [item.get_text() for item in ax_dict['B'].get_yticklabels()]
-    # fig.tight_layout()
-    # plt.savefig(fig_dir / 'shap_summary_correctresp.png', dpi=1000, bbox_inches = "tight")
-
-    # shap.dependence_plot("precursor = target F0", shap_values1[0], dfx)  #
-    # plt.show()
+    ax_dict['B'].set_title('Ranked list of features over their \n impact in predicting a miss', fontsize=18)
 
     result = permutation_importance(xg_reg, X_test, y_test, n_repeats=100,
                                     random_state=123, n_jobs=2)
     sorted_idx = result.importances_mean.argsort()
 
-    ax_dict['D'].barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, color = 'peru')
+    ax_dict['D'].barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, color='peru')
     ax_dict['D'].set_title("Permutation importances on predicting a miss")
     explainer = shap.Explainer(xg_reg, X_train, feature_names=X_train.columns)
     shap_values2 = explainer(X_train)
@@ -276,7 +338,32 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     ax_dict['C'].y_label('SHAP value', fontsize=10)
     ax_dict['C'].set_xlabel('Ferret ID', fontsize=16)
     plt.show()
+    # Plot the scatter plot for trial number and precursor pitch
+    fig, ax = plt.subplots()
+    shap.plots.scatter(shap_values2[:, "trial number"], color=shap_values2[:, "precursor = target F0"],
+                       ax=ax, cmap=cmapcustom, show=False)
+    cb_ax = fig.axes[1]
+    cb_ax.tick_params(labelsize=15)
+    cb_ax.set_ylabel("precursor = target F0", fontsize=15)
+    plt.title('Trial number and its effect on the miss probability', fontsize=18)
+    plt.xlabel('Trial number', fontsize=15)
+    plt.ylabel('SHAP value', fontsize=15)
+    plt.savefig(fig_dir / 'trialnum_vs_precurpitch.png', dpi=1000, bbox_inches="tight")
+    plt.show()
 
+    # Plot the scatter plot for side of audio presentation and precursor pitch
+    fig, ax = plt.subplots(figsize=(10, 10))
+    shap.plots.scatter(shap_values2[:, "audio side"], color=shap_values2[:, "precursor = target F0"],
+                       ax=ax, cmap=cmapcustom, show=False)
+    cb_ax = fig.axes[1]
+    cb_ax.tick_params(labelsize=15)
+    cb_ax.set_ylabel("precursor = target F0 word", fontsize=15)
+    plt.xticks([0, 1], labels=['left', 'right'], fontsize=15)
+    plt.ylabel('SHAP value', fontsize=16)
+    plt.title('Pitch of the side of the booth versus impact in miss probability', fontsize=18)
+    plt.xlabel('Side of audio presentation', fontsize=16)
+    plt.savefig(fig_dir / 'side_vs_precurpitch.png', dpi=1000, bbox_inches="tight")
+    plt.show()
 
 
     fig, ax = plt.subplots()
@@ -324,7 +411,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     plt.title('Precusor = target F0 \n versus impact in miss probability', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
     plt.xlabel('Side of audio presentation', fontsize=16)
-    plt.savefig(fig_dir / 'precursortargpitchintrialnumber.png', dpi=1000, bbox_inches = "tight")
+    # plt.savefig(fig_dir / 'precursortargpitchintrialnumber.png', dpi=1000, bbox_inches = "tight")
     plt.show()
     #
     # shap.plots.scatter(shap_values2[:, "pitch of target"], color=shap_values2[:, "precursor = target F0"], show=False, cmap = cmapcustom)
@@ -478,7 +565,6 @@ def run_correct_responsepipeline(ferrets):
 
 def run_models_for_all_or_one_ferret(run_individual_ferret_models):
     if run_individual_ferret_models:
-        ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
         ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
         for ferret in ferrets:
             xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = run_correct_responsepipeline(
