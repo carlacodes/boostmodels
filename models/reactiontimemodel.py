@@ -499,6 +499,8 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     ax_dict['E'].set_ylabel('SHAP value', fontsize=10)
     ax_dict['E'].set_title('Ferret ID versus impact on reaction time', fontsize=18)
     ax_dict['E'].set_xlabel('Ferret ID', fontsize=16)
+    ax_dict['E'].set_xticks([0, 1, 2, 3, 4])
+    ax_dict['E'].set_xticklabels(ferrets, rotation=45, ha='right')
 
     shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "target F0"], ax=ax_dict['C'],
                        cmap = matplotlib.colormaps[cmapname], show=False)
@@ -513,6 +515,8 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     cb_ax.tick_params(labelsize=15)
     ax_dict['C'].set_ylabel('SHAP value', fontsize=10)
     ax_dict['C'].set_xlabel('Ferret ID', fontsize=16)
+    ax_dict['C'].set_xticks([0, 1, 2, 3, 4])
+    ax_dict['C'].set_xticklabels(ferrets, rotation=45, ha='right')
     # ax_dict['C'].set_title('Ferret ID and precursor = target F0 versus SHAP value on miss probability', fontsize=18)
     #remove padding outside the figures
     font_props = fm.FontProperties(weight='bold', size=17)
@@ -593,7 +597,7 @@ def run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature = 
 
 
 
-    xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx, df_use[col], paramsinput=best_params, ferret_as_feature=ferret_as_feature)
+    xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx, df_use[col], paramsinput=best_params, ferret_as_feature=ferret_as_feature, ferrets = ferrets)
 
 
 
