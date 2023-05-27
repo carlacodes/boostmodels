@@ -467,7 +467,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
                        cmap=cmapcustom, show=False)
 
     fig, ax = plt.gcf(), plt.gca()
-    cb_ax = fig.axes[7]
+    cb_ax = fig.axes[5]
     # Modifying color bar parameters
     cb_ax.tick_params(labelsize=15)
     cb_ax.set_ylabel("precursor = target F0 word", fontsize=12)
