@@ -262,7 +262,7 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput, ferret_as_feature=False, one
         # dfuse = df[["pitchoftarg", "pastcatchtrial", "trialNum", "talker", "side", "precur_and_targ_same",
         #             "timeToTarget",
         #             "realRelReleaseTimes", "ferret", "pastcorrectresp"]]
-        labels = ["pitch of precursor", "target times", "ferret ID", "trial number", "talker", "audio side",
+        labels = ["precursor F0", "target times", "ferret ID", "trial number", "talker", "audio side",
                   "intra-trial F0 roving", "past response correct", "past trial was catch", "falsealarm"]
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
     else:
@@ -270,7 +270,7 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput, ferret_as_feature=False, one
             ["pitchofprecur", "targTimes", "trialNum", "talker", "side", "intra_trial_roving", "pastcorrectresp",
              "pastcatchtrial",
              "falsealarm"]]
-        labels = ["pitch of precursor", "target times", "trial number", "talker", "audio side", "intra-trial F0 roving",
+        labels = ["precursor F0", "target times", "trial number", "talker", "audio side", "intra-trial F0 roving",
                   "past response correct", "past trial was catch", "falsealarm"]
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
 
@@ -378,20 +378,20 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     fig.tight_layout()
     plt.savefig(fig_dir / 'permutation_importance.png', dpi=500)
     plt.show()
-    shap.dependence_plot("pitch of precursor", shap_values1[0], X_train)  #
+    shap.dependence_plot("precursor F0", shap_values1[0], X_train)  #
     plt.show()
 
     # partial dependency plots
 
     # Plot the scatter plot with the colormap
     shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "intra-trial F0 roving"], cmap=cmapcustom)
-    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "pitch of precursor"], cmap=cmapcustom)
+    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "precursor F0"], cmap=cmapcustom)
 
     plt.show()
     plt.tight_layout()
     plt.subplots_adjust(left=-10, right=0.5)
 
-    shap.plots.scatter(shap_values2[:, "pitch of precursor"], color=shap_values2[:, "intra-trial F0 roving"], show=False,
+    shap.plots.scatter(shap_values2[:, "precursor F0"], color=shap_values2[:, "intra-trial F0 roving"], show=False,
                        cmap=cmapcustom)
     fig, ax = plt.gcf(), plt.gca()
     cb_ax = fig.axes[1]
@@ -403,8 +403,8 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.title('Pitch of the precursor word \n versus impact in false alarm probability', fontsize=18)
     plt.xticks([1, 2, 3, 4, 5], labels=['109 Hz', '124 Hz', '144 Hz', '191 Hz', '251 Hz'], fontsize=15)
     plt.ylabel('SHAP value', fontsize=16)
-    plt.xlabel('Pitch of precursor word', fontsize=16)
-    plt.savefig(fig_dir / 'pitch of precursorintratrialrove.png', dpi=500)
+    plt.xlabel('precursor F0 word', fontsize=16)
+    plt.savefig(fig_dir / 'precursor F0intratrialrove.png', dpi=500)
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "target times"], color=shap_values2[:, "trial number"], show=False, cmap=cmapcustom)
@@ -421,7 +421,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.savefig(fig_dir / 'targtimescolouredbytrialnumber.png', dpi=1000)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "target times"], color=shap_values2[:, "pitch of precursor"], show=False,
+    shap.plots.scatter(shap_values2[:, "target times"], color=shap_values2[:, "precursor F0"], show=False,
                        cmap=cmapcustom)
     fig, ax = plt.gcf(), plt.gca()
     # Get colorbar
@@ -430,7 +430,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     cb_ax.tick_params(labelsize=15)
     cb_ax.set_yticks([1, 2, 3, 4, 5])
     cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
-    cb_ax.set_ylabel("Pitch of precursor", fontsize=12)
+    cb_ax.set_ylabel("precursor F0", fontsize=12)
     plt.ylabel('SHAP value', fontsize=10)
     plt.title('Target presentation versus \n impact on false alarm probability', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
@@ -556,7 +556,7 @@ def runlgbfaornot(dataframe):
     labels = [item.get_text() for item in ax.get_yticklabels()]
     print(labels)
     labels[11] = 'time to target presentation'
-    labels[10] = 'pitch of precursor'
+    labels[10] = 'precursor F0'
     labels[9] = 'trial number'
     labels[8] = 'past trial was catch'
     labels[7] = 'side of audio presentation'
@@ -573,7 +573,7 @@ def runlgbfaornot(dataframe):
     plt.savefig('D:/behavmodelfigs/fa_or_not_model/ranked_features.png', dpi=1000, bbox_inches="tight")
     plt.show()
 
-    shap.dependence_plot("pitch of precursor", shap_values1[0], dfx)  #
+    shap.dependence_plot("precursor F0", shap_values1[0], dfx)  #
     plt.show()
     result = permutation_importance(xg_reg, X_test, y_test, n_repeats=10,
                                     random_state=123, n_jobs=2)
@@ -593,7 +593,7 @@ def runlgbfaornot(dataframe):
     plt.subplots_adjust(left=-10, right=0.5)
 
     plt.show()
-    shap.plots.scatter(shap_values2[:, "pitch of precursor"], color=shap_values2[:, "talker"])
+    shap.plots.scatter(shap_values2[:, "precursor F0"], color=shap_values2[:, "talker"])
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "intra-trial F0 roving"], show=False)
