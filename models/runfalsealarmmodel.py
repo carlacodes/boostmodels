@@ -207,7 +207,7 @@ def run_optuna_study_falsealarm(dataframe, y, ferret_as_feature=False):
         # dfuse = df[["pitchoftarg", "pastcatchtrial", "trialNum", "talker", "side", "precur_and_targ_same",
         #             "timeToTarget",
         #             "realRelReleaseTimes", "ferret", "pastcorrectresp"]]
-        labels = ["pitch of precursor", "target times", "ferret ID", "trial number", "talker", "audio side",
+        labels = ["precursor F0", "target times", "ferret ID", "trial number", "talker", "audio side",
                   "intra-trial F0 roving", "past response correct", "past trial was catch", "falsealarm"]
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
     else:
@@ -215,7 +215,7 @@ def run_optuna_study_falsealarm(dataframe, y, ferret_as_feature=False):
             ["pitchofprecur", "targTimes", "trialNum", "talker", "side", "intra_trial_roving", "pastcorrectresp",
              "pastcatchtrial",
              "falsealarm"]]
-        labels = ["pitch of precursor", "target times", "trial number", "talker", "audio side", "intra-trial F0 roving",
+        labels = ["precursor F0", "target times", "trial number", "talker", "audio side", "intra-trial F0 roving",
                   "past response correct", "past trial was catch", "falsealarm"]
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
 
@@ -380,8 +380,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.show()
 
     # partial dependency plots
-    explainer = shap.Explainer(xg_reg, dfx)
-    shap_values2 = explainer(X_train)
+
     fig, ax = plt.subplots(figsize=(15, 15))
     # Plot the scatter plot with the colormap
     shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "intra-trial F0 roving"], cmap=cmapcustom)
@@ -592,7 +591,7 @@ def runlgbfaornot(dataframe):
     shap.plots.scatter(shap_values2[:, "pitch of precursor"], color=shap_values2[:, "talker"])
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "pitch of precursor"], color=shap_values2[:, "intra-trial F0 roving"], show=False)
+    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "intra-trial F0 roving"], show=False)
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "intra-trial F0 roving"], color=shap_values2[:, "talker"])
@@ -706,13 +705,13 @@ def runfalsealarmpipeline(ferrets, optimization=False, ferret_as_feature=False):
 
     if optimization == False:
         # load the saved params
-        params = np.load('../optuna_results/falsealarm_optunaparams_2005.npy', allow_pickle=True).item()
+        params = np.load('../optuna_results/falsealarm_optunaparams_2705.npy', allow_pickle=True).item()
     else:
         study = run_optuna_study_falsealarm(resultingfa_df, resultingfa_df['falsealarm'].to_numpy(),
                                             ferret_as_feature=ferret_as_feature)
         print(study.best_params)
         params = study.best_params
-        np.save('../optuna_results/falsealarm_optunaparams_2005.npy', study.best_params)
+        np.save('../optuna_results/falsealarm_optunaparams_2705.npy', study.best_params)
 
     resultingfa_df.to_csv(filepath)
 
@@ -1064,7 +1063,7 @@ if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
 
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(
-        ferrets, optimization=False, ferret_as_feature=True)
+        ferrets, optimization=True, ferret_as_feature=True)
     # ferrets = ['F2105_Clove']# 'F2105_Clove'
     # df_by_ferretdict = plot_reaction_times(ferrets)
     # #
