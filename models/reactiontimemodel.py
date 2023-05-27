@@ -471,7 +471,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     ax_dict = fig.subplot_mosaic(mosaic)
 
     # Plot the elbow plot
-    ax_dict['A'].plot(feature_labels, cumulative_importances, marker='o', color='gold')
+    ax_dict['A'].plot(feature_labels, cumulative_importances, marker='o', color='cyan')
     ax_dict['A'].set_xlabel('Features')
     ax_dict['A'].set_ylabel('Cumulative Feature Importance')
     ax_dict['A'].set_title('Elbow Plot of Cumulative Feature Importance for Rxn Time Prediction')
@@ -484,7 +484,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     ax_dict['B'].set_title('Ranked list of features over their \n impact on reaction time', fontsize=13)
 
 
-    ax_dict['D'].barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, color='peru')
+    ax_dict['D'].barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, color='cyan')
     ax_dict['D'].set_title("Permutation importances on reaction time")
     ax_dict['D'].set_xlabel("Permutation importance")
 
