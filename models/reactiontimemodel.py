@@ -276,27 +276,21 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     plt.savefig(fig_savedir / 'elbowplot.png', dpi=500, bbox_inches='tight')
     plt.show()
 
-    fig, ax = plt.subplots(figsize=(9, 12))
     shap.summary_plot(shap_values, X, show=False, cmap = matplotlib.colormaps[cmapname])
-
     fig, ax = plt.gcf(), plt.gca()
-    if one_ferret:
-        plt.title('Features over impact in reaction time for ' + ferrets)
-    else:
-        plt.title('Features over impact in reaction time')
+    # if one_ferret:
+    #     plt.title('Features over impact in reaction time for ' + ferrets)
+    # else:
+    #     plt.title('Features over impact in reaction time')
     plt.xlabel('SHAP value (impact on model output) on reaction time')
-    labels = [item.get_text() for item in ax.get_yticklabels()]
-    print(labels)
-    plt.savefig(fig_savedir / 'shapsummaryplot_allanimals2.png', dpi=1000, bbox_inches='tight')
-    plt.show()
-    import matplotlib.image as mpimg
-    summary_plot_file = 'summary_plot.png'
-    shap.summary_plot(shap_values, X, show=False, color= matplotlib.colormaps[cmapname])
-    fig, ax = plt.gcf(), plt.gca()
 
-    fig.set_size_inches(9, 12)
+    import matplotlib.image as mpimg
+    fig.set_size_inches(9, 15)
     ax.set_xlabel('SHAP Value (impact on model output)', fontsize=18)
     ax.set_ylabel('Features', fontsize=18)
+    plt.savefig(fig_savedir / 'shapsummaryplot_allanimals2.png', dpi=1000, bbox_inches='tight')
+
+    plt.show()
 
 
     result = permutation_importance(xg_reg, X_test, y_test, n_repeats=100,
@@ -473,7 +467,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
 
 
     mosaic = ['A', 'B', 'C'], ['D', 'B', 'E']
-    fig = plt.figure(figsize=(24, 10))
+    fig = plt.figure(figsize=(20, 10))
     ax_dict = fig.subplot_mosaic(mosaic)
 
     # Plot the elbow plot

@@ -459,7 +459,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     ax_dict['D'].set_xlabel("Permutation importance")
 
 
-    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "precursor = target F0"], ax=ax_dict['E'],
+    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "intra-trial F0 roving"], ax=ax_dict['E'],
                        cmap=cmapsummary, show=False)
     fig, ax = plt.gcf(), plt.gca()
     cb_ax = fig.axes[1]
@@ -1064,7 +1064,7 @@ if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
 
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(
-        ferrets, optimization=True, ferret_as_feature=True)
+        ferrets, optimization=False, ferret_as_feature=True)
     # ferrets = ['F2105_Clove']# 'F2105_Clove'
     # df_by_ferretdict = plot_reaction_times(ferrets)
     # #
