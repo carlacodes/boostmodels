@@ -328,6 +328,8 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
             fig_dir = Path('D:/behavmodelfigs/fa_or_not_model/')
 
     shap_values1 = shap.TreeExplainer(xg_reg).shap_values(X_train)
+    explainer = shap.Explainer(xg_reg, dfx)
+    shap_values2 = explainer(X_train)
     plt.subplots(figsize=(25, 25))
 
     custom_colors = ['slategray', 'hotpink', "yellow"]  # Add more colors as needed
@@ -381,9 +383,10 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
 
     # partial dependency plots
 
-    fig, ax = plt.subplots(figsize=(15, 15))
     # Plot the scatter plot with the colormap
-    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "intra-trial F0 roving"], cmap=cmapcustom)
+    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "intra-trial F0 roving"], cmap=cmapcustom)
+    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "pitch of precursor"], cmap=cmapcustom)
+
     plt.show()
     plt.tight_layout()
     plt.subplots_adjust(left=-10, right=0.5)
@@ -440,10 +443,10 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     ax_dict = fig.subplot_mosaic(mosaic)
 
     # Plot the elbow plot
-    ax_dict['A'].plot(feature_labels, cumulative_importances, marker='o', color='gold')
+    ax_dict['A'].plot(feature_labels, cumulative_importances, marker='o', color='slategray')
     ax_dict['A'].set_xlabel('Features')
     ax_dict['A'].set_ylabel('Cumulative Feature Importance')
-    ax_dict['A'].set_title('Elbow Plot of Cumulative Feature Importance for Rxn Time Prediction')
+    ax_dict['A'].set_title('Elbow plot of cumulative feature importance for false alarm model', fontsize=13)
     ax_dict['A'].set_xticklabels(feature_labels, rotation=45, ha='right')  # rotate x-axis labels for better readability
 
     # rotate x-axis labels for better readability
@@ -453,13 +456,14 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     ax_dict['B'].set_title('Ranked list of features over their \n impact on false alarm probability', fontsize=13)
 
 
-    ax_dict['D'].barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, color='peru')
+    ax_dict['D'].barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, color='slategray')
     ax_dict['D'].set_title("Permutation importances on false alarm probability")
     ax_dict['D'].set_xlabel("Permutation importance")
 
 
     shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "intra-trial F0 roving"], ax=ax_dict['E'],
-                       cmap=cmapsummary, show=False)
+                       cmap=cmapcustom, show=False)
+
     fig, ax = plt.gcf(), plt.gca()
     cb_ax = fig.axes[1]
     # Modifying color bar parameters
@@ -470,7 +474,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     ax_dict['E'].set_xlabel('Ferret ID', fontsize=16)
 
     shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "precursor F0"], ax=ax_dict['C'],
-                       cmap =cmapsummary, show=False)
+                       cmap =cmapcustom, show=False)
     fig, ax = plt.gcf(), plt.gca()
     cb_ax = fig.axes[1]
     cb_ax.set_yticks([1, 2, 3,4, 5])
@@ -543,6 +547,8 @@ def runlgbfaornot(dataframe):
     print('Balanced Accuracy: %.2f%%' % (np.mean(bal_accuracy) * 100.0))
 
     shap_values1 = shap.TreeExplainer(xg_reg).shap_values(dfx)
+    explainer = shap.Explainer(xg_reg, dfx)
+    shap_values2 = explainer(X_train)
     plt.subplots(figsize=(25, 25))
     shap.summary_plot(shap_values1, dfx, show=False)
     fig, ax = plt.gcf(), plt.gca()
@@ -579,8 +585,7 @@ def runlgbfaornot(dataframe):
     fig.tight_layout()
     plt.savefig('D:/behavmodelfigs/permutation_importance.png', dpi=500)
     plt.show()
-    explainer = shap.Explainer(xg_reg, dfx)
-    shap_values2 = explainer(X_train)
+
     fig, ax = plt.subplots(figsize=(15, 15))
     shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "intra-trial F0 roving"])
     fig.tight_layout()
@@ -705,13 +710,13 @@ def runfalsealarmpipeline(ferrets, optimization=False, ferret_as_feature=False):
 
     if optimization == False:
         # load the saved params
-        params = np.load('../optuna_results/falsealarm_optunaparams_2705.npy', allow_pickle=True).item()
+        params = np.load('../optuna_results/falsealarm_optunaparams_2005.npy', allow_pickle=True).item()
     else:
         study = run_optuna_study_falsealarm(resultingfa_df, resultingfa_df['falsealarm'].to_numpy(),
                                             ferret_as_feature=ferret_as_feature)
         print(study.best_params)
         params = study.best_params
-        np.save('../optuna_results/falsealarm_optunaparams_2705.npy', study.best_params)
+        np.save('../optuna_results/falsealarm_optunaparams_2005.npy', study.best_params)
 
     resultingfa_df.to_csv(filepath)
 
@@ -1063,7 +1068,7 @@ if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
 
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(
-        ferrets, optimization=True, ferret_as_feature=True)
+        ferrets, optimization=False, ferret_as_feature=True)
     # ferrets = ['F2105_Clove']# 'F2105_Clove'
     # df_by_ferretdict = plot_reaction_times(ferrets)
     # #
