@@ -467,12 +467,12 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
                        cmap=cmapcustom, show=False)
 
     fig, ax = plt.gcf(), plt.gca()
-    cb_ax = fig.axes[1]
+    cb_ax = fig.axes[7]
     # Modifying color bar parameters
     cb_ax.tick_params(labelsize=15)
-    cb_ax.set_ylabel("precursor = target F0 word", fontsize=15)
+    cb_ax.set_ylabel("precursor = target F0 word", fontsize=12)
     ax_dict['E'].set_ylabel('SHAP value', fontsize=10)
-    ax_dict['E'].set_title('Ferret ID versus impact on false alarm probability', fontsize=18)
+    ax_dict['E'].set_title('Ferret ID versus impact on false alarm probability', fontsize=13)
     ax_dict['E'].set_xticks([0, 1, 2, 3, 4])
     ax_dict['E'].set_xticklabels(ferrets,  rotation=45, ha='right')
     ax_dict['E'].set_xlabel('Ferret ID', fontsize=16)
@@ -490,7 +490,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     cb_ax.tick_params(labelsize=15)
     ax_dict['C'].set_ylabel('SHAP value', fontsize=10)
     ax_dict['C'].set_xlabel('Ferret ID', fontsize=16)
-    ax_dict['C'].set_title('Ferret ID versus impact on false alarm probability', fontsize=18)
+    ax_dict['C'].set_title('Ferret ID versus impact on false alarm probability', fontsize=13)
 
     ax_dict['C'].set_xticks([0, 1, 2, 3, 4])
     ax_dict['C'].set_xticklabels(ferrets,  rotation=45, ha='right')

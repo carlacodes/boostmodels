@@ -495,9 +495,9 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     cb_ax = fig.axes[1]
     # Modifying color bar parameters
     cb_ax.tick_params(labelsize=15)
-    cb_ax.set_ylabel("precursor = target F0 word", fontsize=15)
+    cb_ax.set_ylabel("precursor = target F0 word", fontsize=10)
     ax_dict['E'].set_ylabel('SHAP value', fontsize=10)
-    ax_dict['E'].set_title('Ferret ID versus impact on reaction time', fontsize=18)
+    ax_dict['E'].set_title('Ferret ID versus impact on reaction time', fontsize=13)
     ax_dict['E'].set_xlabel('Ferret ID', fontsize=16)
     ax_dict['E'].set_xticks([0, 1, 2, 3, 4])
     ax_dict['E'].set_xticklabels(ferrets, rotation=45, ha='right')
@@ -505,7 +505,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "target F0"], ax=ax_dict['C'],
                        cmap = matplotlib.colormaps[cmapname], show=False)
     fig, ax = plt.gcf(), plt.gca()
-    cb_ax = fig.axes[1]
+    cb_ax = fig.axes[7]
     cb_ax.set_yticks([1, 2, 3,4, 5])
     cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
     cb_ax.tick_params(labelsize=15)
@@ -516,6 +516,8 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     ax_dict['C'].set_ylabel('SHAP value', fontsize=10)
     ax_dict['C'].set_xlabel('Ferret ID', fontsize=16)
     ax_dict['C'].set_xticks([0, 1, 2, 3, 4])
+    ax_dict['C'].set_title('Ferret ID versus impact on reaction time', fontsize=13)
+
     ax_dict['C'].set_xticklabels(ferrets, rotation=45, ha='right')
     # ax_dict['C'].set_title('Ferret ID and precursor = target F0 versus SHAP value on miss probability', fontsize=18)
     #remove padding outside the figures
