@@ -478,7 +478,7 @@ def predict_rxn_time_with_dist_model(ferrets, optimization = False, ferret_as_fe
         else:
             best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
             best_params = best_study_results.best_params
-            np.save('optuna_results/best_paramsreleastime_dist_model_'+ ferrets[0]+ str(talker)+'.npy', best_params)
+            np.save('D:\mixedeffectmodelsbehavioural/optuna_results/best_paramsreleastime_dist_model_'+ ferrets[0]+ str(talker)+'.npy', best_params)
     else:
         dfx = dfx
         if optimization == False:
@@ -486,7 +486,7 @@ def predict_rxn_time_with_dist_model(ferrets, optimization = False, ferret_as_fe
         else:
             best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
             best_params = best_study_results.best_params
-            np.save('optuna_results/best_paramsreleastimemodel_dist_ferretasfeature_2805'+'talker'+str(talker)+ '.npy', best_params)
+            np.save('D:\mixedeffectmodelsbehavioural/optuna_results/best_paramsreleastimemodel_dist_ferretasfeature_2805'+'talker'+str(talker)+ '.npy', best_params)
     xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx, df_use[col], paramsinput=best_params, ferret_as_feature=ferret_as_feature, one_ferret=True, ferrets=ferrets[0], talker = talker)
 
 
