@@ -318,8 +318,6 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     word_times, worddictionary_female= run_word_durations(dirfemale)
     word_times_male, worddict_male = run_word_durations_male(dirmale)
     # Load the male sounds dictionary
-    dirmale = 'D:/Stimuli/19122022/MaleSounds24k_addedPinkNoiseRevTargetdB.mat'
-    word_times_male, worddict_male = run_word_durations(dirmale)
 
     #plot the spectrogram and amplittude waveform of each word
     #take the top 5 words from the permutation importance plot
@@ -414,6 +412,8 @@ def extract_releasedata_withdist(ferrets, talker = 1):
     df_use = df_use.drop(['distractors'], axis=1)
     if 'distractorAtten' in df_use.columns:
         df_use = df_use.drop(['distractorAtten'], axis=1)
+    if 'distLvl' in df_use.columns:
+        df_use = df_use.drop(['distLvl'], axis=1)
 
     return df_use
 
@@ -453,8 +453,9 @@ def predict_rxn_time_with_dist_model(ferrets, optimization = False, ferret_as_fe
     df_use = extract_releasedata_withdist(ferrets, talker=talker)
     col = 'centreRelease'
     dfx = df_use.loc[:, df_use.columns != col]
-    col2 = 'ferret'
-    dfx = dfx.loc[:, dfx.columns != col2]
+    if ferret_as_feature == False:
+        col2 = 'ferret'
+        dfx = dfx.loc[:, dfx.columns != col2]
     #count the frequencies of each time a value is not nan by column in dfx
     #count the frequencies of each time a value is not nan by column in dfx
     counts = dfx.count(axis=0)
