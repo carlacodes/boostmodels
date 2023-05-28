@@ -18,8 +18,13 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import sklearn
 from sklearn.model_selection import train_test_split
-from helpers.behaviouralhelpersformodels import *\
+from helpers.behaviouralhelpersformodels import *
+import matplotlib.font_manager as fm
+import matplotlib.image as mpimg
 
+
+def get_axis_limits(ax, scale=1):
+    return ax.get_xlim()[0] * scale, (ax.get_ylim()[1] * scale)
 
 def run_optuna_study_releasetimes(X, y):
     study = optuna.create_study(direction="minimize", study_name="LGBM regressor")
@@ -95,11 +100,6 @@ def runlgbreleasetimes_for_a_ferret(data, paramsinput=None, ferret=1, ferret_nam
     print(mse_train)
     shap_values = shap.TreeExplainer(xg_reg).shap_values(dfx)
 
-    # cumulative_importances_list = []
-    # for shap_values in shap_values1:
-    #     feature_importances = np.abs(shap_values).sum(axis=0)
-    #     cumulative_importances = np.cumsum(feature_importances)
-    #     cumulative_importances_list.append(cumulative_importances)
 
     # Calculate the combined cumulative sum of feature importances
     cumulative_importances_combined = np.sum(np.abs(shap_values), axis=0)
@@ -124,9 +124,10 @@ def runlgbreleasetimes_for_a_ferret(data, paramsinput=None, ferret=1, ferret_nam
     fig, ax = plt.gcf(), plt.gca()
     plt.title('Ranked list of features over their impact in predicting reaction time for' + ferret_name)
     plt.xlabel('SHAP value (impact on model output) on reaction time' + ferret_name)
+    plt.savefig('figs/shap_summary_plot_correct_release_times_' + ferret_name + '.png', dpi=300, bbox_inches='tight')
+    plt.show()
 
-    labels = [item.get_text() for item in ax.get_yticklabels()]
-    print(labels)
+
     trainandtestaccuracy ={
         'ferret': ferret_name,
         'mse_test': mse_test,
@@ -134,23 +135,7 @@ def runlgbreleasetimes_for_a_ferret(data, paramsinput=None, ferret=1, ferret_nam
         'mean_mse_train': np.mean(mse_train),
     }
     np.save('metrics/modelmse' + ferret_name + '.npy', trainandtestaccuracy)
-    # labels[11] = 'distance to sensor'
-    # labels[10] = 'target F0'
-    # labels[9] = 'trial number'
-    # labels[8] = 'precursor = target F0'
-    # labels[7] = 'male talker'
-    # labels[6] = 'time until target'
-    # labels[5] = 'target F0 - precursor F0'
-    # labels[4] = 'day of week'
-    # labels[3] = 'precursor F0'
-    # labels[2] = 'past trial was catch'
-    # labels[1] = 'trial took place in AM'
-    # labels[0] = 'past trial was correct'
 
-    ax.set_yticklabels(labels)
-    plt.savefig('figs/shap_summary_plot_correct_release_times_' + ferret_name + '.png', dpi=300, bbox_inches='tight')
-
-    plt.show()
 
     shap.dependence_plot("timeToTarget", shap_values, dfx)  #
 
@@ -180,9 +165,6 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     X_train, X_test, y_train, y_test = train_test_split(X,y, test_size=0.2,
                                                         random_state=42)
 
-    # param = {'max_depth': 2, 'eta': 1, 'objective': 'reg:squarederror'}
-    # param['nthread'] = 4
-    # param['eval_metric'] = 'auc'
 
     from pathlib import Path
     if ferret_as_feature:
@@ -273,24 +255,8 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     else:
         plt.title('Ranked list of features over their impact in predicting reaction time')
     plt.xlabel('SHAP value (impact on model output) on reaction time')
-    labels = [item.get_text() for item in ax.get_yticklabels()]
-    labelinfo = [item for item in ax.get_yticklabels()]
-    #dynamically asign label based on the column name
 
-    print(labels)
-    # labels[11] = 'trial Number'
-    # labels[10] = 'time to target'
-    # labels[9] = 'side of audio presentation'
-    # labels[8] = 'pitch of target'
-    # labels[7] = 'pitch of precursor'
-    # labels[6] = 'day since start of week'
-    # labels[5] = 'trial took place in AM'
-    # labels[4] = 'past trial catch'
-    # labels[3] = 'male/female talker'
-    # labels[2] = 'precursor = target pitch'
-    # labels[1] = 'change in pitch value'
-    # labels[0] = 'past trial was correct'
-    #
+
     # ax.set_yticklabels(labels)
     plt.savefig(fig_savedir / 'shapsummaryplot_allanimals2.png', dpi=1000, bbox_inches='tight')
     plt.show()
@@ -308,7 +274,10 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     plt.yticks(fontsize=10)
     #add whitespace between y tick labels and plot
     plt.tight_layout()
-    ax.set_title("Permutation importances on predicting the absolute release time for " + ferrets+ ' talker' + talkerlist[talker -1])
+    if one_ferret:
+        ax.set_title("Permutation importances on predicting the absolute release time for " + ferrets + ' talker' + talkerlist[talker -1])
+    else:
+        ax.set_title("Permutation importances on predicting the absolute release time, " + talkerlist[talker -1] +'talker')
     fig.tight_layout()
     plt.savefig(fig_savedir / 'permutation_importance.png', dpi=500, bbox_inches='tight')
     plt.show()
@@ -321,6 +290,16 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
 
     #plot the spectrogram and amplittude waveform of each word
     #take the top 5 words from the permutation importance plot
+    #GET THE TOP 5 WORDS
+    top_words = X_test.columns[sorted_idx][0:4]
+    for top_word in top_words:
+        top_word = top_word[4:]
+        #replace the word with the word number
+        top_word = int(top_word)
+        #re-add it to the list
+        top_words = np.append(top_words, top_word)
+    #remove the word with the word number
+    top_words = np.delete(top_words, [0,1,2, 3])
 
     count = 0
     while count < 6:
@@ -352,21 +331,20 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
                 count += 1
         elif talker == 2:
             # Plot spectrograms and wave amplitudes for male sounds
-            for word in worddict_male:
+            for word in (X_test.columns[sorted_idx]):
+                #remove dist from word
                 word = word[4:]
-
-                spectrogram = np.abs(np.fft.fft(word))
-                amplitude = np.abs(word)
+                spectrogram = np.abs(np.fft.fft(worddict_male[int(word)-1]))
+                amplitude = np.abs(worddict_male[int(word)-1])
 
                 # Plot spectrogram
                 plt.figure()
-                plt.specgram(word, Fs=24414.0625)
+                plt.specgram(worddict_male[int(word)-1].flatten(), Fs=24414.0625)
                 plt.title(f"Spectrogram of '{word}'")
                 plt.xlabel('Time')
                 plt.ylabel('Frequency')
                 plt.colorbar()
-                plt.savefig(fig_savedir / word+'talker'+talker+'spectrogram.png', dpi=500, bbox_inches='tight')
-
+                plt.savefig(os.path.join(str(fig_savedir), 'spectrogram' + word + 'talker'+ str(talker)+'.png'), dpi=500, bbox_inches='tight')
                 plt.show()
 
                 # Plot wave amplitude
@@ -375,10 +353,109 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
                 plt.title(f'Wave Amplitude of "{word}"')
                 plt.xlabel('Time')
                 plt.ylabel('Amplitude')
-                plt.savefig(fig_savedir / word+'talker'+talker+'waveamplitude.png', dpi=500, bbox_inches='tight')
-
+                plt.savefig(os.path.join(str(fig_savedir), 'amplitude' + word + 'talker'+ str(talker)+'.png'), dpi=500, bbox_inches='tight')
                 plt.show()
                 count += 1
+                count += 1
+
+    mosaic = ['A' 'A', 'B', 'C', 'F'], ['D','D' 'B', 'E', 'G']
+    fig = plt.figure(figsize=(20, 10))
+    ax_dict = fig.subplot_mosaic(mosaic)
+
+    # Plot the elbow plot
+    ax_dict['A'].plot(feature_labels, cumulative_importances, marker='o', color='cyan')
+    ax_dict['A'].set_xlabel('Features')
+    ax_dict['A'].set_ylabel('Cumulative Feature Importance')
+    ax_dict['A'].set_title('Elbow Plot of Cumulative Feature Importance for Rxn Time Prediction')
+    ax_dict['A'].set_xticklabels(feature_labels, rotation=45, ha='right')  # rotate x-axis labels for better readability
+
+    # rotate x-axis labels for better readability
+    summary_img = mpimg.imread(fig_savedir / 'shapsummaryplot_allanimals2.png')
+    ax_dict['B'].imshow(summary_img, aspect='auto', )
+    ax_dict['B'].axis('off')  # Turn off axis ticks and labels
+    ax_dict['B'].set_title('Ranked list of features over their \n impact on reaction time', fontsize=13)
+
+
+    ax_dict['D'].barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, color='cyan')
+    ax_dict['D'].set_title("Permutation importances on reaction time")
+    ax_dict['D'].set_xlabel("Permutation importance")
+
+    # Plot spectrogram
+    if talker == 1:
+        ax_dict['C'].specgram(worddictionary_female[int(39) - 1].flatten(), Fs=24414.0625)
+        ax_dict['C'].plot(np.abs(worddictionary_female[int(39)-1]))
+
+        ax_dict['C'].set_title(f"Spectrogram of word 39")
+        ax_dict['C'].set_xlabel('Time')
+        ax_dict['C'].set_ylabel('Frequency')
+        ax_dict['C'].colorbar()
+
+        ax_dict['E'].specgram(worddictionary_female[0].flatten(), Fs=24414.0625)
+        ax_dict['E'].plot(np.abs(worddictionary_female[0]), alpha=0.5)
+        ax_dict['E'].legend()
+        ax_dict['E'].set_title(f"Spectrogram of target word")
+        ax_dict['E'].set_xlabel('Time')
+        ax_dict['E'].set_ylabel('Frequency')
+        ax_dict['E'].colorbar()
+
+        ax_dict['F'].specgram(worddictionary_female[int(top_words[2]) - 1].flatten(), Fs=24414.0625)
+        ax_dict['F'].plot(np.abs(worddictionary_female[int(top_words[2]) - 1]))
+        ax_dict['F'].set_title(f"Spectrogram of '{top_words[2]}'")
+        ax_dict['F'].set_xlabel('Time')
+        ax_dict['F'].set_ylabel('Frequency')
+        ax_dict['F'].colorbar()
+
+        ax_dict['G'].specgram(worddictionary_female[int(top_words[3]) - 1].flatten(), Fs=24414.0625)
+        ax_dict['G'].plot(np.abs(worddictionary_female[int(top_words[3]) - 1]))
+        ax_dict['G'].set_title(f"Spectrogram of word 32")
+        ax_dict['G'].set_xlabel('Time')
+        ax_dict['G'].set_ylabel('Frequency')
+        ax_dict['G'].colorbar()
+
+    elif talker == 2:
+        ax_dict['C'].specgram(worddict_male[int(top_words[1]) - 1].flatten(), Fs=24414.0625)
+        ax_dict['C'].plot(np.abs(worddict_male[int(top_words[1])-1]), alpha = 0.5, label = 'Amplitude')
+        ax_dict['C'].set_title(f"Spectrogram of '{top_words[1]}'")
+        ax_dict['C'].set_xlabel('Time')
+        ax_dict['C'].set_ylabel('Frequency')
+        ax_dict['C'].colorbar()
+        ax_dict['C'].legend()
+
+        ax_dict['E'].specgram(worddict_male[0].flatten(), Fs=24414.0625)
+        ax_dict['E'].plot(np.abs(worddict_male[0]), alpha=0.5)
+        ax_dict['E'].legend()
+        ax_dict['E'].set_title(f"Spectrogram of target word")
+        ax_dict['E'].set_xlabel('Time')
+        ax_dict['E'].set_ylabel('Frequency')
+        ax_dict['E'].colorbar()
+
+        ax_dict['F'].specgram(worddict_male[int(top_words[2]) - 1].flatten(), Fs=24414.0625)
+        ax_dict['F'].plot(np.abs(worddict_male[int(top_words[2]) - 1]))
+        ax_dict['F'].set_title(f"Spectrogram of '{top_words[2]}'")
+        ax_dict['F'].set_xlabel('Time')
+        ax_dict['F'].set_ylabel('Frequency')
+        ax_dict['F'].colorbar()
+
+        ax_dict['G'].specgram(worddict_male[int(top_words[3]) - 1].flatten(), Fs=24414.0625)
+        ax_dict['G'].plot(np.abs(worddict_male[int(top_words[3]) - 1]))
+        ax_dict['G'].set_title(f"Spectrogram of word 32")
+        ax_dict['G'].set_xlabel('Time')
+        ax_dict['G'].set_ylabel('Frequency')
+        ax_dict['G'].colorbar()
+
+    #remove padding outside the figures
+    font_props = fm.FontProperties(weight='bold', size=17)
+
+    ax_dict['A'].annotate('a)', xy=get_axis_limits(ax_dict['A']), xytext=(-0.1, ax_dict['A'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props, zorder=10)
+    ax_dict['B'].annotate('b)', xy=get_axis_limits(ax_dict['B']), xytext=(-0.1, ax_dict['B'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+    ax_dict['C'].annotate('c)', xy=get_axis_limits(ax_dict['C']), xytext=(-0.1, ax_dict['C'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+    ax_dict['D'].annotate('d)', xy=get_axis_limits(ax_dict['D']), xytext=(-0.1, ax_dict['D'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+    ax_dict['E'].annotate('e)', xy=get_axis_limits(ax_dict['E']), xytext=(-0.1, ax_dict['E'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+
+
+    plt.tight_layout()
+    plt.savefig(fig_savedir / 'big_summary_plot.png', dpi=1000, bbox_inches="tight")
+    plt.show()
 
 
 
@@ -487,7 +564,7 @@ def predict_rxn_time_with_dist_model(ferrets, optimization = False, ferret_as_fe
     else:
         dfx = dfx
         if optimization == False:
-            best_params = np.load('optuna_results/best_paramsreleastimemodel_dist_ferretasfeature_2805'+'talker'+str(talker)+'.npy', allow_pickle=True).item()
+            best_params = np.load('D:\mixedeffectmodelsbehavioural/optuna_results/best_paramsreleastimemodel_dist_ferretasfeature_2805'+'talker'+str(talker)+'.npy', allow_pickle=True).item()
         else:
             best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
             best_params = best_study_results.best_params
@@ -504,7 +581,7 @@ def main():
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'] #, 'F2105_Clove']
 
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    predict_rxn_time_with_dist_model(ferrets, optimization = True, ferret_as_feature=True, talker = 1)
+    predict_rxn_time_with_dist_model(ferrets, optimization = False, ferret_as_feature=True, talker = 1)
 
     # for ferret in ferrets:
     #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)
