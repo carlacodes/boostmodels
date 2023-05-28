@@ -246,7 +246,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     plt.savefig(fig_savedir / 'elbowplot.png', dpi=500, bbox_inches='tight')
     plt.show()
 
-    fig, ax = plt.subplots(figsize=(15, 15))
+    fig, ax = plt.subplots(figsize=(9, 15))
     shap.summary_plot(shap_values, X, show=False, cmap = matplotlib.colormaps[cmapname])
 
     fig, ax = plt.gcf(), plt.gca()
@@ -358,7 +358,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
                 count += 1
                 count += 1
 
-    mosaic = ['A' 'A', 'B', 'C', 'F'], ['D','D' 'B', 'E', 'G']
+    mosaic = ['A', 'A', 'B', 'C', 'F'], ['D','D','B', 'E', 'G']
     fig = plt.figure(figsize=(20, 10))
     ax_dict = fig.subplot_mosaic(mosaic)
 
@@ -382,66 +382,41 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
 
     # Plot spectrogram
     if talker == 1:
-        ax_dict['C'].specgram(worddictionary_female[int(39) - 1].flatten(), Fs=24414.0625)
-        ax_dict['C'].plot(np.abs(worddictionary_female[int(39)-1]))
-
-        ax_dict['C'].set_title(f"Spectrogram of word 39")
-        ax_dict['C'].set_xlabel('Time')
-        ax_dict['C'].set_ylabel('Frequency')
-        ax_dict['C'].colorbar()
-
-        ax_dict['E'].specgram(worddictionary_female[0].flatten(), Fs=24414.0625)
-        ax_dict['E'].plot(np.abs(worddictionary_female[0]), alpha=0.5)
-        ax_dict['E'].legend()
-        ax_dict['E'].set_title(f"Spectrogram of target word")
-        ax_dict['E'].set_xlabel('Time')
-        ax_dict['E'].set_ylabel('Frequency')
-        ax_dict['E'].colorbar()
-
-        ax_dict['F'].specgram(worddictionary_female[int(top_words[2]) - 1].flatten(), Fs=24414.0625)
-        ax_dict['F'].plot(np.abs(worddictionary_female[int(top_words[2]) - 1]))
-        ax_dict['F'].set_title(f"Spectrogram of '{top_words[2]}'")
-        ax_dict['F'].set_xlabel('Time')
-        ax_dict['F'].set_ylabel('Frequency')
-        ax_dict['F'].colorbar()
-
-        ax_dict['G'].specgram(worddictionary_female[int(top_words[3]) - 1].flatten(), Fs=24414.0625)
-        ax_dict['G'].plot(np.abs(worddictionary_female[int(top_words[3]) - 1]))
-        ax_dict['G'].set_title(f"Spectrogram of word 32")
-        ax_dict['G'].set_xlabel('Time')
-        ax_dict['G'].set_ylabel('Frequency')
-        ax_dict['G'].colorbar()
-
+        worddict = worddictionary_female
     elif talker == 2:
-        ax_dict['C'].specgram(worddict_male[int(top_words[1]) - 1].flatten(), Fs=24414.0625)
-        ax_dict['C'].plot(np.abs(worddict_male[int(top_words[1])-1]), alpha = 0.5, label = 'Amplitude')
-        ax_dict['C'].set_title(f"Spectrogram of '{top_words[1]}'")
-        ax_dict['C'].set_xlabel('Time')
-        ax_dict['C'].set_ylabel('Frequency')
-        ax_dict['C'].colorbar()
-        ax_dict['C'].legend()
+        worddict = worddict_male
+    pxx, freq, t, cax = ax_dict['C'].specgram(worddict[top_words[1] - 1].flatten(), Fs=24414.0625)
 
-        ax_dict['E'].specgram(worddict_male[0].flatten(), Fs=24414.0625)
-        ax_dict['E'].plot(np.abs(worddict_male[0]), alpha=0.5)
-        ax_dict['E'].legend()
-        ax_dict['E'].set_title(f"Spectrogram of target word")
-        ax_dict['E'].set_xlabel('Time')
-        ax_dict['E'].set_ylabel('Frequency')
-        ax_dict['E'].colorbar()
+    ax_dict['C'].fill_between(np.arange(len(np.abs(worddict[int(top_words[1]) - 1]))) / 24414.0625, np.abs(worddict[int(top_words[1]) - 1]).flatten(), color='red', alpha=0.5)
+    ax_dict['C'].set_title(f"Spectrogram of word 39")
+    ax_dict['C'].set_xlabel('Time')
+    ax_dict['C'].set_ylabel('Frequency')
+    plt.colorbar(cax, ax = ax_dict['C'])
 
-        ax_dict['F'].specgram(worddict_male[int(top_words[2]) - 1].flatten(), Fs=24414.0625)
-        ax_dict['F'].plot(np.abs(worddict_male[int(top_words[2]) - 1]))
-        ax_dict['F'].set_title(f"Spectrogram of '{top_words[2]}'")
-        ax_dict['F'].set_xlabel('Time')
-        ax_dict['F'].set_ylabel('Frequency')
-        ax_dict['F'].colorbar()
+    pxx, freq, t, cax = ax_dict['E'].specgram(worddict[0].flatten(), Fs=24414.0625)
+    ax_dict['E'].fill_between(np.arange(len(np.abs(worddict[0]))) / 24414.0625, np.abs(worddict[0]).flatten(), color='red', alpha=0.5)
+    ax_dict['E'].legend()
+    ax_dict['E'].set_title(f"Spectrogram of target word")
+    ax_dict['E'].set_xlabel('Time')
+    ax_dict['E'].set_ylabel('Frequency')
+    plt.colorbar(cax, ax = ax_dict['E'])
 
-        ax_dict['G'].specgram(worddict_male[int(top_words[3]) - 1].flatten(), Fs=24414.0625)
-        ax_dict['G'].plot(np.abs(worddict_male[int(top_words[3]) - 1]))
-        ax_dict['G'].set_title(f"Spectrogram of word 32")
-        ax_dict['G'].set_xlabel('Time')
-        ax_dict['G'].set_ylabel('Frequency')
-        ax_dict['G'].colorbar()
+    pxx,  freq, t, cax = ax_dict['F'].specgram(worddict[int(top_words[2]) - 1].flatten(), Fs=24414.0625)
+    ax_dict['F'].fill_between(np.arange(len(np.abs(worddict[int(top_words[2]) - 1]))) / 24414.0625, np.abs(worddict[int(top_words[2]) - 1]).flatten(), color='red', alpha=0.5)
+    ax_dict['F'].set_title(f"Spectrogram of '{top_words[2]}'")
+    ax_dict['F'].set_xlabel('Time')
+    ax_dict['F'].set_ylabel('Frequency')
+    plt.colorbar(cax, ax = ax_dict['F'])
+
+    pxx, freq, t, cax = ax_dict['G'].specgram(worddict[int(top_words[3]) - 1].flatten(), Fs=24414.0625)
+    ax_dict['G'].fill_between(np.arange(len(np.abs(worddict[int(top_words[3]) - 1]))) / 24414.0625, np.abs(worddict[int(top_words[3]) - 1]).flatten(), color='red', alpha=0.5)
+
+    ax_dict['G'].set_title(f"Spectrogram of word 32")
+    ax_dict['G'].set_xlabel('Time')
+    ax_dict['G'].set_ylabel('Frequency')
+    plt.colorbar(cax, ax = ax_dict['G'])
+
+
 
     #remove padding outside the figures
     font_props = fm.FontProperties(weight='bold', size=17)
