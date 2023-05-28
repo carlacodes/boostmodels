@@ -326,17 +326,19 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     while count < 6:
         if talker == 1:
             for word in (X_test.columns[sorted_idx]):
-                spectrogram = np.abs(np.fft.fft(int(word)-1))
-                amplitude = np.abs(word)
+                #remove dist from word
+                word = word[4:]
+                spectrogram = np.abs(np.fft.fft(worddictionary_female[int(word)-1]))
+                amplitude = np.abs(worddictionary_female[int(word)-1])
 
                 # Plot spectrogram
                 plt.figure()
-                plt.specgram(word, Fs=24414.0625)
+                plt.specgram(worddictionary_female[int(word)-1].flatten(), Fs=24414.0625)
                 plt.title(f"Spectrogram of '{word}'")
                 plt.xlabel('Time')
                 plt.ylabel('Frequency')
                 plt.colorbar()
-                plt.savefig(fig_savedir / word+'spectrogram.png', dpi=500, bbox_inches='tight')
+                plt.savefig(os.path.join(str(fig_savedir), 'spectrogram' + word + 'talker'+ str(talker)+'.png'), dpi=500, bbox_inches='tight')
                 plt.show()
 
                 # Plot wave amplitude
@@ -345,12 +347,14 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
                 plt.title(f'Wave Amplitude of "{word}"')
                 plt.xlabel('Time')
                 plt.ylabel('Amplitude')
-                plt.savefig(fig_savedir / word+'talker_'+talker+'waveamplitude.png', dpi=500, bbox_inches='tight')
+                plt.savefig(os.path.join(str(fig_savedir), 'amplitude' + word + 'talker'+ str(talker)+'.png'), dpi=500, bbox_inches='tight')
                 plt.show()
                 count += 1
         elif talker == 2:
             # Plot spectrograms and wave amplitudes for male sounds
             for word in worddict_male:
+                word = word[4:]
+
                 spectrogram = np.abs(np.fft.fft(word))
                 amplitude = np.abs(word)
 
@@ -488,7 +492,12 @@ def predict_rxn_time_with_dist_model(ferrets, optimization = False, ferret_as_fe
             best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
             best_params = best_study_results.best_params
             np.save('D:\mixedeffectmodelsbehavioural/optuna_results/best_paramsreleastimemodel_dist_ferretasfeature_2805'+'talker'+str(talker)+ '.npy', best_params)
-    xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx, df_use[col], paramsinput=best_params, ferret_as_feature=ferret_as_feature, one_ferret=True, ferrets=ferrets[0], talker = talker)
+    if len(ferrets) ==1:
+        one_ferret = True
+        ferrets = ferrets[0]
+    else:
+        one_ferret = False
+    xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx, df_use[col], paramsinput=best_params, ferret_as_feature = ferret_as_feature, one_ferret=one_ferret, ferrets=ferrets, talker = talker)
 
 
 def main():
