@@ -1,11 +1,9 @@
 import sklearn.metrics
-# from rpy2.robjects import pandas2ri
-import seaborn as sns
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import KFold
 from sklearn.model_selection import cross_val_score
 from sklearn.inspection import permutation_importance
-
+from helpers.embedworddurations import *
 import shap
 import matplotlib
 import lightgbm as lgb
@@ -315,121 +313,75 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     plt.savefig(fig_savedir / 'permutation_importance.png', dpi=500, bbox_inches='tight')
     plt.show()
 
-    # shap.dependence_plot("timeToTarget", shap_values, X)  #
-    # explainer = shap.Explainer(xg_reg, X)
-    # shap_values2 = explainer(X_train)
-    #
-    #
-    # shap.plots.scatter(shap_values2[:, "timeToTarget"], color=shap_values2[:, "trialNum"], show=False, cmap = matplotlib.colormaps[cmapname])
-    # fig, ax = plt.gcf(), plt.gca()
-    # # Get colorbar
-    # cb_ax = fig.axes[1]
-    # # Modifying color bar parameters
-    # cb_ax.tick_params(labelsize=15)
-    # cb_ax.set_ylabel("Trial number", fontsize=12)
-    # plt.ylabel('SHAP value', fontsize=10)
-    # if one_ferret:
-    #     plt.title('Target presentation time \n versus impact in predicted reacton time for' + ferrets[0], fontsize=18)
-    # else:
-    #     plt.title('Target presentation time \n versus impact in predicted reacton time', fontsize=18)
-    # plt.ylabel('SHAP value', fontsize=16)
-    # plt.xlabel('Target presentation time', fontsize=16)
-    # plt.savefig(fig_savedir /'targtimescolouredbytrialnumber.png', dpi=1000)
-    # plt.show()
-    #
-    # shap.plots.scatter(shap_values2[:, "pitchoftarg"], color=shap_values2[:, "precur_and_targ_same"], show=False, cmap = matplotlib.colormaps[cmapname])
-    # fig, ax = plt.gcf(), plt.gca()
-    # # Get colorbar
-    # cb_ax = fig.axes[1]
-    # # Modifying color bar parameters
-    # cb_ax.tick_params(labelsize=15)
-    # cb_ax.set_yticks([1, 2, 3,4, 5])
-    # # cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
-    # cb_ax.set_ylabel("Pitch of precursor = target", fontsize=12)
-    # plt.ylabel('SHAP value', fontsize=10)
-    # if one_ferret:
-    #     plt.title('Pitch of target \n versus impact in predicted reacton time for' + ferrets, fontsize=18)
-    # else:
-    #     plt.title('Pitch of target \n versus impact in predicted reacton time', fontsize=18)
-    # plt.ylabel('SHAP value', fontsize=16)
-    # plt.xlabel('Pitch of target', fontsize=16)
-    # # plt.xticks([1,2,3,4,5], labels=['109', '124', '144 ', '191', '251'], fontsize=15)
-    # plt.savefig( fig_savedir /'pitchoftargcolouredbyprecur.png', dpi=1000)
-    # plt.show()
-    #
-    # if one_ferret == False:
-    #     shap.plots.scatter(shap_values2[:, "ferret"], color=shap_values2[:, "timeToTarget"], show=False, cmap = matplotlib.colormaps[cmapname])
-    #     fig, ax = plt.gcf(), plt.gca()
-    #     # Get colorbar
-    #     cb_ax = fig.axes[1]
-    #     # Modifying color bar parameters
-    #     cb_ax.tick_params(labelsize=15)
-    #     cb_ax.set_yticks([1, 2, 3,4, 5])
-    #     # cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
-    #     cb_ax.set_ylabel("Target presentation time ", fontsize=12)
-    #     plt.ylabel('SHAP value', fontsize=10)
-    #     if one_ferret:
-    #         plt.title('Ferret \n versus impact in predicted reacton time for' + ferrets[0], fontsize=18)
-    #     else:
-    #         plt.title('Ferret \n versus impact in predicted reacton time', fontsize=18)
-    #     plt.ylabel('SHAP value', fontsize=16)
-    #     plt.xlabel('Ferret', fontsize=16)
-    #     # plt.xticks([1,2,3,4,5], labels=['109', '124', '144 ', '191', '251'], fontsize=15)
-    #     plt.xticks([0,1,2,3,4], labels=['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'], fontsize=15)
-    #     #rotate xtick labels:
-    #     plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
-    #     plt.savefig( fig_savedir /'ferretcolouredbytargtimes.png', dpi=1000)
-    #     plt.show()
-    #
-    #     shap.plots.scatter(shap_values2[:, "ferret"], color=shap_values2[:, "pitchofprecur"], show=False,
-    #                        cmap=matplotlib.colormaps[cmapname])
-    #     fig, ax = plt.gcf(), plt.gca()
-    #     # Get colorbar
-    #     cb_ax = fig.axes[1]
-    #     # Modifying color bar parameters
-    #     cb_ax.tick_params(labelsize=15)
-    #     cb_ax.set_yticks([1, 2, 3, 4, 5])
-    #     # cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
-    #     cb_ax.set_ylabel("Precursor = Target pitch ", fontsize=12)
-    #     plt.ylabel('SHAP value', fontsize=10)
-    #     if one_ferret:
-    #         plt.title('Ferret \n versus impact in predicted reacton time for' + ferrets, fontsize=18)
-    #     else:
-    #         plt.title('Ferret \n versus impact in predicted reacton time', fontsize=18)
-    #     plt.ylabel('SHAP value', fontsize=16)
-    #     plt.xlabel('Ferret', fontsize=16)
-    #     # plt.xticks([1,2,3,4,5], labels=['109', '124', '144 ', '191', '251'], fontsize=15)
-    #     plt.xticks([0, 1, 2, 3, 4], labels=['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'],
-    #                fontsize=15)
-    #     # rotate xtick labels:
-    #     plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
-    #     plt.savefig(fig_savedir / 'ferretcolouredbyintratrialroving.png', dpi=1000)
-    #     plt.show()
-    #
-    #     shap.plots.scatter(shap_values2[:, "side"], color=shap_values2[:, "ferret"], show=False,
-    #                        cmap=matplotlib.colormaps[cmapname])
-    #     fig, ax = plt.gcf(), plt.gca()
-    #     # Get colorbar
-    #     cb_ax = fig.axes[1]
-    #     # Modifying color bar parameters
-    #     cb_ax.tick_params(labelsize=15)
-    #     cb_ax.set_yticks([0, 1, 2, 3, 4])
-    #     cb_ax.set_yticklabels(['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'])
-    #     cb_ax.set_ylabel("ferret ", fontsize=12)
-    #     # plt.xticks([0, 1, 2, 3, 4], labels=['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'],
-    #     #            fontsize=15)
-    #     plt.ylabel('SHAP value', fontsize=10)
-    #
-    #     plt.title('Ferret \n versus impact in predicted reacton time', fontsize=18)
-    #
-    #     # plt.ylabel('SHAP value', fontsize=16)
-    #     plt.xlabel('side', fontsize=16)
-    #     plt.xticks([0,1], labels=['left', 'right'], fontsize=15)
-    #
-    #     # rotate xtick labels:
-    #     plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
-    #     plt.savefig(fig_savedir / 'sidecolouredbyferret.png', dpi=1000)
-    #     plt.show()
+    dirfemale = 'D:/Stimuli/19122022/FemaleSounds24k_addedPinkNoiseRevTargetdB.mat'
+    dirmale = 'D:/Stimuli/19122022/MaleSounds24k_addedPinkNoiseRevTargetdB.mat'
+    word_times, worddictionary_female= run_word_durations(dirfemale)
+    word_times_male, worddict_male = run_word_durations_male(dirmale)
+    # Load the male sounds dictionary
+    dirmale = 'D:/Stimuli/19122022/MaleSounds24k_addedPinkNoiseRevTargetdB.mat'
+    word_times_male, worddict_male = run_word_durations(dirmale)
+
+    #plot the spectrogram and amplittude waveform of each word
+    #take the top 5 words from the permutation importance plot
+
+    count = 0
+    while count < 6:
+        if talker == 1:
+            for word in (X_test.columns[sorted_idx]):
+                spectrogram = np.abs(np.fft.fft(int(word)-1))
+                amplitude = np.abs(word)
+
+                # Plot spectrogram
+                plt.figure()
+                plt.specgram(word, Fs=24414.0625)
+                plt.title(f"Spectrogram of '{word}'")
+                plt.xlabel('Time')
+                plt.ylabel('Frequency')
+                plt.colorbar()
+                plt.savefig(fig_savedir / word+'spectrogram.png', dpi=500, bbox_inches='tight')
+                plt.show()
+
+                # Plot wave amplitude
+                plt.figure()
+                plt.plot(amplitude)
+                plt.title(f'Wave Amplitude of "{word}"')
+                plt.xlabel('Time')
+                plt.ylabel('Amplitude')
+                plt.savefig(fig_savedir / word+'talker_'+talker+'waveamplitude.png', dpi=500, bbox_inches='tight')
+                plt.show()
+                count += 1
+        elif talker == 2:
+            # Plot spectrograms and wave amplitudes for male sounds
+            for word in worddict_male:
+                spectrogram = np.abs(np.fft.fft(word))
+                amplitude = np.abs(word)
+
+                # Plot spectrogram
+                plt.figure()
+                plt.specgram(word, Fs=24414.0625)
+                plt.title(f"Spectrogram of '{word}'")
+                plt.xlabel('Time')
+                plt.ylabel('Frequency')
+                plt.colorbar()
+                plt.savefig(fig_savedir / word+'talker'+talker+'spectrogram.png', dpi=500, bbox_inches='tight')
+
+                plt.show()
+
+                # Plot wave amplitude
+                plt.figure()
+                plt.plot(amplitude)
+                plt.title(f'Wave Amplitude of "{word}"')
+                plt.xlabel('Time')
+                plt.ylabel('Amplitude')
+                plt.savefig(fig_savedir / word+'talker'+talker+'waveamplitude.png', dpi=500, bbox_inches='tight')
+
+                plt.show()
+                count += 1
+
+
+
+
+
 
     return xg_reg, ypred, y_test, results
 
@@ -484,11 +436,11 @@ def run_correctrxntime_model(ferrets, optimization=False, ferret_as_feature=Fals
     else:
         dfx = dfx
         if optimization == False:
-            best_params = np.load('../optuna_results/best_paramsreleastimemodel_allferrets_ferretasfeature.npy', allow_pickle=True).item()
+            best_params = np.load('D:\mixedeffectmodelsbehavioural\optuna_results/best_paramsreleastimemodel_allferrets_ferretasfeature.npy', allow_pickle=True).item()
         else:
             best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
             best_params = best_study_results.best_params
-            np.save('../optuna_results/best_paramsreleastimemodel_allferrets_ferretasfeature.npy', best_params)
+            np.save('D:\mixedeffectmodelsbehavioural\optuna_results/best_paramsreleastimemodel_allferrets_ferretasfeature.npy', best_params)
 
 
 
@@ -530,23 +482,23 @@ def predict_rxn_time_with_dist_model(ferrets, optimization = False, ferret_as_fe
     else:
         dfx = dfx
         if optimization == False:
-            best_params = np.load('optuna_results/best_paramsreleastimemodel_dist_ferretasfeature_'+ ferrets[0]+'talker'+str(talker)+'.npy', allow_pickle=True).item()
+            best_params = np.load('optuna_results/best_paramsreleastimemodel_dist_ferretasfeature_2805'+'talker'+str(talker)+'.npy', allow_pickle=True).item()
         else:
             best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
             best_params = best_study_results.best_params
-            np.save('optuna_results/best_paramsreleastimemodel_dist_ferretasfeature_'+  ferrets[0]+'talker'+str(talker)+ '.npy', best_params)
+            np.save('optuna_results/best_paramsreleastimemodel_dist_ferretasfeature_2805'+'talker'+str(talker)+ '.npy', best_params)
     xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx, df_use[col], paramsinput=best_params, ferret_as_feature=ferret_as_feature, one_ferret=True, ferrets=ferrets[0], talker = talker)
 
 
 def main():
-    ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni'] #, 'F2105_Clove']
+    ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'] #, 'F2105_Clove']
 
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    # run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature=True)
+    predict_rxn_time_with_dist_model(ferrets, optimization = True, ferret_as_feature=True, talker = 1)
 
-    for ferret in ferrets:
-        predict_rxn_time_with_dist_model([ferret], optimization=True, ferret_as_feature=False, talker = 1)
-        predict_rxn_time_with_dist_model([ferret], optimization=True, ferret_as_feature=False, talker = 2)
+    # for ferret in ferrets:
+    #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)
+    #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 2)
 
 
 

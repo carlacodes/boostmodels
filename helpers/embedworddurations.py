@@ -24,7 +24,7 @@ def run_word_durations(dirfemale):
     word_dictionary2 = word_dictionary[0]
     word_dictionary2 = word_dictionary2[0]
     word_dictionary_np = np.array(word_dictionary2)
-    word_dictionary_np=word_dictionary_np[0]
+    word_dictionary_np = word_dictionary_np[0]
     word_times = embed_word_durations(word_dictionary_np, frequency)
 
     # word_dictionary2=word_dictionary[0,0]
