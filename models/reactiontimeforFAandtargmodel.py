@@ -246,17 +246,14 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     plt.savefig(fig_savedir / 'elbowplot.png', dpi=500, bbox_inches='tight')
     plt.show()
 
-    fig, ax = plt.subplots(figsize=(9, 15))
     shap.summary_plot(shap_values, X, show=False, cmap = matplotlib.colormaps[cmapname])
 
     fig, ax = plt.gcf(), plt.gca()
+    fig.set_size_inches(9, 15)
     if one_ferret:
         plt.title('Ranked list of features over their impact in predicting reaction time for' + ferrets+ ' talker' + talkerlist[talker -1])
-    else:
-        plt.title('Ranked list of features over their impact in predicting reaction time')
+
     plt.xlabel('SHAP value (impact on model output) on reaction time')
-
-
     # ax.set_yticklabels(labels)
     plt.savefig(fig_savedir / 'shapsummaryplot_allanimals2.png', dpi=1000, bbox_inches='tight')
     plt.show()
@@ -367,7 +364,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     ax_dict['A'].set_xlabel('Features')
     ax_dict['A'].set_ylabel('Cumulative Feature Importance')
     ax_dict['A'].set_title('Elbow Plot of Cumulative Feature Importance for Rxn Time Prediction')
-    ax_dict['A'].set_xticklabels(feature_labels, rotation=45, ha='right')  # rotate x-axis labels for better readability
+    ax_dict['A'].set_xticklabels(feature_labels, rotation=45, ha='right', fontsize = 5)  # rotate x-axis labels for better readability
 
     # rotate x-axis labels for better readability
     summary_img = mpimg.imread(fig_savedir / 'shapsummaryplot_allanimals2.png')
@@ -376,9 +373,12 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     ax_dict['B'].set_title('Ranked list of features over their \n impact on reaction time', fontsize=13)
 
 
+
     ax_dict['D'].barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, color='cyan')
     ax_dict['D'].set_title("Permutation importances on reaction time")
     ax_dict['D'].set_xlabel("Permutation importance")
+    ax_dict['D'].set_yticklabels(X_test.columns[sorted_idx], rotation=45, ha='right', fontsize = 5)  # rotate x-axis labels for better readability
+
 
     # Plot spectrogram
     if talker == 1:
@@ -388,7 +388,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     pxx, freq, t, cax = ax_dict['C'].specgram(worddict[top_words[1] - 1].flatten(), Fs=24414.0625)
 
     ax_dict['C'].fill_between(np.arange(len(np.abs(worddict[int(top_words[1]) - 1]))) / 24414.0625, np.abs(worddict[int(top_words[1]) - 1]).flatten(), color='red', alpha=0.5)
-    ax_dict['C'].set_title(f"Spectrogram of word 39")
+    ax_dict['C'].set_title(f"Spectrogram of '{top_words[1]}'")
     ax_dict['C'].set_xlabel('Time')
     ax_dict['C'].set_ylabel('Frequency')
     plt.colorbar(cax, ax = ax_dict['C'])
@@ -411,10 +411,10 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     pxx, freq, t, cax = ax_dict['G'].specgram(worddict[int(top_words[3]) - 1].flatten(), Fs=24414.0625)
     ax_dict['G'].fill_between(np.arange(len(np.abs(worddict[int(top_words[3]) - 1]))) / 24414.0625, np.abs(worddict[int(top_words[3]) - 1]).flatten(), color='red', alpha=0.5)
 
-    ax_dict['G'].set_title(f"Spectrogram of word 32")
+    ax_dict['G'].set_title(f"Spectrogram of '{top_words[3]}'")
     ax_dict['G'].set_xlabel('Time')
     ax_dict['G'].set_ylabel('Frequency')
-    plt.colorbar(cax, ax = ax_dict['G'])
+    plt.colorbar(cax, ax = ax_dict['G'], )
 
 
 
@@ -424,12 +424,14 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     ax_dict['A'].annotate('a)', xy=get_axis_limits(ax_dict['A']), xytext=(-0.1, ax_dict['A'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props, zorder=10)
     ax_dict['B'].annotate('b)', xy=get_axis_limits(ax_dict['B']), xytext=(-0.1, ax_dict['B'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
     ax_dict['C'].annotate('c)', xy=get_axis_limits(ax_dict['C']), xytext=(-0.1, ax_dict['C'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-    ax_dict['D'].annotate('d)', xy=get_axis_limits(ax_dict['D']), xytext=(-0.1, ax_dict['D'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-    ax_dict['E'].annotate('e)', xy=get_axis_limits(ax_dict['E']), xytext=(-0.1, ax_dict['E'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+    ax_dict['D'].annotate('e)', xy=get_axis_limits(ax_dict['D']), xytext=(-0.1, ax_dict['D'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+    ax_dict['E'].annotate('f)', xy=get_axis_limits(ax_dict['E']), xytext=(-0.1, ax_dict['E'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+    ax_dict['F'].annotate('d)', xy=get_axis_limits(ax_dict['F']), xytext=(-0.1, ax_dict['F'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+    ax_dict['G'].annotate('g)', xy=get_axis_limits(ax_dict['G']), xytext=(-0.1, ax_dict['G'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
 
 
     plt.tight_layout()
-    plt.savefig(fig_savedir / 'big_summary_plot.png', dpi=1000, bbox_inches="tight")
+    plt.savefig(os.path.join((fig_savedir) , str(talker) +'_talker_big_summary_plot.png'), dpi=1000, bbox_inches="tight")
     plt.show()
 
 
@@ -556,7 +558,7 @@ def main():
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'] #, 'F2105_Clove']
 
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    predict_rxn_time_with_dist_model(ferrets, optimization = False, ferret_as_feature=True, talker = 1)
+    predict_rxn_time_with_dist_model(ferrets, optimization = False, ferret_as_feature=True, talker = 2)
 
     # for ferret in ferrets:
     #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)
