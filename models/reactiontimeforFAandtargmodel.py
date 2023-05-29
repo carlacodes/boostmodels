@@ -209,6 +209,8 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     else:
         plt.title('feature importances for the LGBM Correct Release Times model')
     plt.show()
+    female_word_labels = ['instruments', 'when a', 'sailor', 'in a small', 'craft', 'faces', 'of the might', 'of the vast', 'atlantic', 'ocean', 'today', 'he takes', 'the same', 'risks', 'that generations', 'took', 'before', 'him', 'but', 'in contrast', 'them', 'he can meet', 'any', 'emergency', 'that comes', 'his way', 'confidence', 'that stems', 'profound', 'trust', 'advance', 'of science', 'boats', 'stronger', 'more stable', 'protecting', 'against', 'and du', 'exposure', 'tools and', 'more ah', 'accurate', 'the more', 'reliable', 'helping in', 'normal weather', 'and conditions', 'food', 'and drink', 'of better', 'researched', 'than easier', 'to cook', 'than ever', 'before', 'rev. instruments', 'pink noise']
+    male_word_labels = ['instruments', 'when a', 'sailor', 'in a', 'small', 'craft', 'faces', 'the might', 'of the', 'vast', 'atlantic', 'ocean', 'today', 'he', 'takes', 'the same', 'risks', 'that generations', 'took', 'before him', 'but', 'in contrast', 'to them', 'he', 'can meet', 'any', 'emergency', 'that comes', 'his way', 'with a', 'confidence', 'that stems', 'from', 'profound', 'trust', 'in the', 'advances', 'of science', 'boats', 'as stronger', 'and more', 'stable', 'protecting', 'against', 'undue', 'exposure', 'tools', 'and', 'accurate', 'and more', 'reliable', 'helping', 'in all', 'weather', 'and', 'rev. instruments', 'pink noise']
 
     kfold = KFold(n_splits=10)
     results = cross_val_score(xg_reg, X_train, y_train, scoring='neg_mean_squared_error', cv=kfold)
@@ -229,13 +231,21 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     sorted_indices = sorted_indices[::-1]
     feature_importances = feature_importances[sorted_indices]
     feature_labels = X.columns[sorted_indices]
+    if talker == 1:
+        female_word_labels = np.array(female_word_labels)
+
+        feature_labels_words = female_word_labels[sorted_indices]
+    else:
+        male_word_labels = np.array(male_word_labels)
+
+        feature_labels_words = male_word_labels[sorted_indices]
     cumulative_importances = np.cumsum(feature_importances)
 
     talkerlist = ['female', 'male'
     ]
     # Plot the elbow plot
     plt.figure(figsize=(10, 6))
-    plt.plot(feature_labels, cumulative_importances, marker='o', color = 'cyan')
+    plt.plot(feature_labels_words, cumulative_importances, marker='o', color = 'cyan')
     plt.xlabel('Features')
     plt.ylabel('Cumulative Feature Importance')
     if one_ferret:
@@ -264,7 +274,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
 
     sorted_idx = result.importances_mean.argsort()
     fig, ax = plt.subplots(figsize=(8, 18))
-    ax.barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, height = 0.3, color = 'cyan')
+    ax.barh(feature_labels_words, result.importances[sorted_idx].mean(axis=1).T, height = 0.3, color = 'cyan')
     #rotate y -axis labels for better readability
     plt.yticks(rotation=45, ha='right')
     #make font size smaller for y tick labels
@@ -298,62 +308,62 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     #remove the word with the word number
     top_words = np.delete(top_words, [0,1,2, 3])
 
-    count = 0
-    while count < 6:
-        if talker == 1:
-            for word in (X_test.columns[sorted_idx]):
-                #remove dist from word
-                word = word[4:]
-                spectrogram = np.abs(np.fft.fft(worddictionary_female[int(word)-1]))
-                amplitude = np.abs(worddictionary_female[int(word)-1])
-
-                # Plot spectrogram
-                plt.figure()
-                plt.specgram(worddictionary_female[int(word)-1].flatten(), Fs=24414.0625)
-                plt.title(f"Spectrogram of '{word}'")
-                plt.xlabel('Time')
-                plt.ylabel('Frequency')
-                plt.colorbar()
-                plt.savefig(os.path.join(str(fig_savedir), 'spectrogram' + word + 'talker'+ str(talker)+'.png'), dpi=500, bbox_inches='tight')
-                plt.show()
-
-                # Plot wave amplitude
-                plt.figure()
-                plt.plot(amplitude)
-                plt.title(f'Wave Amplitude of "{word}"')
-                plt.xlabel('Time')
-                plt.ylabel('Amplitude')
-                plt.savefig(os.path.join(str(fig_savedir), 'amplitude' + word + 'talker'+ str(talker)+'.png'), dpi=500, bbox_inches='tight')
-                plt.show()
-                count += 1
-        elif talker == 2:
-            # Plot spectrograms and wave amplitudes for male sounds
-            for word in (X_test.columns[sorted_idx]):
-                #remove dist from word
-                word = word[4:]
-                spectrogram = np.abs(np.fft.fft(worddict_male[int(word)-1]))
-                amplitude = np.abs(worddict_male[int(word)-1])
-
-                # Plot spectrogram
-                plt.figure()
-                plt.specgram(worddict_male[int(word)-1].flatten(), Fs=24414.0625)
-                plt.title(f"Spectrogram of '{word}'")
-                plt.xlabel('Time')
-                plt.ylabel('Frequency')
-                plt.colorbar()
-                plt.savefig(os.path.join(str(fig_savedir), 'spectrogram' + word + 'talker'+ str(talker)+'.png'), dpi=500, bbox_inches='tight')
-                plt.show()
-
-                # Plot wave amplitude
-                plt.figure()
-                plt.plot(amplitude)
-                plt.title(f'Wave Amplitude of "{word}"')
-                plt.xlabel('Time')
-                plt.ylabel('Amplitude')
-                plt.savefig(os.path.join(str(fig_savedir), 'amplitude' + word + 'talker'+ str(talker)+'.png'), dpi=500, bbox_inches='tight')
-                plt.show()
-                count += 1
-                count += 1
+    # count = 0
+    # while count < 6:
+    #     if talker == 1:
+    #         for word in (X_test.columns[sorted_idx]):
+    #             #remove dist from word
+    #             word = word[4:]
+    #             spectrogram = np.abs(np.fft.fft(worddictionary_female[int(word)-1]))
+    #             amplitude = np.abs(worddictionary_female[int(word)-1])
+    #
+    #             # Plot spectrogram
+    #             plt.figure()
+    #             plt.specgram(worddictionary_female[int(word)-1].flatten(), Fs=24414.0625)
+    #             plt.title(f"Spectrogram of '{word}'")
+    #             plt.xlabel('Time')
+    #             plt.ylabel('Frequency')
+    #             plt.colorbar()
+    #             plt.savefig(os.path.join(str(fig_savedir), 'spectrogram' + word + 'talker'+ str(talker)+'.png'), dpi=500, bbox_inches='tight')
+    #             plt.show()
+    #
+    #             # Plot wave amplitude
+    #             plt.figure()
+    #             plt.plot(amplitude)
+    #             plt.title(f'Wave Amplitude of "{word}"')
+    #             plt.xlabel('Time')
+    #             plt.ylabel('Amplitude')
+    #             plt.savefig(os.path.join(str(fig_savedir), 'amplitude' + word + 'talker'+ str(talker)+'.png'), dpi=500, bbox_inches='tight')
+    #             plt.show()
+    #             count += 1
+    #     elif talker == 2:
+    #         # Plot spectrograms and wave amplitudes for male sounds
+    #         for word in (X_test.columns[sorted_idx]):
+    #             #remove dist from word
+    #             word = word[4:]
+    #             spectrogram = np.abs(np.fft.fft(worddict_male[int(word)-1]))
+    #             amplitude = np.abs(worddict_male[int(word)-1])
+    #
+    #             # Plot spectrogram
+    #             plt.figure()
+    #             plt.specgram(worddict_male[int(word)-1].flatten(), Fs=24414.0625)
+    #             plt.title(f"Spectrogram of '{word}'")
+    #             plt.xlabel('Time')
+    #             plt.ylabel('Frequency')
+    #             plt.colorbar()
+    #             plt.savefig(os.path.join(str(fig_savedir), 'spectrogram' + word + 'talker'+ str(talker)+'.png'), dpi=500, bbox_inches='tight')
+    #             plt.show()
+    #
+    #             # Plot wave amplitude
+    #             plt.figure()
+    #             plt.plot(amplitude)
+    #             plt.title(f'Wave Amplitude of "{word}"')
+    #             plt.xlabel('Time')
+    #             plt.ylabel('Amplitude')
+    #             plt.savefig(os.path.join(str(fig_savedir), 'amplitude' + word + 'talker'+ str(talker)+'.png'), dpi=500, bbox_inches='tight')
+    #             plt.show()
+    #             count += 1
+    #             count += 1
 
     mosaic = ['A', 'A', 'B', 'C', 'F'], ['D','D','B', 'E', 'G']
     fig = plt.figure(figsize=(20, 10))
@@ -364,7 +374,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     ax_dict['A'].set_xlabel('Features')
     ax_dict['A'].set_ylabel('Cumulative Feature Importance')
     ax_dict['A'].set_title('Elbow Plot of Cumulative Feature Importance for Rxn Time Prediction')
-    ax_dict['A'].set_xticklabels(feature_labels, rotation=45, ha='right', fontsize = 5)  # rotate x-axis labels for better readability
+    ax_dict['A'].set_xticklabels(feature_labels_words, rotation=45, ha='right', fontsize = 5)  # rotate x-axis labels for better readability
 
     # rotate x-axis labels for better readability
     summary_img = mpimg.imread(fig_savedir / 'shapsummaryplot_allanimals2.png')
@@ -374,10 +384,10 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
 
 
 
-    ax_dict['D'].barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, color='cyan')
+    ax_dict['D'].barh(feature_labels_words, result.importances[sorted_idx].mean(axis=1).T, color='cyan')
     ax_dict['D'].set_title("Permutation importances on reaction time")
     ax_dict['D'].set_xlabel("Permutation importance")
-    ax_dict['D'].set_yticklabels(X_test.columns[sorted_idx], rotation=45, ha='right', fontsize = 5)  # rotate x-axis labels for better readability
+    ax_dict['D'].set_yticklabels(feature_labels_words, rotation=45, ha='right', fontsize=5)  # rotate x-axis labels for better readability
 
 
     # Plot spectrogram
@@ -388,7 +398,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     pxx, freq, t, cax = ax_dict['C'].specgram(worddict[top_words[1] - 1].flatten(), Fs=24414.0625)
 
     ax_dict['C'].fill_between(np.arange(len(np.abs(worddict[int(top_words[1]) - 1]))) / 24414.0625, np.abs(worddict[int(top_words[1]) - 1]).flatten(), color='red', alpha=0.5)
-    ax_dict['C'].set_title(f"Spectrogram of '{top_words[1]}'")
+    ax_dict['C'].set_title(f"Spectrogram of '{feature_labels_words[1]}'")
     ax_dict['C'].set_xlabel('Time')
     ax_dict['C'].set_ylabel('Frequency')
     plt.colorbar(cax, ax = ax_dict['C'])
@@ -403,15 +413,14 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
 
     pxx,  freq, t, cax = ax_dict['F'].specgram(worddict[int(top_words[2]) - 1].flatten(), Fs=24414.0625)
     ax_dict['F'].fill_between(np.arange(len(np.abs(worddict[int(top_words[2]) - 1]))) / 24414.0625, np.abs(worddict[int(top_words[2]) - 1]).flatten(), color='red', alpha=0.5)
-    ax_dict['F'].set_title(f"Spectrogram of '{top_words[2]}'")
+    ax_dict['F'].set_title(f"Spectrogram of '{feature_labels_words[2]}'")
     ax_dict['F'].set_xlabel('Time')
     ax_dict['F'].set_ylabel('Frequency')
     plt.colorbar(cax, ax = ax_dict['F'])
 
     pxx, freq, t, cax = ax_dict['G'].specgram(worddict[int(top_words[3]) - 1].flatten(), Fs=24414.0625)
     ax_dict['G'].fill_between(np.arange(len(np.abs(worddict[int(top_words[3]) - 1]))) / 24414.0625, np.abs(worddict[int(top_words[3]) - 1]).flatten(), color='red', alpha=0.5)
-
-    ax_dict['G'].set_title(f"Spectrogram of '{top_words[3]}'")
+    ax_dict['G'].set_title(f"Spectrogram of '{feature_labels_words[3]}'")
     ax_dict['G'].set_xlabel('Time')
     ax_dict['G'].set_ylabel('Frequency')
     plt.colorbar(cax, ax = ax_dict['G'], )
@@ -465,6 +474,12 @@ def extract_releasedata_withdist(ferrets, talker = 1):
     df = pd.concat([df_intra, df_inter, df_control], axis = 0)
     #get a dataframe with only the dist_cols and then combine with two other columns
     df_dist = df[dist_cols]
+    # if talker == 1:
+    #     labels = ['instruments', 'when a', 'sailor', 'in a small', 'craft', 'faces', 'of the might', 'of the vast', 'atlantic', 'ocean', 'today', 'he takes', 'the same', 'risks', 'that generations', 'took', 'before', 'him', 'but', 'in contrast', 'them', 'he can meet', 'any', 'emergency', 'that comes', 'his way', 'confidence', 'that stems', 'profound', 'trust', 'advance', 'of science', 'boats', 'stronger', 'more stable', 'protecting', 'against', 'and du', 'exposure', 'tools and', 'more ah', 'accurate', 'the more', 'reliable', 'helping in', 'normal weather', 'and conditions', 'food', 'and drink', 'of better', 'researched', 'than easier', 'to cook', 'than ever', 'before', 'rev. instruments', 'pink noise']
+    # else:
+    #     labels = ['instruments', 'when a', 'sailor', 'in a', 'small', 'craft', 'faces', 'the might', 'of the', 'vast', 'atlantic', 'ocean', 'today', 'he', 'takes', 'the same', 'risks', 'that generations', 'took', 'before him', 'but', 'in contrast', 'to them', 'he', 'can meet', 'any', 'emergency', 'that comes', 'his way', 'with a', 'confidence', 'that stems', 'from', 'profound', 'trust', 'in the', 'advances', 'of science', 'boats', 'as stronger', 'and more', 'stable', 'protecting', 'against', 'undue', 'exposure', 'tools', 'and', 'accurate', 'and more', 'reliable', 'helping', 'in all', 'weather', 'and', 'rev. instruments', 'pink noise']
+
+
     df_use = pd.concat([df_dist, df['centreRelease']], axis=1)
     #drop the distractors column
     df_use = df_use.drop(['distractors'], axis=1)
@@ -472,6 +487,8 @@ def extract_releasedata_withdist(ferrets, talker = 1):
         df_use = df_use.drop(['distractorAtten'], axis=1)
     if 'distLvl' in df_use.columns:
         df_use = df_use.drop(['distLvl'], axis=1)
+
+    # df_use = df_use.rename(columns=dict(zip(df_use.columns, labels)))
 
     return df_use
 
@@ -558,7 +575,7 @@ def main():
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'] #, 'F2105_Clove']
 
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    predict_rxn_time_with_dist_model(ferrets, optimization = False, ferret_as_feature=True, talker = 2)
+    predict_rxn_time_with_dist_model(ferrets, optimization = False, ferret_as_feature=True, talker = 1)
 
     # for ferret in ferrets:
     #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)
