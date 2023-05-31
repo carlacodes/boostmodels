@@ -201,6 +201,9 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
 
     kfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=123)
     results = cross_val_score(xg_reg, X_test, y_test, scoring='accuracy', cv=kfold)
+
+    bal_accuracy_train = cross_val_score(xg_reg, X_train, y_train, scoring='balanced_accuracy', cv=kfold)
+
     bal_accuracy = cross_val_score(xg_reg, X_test, y_test, scoring='balanced_accuracy', cv=kfold)
     print("Accuracy: %.2f%%" % (np.mean(results) * 100.0))
     print(results)
@@ -285,7 +288,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "target F0"], ax=ax_dict['C'],
                        cmap=cmapcustom, show=False)
     fig, ax = plt.gcf(), plt.gca()
-    cb_ax = fig.axes[1]
+    cb_ax = fig.axes[5]
     cb_ax.set_yticks([1, 2, 3,4, 5])
     cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
     cb_ax.tick_params(labelsize=15)
