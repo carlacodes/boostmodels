@@ -243,7 +243,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
 
     #make the y labels smaller
 
-    plt.savefig(summary_plot_file, dpi = 1000, bbox_inches='tight')
+    plt.savefig(summary_plot_file, dpi = 500, bbox_inches='tight')
 
     plt.show()
 

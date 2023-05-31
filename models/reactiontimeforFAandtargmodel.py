@@ -265,7 +265,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
 
     plt.xlabel('SHAP value (impact on model output) on reaction time')
     # ax.set_yticklabels(labels)
-    plt.savefig(fig_savedir / 'shapsummaryplot_allanimals2.png', dpi=1000, bbox_inches='tight')
+    plt.savefig(fig_savedir / 'shapsummaryplot_allanimals2.png', dpi=400, bbox_inches='tight')
     plt.show()
 
     result = permutation_importance(xg_reg, X_test, y_test, n_repeats=100,
@@ -286,7 +286,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     else:
         ax.set_title("Permutation importances on predicting the absolute release time, " + talkerlist[talker -1] +'talker')
     fig.tight_layout()
-    plt.savefig(fig_savedir / 'permutation_importance.png', dpi=500, bbox_inches='tight')
+    plt.savefig(fig_savedir / 'permutation_importance.png', dpi=400, bbox_inches='tight')
     plt.show()
 
     dirfemale = 'D:/Stimuli/19122022/FemaleSounds24k_addedPinkNoiseRevTargetdB.mat'
@@ -575,7 +575,7 @@ def main():
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'] #, 'F2105_Clove']
 
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    predict_rxn_time_with_dist_model(ferrets, optimization = False, ferret_as_feature=True, talker = 1)
+    predict_rxn_time_with_dist_model(ferrets, optimization = False, ferret_as_feature=True, talker = 2)
 
     # for ferret in ferrets:
     #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)

@@ -129,7 +129,7 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
 
             color = color_map(
                 np.where(np.array(list(measurement.keys())) == talker)[0][0])  # Assign color based on label
-            rects = ax1.bar(offset, measurement_data['hits'], width, label=talker, color=color)
+            rects = ax1.bar(offset, measurement_data['hits'], width, label='_nolegend_', color=color)
             #scatter plot the corresponding individual ferret data, each ferret is a different marker shape
             marker_list = ['o', 's', '<', 'd', "*"]
             count = 0
@@ -144,7 +144,7 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
             multiplier += 1
 
     ax1.set_ylim(0, 1)
-    ax1.set_ylabel('p(hits)')
+    ax1.set_ylabel('P(hits)')
     ax1.set_title('Hits')
 
     width = 0.25  # the width of the bars
@@ -165,7 +165,11 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
                 offset = (gap_width) + (width * multiplier)  # Add gap offset for the second series
 
             color = color_map(
-                np.where(np.array(list(measurement.keys())) == talker)[0][0])  # Assign color based on label
+                np.where(np.array(list(measurement.keys())) == talker)[0][0])
+            if multiplier> 3:
+                label = talker
+            else:
+                label = '_nolegend_' # Assign color based on label
             rects = ax2.bar(offset, measurement_data['false_alarms'], width, label=talker, color=color)
             #scatter plot the corresponding individual ferret data, each ferret is a different marker shape
             marker_list = ['o', 's', '<', 'd', "*"]
@@ -174,18 +178,23 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
             for ferret, ferret_data in stats_dict_combined[attribute][talker]['false_alarms'].items():
                 #add jitter to offset
                 print('ferret data', ferret_data)
+                if multiplier < 1:
+                    label_text = ferret
+                else:
+                    label_text = '_nolegend_'
                 offset_jitter = offset + np.random.uniform(-0.05, 0.05)
-                ax2.scatter(offset_jitter, ferret_data, 25, color=color, marker=marker_list[count],label='_nolegend_', edgecolors='black')
+                ax2.scatter(offset_jitter, ferret_data, 25, color=color, marker=marker_list[count],label=label_text, edgecolors='black')
                 count += 1
 
             multiplier += 1
 
     ax2.set_ylim(0, 1)
-    ax2.legend(['control', 'inter F0', 'intra F0'])
+    # ax2.legend()
+    ax2.legend(['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove', 'control F0', 'inter F0', 'intra F0' ], fontsize=6, loc='upper right')
 
     ax2.set_xticks([0.25, 1.25], ['Female', 'Male'])
 
-    ax2.set_ylabel('p(FA)')
+    ax2.set_ylabel('(FA)')
     ax2.set_title('False alarms')
 
 
@@ -249,7 +258,7 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
 
     ax4.set_xticks([0.25, 1.25], ['Female', 'Male'])
 
-    ax4.set_ylabel('d\'')
+    ax4.set_ylabel('P(d\')')
     ax4.set_title('d\'')
 
     def get_axis_limits(ax, scale=1):
@@ -270,7 +279,7 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
     ax4.annotate('d)', xy=get_axis_limits(ax4), xytext=(-0.1, ax4.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
 
     plt.suptitle('Proportion of hits, false alarms,\n correct responses and d\' by talker')
-    plt.savefig('../figs/proportion_hits_falsealarms_correctresp_dprime_bytalker.png', dpi = 500, bbox_inches='tight')
+    plt.savefig('figs/proportion_hits_falsealarms_correctresp_dprime_bytalker.png', dpi = 500, bbox_inches='tight')
     plt.show()
 
 
