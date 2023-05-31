@@ -310,7 +310,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
 
 
     plt.tight_layout()
-    plt.savefig(fig_dir / 'big_summary_plot.png', dpi=1000, bbox_inches="tight")
+    plt.savefig(fig_dir / 'big_summary_plot.png', dpi=500, bbox_inches="tight")
     plt.show()
     # Plot the scatter plot for trial number and precursor pitch
     fig, ax = plt.subplots()

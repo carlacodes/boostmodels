@@ -440,7 +440,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
 
 
     plt.tight_layout()
-    plt.savefig(os.path.join((fig_savedir) , str(talker) +'_talker_big_summary_plot.png'), dpi=1000, bbox_inches="tight")
+    plt.savefig(os.path.join((fig_savedir) , str(talker) +'_talker_big_summary_plot.png'), dpi=500, bbox_inches="tight")
     plt.show()
 
 

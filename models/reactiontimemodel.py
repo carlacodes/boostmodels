@@ -288,7 +288,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     fig.set_size_inches(9, 15)
     ax.set_xlabel('SHAP Value (impact on model output)', fontsize=18)
     ax.set_ylabel('Features', fontsize=18)
-    plt.savefig(fig_savedir / 'shapsummaryplot_allanimals2.png', dpi=1000, bbox_inches='tight')
+    plt.savefig(fig_savedir / 'shapsummaryplot_allanimals2.png', dpi=300, bbox_inches='tight')
 
     plt.show()
 
@@ -304,7 +304,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         ax.set_title('Permutation Importances of the \n Reaction Time Model', fontsize = 13)
     plt.xlabel('Permutation Importance')
     fig.tight_layout()
-    plt.savefig(fig_savedir / 'permutation_importance.png', dpi=500, bbox_inches='tight')
+    plt.savefig(fig_savedir / 'permutation_importance.png', dpi=300, bbox_inches='tight')
     plt.show()
 
     shap.dependence_plot("time to target", shap_values, X)  #
@@ -326,7 +326,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         plt.title('Target presentation time versus impact on reacton time', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
     plt.xlabel('Target presentation time', fontsize=16)
-    plt.savefig(fig_savedir /'targtimescolouredbytrialnumber.png', dpi=1000)
+    plt.savefig(fig_savedir /'targtimescolouredbytrialnumber.png', dpi=300)
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "precursor = target F0"], color=shap_values2[:, "talker"], show=False, cmap = matplotlib.colormaps[cmapname])
@@ -531,7 +531,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
 
 
     plt.tight_layout()
-    plt.savefig(fig_savedir / 'big_summary_plot.png', dpi=1000, bbox_inches="tight")
+    plt.savefig(fig_savedir / 'big_summary_plot.png', dpi=500, bbox_inches="tight")
     plt.show()
 
     return xg_reg, ypred, y_test, results

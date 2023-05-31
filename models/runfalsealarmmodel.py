@@ -509,7 +509,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
 
 
     plt.tight_layout()
-    plt.savefig(fig_dir / 'big_summary_plot.png', dpi=1000, bbox_inches="tight")
+    plt.savefig(fig_dir / 'big_summary_plot.png', dpi=500, bbox_inches="tight")
     plt.show()
     return xg_reg, ypred, y_test, results, shap_values1, X_train, y_train, bal_accuracy, shap_values2
 
