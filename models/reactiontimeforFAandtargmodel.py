@@ -96,7 +96,7 @@ def runlgbreleasetimes_for_a_ferret(data, paramsinput=None, ferret=1, ferret_nam
     mse_test = mean_squared_error(ypred, y_test)
     mse_test = cross_val_score(xg_reg, X_test, y_test, scoring='neg_mean_squared_error', cv=kfold)
     print("MSE on test: %.4f" % (mse_test) + ferret_name)
-    print("negative MSE training: %.2f%%" % (np.mean(mse_train) * 100.0))
+    print("negative MSE training: %.4f" % (mse_train) + ferret_name)
     print(mse_train)
     shap_values = shap.TreeExplainer(xg_reg).shap_values(dfx)
 
@@ -419,7 +419,12 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     plt.colorbar(cax, ax = ax_dict['F'])
 
     pxx, freq, t, cax = ax_dict['G'].specgram(worddict[int(top_words[3]) - 1].flatten(), Fs=24414.0625)
-    ax_dict['G'].fill_between(np.arange(len(np.abs(worddict[int(top_words[3]) - 1]))) / 24414.0625, np.abs(worddict[int(top_words[3]) - 1]).flatten(), color='red', alpha=0.5)
+    if talker == 2:
+        data_scaled = scaledata(worddict[int(top_words[3]) - 1].flatten(), -7977, 7797)
+    else:
+        data_scaled = worddict[int(top_words[3]) - 1].flatten()
+    ax_dict['G'].fill_between(np.arange(len(data_scaled)) / 24414.0625, np.abs(data_scaled.flatten()), color='red', alpha=0.5)
+
     ax_dict['G'].set_title(f"Spectrogram of '{feature_labels_words[3]}'")
     ax_dict['G'].set_xlabel('Time')
     ax_dict['G'].set_ylabel('Frequency')
@@ -446,6 +451,12 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
 
 
 
+    # fig, ax = plt.subplots()
+    # ax.specgram(worddict[int(top_words[3]) - 1].flatten(), Fs=24414.0625)
+    # #rescale -7977, 7977 the amplitude of worddict
+    # data_scaled = scaledata(worddict[int(top_words[3]) - 1].flatten(), -7797, 7797)
+    # ax.fill_between(np.arange(len(data_scaled)) / 24414.0625, np.abs(data_scaled.flatten()), color='red', alpha=0.5)
+    # plt.show()
 
 
     return xg_reg, ypred, y_test, results
@@ -524,7 +535,7 @@ def run_correctrxntime_model(ferrets, optimization=False, ferret_as_feature=Fals
 
 
 
-def predict_rxn_time_with_dist_model(ferrets, optimization = False, ferret_as_feature = False, talker = 1):
+def predict_rxn_time_with_dist_model(ferrets, optimization = False, ferret_as_feature = False, talker = 2):
     df_use = extract_releasedata_withdist(ferrets, talker=talker)
     col = 'centreRelease'
     dfx = df_use.loc[:, df_use.columns != col]
