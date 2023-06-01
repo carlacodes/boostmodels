@@ -266,7 +266,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     labels = ax.get_yticklabels()
     labels = [item.get_text() for item in ax.get_yticklabels()]
     #set the labels
-    ax.set_yticklabels(np.flip(feature_labels_words))
+    ax.set_yticklabels(np.flip(feature_labels_words[0:20]))
     plt.xticks(rotation=45, ha='right')  # rotate x-axis labels for better readability
 
     if one_ferret:
