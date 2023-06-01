@@ -261,7 +261,14 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     shap.summary_plot(shap_values, X, show=False, cmap = matplotlib.colormaps[cmapname])
 
     fig, ax = plt.gcf(), plt.gca()
-    fig.set_size_inches(9, 15)
+    # fig.set_size_inches(15, 9)
+    #get the labels
+    labels = ax.get_yticklabels()
+    labels = [item.get_text() for item in ax.get_yticklabels()]
+    #set the labels
+    ax.set_yticklabels(np.flip(feature_labels_words))
+    plt.xticks(rotation=45, ha='right')  # rotate x-axis labels for better readability
+
     if one_ferret:
         plt.title('Ranked list of features over their impact in predicting reaction time for' + ferrets+ ' talker' + talkerlist[talker -1])
 
@@ -368,7 +375,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     #             count += 1
 
     mosaic = ['A', 'A', 'A', 'A'],['D', 'D', 'D', 'D'] ,['D', 'D', 'D', 'D'], ['B', 'B', 'B', 'B'], ['H', 'I', 'J', 'K'], ['C', 'F', 'E', 'G']
-    fig = plt.figure(figsize=(10, 25))
+    fig = plt.figure(figsize=(10, 30))
     ax_dict = fig.subplot_mosaic(mosaic)
 
     # Plot the elbow plot
@@ -376,7 +383,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     ax_dict['A'].set_xlabel('Features')
     ax_dict['A'].set_ylabel('Cumulative Feature Importance')
     ax_dict['A'].set_title('Elbow Plot of Cumulative Feature Importance for Rxn Time Prediction')
-    ax_dict['A'].set_xticklabels(feature_labels_words, rotation=45, ha='right', fontsize = 12)  # rotate x-axis labels for better readability
+    ax_dict['A'].set_xticklabels(feature_labels_words, rotation=45, ha='right', fontsize=12)  # rotate x-axis labels for better readability
 
     # rotate x-axis labels for better readability
     summary_img = mpimg.imread(fig_savedir / 'shapsummaryplot_allanimals2.png')
@@ -389,7 +396,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     ax_dict['D'].barh(feature_labels_words, result.importances[sorted_idx].mean(axis=1).T, color='cyan')
     ax_dict['D'].set_title("Permutation importances on reaction time")
     ax_dict['D'].set_xlabel("Permutation importance")
-    ax_dict['D'].set_yticklabels(feature_labels_words, rotation=45, ha='right', fontsize=10)  # rotate x-axis labels for better readability
+    ax_dict['D'].set_yticklabels(np.flip(feature_labels_words), rotation=45, ha='right', fontsize=10)  # rotate x-axis labels for better readability
 
 
     # Plot spectrogram
@@ -399,7 +406,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         worddict = worddict_male
     pxx, freq, t, cax = ax_dict['C'].specgram(worddict[top_words[1] - 1].flatten(), Fs=24414.0625)
 
-    ax_dict['C'].set_title(f"Spectrogram of '{feature_labels_words[1]}'")
+    ax_dict['C'].set_title(f"Spectrogram of \n '{feature_labels_words[1]}'")
     ax_dict['C'].set_xlabel('Time')
     ax_dict['C'].set_ylabel('Frequency')
     plt.colorbar(cax, ax = ax_dict['C'])
@@ -408,13 +415,13 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
 
     pxx, freq, t, cax = ax_dict['E'].specgram(worddict[0].flatten(), Fs=24414.0625)
     ax_dict['E'].legend()
-    ax_dict['E'].set_title(f"Spectrogram of target word")
+    ax_dict['E'].set_title(f"Spectrogram of \n target word")
     ax_dict['E'].set_xlabel('Time')
     ax_dict['E'].set_ylabel('Frequency')
     plt.colorbar(cax, ax = ax_dict['E'])
 
     pxx,  freq, t, cax = ax_dict['F'].specgram(worddict[int(top_words[2]) - 1].flatten(), Fs=24414.0625)
-    ax_dict['F'].set_title(f"Spectrogram of '{feature_labels_words[2]}'")
+    ax_dict['F'].set_title(f"Spectrogram of \n '{feature_labels_words[2]}'")
     ax_dict['F'].set_xlabel('Time')
     ax_dict['F'].set_ylabel('Frequency')
     plt.colorbar(cax, ax = ax_dict['F'])
@@ -425,24 +432,24 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     else:
         data_scaled = worddict[int(top_words[3]) - 1].flatten()
 
-    ax_dict['G'].set_title(f"Spectrogram of '{feature_labels_words[3]}'")
+    ax_dict['G'].set_title(f"Spectrogram of \n '{feature_labels_words[3]}'")
     ax_dict['G'].set_xlabel('Time')
     ax_dict['G'].set_ylabel('Frequency')
     plt.colorbar(cax, ax = ax_dict['G'], )
 
     # ['H', 'I', 'J', 'K'],
-    ax_dict['H'].fill_between(np.arange(len(np.abs(worddict[int(top_words[1]) - 1]))) / 24414.0625, np.abs(worddict[int(top_words[1]) - 1]).flatten(), color='red', alpha=0.5)
-    ax_dict['H'].set_title(f"Spectrogram of '{feature_labels_words[1]}'")
+    ax_dict['H'].fill_between(np.arange(len(np.abs(worddict[int(top_words[1]) - 1]))) / 24414.0625, (worddict[int(top_words[1]) - 1]).flatten(), color='red', alpha=0.5)
+    ax_dict['H'].set_title(f"Amplitude waveform of \n '{feature_labels_words[1]}'")
 
 
-    ax_dict['I'].fill_between(np.arange(len(np.abs(worddict[0]))) / 24414.0625, np.abs(worddict[0]).flatten(), color='red', alpha=0.5)
-    ax_dict['I'].set_title(f"Amplitude waveform of '{feature_labels_words[0]}'")
+    ax_dict['I'].fill_between(np.arange(len(np.abs(worddict[0]))) / 24414.0625, (worddict[0]).flatten(), color='red', alpha=0.5)
+    ax_dict['I'].set_title(f"Amplitude waveform of \n '{feature_labels_words[0]}'")
 
-    ax_dict['J'].fill_between(np.arange(len(np.abs(worddict[int(top_words[2]) - 1]))) / 24414.0625, np.abs(worddict[int(top_words[2]) - 1]).flatten(), color='red', alpha=0.5)
-    ax_dict['J'].set_title(f"Amplitude waveform of '{feature_labels_words[2]}'")
+    ax_dict['J'].fill_between(np.arange(len(np.abs(worddict[int(top_words[2]) - 1]))) / 24414.0625, (worddict[int(top_words[2]) - 1]).flatten(), color='red', alpha=0.5)
+    ax_dict['J'].set_title(f"Amplitude waveform of \n '{feature_labels_words[2]}'")
 
-    ax_dict['K'].fill_between(np.arange(len(data_scaled)) / 24414.0625, np.abs(data_scaled.flatten()), color='red', alpha=0.5)
-    ax_dict['K'].set_title(f"Amplitude waveform of '{feature_labels_words[3]}'")
+    ax_dict['K'].fill_between(np.arange(len(data_scaled)) / 24414.0625, (data_scaled.flatten()), color='red', alpha=0.5)
+    ax_dict['K'].set_title(f"Amplitude waveform of \n '{feature_labels_words[3]}'")
 
 
     #remove padding outside the figures
@@ -459,6 +466,9 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
 
     plt.tight_layout()
     plt.savefig(os.path.join((fig_savedir) , str(talker) +'_talker_big_summary_plot.png'), dpi=500, bbox_inches="tight")
+    fig.tight_layout()
+    plt.subplots_adjust(wspace=0.5, hspace=0.2)
+
     plt.show()
 
 
