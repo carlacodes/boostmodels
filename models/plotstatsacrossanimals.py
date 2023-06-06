@@ -405,16 +405,15 @@ def plot_stats_by_pitch(stats_dict_all_combined, stats_dict_combined):
     multiplier = 0
     gap_width = 0.2  # Width of the gap between series
 
-    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2,2, layout='constrained',figsize=(5,5))
+    fig, ((ax1, ax2)) = plt.subplots(2,1, layout='constrained',figsize=(5,5))
     #make a panel for the subplots to go into
 
     color_map = plt.cm.get_cmap('tab10')  # Choose a colormap
 
     for attribute, measurement in stats_dict_all_combined.items():
-            if multiplier < 3:
-                offset = width * multiplier
-            else:
-                offset = (gap_width) + (width * multiplier)  # Add gap offset for the second series
+
+            offset = width * multiplier
+    # Add gap offset for the second series
 
             color = color_map(attribute)  # Assign color based on label
             rects = ax1.bar(offset, measurement['hits'], width, label='_nolegend_', color=color)
@@ -432,15 +431,16 @@ def plot_stats_by_pitch(stats_dict_all_combined, stats_dict_combined):
             multiplier += 1
 
     ax1.set_ylim(0, 1)
-    ax1.set_ylabel('P(correct response) by F0 of target word')
-    ax1.set_title('Correct response')
+    ax1.set_ylabel('P(hit) by F0 of target word')
+    ax1.set_title('hit')
 
     width = 0.25  # the width of the bars
     multiplier = 0
     gap_width = 0.2
 
 
-    ax1.set_xticks([0.25, 1.25], ['Female', 'Male'])
+    ax1.set_xticks([0, 0.25, 0.5, 0.75, 1.0], ['109', '124', '144', '191', '251 '])
+    ax1.set_xlabel('F0 of target word (Hz)')
 
 
 
