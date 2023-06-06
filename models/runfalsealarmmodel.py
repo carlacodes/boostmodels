@@ -1052,7 +1052,7 @@ def plot_reaction_times_interandintra(ferrets):
     df_by_ferret_f_rove_intra = {}
     df_by_ferret_m_rove_intra = {}
     # now plot by ferret ID
-    ferrets = [0, 1, 2, 3]
+    ferrets = [0, 1, 2, 3, 4]
     for ferret in ferrets:
         df_by_ferret_f_control[ferret] = df_female_control.loc[df_female_control['ferret'] == ferret]
         df_by_ferret_f_rove[ferret] = df_female_rove.loc[df_female_rove['ferret'] == ferret]
@@ -1062,29 +1062,44 @@ def plot_reaction_times_interandintra(ferrets):
         df_by_ferret_m_rove[ferret] = df_male_control.loc[df_male_control['ferret'] == ferret]
         df_by_ferret_m_rove_intra[ferret] = df_male_rove_intra.loc[df_male_rove_intra['ferret'] == ferret]
 
-    ferret_labels = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
+    ferret_labels = ['F1702', 'F1815', 'F1803', 'F2002', 'F2105']
+    mosaic = ['0', '1', '2', '3', '4'], ['0', '1', '2', '3', '4']
+    fig = plt.figure(figsize=(20, 5))
+    ax_dict = fig.subplot_mosaic(mosaic)
     for ferret in ferrets:
-        sns.distplot(df_by_ferret_f_control[ferret]['realRelReleaseTimes'], color='blue', label='control F0, female')
-        sns.distplot(df_by_ferret_f_rove[ferret]['realRelReleaseTimes'], color='red', label='inter-roved F0, female')
-        sns.distplot(df_by_ferret_m_control[ferret]['realRelReleaseTimes'], color='green', label='control F0, male')
-        sns.distplot(df_by_ferret_m_rove[ferret]['realRelReleaseTimes'], color='orange', label='inter-roved F0, male')
+        sns.distplot(df_by_ferret_f_control[ferret]['realRelReleaseTimes'], color='blue', label='control F0, female', ax = ax_dict[str(ferret)])
+        sns.distplot(df_by_ferret_f_rove[ferret]['realRelReleaseTimes'], color='red', label='inter-roved F0, female', ax = ax_dict[str(ferret)])
+        sns.distplot(df_by_ferret_m_control[ferret]['realRelReleaseTimes'], color='green', label='control F0, male', ax = ax_dict[str(ferret)])
+        sns.distplot(df_by_ferret_m_rove[ferret]['realRelReleaseTimes'], color='orange', label='inter-roved F0, male', ax = ax_dict[str(ferret)])
         sns.distplot(df_by_ferret_f_rove_intra[ferret]['realRelReleaseTimes'], color='darkmagenta',
-                     label='intra-roved F0, female')
+                     label='intra-roved F0, female', ax = ax_dict[str(ferret)])
         sns.distplot(df_by_ferret_m_rove_intra[ferret]['realRelReleaseTimes'], color='orangered',
-                     label='intra-roved F0, male')
+                     label='intra-roved F0, male', ax=ax_dict[str(ferret)])
 
-        plt.title('Reaction times for ferret ID ' + str(ferret_labels[ferret]), fontsize=15)
-        plt.legend(fontsize=10)
-        plt.xlabel('reaction time relative to target presentation (s)', fontsize=13)
-        plt.savefig('D:/behavmodelfigs/reaction_times_by_ferret_inter' + str(ferret_labels[ferret]) + '.png', dpi=500)
-        plt.show()
+        ax_dict[str(ferret)].set_title('Reaction times for ' + str(ferret_labels[ferret]), fontsize=12)
+        if ferret == 0:
+            ax_dict[str(ferret)].legend(fontsize=8)
+        ax_dict[str(ferret)].set_xlabel('reaction time relative \n to target presentation (s)', fontsize=10)
+    fig.tight_layout()
+
+    font_props = fm.FontProperties(weight='bold', size=17)
+
+    ax_dict['0'].annotate('a)', xy=get_axis_limits(ax_dict['0']), xytext=(-0.1, ax_dict['0'].title.get_position()[1]+0.01), textcoords='axes fraction', fontproperties = font_props, zorder=1)
+    ax_dict['1'].annotate('b)', xy=get_axis_limits(ax_dict['1']), xytext=(-0.1, ax_dict['1'].title.get_position()[1]+0.01), textcoords='axes fraction', fontproperties = font_props,zorder=1)
+    ax_dict['2'].annotate('c)', xy=get_axis_limits(ax_dict['2']), xytext=(-0.1, ax_dict['2'].title.get_position()[1]+0.01), textcoords='axes fraction', fontproperties = font_props,zorder=1)
+    ax_dict['3'].annotate('d)', xy=get_axis_limits(ax_dict['3']), xytext=(-0.1, ax_dict['3'].title.get_position()[1]+0.01), textcoords='axes fraction', fontproperties = font_props,zorder=1)
+    ax_dict['4'].annotate('e)', xy=get_axis_limits(ax_dict['4']), xytext=(-0.1, ax_dict['4'].title.get_position()[1]+0.01), textcoords='axes fraction', fontproperties = font_props,zorder=1)
+
+
+    plt.savefig('D:/behavmodelfigs/reaction_times_by_ferret_interbigmosaic.png', dpi=500)
+    plt.show()
 
     return df_by_ferret
 
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-
+    plot_reaction_times_interandintra(ferrets)
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(
         ferrets, optimization=False, ferret_as_feature=True)
     # ferrets = ['F2105_Clove']# 'F2105_Clove'

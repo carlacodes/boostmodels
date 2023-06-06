@@ -568,7 +568,7 @@ def predict_rxn_time_with_dist_model(ferrets, optimization = False, ferret_as_fe
         col2 = 'ferret'
         dfx = dfx.loc[:, dfx.columns != col2]
         if optimization == False:
-            best_params = np.load('optuna_results/best_paramsreleastime_dist_model_'+ ferrets[0]+'talker'+ str(talker)+'.npy', allow_pickle=True).item()
+            best_params = np.load('D:/mixedeffectmodelsbehavioural/optuna_results/best_paramsreleastime_dist_model_'+ ferrets[0]+'talker'+ str(talker)+'.npy', allow_pickle=True).item()
         else:
             best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
             best_params = best_study_results.best_params
@@ -596,8 +596,8 @@ def main():
     # predict_rxn_time_with_dist_model(ferrets, optimization = False, ferret_as_feature=True, talker = 2)
 
     for ferret in ferrets:
-        predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)
-        predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 2)
+        predict_rxn_time_with_dist_model([ferret], optimization=True, ferret_as_feature=False, talker = 1)
+        predict_rxn_time_with_dist_model([ferret], optimization=True, ferret_as_feature=False, talker = 2)
 
 
 
