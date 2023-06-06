@@ -299,6 +299,13 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     sorted_idx = result.importances_mean.argsort()
     fig, ax = plt.subplots(figsize=(8, 18))
     ax.barh(feature_labels_words, result.importances[sorted_idx].mean(axis=1).T, height = 0.3, color = 'cyan')
+    #save the permutation importance values
+
+    if one_ferret:
+        np.save(fig_savedir / 'permutation_importance_values.npy', result.importances[sorted_idx].mean(axis=1).T)
+        np.save(fig_savedir / 'permutation_importance_labels.npy', feature_labels_words)
+
+
     #rotate y -axis labels for better readability
     plt.yticks(rotation=45, ha='right')
     #make font size smaller for y tick labels
@@ -366,24 +373,17 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         worddict = worddict_male
 
 
-    spectrogram, frequencies, times, _ = plt.specgram(worddict[int(top_words[1]) - 1].flatten(), Fs=24414.0625, NFFT=1024, noverlap=512, scale = 'linear')
-    log_freqs = np.log10(frequencies)
-    cax = ax_dict['E'].imshow(
-        10 * np.log10(spectrogram),  # Convert to decibel scale
-        aspect='auto',
-        origin='lower',
-        extent=[times[0], times[-1], log_freqs[0], log_freqs[-1]],
-    )
 
-
-
+    pxx, freq, t, cax = ax_dict['E'].specgram(worddict[int(top_words[1]) - 1].flatten(), Fs=24414.0625, mode = 'magnitude', cmap = cmap_color)
     ax_dict['E'].set_title(f" '{feature_labels_words[1]}'")
     ax_dict['E'].set_xlabel('Time (s)')
-    plt.colorbar(cax, ax = ax_dict['C'])
+    plt.colorbar(cax, ax = ax_dict['E'])
 
 
-    f, t, Sxx = scipy.signal.spectrogram(worddict[int(top_words[0]) - 1].flatten(), fs=24414.0625, window='hann')
-    cax = ax_dict['C'].pcolormesh(t, np.log10(f), Sxx, shading=cmap_color)
+    # f, t, Sxx = scipy.signal.spectrogram(worddict[int(top_words[0]) - 1].flatten(), fs=24414.0625, window='hann')
+    # cax = ax_dict['C'].pcolormesh(t, np.log10(f), Sxx, shading=cmap_color)
+    #
+    pxx, freq, t, cax = ax_dict['C'].specgram(worddict[int(top_words[0]) - 1].flatten(), Fs=24414.0625, mode = 'magnitude', cmap = cmap_color)
     ax_dict['C'].legend()
     ax_dict['C'].set_title(f" target word")
     ax_dict['C'].set_xlabel('Time (s)')
@@ -392,8 +392,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     # ax_dict['E'].set_ylabel('Frequency')
     plt.colorbar(cax, ax = ax_dict['E'])
 
-    f, t, Sxx = scipy.signal.spectrogram(worddict[int(top_words[2]) - 1].flatten(), fs=24414.0625, window='hann')
-    cax = ax_dict['F'].pcolormesh(t, math.log10(f), Sxx, shading=cmap_color)
+    pxx, freq, t, cax = ax_dict['F'].specgram(worddict[int(top_words[2]) - 1].flatten(), Fs=24414.0625, mode = 'magnitude', cmap = cmap_color)
     ax_dict['F'].set_title(f"  '{feature_labels_words[2]}'")
     ax_dict['F'].set_xlabel('Time (s)')
     # ax_dict['F'].set_ylabel('Frequency')
@@ -406,10 +405,10 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         data_scaled = scaledata(worddict[int(top_words[3]) - 1].flatten(), -7977, 7797)
     else:
         data_scaled = worddict[int(top_words[3]) - 1].flatten()
-
-    f, t, Sxx = scipy.signal.spectrogram(data_scaled, fs=24414.0625, window='hann')
-    cax = ax_dict['G'].pcolormesh(t, math.log10(f), Sxx, shading=cmap_color)
-
+    #
+    # f, t, Sxx = scipy.signal.spectrogram(data_scaled, fs=24414.0625, window='hann')
+    # cax = ax_dict['G'].pcolormesh(t, math.log10(f), Sxx, shading=cmap_color)
+    pxx, freq, t, cax = ax_dict['G'].specgram(worddict[int(top_words[3]) - 1].flatten(), Fs=24414.0625, mode = 'magnitude', cmap = cmap_color)
     ax_dict['G'].set_title(f" '{feature_labels_words[3]}'")
     ax_dict['G'].set_xlabel('Time (s)')
     # ax_dict['G'].set_ylabel('Frequency (Hz)')
@@ -594,11 +593,11 @@ def main():
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'] #, 'F2105_Clove']
 
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    predict_rxn_time_with_dist_model(ferrets, optimization = False, ferret_as_feature=True, talker = 2)
+    # predict_rxn_time_with_dist_model(ferrets, optimization = False, ferret_as_feature=True, talker = 2)
 
-    # for ferret in ferrets:
-    #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)
-    #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 2)
+    for ferret in ferrets:
+        predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)
+        predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 2)
 
 
 
