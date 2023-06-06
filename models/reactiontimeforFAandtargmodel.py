@@ -366,15 +366,24 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         worddict = worddict_male
 
 
-    f, t, Sxx = scipy.signal.spectrogram(worddict[int(top_words[1]) - 1].flatten(), fs=24414.0625, window='hann')
-    cax = ax_dict['E'].pcolormesh(t, math.log10(f), Sxx, shading=cmap_color)
+    spectrogram, frequencies, times, _ = plt.specgram(worddict[int(top_words[1]) - 1].flatten(), Fs=24414.0625, NFFT=1024, noverlap=512, scale = 'linear')
+    log_freqs = np.log10(frequencies)
+    cax = ax_dict['E'].imshow(
+        10 * np.log10(spectrogram),  # Convert to decibel scale
+        aspect='auto',
+        origin='lower',
+        extent=[times[0], times[-1], log_freqs[0], log_freqs[-1]],
+    )
+
+
+
     ax_dict['E'].set_title(f" '{feature_labels_words[1]}'")
     ax_dict['E'].set_xlabel('Time (s)')
     plt.colorbar(cax, ax = ax_dict['C'])
 
 
     f, t, Sxx = scipy.signal.spectrogram(worddict[int(top_words[0]) - 1].flatten(), fs=24414.0625, window='hann')
-    cax = ax_dict['C'].pcolormesh(t, math.log10(f), Sxx, shading=cmap_color)
+    cax = ax_dict['C'].pcolormesh(t, np.log10(f), Sxx, shading=cmap_color)
     ax_dict['C'].legend()
     ax_dict['C'].set_title(f" target word")
     ax_dict['C'].set_xlabel('Time (s)')

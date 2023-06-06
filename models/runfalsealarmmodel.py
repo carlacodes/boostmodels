@@ -262,7 +262,7 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput, ferret_as_feature=False, one
         # dfuse = df[["pitchoftarg", "pastcatchtrial", "trialNum", "talker", "side", "precur_and_targ_same",
         #             "timeToTarget",
         #             "realRelReleaseTimes", "ferret", "pastcorrectresp"]]
-        labels = ["precursor F0", "target times", "ferret ID", "trial number", "talker", "audio side",
+        labels = ["precursor F0", "time since start of trial", "ferret ID", "trial number", "talker", "audio side",
                   "intra-trial F0 roving", "past response correct", "past trial was catch", "falsealarm"]
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
     else:
@@ -270,7 +270,7 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput, ferret_as_feature=False, one
             ["pitchofprecur", "targTimes", "trialNum", "talker", "side", "intra_trial_roving", "pastcorrectresp",
              "pastcatchtrial",
              "falsealarm"]]
-        labels = ["precursor F0", "target times", "trial number", "talker", "audio side", "intra-trial F0 roving",
+        labels = ["precursor F0", "time since start of trial", "trial number", "talker", "audio side", "intra-trial F0 roving",
                   "past response correct", "past trial was catch", "falsealarm"]
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
 
@@ -391,6 +391,12 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "precursor F0"], cmap=cmapcustom)
     fig, ax = plt.subplots(figsize=(10, 10))
     shap.plots.scatter(shap_values2[:, "precursor F0"], color=shap_values2[:, "target times"], show= False, ax =ax,  cmap=cmapcustom)
+    cax = fig.axes[1]
+    cax.tick_params(labelsize=15)
+    cax.set_ylabel("Time since start of trial", fontsize=12)
+    plt.xlim(0.8, 5.2)
+    plt.xticks([1, 2, 3, 4, 5], labels = ["109", "124", "144", "191", "251"])
+    # shap.plots.scatter(shap_values2[:, "target times"], color=shap_values2[:, "precursor F0"], show= True, ax =ax,  cmap=cmapcustom)
 
     plt.show()
     plt.tight_layout()
