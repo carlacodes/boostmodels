@@ -207,7 +207,7 @@ def run_optuna_study_falsealarm(dataframe, y, ferret_as_feature=False):
         # dfuse = df[["pitchoftarg", "pastcatchtrial", "trialNum", "talker", "side", "precur_and_targ_same",
         #             "timeToTarget",
         #             "realRelReleaseTimes", "ferret", "pastcorrectresp"]]
-        labels = ["precursor F0", "target times", "ferret ID", "trial number", "talker", "audio side",
+        labels = ["precursor F0", "time since start of trial", "ferret ID", "trial number", "talker", "audio side",
                   "intra-trial F0 roving", "past response correct", "past trial was catch", "falsealarm"]
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
     else:
@@ -215,7 +215,7 @@ def run_optuna_study_falsealarm(dataframe, y, ferret_as_feature=False):
             ["pitchofprecur", "targTimes", "trialNum", "talker", "side", "intra_trial_roving", "pastcorrectresp",
              "pastcatchtrial",
              "falsealarm"]]
-        labels = ["precursor F0", "target times", "trial number", "talker", "audio side", "intra-trial F0 roving",
+        labels = ["precursor F0", "time since start of trial", "trial number", "talker", "audio side", "intra-trial F0 roving",
                   "past response correct", "past trial was catch", "falsealarm"]
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
 

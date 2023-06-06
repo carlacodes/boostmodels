@@ -36,6 +36,7 @@ def run_stats_calc(df, ferrets, stats_dict, pitch_param = 'control_trial'):
     # stats_dict[pitch_param]['hits'] = {}
     # stats_dict[pitch_param]['false_alarms'] = {}
     # stats_dict[pitch_param]['correct_response'] = {}
+
     talkers = [1,2]
     stats_dict[1] = {}
     stats_dict[2] = {}
@@ -59,6 +60,7 @@ def run_stats_calc(df, ferrets, stats_dict, pitch_param = 'control_trial'):
         selected_ferret = df_noncatchnoncorrection[df_noncatchnoncorrection['ferret'] == count]
         selected_ferret_catch = df_catchnoncorrection[df_catchnoncorrection['ferret'] == count]
         selected_ferret_all = df_noncorrection[df_noncorrection['ferret'] == count]
+
         for talker in talkers:
             selected_ferret_talker = selected_ferret[selected_ferret['talker'] == talker]
             selected_ferret_all_talker = selected_ferret_all[selected_ferret_all['talker'] == talker]
