@@ -162,12 +162,12 @@ def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'control_tria
         selected_ferret_all = df_noncorrection[df_noncorrection['ferret'] == count]
 
         for pitch in pitch_list:
-            selected_ferret_talker = selected_ferret[selected_ferret['pitchotarg'] == pitch]
-            selected_ferret_all_talker = selected_ferret_all[selected_ferret_all['pitchotarg'] == pitch]
+            selected_ferret_talker = selected_ferret[selected_ferret['pitchoftarg'] == pitch]
+            selected_ferret_all_talker = selected_ferret_all[selected_ferret_all['pitchoftarg'] == pitch]
 
             selected_ferret_talker_hitrate = selected_ferret_talker[selected_ferret_talker['response'] != 5]
 
-            selected_ferret_catch_talker = selected_ferret_catch[selected_ferret_catch['pitchotarg'] == pitch]
+            selected_ferret_catch_talker = selected_ferret_catch[selected_ferret_catch['pitchoftarg'] == pitch]
 
             stats_dict[pitch]['hits'][ferret] = np.mean(selected_ferret_talker_hitrate['hit'])
             stats_dict[pitch]['false_alarms'][ferret] = np.mean(selected_ferret_all_talker['falsealarm'])
@@ -411,16 +411,13 @@ def plot_stats_by_pitch(stats_dict_all_combined, stats_dict_combined):
     color_map = plt.cm.get_cmap('tab10')  # Choose a colormap
 
     for attribute, measurement in stats_dict_all_combined.items():
-        for talker, measurement_data in measurement.items():
-            print(measurement_data)
             if multiplier < 3:
                 offset = width * multiplier
             else:
                 offset = (gap_width) + (width * multiplier)  # Add gap offset for the second series
 
-            color = color_map(
-                np.where(np.array(list(measurement.keys())) == talker)[0][0])  # Assign color based on label
-            rects = ax1.bar(offset, measurement_data['hits'], width, label='_nolegend_', color=color)
+            color = color_map(attribute)  # Assign color based on label
+            rects = ax1.bar(offset, measurement['hits'], width, label='_nolegend_', color=color)
             #scatter plot the corresponding individual ferret data, each ferret is a different marker shape
             marker_list = ['o', 's', '<', 'd', "*"]
             count = 0
