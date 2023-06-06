@@ -390,13 +390,13 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "intra-trial F0 roving"], cmap=cmapcustom)
     shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "precursor F0"], cmap=cmapcustom)
     fig, ax = plt.subplots(figsize=(10, 10))
-    shap.plots.scatter(shap_values2[:, "precursor F0"], color=shap_values2[:, "target times"], show= False, ax =ax,  cmap=cmapcustom)
+    shap.plots.scatter(shap_values2[:, "precursor F0"], color=shap_values2[:, "time since start of trial"], show= False, ax =ax,  cmap=cmapcustom)
     cax = fig.axes[1]
     cax.tick_params(labelsize=15)
     cax.set_ylabel("Time since start of trial", fontsize=12)
     plt.xlim(0.8, 5.2)
     plt.xticks([1, 2, 3, 4, 5], labels = ["109", "124", "144", "191", "251"])
-    # shap.plots.scatter(shap_values2[:, "target times"], color=shap_values2[:, "precursor F0"], show= True, ax =ax,  cmap=cmapcustom)
+    # shap.plots.scatter(shap_values2[:, "time since start of trial"], color=shap_values2[:, "precursor F0"], show= True, ax =ax,  cmap=cmapcustom)
 
     plt.show()
     plt.tight_layout()
@@ -418,7 +418,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.savefig(fig_dir / 'precursor F0intratrialrove.png', dpi=500)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "target times"], color=shap_values2[:, "trial number"], show=False, cmap=cmapcustom)
+    shap.plots.scatter(shap_values2[:, "time since start of trial"], color=shap_values2[:, "trial number"], show=False, cmap=cmapcustom)
     fig, ax = plt.gcf(), plt.gca()
     # Get colorbar
     cb_ax = fig.axes[1]
@@ -432,7 +432,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.savefig(fig_dir / 'targtimescolouredbytrialnumber.png', dpi=1000)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "target times"], color=shap_values2[:, "precursor F0"], show=False,
+    shap.plots.scatter(shap_values2[:, "time since start of trial"], color=shap_values2[:, "precursor F0"], show=False,
                        cmap=cmapcustom)
     fig, ax = plt.gcf(), plt.gca()
     # Get colorbar
@@ -646,7 +646,7 @@ def runlgbfaornot(dataframe):
 
     fig, ax = plt.subplots(figsize=(18, 15))
     shap.plots.scatter(shap_values2[:, "targTimes"], color=shap_values2[:, "cosinesim"], show=False)
-    plt.title('shap values for FA model as a function of target times, coloured by cosine similarity')
+    plt.title('shap values for FA model as a function of time since start of trial, coloured by cosine similarity')
     fig.tight_layout()
     plt.savefig('D:/behavmodelfigs/targtimescosinecolor.png', dpi=500)
     plt.show()
