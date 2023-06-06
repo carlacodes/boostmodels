@@ -421,7 +421,7 @@ def plot_stats_by_pitch(stats_dict_all_combined, stats_dict_combined):
             #scatter plot the corresponding individual ferret data, each ferret is a different marker shape
             marker_list = ['o', 's', '<', 'd', "*"]
             count = 0
-            for ferret, ferret_data in stats_dict_combined[attribute][talker]['hits'].items():
+            for ferret, ferret_data in stats_dict_combined[attribute]['hits'].items():
                 #add jitter to offset
                 print('ferret', ferret)
                 print('ferret data', ferret_data)
