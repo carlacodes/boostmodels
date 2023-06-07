@@ -215,9 +215,9 @@ def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'inter_trial_
 
     else:
 
-        df_noncatchnoncorrection = df[(df['catchTrial'] == 0) & (df['correctionTrial'] == 0) & ((df[pitch_param] == 1) |(df['control_trial'] == 2))]
-        df_catchnoncorrection = df[(df['catchTrial'] == 1) & (df['correctionTrial'] == 0) & ((df[pitch_param] == 1) |(df['control_trial'] == 2))]
-        df_noncorrection = df[(df['correctionTrial'] == 0) & ((df[pitch_param] == 1) |(df['control_trial'] == 2))]
+        df_noncatchnoncorrection = df[(df['catchTrial'] == 0) & (df['correctionTrial'] == 0) & ((df[pitch_param] == 1) |(df['control_trial'] == 1))]
+        df_catchnoncorrection = df[(df['catchTrial'] == 1) & (df['correctionTrial'] == 0) & ((df[pitch_param] == 1) |(df['control_trial'] == 1))]
+        df_noncorrection = df[(df['correctionTrial'] == 0) & ((df[pitch_param] == 1) |(df['control_trial'] == 1))]
     count = int(0)
 
 
