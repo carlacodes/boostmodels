@@ -502,7 +502,7 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
     fig, ax = plt.subplots()
 
 
-def plot_stats_by_pitch(stats_dict_all_combined, stats_dict_combined):
+def plot_stats_by_pitch(stats_dict_all_combined, stats_dict_combined, stats_dict_all_inter, stats_dict_inter, stats_dict_all_intra, stats_dict_intra):
 
     #generate bar plots
     stats = pd.DataFrame.from_dict(stats_dict_all_combined)
@@ -548,7 +548,42 @@ def plot_stats_by_pitch(stats_dict_all_combined, stats_dict_combined):
     ax1.set_xticks([0, 0.25, 0.5, 0.75, 1.0], ['109', '124', '144', '191', '251 '])
     ax1.set_xlabel('F0 of target word (Hz)')
 
+    for attribute, measurement in stats_dict_all_inter.items():
 
+            offset = width * multiplier
+            # Add gap offset for the second series
+
+            color = color_map(attribute)  # Assign color based on label
+            rects = ax2.bar(offset, measurement['false_alarms'], width, label='_nolegend_', color=color)
+            #scatter plot the corresponding individual ferret data, each ferret is a different marker shape
+            marker_list = ['o', 's', '<', 'd', "*"]
+            count = 0
+            for ferret, ferret_data in stats_dict_inter[attribute]['false_alarms'].items():
+                #add jitter to offset
+                print('ferret', ferret)
+                print('ferret data', ferret_data)
+                offset_jitter = offset + np.random.uniform(-0.05, 0.05)
+                ax1.scatter(offset_jitter, ferret_data, 25, color=color, marker=marker_list[count],label='_nolegend_', edgecolors='black')
+                count += 1
+
+            multiplier += 1
+    if multiplier>=5:
+        for attribute, measurement in stats_dict_all_intra.items():
+
+                offset = width * multiplier
+                # Add gap offset for the second series
+
+                color = color_map(attribute)
+                rects = ax2.bar(offset, measurement['false_alarm'], width, label='_nolegend_', color=color)
+
+
+    ax2.set_ylim(0, 1)
+    ax2.set_ylabel('P(false alarm) by F0 of target word')
+    ax2.set_title('false alarm')
+
+    width = 0.25  # the width of the bars
+    multiplier = 0
+    gap_width = 0.2
 
     def get_axis_limits(ax, scale=1):
         return ax.get_xlim()[0] * scale, (ax.get_ylim()[1] * scale)
@@ -603,7 +638,7 @@ if __name__ == '__main__':
     stats_dict_all_bypitch, stats_dict_bypitch = run_stats_calc_by_pitch(df, ferrets, stats_dict_empty, pitch_param=None)
     stats_dict_all_inter, stats_dict_inter = run_stats_calc_by_pitch(df, ferrets, stats_dict_empty, pitch_param='inter_trial_roving')
     stats_dict_all_intra, stats_dict_intra = run_stats_calc(df, ferrets, pitch_param='intra_trial_roving')
-    plot_stats_by_pitch(stats_dict_all_bypitch, stats_dict_bypitch)
+    plot_stats_by_pitch(stats_dict_all_bypitch, stats_dict_bypitch, stats_dict_all_inter, stats_dict_inter, stats_dict_all_intra, stats_dict_intra)
 
 
 
