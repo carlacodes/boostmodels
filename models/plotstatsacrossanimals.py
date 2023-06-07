@@ -568,14 +568,22 @@ def plot_stats_by_pitch(stats_dict_all_combined, stats_dict_combined, stats_dict
 
             multiplier += 1
     if multiplier>=5:
-        for attribute, measurement in stats_dict_all_intra.items():
 
-                offset = width * multiplier
-                # Add gap offset for the second series
+        offset = width * multiplier
+        # Add gap offset for the second series
 
-                color = color_map(attribute)
-                rects = ax2.bar(offset, measurement['intra_trial_roving']['false_alarms'], width, label='_nolegend_', color=color)
-
+        color = color_map(attribute)
+        for talker, measurement in stats_dict_all_intra.items():
+            rects = ax2.bar(offset, stats_dict_all_intra[talker]['intra_trial_roving']['false_alarms'], width, label='_nolegend_', color=color)
+            for ferret, ferret_data in stats_dict_intra[talker]['intra_trial_roving']['false_alarms'].items():
+                # add jitter to offset
+                print('ferret', ferret)
+                print('ferret data', ferret_data)
+                offset_jitter = offset + np.random.uniform(-0.05, 0.05)
+                ax1.scatter(offset_jitter, ferret_data, 25, color=color, marker=marker_list[count], label='_nolegend_',
+                            edgecolors='black')
+                count += 1
+            multiplier += 1
 
     ax2.set_ylim(0, 1)
     ax2.set_ylabel('P(false alarm) by F0 of target word')
