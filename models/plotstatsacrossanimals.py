@@ -574,7 +574,7 @@ def plot_stats_by_pitch(stats_dict_all_combined, stats_dict_combined, stats_dict
                 # Add gap offset for the second series
 
                 color = color_map(attribute)
-                rects = ax2.bar(offset, measurement['false_alarm'], width, label='_nolegend_', color=color)
+                rects = ax2.bar(offset, measurement['intra_trial_roving']['false_alarms'], width, label='_nolegend_', color=color)
 
 
     ax2.set_ylim(0, 1)
