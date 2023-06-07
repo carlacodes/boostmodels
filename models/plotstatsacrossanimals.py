@@ -26,7 +26,7 @@ from helpers.calculate_stats import *
 
 
 
-def run_stats_calc(df, ferrets, stats_dict, pitch_param = 'control_trial'):
+def run_stats_calc(df, ferrets, pitch_param = 'control_trial'):
 
     df_noncatchnoncorrection = df[(df['catchTrial'] == 0) & (df['correctionTrial'] == 0) & (df[pitch_param] == 1)]
     df_catchnoncorrection = df[(df['catchTrial'] == 1) & (df['correctionTrial'] == 0) & (df[pitch_param] == 1)]
@@ -38,6 +38,7 @@ def run_stats_calc(df, ferrets, stats_dict, pitch_param = 'control_trial'):
     # stats_dict[pitch_param]['correct_response'] = {}
 
     talkers = [1,2]
+    stats_dict = {}
     stats_dict[1] = {}
     stats_dict[2] = {}
     stats_dict[1][pitch_param] = {}
@@ -599,10 +600,10 @@ if __name__ == '__main__':
     stats_dict_empty = {}
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
     df = behaviouralhelperscg.get_stats_df(ferrets=ferrets, startdate='04-01-2016', finishdate='01-03-2023')
-    stats_dict_all, stats_dict = run_stats_calc_by_pitch(df, ferrets, stats_dict_empty, pitch_param=None)
+    stats_dict_all_bypitch, stats_dict_bypitch = run_stats_calc_by_pitch(df, ferrets, stats_dict_empty, pitch_param=None)
     stats_dict_all_inter, stats_dict_inter = run_stats_calc_by_pitch(df, ferrets, stats_dict_empty, pitch_param='inter_trial_roving')
-    stats_dict_all_intra, stats_dict_insta = run_stats_calc(df, ferrets, stats_dict_empty, pitch_param='intra_trial_roving')
-    plot_stats_by_pitch(stats_dict_all, stats_dict)
+    stats_dict_all_intra, stats_dict_intra = run_stats_calc(df, ferrets, pitch_param='intra_trial_roving')
+    plot_stats_by_pitch(stats_dict_all_bypitch, stats_dict_bypitch)
 
 
 
