@@ -563,23 +563,23 @@ def plot_stats_by_pitch(stats_dict_all_combined, stats_dict_combined, stats_dict
                 print('ferret', ferret)
                 print('ferret data', ferret_data)
                 offset_jitter = offset + np.random.uniform(-0.05, 0.05)
-                ax1.scatter(offset_jitter, ferret_data, 25, color=color, marker=marker_list[count],label='_nolegend_', edgecolors='black')
+                ax2.scatter(offset_jitter, ferret_data, 25, color=color, marker=marker_list[count],label='_nolegend_', edgecolors='black')
                 count += 1
 
             multiplier += 1
-    if multiplier>=5:
+    if multiplier >= 5:
+        multiplier = len(stats_dict_all_inter)+1
 
-        offset = width * multiplier
         # Add gap offset for the second series
 
         color = color_map(attribute)
         for talker, measurement in stats_dict_all_intra.items():
+            offset = width * multiplier
             rects = ax2.bar(offset, stats_dict_all_intra[talker]['intra_trial_roving']['false_alarms'], width, label='_nolegend_', color=color)
             count = 0
+
             for ferret, ferret_data in stats_dict_intra[talker]['intra_trial_roving']['false_alarms'].items():
                 # add jitter to offset
-                print('ferret', ferret)
-                print('ferret data', ferret_data)
                 offset_jitter = offset + np.random.uniform(-0.05, 0.05)
                 ax2.scatter(offset_jitter, ferret_data, 25, color=color, marker=marker_list[count], label='_nolegend_',
                             edgecolors='black')
@@ -589,10 +589,6 @@ def plot_stats_by_pitch(stats_dict_all_combined, stats_dict_combined, stats_dict
     ax2.set_ylim(0, 1)
     ax2.set_ylabel('P(false alarm) by F0 of target word')
     ax2.set_title('false alarm')
-
-    width = 0.25  # the width of the bars
-    multiplier = 0
-    gap_width = 0.2
 
     def get_axis_limits(ax, scale=1):
         return ax.get_xlim()[0] * scale, (ax.get_ylim()[1] * scale)
@@ -642,6 +638,7 @@ def run_barplot_pipeline():
 
 if __name__ == '__main__':
     stats_dict_empty = {}
+    run_barplot_pipeline()
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
     df = behaviouralhelperscg.get_stats_df(ferrets=ferrets, startdate='04-01-2016', finishdate='01-03-2023')
     stats_dict_all_bypitch, stats_dict_bypitch = run_stats_calc_by_pitch(df, ferrets, stats_dict_empty, pitch_param=None)
