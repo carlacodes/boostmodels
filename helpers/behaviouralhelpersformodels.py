@@ -1041,10 +1041,10 @@ class behaviouralhelperscg():
                 chosentrial = pitchshiftmat.values[i]
                 is_all_zero = np.all((chosentrial == 0))
 
-                if is_all_zero:
-                    control_trial.append(0)
-                else:
+                if is_all_zero or (isinstance(chosentrial, float) and( (newdata['talker'].values == 2).any() or (newdata['talker'].values == 1).any())):
                     control_trial.append(1)
+                else:
+                    control_trial.append(0)
 
                 if isinstance(chosentrial, float) or is_all_zero:
                     chosentrial = talkermat.values[i].astype(int)

@@ -506,12 +506,12 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     #
     pxx, freq, t, cax = ax_dict['C'].specgram(worddict[int(top_words[0]) - 1].flatten(), Fs=24414.0625, mode = 'magnitude', cmap = cmap_color)
     ax_dict['C'].legend()
-    ax_dict['C'].set_title(f" target word")
+    ax_dict['C'].set_title(f" instruments")
     ax_dict['C'].set_xlabel('Time (s)')
     ax_dict['C'].set_ylabel('Frequency (Hz)')
 
     # ax_dict['E'].set_ylabel('Frequency')
-    plt.colorbar(cax, ax = ax_dict['E'])
+    plt.colorbar(cax, ax = ax_dict['C'])
 
     pxx, freq, t, cax = ax_dict['F'].specgram(worddict[int(top_words[2]) - 1].flatten(), Fs=24414.0625, mode = 'magnitude', cmap = cmap_color)
     ax_dict['F'].set_title(f"  '{feature_labels_words[2]}'")
@@ -537,20 +537,20 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
 
     # ['H', 'I', 'J', 'K'],
     ax_dict['J'].fill_between(np.arange(len(np.abs(worddict[int(top_words[1]) - 1]))) / 24414.0625, (worddict[int(top_words[1]) - 1]).flatten(), color=talker_color, alpha=0.5)
-    ax_dict['J'].set_title(f"Amplitude waveform of \n '{feature_labels_words[1]}'")
+    ax_dict['J'].set_title(f"'{feature_labels_words[1]}'")
     ax_dict['J'].set_ylabel('Amplitude (a.u.)')
     ax_dict['H'].set_xlabel('Time (s)')
 
     ax_dict['H'].fill_between(np.arange(len(np.abs(worddict[0]))) / 24414.0625, (worddict[0]).flatten(), color=talker_color, alpha=0.5)
-    ax_dict['H'].set_title(f"Amplitude waveform of \n '{feature_labels_words[0]}'")
+    ax_dict['H'].set_title(f" '{feature_labels_words[0]}'")
     ax_dict['H'].set_xlabel('Time (s)')
 
     ax_dict['I'].fill_between(np.arange(len(np.abs(worddict[int(top_words[2]) - 1]))) / 24414.0625, (worddict[int(top_words[2]) - 1]).flatten(), color=talker_color, alpha=0.5)
-    ax_dict['I'].set_title(f"Amplitude waveform of \n '{feature_labels_words[2]}'")
+    ax_dict['I'].set_title(f"'{feature_labels_words[2]}'")
     ax_dict['I'].set_xlabel('Time (s)')
 
     ax_dict['K'].fill_between(np.arange(len(data_scaled)) / 24414.0625, (data_scaled.flatten()), color=talker_color, alpha=0.5)
-    ax_dict['K'].set_title(f"Amplitude waveform of \n '{feature_labels_words[3]}'")
+    ax_dict['K'].set_title(f"'{feature_labels_words[3]}'")
     ax_dict['K'].set_xlabel('Time (s)')
 
     #remove padding outside the figures
@@ -714,7 +714,7 @@ def main():
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'] #, 'F2105_Clove']
 
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    predict_rxn_time_with_dist_model(ferrets, optimization = False, ferret_as_feature=True, talker = 1)
+    predict_rxn_time_with_dist_model(ferrets, optimization = False, ferret_as_feature=True, talker = 2)
     #
     # for ferret in ferrets:
     #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)
