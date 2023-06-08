@@ -615,7 +615,7 @@ def plot_stats_by_pitch(stats_dict_all_combined, stats_dict_combined, stats_dict
 def run_barplot_pipeline():
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
     df = behaviouralhelperscg.get_stats_df(ferrets=ferrets, startdate='04-01-2016', finishdate='01-03-2023')
-
+    stats_dict = {}
     pitch_type_list = ['control_trial', 'inter_trial_roving', 'intra_trial_roving']
     stats_dict_all_combined = {}
     stats_dict_combined = {}
@@ -625,7 +625,7 @@ def run_barplot_pipeline():
     stats_dict_combined[2] = {}
 
     for pitch in pitch_type_list:
-        stats_dict_all, stats_dict = run_stats_calc(df, ferrets, stats_dict, pitch_param=pitch)
+        stats_dict_all, stats_dict = run_stats_calc(df, ferrets, pitch_param=pitch)
         # append to dataframe
 
         stats_dict_all_combined[1][pitch] = stats_dict_all[1][pitch]

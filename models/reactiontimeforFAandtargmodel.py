@@ -1,3 +1,4 @@
+import npyx
 import sklearn.metrics
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import KFold
@@ -249,10 +250,6 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         talker_color = 'tomato'
         cmap_color = 'inferno'
 
-    # if talker ==1:
-    #
-    # elif talker ==2:
-    #
 
     cumulative_importances = np.cumsum(feature_importances)
 
@@ -319,6 +316,49 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     fig.tight_layout()
     plt.savefig(fig_savedir / 'permutation_importance.png', dpi=400, bbox_inches='tight')
     plt.show()
+
+    #load the permutation importances by ferret and do a stacked bar plot based on the top 5 words:
+    permutation_importance_dict = {}
+    permutation_importance_labels_dict = {}
+    for ferret in ferrets:
+        load_dir = Path('figs/absolutereleasemodel/ferret_as_feature/' + ferret + 'talker' + str(talker))
+
+        permutation_importance_values  = np.load(load_dir / 'permutation_importance_values.npy')
+        permutation_importance_labels = np.load(load_dir / 'permutation_importance_labels.npy')
+        #put into dictionary
+        #get the top 5 words
+        top_words = permutation_importance_values[:5]
+        top_labels = permutation_importance_labels[:5]
+        #get the top 5 words
+
+        permutation_importance_dict[ferret] = top_words
+        permutation_importance_labels_dict[ferret] = top_labels
+
+
+    # Plotting the stacked bar plot
+    fig, ax = plt.subplots()
+    width = 0.5
+
+    for i, ferret in enumerate(permutation_importance_dict.keys()):
+        values = permutation_importance_dict[ferret]
+        labels = permutation_importance_labels_dict[ferret]
+        positions = np.arange(len(values))
+
+        ax.bar(positions, values, width, label=ferret,
+               bottom=np.sum(list(permutation_importance_dict.values())[:i], axis=0))
+
+    ax.set_ylabel('Importance')
+    ax.set_title('Top 5 Features by Subject')
+    ax.set_xticks(positions)
+    ax.set_xticklabels(labels)
+    ax.legend()
+
+    plt.show()
+
+
+
+
+
 
     dirfemale = 'D:/Stimuli/19122022/FemaleSounds24k_addedPinkNoiseRevTargetdB.mat'
     dirmale = 'D:/Stimuli/19122022/MaleSounds24k_addedPinkNoiseRevTargetdB.mat'
@@ -593,11 +633,11 @@ def main():
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'] #, 'F2105_Clove']
 
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    # predict_rxn_time_with_dist_model(ferrets, optimization = False, ferret_as_feature=True, talker = 2)
-
-    for ferret in ferrets:
-        predict_rxn_time_with_dist_model([ferret], optimization=True, ferret_as_feature=False, talker = 1)
-        predict_rxn_time_with_dist_model([ferret], optimization=True, ferret_as_feature=False, talker = 2)
+    predict_rxn_time_with_dist_model(ferrets, optimization = False, ferret_as_feature=True, talker = 2)
+    #
+    # for ferret in ferrets:
+    #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)
+    #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 2)
 
 
 
