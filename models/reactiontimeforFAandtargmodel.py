@@ -321,7 +321,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     permutation_importance_dict = {}
     permutation_importance_labels_dict = {}
     for ferret in ferrets:
-        load_dir = Path('figs/absolutereleasemodel/ferret_as_feature/' + ferret + 'talker' + str(talker))
+        load_dir = Path('figs/absolutereleasemodel/' + ferret + 'talker' + str(talker))
 
         permutation_importance_values  = np.load(load_dir / 'permutation_importance_values.npy')
         permutation_importance_labels = np.load(load_dir / 'permutation_importance_labels.npy')
