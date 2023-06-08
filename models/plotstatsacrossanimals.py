@@ -589,6 +589,7 @@ def plot_stats_by_pitch(stats_dict_all_combined, stats_dict_combined, stats_dict
     ax2.set_ylim(0, 1)
     ax2.set_ylabel('P(false alarm) by F0 of target word')
     ax2.set_title('false alarm')
+    ax2.set_xticks([0, 0.25, 0.5, 0.75, 1.0, 1.5, 1.75], ['109', '124', '144', '191', '251 ', 'intra - female', 'intra - male '])
 
     def get_axis_limits(ax, scale=1):
         return ax.get_xlim()[0] * scale, (ax.get_ylim()[1] * scale)
