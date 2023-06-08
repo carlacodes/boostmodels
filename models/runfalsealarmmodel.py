@@ -1168,14 +1168,14 @@ def plot_reaction_times_interandintra_swarm(ferrets):
     fig = plt.figure(figsize=(20, 5))
     ax_dict = fig.subplot_mosaic(mosaic)
     for ferret in ferrets:
-        sns.swarmplot(df_by_ferret_f_control[ferret]['realRelReleaseTimes'], color='blue', label='control F0, female', ax = ax_dict[str(ferret)])
-        sns.swarmplot(df_by_ferret_f_rove[ferret]['realRelReleaseTimes'], color='red', label='inter-roved F0, female', ax = ax_dict[str(ferret)])
-        sns.swarmplot(df_by_ferret_m_control[ferret]['realRelReleaseTimes'], color='green', label='control F0, male', ax = ax_dict[str(ferret)])
-        sns.swarmplot(df_by_ferret_m_rove[ferret]['realRelReleaseTimes'], color='orange', label='inter-roved F0, male', ax = ax_dict[str(ferret)])
+        sns.swarmplot(df_by_ferret_f_control[ferret]['realRelReleaseTimes'], color='blue', label='control F0, female', ax = ax_dict[str(ferret)], alpha=0.5)
+        sns.swarmplot(df_by_ferret_f_rove[ferret]['realRelReleaseTimes'], color='red', label='inter-roved F0, female', ax = ax_dict[str(ferret)], alpha=0.5)
+        sns.swarmplot(df_by_ferret_m_control[ferret]['realRelReleaseTimes'], color='green', label='control F0, male', ax = ax_dict[str(ferret)], alpha = 0.5)
+        sns.swarmplot(df_by_ferret_m_rove[ferret]['realRelReleaseTimes'], color='orange', label='inter-roved F0, male', ax = ax_dict[str(ferret)], alpha = 0.5)
         sns.swarmplot(df_by_ferret_f_rove_intra[ferret]['realRelReleaseTimes'], color='darkmagenta',
-                     label='intra-roved F0, female', ax = ax_dict[str(ferret)])
+                     label='intra-roved F0, female', ax = ax_dict[str(ferret)], alpha = 0.5)
         sns.swarmplot(df_by_ferret_m_rove_intra[ferret]['realRelReleaseTimes'], color='orangered',
-                     label='intra-roved F0, male', ax=ax_dict[str(ferret)])
+                     label='intra-roved F0, male', ax=ax_dict[str(ferret)], alpha =0.5)
 
         ax_dict[str(ferret)].set_title('Reaction times for ' + str(ferret_labels[ferret]), fontsize=12)
         if ferret == 0:
