@@ -336,35 +336,81 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         permutation_importance_dict[ferret] = top_words
         permutation_importance_labels_dict[ferret] = top_labels
 
-    common_labels = set.intersection(*[set(labels) for labels in permutation_importance_labels_dict.values()])
+    # common_labels = set.intersection(*[set(labels) for labels in permutation_importance_labels_dict.values()])
 
+    # Plotting the stacked bar plot
     # Plotting the stacked bar plot
     fig, ax = plt.subplots()
     width = 0.5
 
-    positions = np.arange(len(common_labels))
+    labels = []
+    positions = np.arange(len(permutation_importance_dict))
+    bottom = np.zeros(len(permutation_importance_labels_dict[ferrets[0]]))
 
     for i, ferret in enumerate(permutation_importance_dict.keys()):
-        values = []
-        labels = []
+        labels_ferret = permutation_importance_labels_dict[ferret]
+        common_labels = list(set(labels_ferret) - (set(labels_ferret) - set(labels)))
 
-        for label in common_labels:
-            if label in permutation_importance_labels_dict[ferret]:
-                index = permutation_importance_labels_dict[ferret].tolist().index(label)
-                values.append(permutation_importance_dict[ferret][index])
-                labels.append(label)
+        values = permutation_importance_dict[ferret][0:len(common_labels)]
+        positions = np.arange(len(common_labels))
 
-        if len(values) > 0:
-            ax.bar(positions, values, width, label=ferret,
-                   bottom=np.sum(list(permutation_importance_dict.values())[:i], axis=0))
+        if i > 0:
+            stacked_values = []
+            for label in common_labels:
+                if label in labels:
+                    index = labels.index(label)
+                    stacked_values.append(permutation_importance_dict[ferret][
+                                              permutation_importance_labels_dict[ferret].tolist().index(label)] +
+                                          bottom[index])
+                else:
+                    stacked_values.append(permutation_importance_dict[ferret][
+                                              permutation_importance_labels_dict[ferret].tolist().index(label)])
+            values = stacked_values
+
+        ax.bar(positions, values, width, label=ferret, bottom=bottom[0:len(common_labels)])
+        bottom[0:len(common_labels)] += values
+
+        labels.extend(common_labels)
 
     ax.set_ylabel('Importance')
     ax.set_title('Top 5 Common Features by Ferret')
     ax.set_xticks(positions)
-    ax.set_xticklabels(common_labels)
+    ax.set_xticklabels(labels)
     ax.legend()
 
     plt.show()
+    # fig, ax = plt.subplots()
+    # width = 0.5
+    # values = []
+    # labels = []
+    # for i, ferret in enumerate(permutation_importance_dict.keys()):
+    #
+    #     #     positions = np.arange(len(values))
+    #     #
+    #     labels_ferrets = permutation_importance_labels_dict[ferret].tolist()
+    #     common_labels = list(set(labels_ferrets) - (set(labels_ferrets) - set(labels)))
+    #     positions = np.arange(len(common_labels))
+    #     #if it is the first ferret, just plot the values
+    #     if i == 0:
+    #         values = permutation_importance_dict[ferret][0:len(common_labels)]
+    #         labels = common_labels
+    #         ax.bar(positions, values, width, label=ferret)
+    #     else:
+    #         #if it is not the first ferret, plot the values on top of the previous ferret
+    #         values = permutation_importance_dict[ferret][0:len(common_labels)]
+    #         labels = common_labels
+    #         ax.bar(positions, values, width, label=ferret, bottom=np.sum(list(permutation_importance_dict.values())[:i], axis=0))
+    #
+    #     labels.append(labels_ferrets)
+    #
+    #
+    # ax.set_ylabel('Importance')
+    # ax.set_title('Top 5 Common Features by Ferret')
+    # ax.set_xticks(positions)
+    # ax.set_xticklabels(common_labels)
+    # ax.legend()
+    #
+    # plt.show()
     #
     # # Plotting the stacked bar plot
     # fig, ax = plt.subplots()
