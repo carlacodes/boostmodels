@@ -13,4 +13,4 @@ To set up:
 5. run `python main.py`
 
 <br> Please note, while I was able to run mixed effects models in python using pymer, I find the package incredibly clunky as
-you are effectively calling R code from python. 
+you are effectively calling R code from python. This is why most of the archived code imports pymer; ultimately I abandoned this analysis due to the low predictive power of the mixed effects models and glms on this type of data.
