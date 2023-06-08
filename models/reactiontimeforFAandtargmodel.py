@@ -327,33 +327,64 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         permutation_importance_labels = np.load(load_dir / 'permutation_importance_labels.npy')
         #put into dictionary
         #get the top 5 words
-        top_words = permutation_importance_values[:5]
-        top_labels = permutation_importance_labels[:5]
+        #need permutation importances in descending order rather than ascending order to match labels
+        permutation_importance_values = np.flip(permutation_importance_values)
+        top_words = permutation_importance_values[0:6]
+        top_labels = permutation_importance_labels[0:6]
         #get the top 5 words
 
         permutation_importance_dict[ferret] = top_words
         permutation_importance_labels_dict[ferret] = top_labels
 
+    common_labels = set.intersection(*[set(labels) for labels in permutation_importance_labels_dict.values()])
 
     # Plotting the stacked bar plot
     fig, ax = plt.subplots()
     width = 0.5
 
-    for i, ferret in enumerate(permutation_importance_dict.keys()):
-        values = permutation_importance_dict[ferret]
-        labels = permutation_importance_labels_dict[ferret]
-        positions = np.arange(len(values))
+    positions = np.arange(len(common_labels))
 
-        ax.bar(positions, values, width, label=ferret,
-               bottom=np.sum(list(permutation_importance_dict.values())[:i], axis=0))
+    for i, ferret in enumerate(permutation_importance_dict.keys()):
+        values = []
+        labels = []
+
+        for label in common_labels:
+            if label in permutation_importance_labels_dict[ferret]:
+                index = permutation_importance_labels_dict[ferret].tolist().index(label)
+                values.append(permutation_importance_dict[ferret][index])
+                labels.append(label)
+
+        if len(values) > 0:
+            ax.bar(positions, values, width, label=ferret,
+                   bottom=np.sum(list(permutation_importance_dict.values())[:i], axis=0))
 
     ax.set_ylabel('Importance')
-    ax.set_title('Top 5 Features by Subject')
+    ax.set_title('Top 5 Common Features by Ferret')
     ax.set_xticks(positions)
-    ax.set_xticklabels(labels)
+    ax.set_xticklabels(common_labels)
     ax.legend()
 
     plt.show()
+    #
+    # # Plotting the stacked bar plot
+    # fig, ax = plt.subplots()
+    # width = 0.5
+    #
+    # for i, ferret in enumerate(permutation_importance_dict.keys()):
+    #     values = permutation_importance_dict[ferret]
+    #     labels = permutation_importance_labels_dict[ferret]
+    #     positions = np.arange(len(values))
+    #
+    #     ax.bar(positions, values, width, label=ferret,
+    #            bottom=np.sum(list(permutation_importance_dict.values())[:i], axis=0))
+    #
+    # ax.set_ylabel('Importance')
+    # ax.set_title('Top 6 Features by Subject')
+    # ax.set_xticks(positions)
+    # ax.legend()
+    #
+    # plt.show()
+
 
 
 
