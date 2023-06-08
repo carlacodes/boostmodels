@@ -261,7 +261,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     plt.xlabel('Features')
     plt.ylabel('Cumulative Feature Importance')
     if one_ferret:
-        plt.title('Elbow Plot of Cumulative Feature Importance for Correct Reaction Time Model for' + ferrets + ' talker'+ talkerlist[talker -1], fontsize = 20)
+        plt.title('Elbow Plot of Cumulative Feature Importance for Correct Reaction Time Model for' + ferrets + ' talker'+ talkerlist[talker -1], fontsize = 15)
     else:
         plt.title('Elbow Plot of Cumulative Feature Importance for Correct Reaction Time Model', fontsize = 20)
     plt.xticks(rotation=45, ha='right')  # rotate x-axis labels for better readability
@@ -329,8 +329,8 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         #get the top 5 words
         #need permutation importances in descending order rather than ascending order to match labels
         permutation_importance_values = np.flip(permutation_importance_values)
-        top_words = permutation_importance_values[0:6]
-        top_labels = permutation_importance_labels[0:6]
+        top_words = permutation_importance_values[1:6]
+        top_labels = permutation_importance_labels[1:6]
         #get the top 5 words
 
         permutation_importance_dict[ferret] = top_words
@@ -339,46 +339,17 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     # common_labels = set.intersection(*[set(labels) for labels in permutation_importance_labels_dict.values()])
 
     # Plotting the stacked bar plot
+    # Determine the unique set of all labels
+    # Determine the unique set of all labels
+    all_labels = set().union(*[set(labels) for labels in permutation_importance_labels_dict.values()])
+
     # Plotting the stacked bar plot
     fig, ax = plt.subplots()
     width = 0.5
 
-    labels = []
-    positions = np.arange(len(permutation_importance_dict))
-    bottom = np.zeros(len(permutation_importance_labels_dict[ferrets[0]]))
+    positions = np.arange(len(all_labels))
 
-    for i, ferret in enumerate(permutation_importance_dict.keys()):
-        labels_ferret = permutation_importance_labels_dict[ferret]
-        common_labels = list(set(labels_ferret) - (set(labels_ferret) - set(labels)))
 
-        values = permutation_importance_dict[ferret][0:len(common_labels)]
-        positions = np.arange(len(common_labels))
-
-        if i > 0:
-            stacked_values = []
-            for label in common_labels:
-                if label in labels:
-                    index = labels.index(label)
-                    stacked_values.append(permutation_importance_dict[ferret][
-                                              permutation_importance_labels_dict[ferret].tolist().index(label)] +
-                                          bottom[index])
-                else:
-                    stacked_values.append(permutation_importance_dict[ferret][
-                                              permutation_importance_labels_dict[ferret].tolist().index(label)])
-            values = stacked_values
-
-        ax.bar(positions, values, width, label=ferret, bottom=bottom[0:len(common_labels)])
-        bottom[0:len(common_labels)] += values
-
-        labels.extend(common_labels)
-
-    ax.set_ylabel('Importance')
-    ax.set_title('Top 5 Common Features by Ferret')
-    ax.set_xticks(positions)
-    ax.set_xticklabels(labels)
-    ax.legend()
-
-    plt.show()
     # fig, ax = plt.subplots()
     # width = 0.5
     # values = []
@@ -459,27 +430,58 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
 
 
     mosaic = ['A', 'A', 'A', 'A'],['D', 'D', 'D', 'D'] ,['D', 'D', 'D', 'D'], ['B', 'B', 'B', 'B'], ['H', 'I', 'J', 'K'], ['C', 'F', 'E', 'G']
-    fig = plt.figure(figsize=(10, 30))
+    fig = plt.figure(figsize=(10, 35))
     ax_dict = fig.subplot_mosaic(mosaic)
 
     # Plot the elbow plot
     ax_dict['A'].plot(feature_labels, cumulative_importances, marker='o', color=talker_color)
-    ax_dict['A'].set_xlabel('Features')
-    ax_dict['A'].set_ylabel('Cumulative Feature Importance')
-    ax_dict['A'].set_title('Elbow plot of cumulative feature importance for absolute reaction time model,' + talker_word + ' talker')
+    ax_dict['A'].set_xlabel('Features', fontsize = 15)
+    ax_dict['A'].set_ylabel('Cumulative feature importance', fontsize = 15)
+    ax_dict['A'].set_title('Elbow plot of cumulative feature importance \n on absolute reaction time,' + talker_word + ' talker', fontsize = 15)
     ax_dict['A'].set_xticklabels(feature_labels_words, rotation=45, ha='right', fontsize=12)  # rotate x-axis labels for better readability
 
     # rotate x-axis labels for better readability
-    summary_img = mpimg.imread(fig_savedir / 'shapsummaryplot_allanimals2.png')
-    ax_dict['B'].imshow(summary_img, aspect='auto', )
-    ax_dict['B'].axis('off')  # Turn off axis ticks and labels
-    ax_dict['B'].set_title('Ranked list of SHAP features over their impact on absolute reaction time, ' + talker_word + ' talker', fontsize=12)
+    # summary_img = mpimg.imread(fig_savedir / 'shapsummaryplot_allanimals2.png')
+    bottom = np.zeros(len(all_labels))
+    import matplotlib.cm as cm
+
+    if talker == 1:
+        color_list_bar = ['purple', 'crimson', 'darkorange', 'gold', 'burlywood']
+    else:
+        color_list_bar = ['red', 'chocolate', 'lightsalmon', 'peachpuff', 'orange']
+
+    # Your code here...
+
+    my_cmap = cm.get_cmap(cmap_color)  # Choose a colormap
+
+    for i, ferret in enumerate(permutation_importance_dict.keys()):
+        values = np.zeros(len(all_labels))
+        labels_ferret = permutation_importance_labels_dict[ferret]
+        for j, label in enumerate(all_labels):
+            if label in labels_ferret:
+                index = labels_ferret.tolist().index(label)
+                values[j] = permutation_importance_dict[ferret][index]
+
+        ax_dict['B'].bar(positions, values, width, bottom=bottom, label=ferret, color = color_list_bar[i])
+
+        bottom += values
+
+    ax_dict['B'].set_ylabel('Permutation importance', fontsize = 15)
+    ax_dict['B'].set_title('Top 5 features for predicting absolute release time, ' + talkerlist[talker -1] +' talker', fontsize = 15)
+    ax_dict['B'].set_xticks(np.arange(len(all_labels)))
+    ax_dict['B'].set_xticklabels(all_labels, rotation=90, fontsize = 15)
+    ax_dict['B'].legend()
+
+    # ax_dict['B'].subplots_adjust(bottom=0.3)  # Adjust the bottom margin to accommodate rotated xtick labels
 
 
 
     ax_dict['D'].barh(np.flip(feature_labels_words), result.importances[sorted_idx].mean(axis=1).T, color=talker_color)
-    ax_dict['D'].set_title("Permutation importance features on absolute reaction time, " + talker_word + " talker ")
-    ax_dict['D'].set_xlabel("Permutation importance")
+    ax_dict['D'].set_title("Permutation importance features on absolute reaction time, " + talker_word + " talker ", fontsize = 15)
+    ax_dict['D'].set_xlabel("Permutation importance", fontsize = 15)
+    ax_dict['D'].set_ylabel("Feature", fontsize = 15)
+    ax_dict['D'].set_yticks(np.flip(feature_labels_words))
+    ax_dict['D'].set_yticklabels(np.flip(feature_labels_words), ha='right', fontsize=15)  # rotate x-axis labels for better readability
     # ax_dict['D'].set_yticklabels(np.flip(feature_labels_words), rotation=45, ha='right', fontsize=10)  # rotate x-axis labels for better readability
 
 
@@ -710,7 +712,7 @@ def main():
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'] #, 'F2105_Clove']
 
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    predict_rxn_time_with_dist_model(ferrets, optimization = False, ferret_as_feature=True, talker = 2)
+    predict_rxn_time_with_dist_model(ferrets, optimization = False, ferret_as_feature=True, talker = 1)
     #
     # for ferret in ferrets:
     #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)
