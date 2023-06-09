@@ -276,19 +276,23 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "precursor = target F0"], ax=ax_dict['E'],
                        cmap=cmapcustom, show=False)
     fig, ax = plt.gcf(), plt.gca()
-    cb_ax = fig.axes[1]
-    # Modifying color bar parameters
-    cb_ax.tick_params(labelsize=15)
-    cb_ax.set_ylabel("precursor = target F0 word", fontsize=15)
+    cb_ax = fig.axes[5]
+    # # Modifying color bar parameters
+    # cb_ax.tick_params(labelsize=15)
+    # cb_ax.set_ylabel("precursor = target F0 word", fontsize=15)
     ax_dict['E'].set_ylabel('SHAP value', fontsize=10)
     ax_dict['E'].set_title('Ferret ID versus impact on miss probability', fontsize=18)
-
+    cb_ax.set_yticks([0,1])
+    cb_ax.set_yticklabels(['precursor ≠ target F0', 'precursor = target F0'])
     ax_dict['E'].set_xlabel('Ferret ID', fontsize=16)
+    # ax_dict['E'].set_xticklabels(ferrets, fontsize=16)
 
     shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "target F0"], ax=ax_dict['C'],
                        cmap=cmapcustom, show=False)
     fig, ax = plt.gcf(), plt.gca()
-    cb_ax = fig.axes[5]
+    ax_dict['C'].set_title('Ferret ID versus impact on miss probability', fontsize=18)
+
+    cb_ax = fig.axes[7]
     cb_ax.set_yticks([1, 2, 3,4, 5])
     cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
     cb_ax.tick_params(labelsize=15)
@@ -298,6 +302,8 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     cb_ax.tick_params(labelsize=15)
     ax_dict['C'].set_ylabel('SHAP value', fontsize=10)
     ax_dict['C'].set_xlabel('Ferret ID', fontsize=16)
+    # ax_dict['C'].set_xticklabels(ferrets, fontsize=16)
+
     # ax_dict['C'].set_title('Ferret ID and precursor = target F0 versus SHAP value on miss probability', fontsize=18)
     #remove padding outside the figures
     font_props = fm.FontProperties(weight='bold', size=17)
@@ -313,7 +319,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     plt.savefig(fig_dir / 'big_summary_plot.png', dpi=500, bbox_inches="tight")
     plt.show()
     # Plot the scatter plot for trial number and precursor pitch
-    fig, ax = plt.subplots()
+    # fig, ax = plt.subplots()
     shap.plots.scatter(shap_values2[:, "trial number"], color=shap_values2[:, "precursor = target F0"],
                        ax=ax, cmap=cmapcustom, show=False)
     cb_ax = fig.axes[1]
