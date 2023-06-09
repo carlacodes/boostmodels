@@ -495,7 +495,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
 
 
 
-    pxx, freq, t, cax = ax_dict['E'].specgram(worddict[int(top_words[1]) - 1].flatten(), Fs=24414.0625, mode = 'magnitude', cmap = cmap_color)
+    pxx, freq, t, cax = ax_dict['E'].specgram(worddict[int(top_words[1]) - 1].flatten(), Fs=24414.0625, mode = 'psd', cmap = cmap_color)
     ax_dict['E'].set_title(f" '{feature_labels_words[1]}'")
     ax_dict['E'].set_xlabel('Time (s)')
     plt.colorbar(cax, ax = ax_dict['E'])
@@ -504,7 +504,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     # f, t, Sxx = scipy.signal.spectrogram(worddict[int(top_words[0]) - 1].flatten(), fs=24414.0625, window='hann')
     # cax = ax_dict['C'].pcolormesh(t, np.log10(f), Sxx, shading=cmap_color)
     #
-    pxx, freq, t, cax = ax_dict['C'].specgram(worddict[int(top_words[0]) - 1].flatten(), Fs=24414.0625, mode = 'magnitude', cmap = cmap_color)
+    pxx, freq, t, cax = ax_dict['C'].specgram(worddict[int(top_words[0]) - 1].flatten(), Fs=24414.0625, mode = 'psd', cmap = cmap_color)
     ax_dict['C'].legend()
     ax_dict['C'].set_title(f" instruments")
     ax_dict['C'].set_xlabel('Time (s)')
@@ -513,7 +513,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     # ax_dict['E'].set_ylabel('Frequency')
     plt.colorbar(cax, ax = ax_dict['C'])
 
-    pxx, freq, t, cax = ax_dict['F'].specgram(worddict[int(top_words[2]) - 1].flatten(), Fs=24414.0625, mode = 'magnitude', cmap = cmap_color)
+    pxx, freq, t, cax = ax_dict['F'].specgram(worddict[int(top_words[2]) - 1].flatten(), Fs=24414.0625, mode = 'psd', cmap = cmap_color)
     ax_dict['F'].set_title(f"  '{feature_labels_words[2]}'")
     ax_dict['F'].set_xlabel('Time (s)')
     # ax_dict['F'].set_ylabel('Frequency')
@@ -529,7 +529,8 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     #
     # f, t, Sxx = scipy.signal.spectrogram(data_scaled, fs=24414.0625, window='hann')
     # cax = ax_dict['G'].pcolormesh(t, math.log10(f), Sxx, shading=cmap_color)
-    pxx, freq, t, cax = ax_dict['G'].specgram(worddict[int(top_words[3]) - 1].flatten(), Fs=24414.0625, mode = 'magnitude', cmap = cmap_color)
+    pxx, freq, t, cax = plt.specgram(worddict[int(top_words[3]) - 1].flatten(), Fs=24414.0625, mode = 'psd')
+    ax_dict['G'].imshow(pxx, aspect='auto', origin='lower', extent=[t.min(), t.max(), freq.min(), freq.max()], cmap = cmap_color)
     ax_dict['G'].set_title(f" '{feature_labels_words[3]}'")
     ax_dict['G'].set_xlabel('Time (s)')
     # ax_dict['G'].set_ylabel('Frequency (Hz)')
