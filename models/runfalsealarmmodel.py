@@ -1101,7 +1101,8 @@ def plot_reaction_times_interandintra_swarm(ferrets):
     # plot the reaction times by animal
     resultingdf = behaviouralhelperscg.get_reactiontime_data(ferrets=ferrets, startdate='04-01-2020',
                                                              finishdate='01-10-2022')
-    df_use = resultingdf
+    #only get correct hit trials for the swarm plot
+    df_use = resultingdf[ 0<=resultingdf['realRelReleaseTimes'] <=2]
 
     df_left_by_ferret = {}
     df_female = df_use.loc[df_use['talker'] == 1]
