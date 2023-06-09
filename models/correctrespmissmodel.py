@@ -282,10 +282,11 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     # cb_ax.set_ylabel("precursor = target F0 word", fontsize=15)
     ax_dict['E'].set_ylabel('SHAP value', fontsize=10)
     ax_dict['E'].set_title('Ferret ID versus impact on miss probability', fontsize=18)
-    cb_ax.set_yticks([0,1])
+    cb_ax.set_yticks([0.25, 0.75])
     cb_ax.set_yticklabels(['precursor ≠ target F0', 'precursor = target F0'])
     ax_dict['E'].set_xlabel('Ferret ID', fontsize=16)
-    # ax_dict['E'].set_xticklabels(ferrets, fontsize=16)
+    ax_dict['E'].set_xticks([0, 1, 2, 3, 4])
+    ax_dict['E'].set_xticklabels(ferrets, fontsize=10, rotation = 45, ha='right')
 
     shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "target F0"], ax=ax_dict['C'],
                        cmap=cmapcustom, show=False)
@@ -302,6 +303,9 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     cb_ax.tick_params(labelsize=15)
     ax_dict['C'].set_ylabel('SHAP value', fontsize=10)
     ax_dict['C'].set_xlabel('Ferret ID', fontsize=16)
+    ax_dict['C'].set_xticks([0, 1, 2, 3, 4])
+    ax_dict['C'].set_xticklabels(ferrets, fontsize=10, rotation = 45, ha='right')
+
     # ax_dict['C'].set_xticklabels(ferrets, fontsize=16)
 
     # ax_dict['C'].set_title('Ferret ID and precursor = target F0 versus SHAP value on miss probability', fontsize=18)
