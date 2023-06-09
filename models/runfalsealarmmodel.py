@@ -1185,7 +1185,7 @@ def plot_reaction_times_interandintra_swarm(ferrets):
             sns.swarmplot(dict_by_ferret[ferret][pitch]['realRelReleaseTimes'], color=colorlist[count], label=pitchlist[count], ax = ax_dict[str(count)])
             count += 1
 
-        ax_dict[str(ferret)].set_title('Reaction times for ' + str(ferret_labels[ferret]), alpha =0.5, fontsize=12)
+        ax_dict[str(ferret)].set_title('Reaction times for ' + str(ferret_labels[ferret]), fontsize=12)
         if ferret == 0:
             ax_dict[str(ferret)].legend(fontsize=8)
         ax_dict[str(ferret)].set_xlabel('reaction time relative \n to target presentation (s)', fontsize=10)
