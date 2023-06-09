@@ -835,7 +835,9 @@ class behaviouralhelperscg():
 
                 chosentrial = pitchshiftmat.values[i]
                 is_all_zero = np.all((chosentrial == 0))
-                if is_all_zero or (isinstance(chosentrial, float) and( (newdata['talker'].values == 2).any() or (newdata['talker'].values == 1).any())):
+                chosentalker = talkerlist.values[i]
+
+                if is_all_zero or (isinstance(chosentrial, float) and( chosentalker ==2 or chosentalker==1)):
                     control_trial.append(1)
                 else:
                     control_trial.append(0)
@@ -845,7 +847,6 @@ class behaviouralhelperscg():
                     intra_trial_roving.append(0)
                 else:
                     intra_trial_roving.append(1)
-                chosentalker = talkerlist.values[i]
 
                 if chosentalker == 3 or chosentalker == 5 or chosentalker == 8 or chosentalker == 13:
                     inter_trial_roving.append(1)
@@ -863,11 +864,12 @@ class behaviouralhelperscg():
                     chosentalker = 1
                 talkerlist2[i] = chosentalker
 
-                if ((
-                            chosenresponseindex == 0 or chosenresponseindex == 1) and realrelreleasetime >= 0) or chosenresponseindex == 3 or chosenresponseindex == 7:
-                    falsealarm = np.append(falsealarm, 0)
-                else:
+                # if ((
+                #             chosenresponseindex == 0 or chosenresponseindex == 1) and realrelreleasetime >= 0) or chosenresponseindex == 3 or chosenresponseindex == 7:
+                if chosenresponseindex == 5:
                     falsealarm = np.append(falsealarm, 1)
+                else:
+                    falsealarm = np.append(falsealarm, 0)
                 if ((
                             chosenresponseindex == 0 or chosenresponseindex == 1) and realrelreleasetime >= 0) or chosenresponseindex == 3:
                     correctresp = np.append(correctresp, 1)

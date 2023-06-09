@@ -218,7 +218,7 @@ def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'inter_trial_
 
         df_noncatchnoncorrection = df[(df['catchTrial'] == 0) & (df['correctionTrial'] == 0) & ((df[pitch_param] == 1) |(df['control_trial'] == 1))]
         df_catchnoncorrection = df[(df['catchTrial'] == 1) & (df['correctionTrial'] == 0) & ((df[pitch_param] == 1) |(df['control_trial'] == 1))]
-        df_noncorrection = df[(df['correctionTrial'] == 0) & ((df[pitch_param] == 1) |(df['control_trial'] == 1))]
+        df_noncorrection = df[(df['correctionTrial'] == 0) & ((df[pitch_param] == 1) | (df['control_trial'] == 1))]
     count = int(0)
 
 
@@ -642,11 +642,12 @@ def run_barplot_pipeline():
 
 if __name__ == '__main__':
     stats_dict_empty = {}
-    # run_barplot_pipeline()
+    run_barplot_pipeline()
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
     df = behaviouralhelperscg.get_stats_df(ferrets=ferrets, startdate='04-01-2016', finishdate='01-03-2023')
-    stats_dict_all_bypitch, stats_dict_bypitch = run_stats_calc_by_pitch(df, ferrets, stats_dict_empty, pitch_param=None)
     stats_dict_all_inter, stats_dict_inter = run_stats_calc_by_pitch(df, ferrets, stats_dict_empty, pitch_param='inter_trial_roving')
+
+    stats_dict_all_bypitch, stats_dict_bypitch = run_stats_calc_by_pitch(df, ferrets, stats_dict_empty, pitch_param=None)
     stats_dict_all_intra, stats_dict_intra = run_stats_calc(df, ferrets, pitch_param='intra_trial_roving')
     plot_stats_by_pitch(stats_dict_all_bypitch, stats_dict_bypitch, stats_dict_all_inter, stats_dict_inter, stats_dict_all_intra, stats_dict_intra)
 
