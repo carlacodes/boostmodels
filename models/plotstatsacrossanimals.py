@@ -269,7 +269,7 @@ def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'inter_trial_
 
         for pitch in pitch_list:
             selected_ferret_talker = selected_ferret[selected_ferret['pitchoftarg'] == pitch]
-            selected_ferret_all_talker = selected_ferret_all[selected_ferret_all['pitchoftarg'] == pitch]
+            selected_ferret_all_talker = selected_ferret_all[selected_ferret_all['f0'] == pitch]
 
             selected_ferret_talker_hitrate = selected_ferret_talker[selected_ferret_talker['response'] != 5]
 

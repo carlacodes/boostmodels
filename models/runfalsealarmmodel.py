@@ -1158,9 +1158,11 @@ def plot_reaction_times_interandintra_swarm(ferrets):
     dict_by_ferret = {}
     #break down by ferret and pitch of target
     for ferret in ferrets:
+        dict_by_ferret[ferret]={}
         for pitch in [1, 2, 3, 4, 5]:
-            dict_by_ferret[ferret] = df_use.loc[df_use['ferret'] == ferret]
-            dict_by_ferret[ferret][pitch] = df_by_ferret[ferret].loc[df_by_ferret[ferret]['pitchoftarg'] == pitch]
+            df_ferret_inst= df_use[df_use['ferret'] == ferret]
+            dict_by_ferret[ferret][pitch]={}
+            dict_by_ferret[ferret][pitch] = df_ferret_inst[df_ferret_inst['pitchoftarg'] == pitch]
     for ferret in ferrets:
         df_by_ferret_f_control[ferret] = df_female_control.loc[df_female_control['ferret'] == ferret]
         df_by_ferret_f_rove[ferret] = df_female_rove.loc[df_female_rove['ferret'] == ferret]
@@ -1183,7 +1185,7 @@ def plot_reaction_times_interandintra_swarm(ferrets):
             sns.swarmplot(dict_by_ferret[ferret][pitch]['realRelReleaseTimes'], color=colorlist[count], label=pitchlist[count])
             count += 1
 
-        ax_dict[str(ferret)].set_title('Reaction times for ' + str(ferret_labels[ferret]), fontsize=12)
+        ax_dict[str(ferret)].set_title('Reaction times for ' + str(ferret_labels[ferret]), alpha =0.5, fontsize=12)
         if ferret == 0:
             ax_dict[str(ferret)].legend(fontsize=8)
         ax_dict[str(ferret)].set_xlabel('reaction time relative \n to target presentation (s)', fontsize=10)

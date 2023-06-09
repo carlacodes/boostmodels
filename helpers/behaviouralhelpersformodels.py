@@ -818,6 +818,7 @@ class behaviouralhelperscg():
             inter_trial_roving = []
             control_trial = []
             pitchoftarg = []
+            f0_list = []
             pitchofprecur = []
             talkerlist2 = np.empty(len(pitchshiftmat))
             falsealarm = np.empty(shape=(0, 0))
@@ -881,6 +882,15 @@ class behaviouralhelperscg():
                     targpos = int(targpos[0])
                     precur_pos = targpos - 1
 
+                    if chosentrial[targpos] == 8.0:
+                        f0_list.append(float(3))
+                    elif chosentrial[targpos] == 13.0:
+                        f0_list.append(float(1))
+                    elif chosentrial[targpos] == 1.0:
+                        f0_list.append(float(4))
+                    else:
+                        f0_list.append(float(chosentrial[targpos]))
+
                     if np.sum(newdata['dDurs'].values[i][:targpos]) / fs <= newdata['centreRelease'].values[i] - newdata['absentTime'].values[i] or newdata['response'].values[i] == 7:
                         if chosentrial[targpos] == 8.0:
                             pitchoftarg.append(float(3))
@@ -907,6 +917,7 @@ class behaviouralhelperscg():
                 except:
                     pitchoftarg.append(np.nan)
                     pitchofprecur.append(np.nan)
+                    f0_list.append(np.nan)
 
             falsealarm = falsealarm[~np.isnan(falsealarm)]
             correctresp = correctresp[~np.isnan(correctresp)]
@@ -927,6 +938,7 @@ class behaviouralhelperscg():
             newdata['stepval'] = stepval.tolist()
             newdata['timeToTarget'] = newdata['timeToTarget'] / 24414.0625
             newdata['AM'] = newdata['AM'].astype(int)
+            newdata['f0'] = f0_list
             newdata = newdata[newdata['distractor_or_fa'].values <= 57]
 
             cosinesimfemale = np.load('D:/Stimuli/cosinesimvectorfemale.npy')
