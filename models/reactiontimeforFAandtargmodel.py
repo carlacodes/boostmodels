@@ -421,7 +421,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     #plot the spectrogram and amplittude waveform of each word
     #take the top 5 words from the permutation importance plot
     #GET THE TOP 5 WORDS
-    top_words = X_test.columns[sorted_idx][0:4]
+    top_words = np.flip(X_test.columns[sorted_idx])[0:4]
     for top_word in top_words:
         top_word = top_word[4:]
         #replace the word with the word number
@@ -494,11 +494,12 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         worddict = worddict_male
 
     # pxx, freq, t, cax = ax_dict['E'].specgram(worddict[int(top_words[1]) - 1].flatten(), Fs=24414.0625, mode = 'psd', cmap = cmap_color)
-    D = librosa.amplitude_to_db(np.abs(librosa.stft(worddict[int(top_words[1]) - 1].flatten())), ref=np.max)
-    cax = librosa.display.specshow(D, sr=24414.0625, x_axis='time', y_axis='log', ax=ax_dict['E'], cmap=cmap_color)
+    D = librosa.amplitude_to_db(np.abs(librosa.stft(worddict[int(top_words[1]) - 1].flatten())))
+    cax = librosa.display.specshow(D, x_axis='time', y_axis='log', ax=ax_dict['E'],  sr = 24414.0625, cmap=cmap_color)
     ax_dict['E'].set_title(f" '{feature_labels_words[1]}'")
     ax_dict['E'].set_xlabel('Time (s)')
-    ax_dict['E'].set_xticks(np.arange(0, 0.6, 0.2))
+    ax_dict['E'].set_xticks(np.round(np.arange(0.1, len(worddict[int(top_words[1]) - 1])/24414.0625, 0.1), 2))
+    ax_dict['E'].set_xticklabels(np.round(np.arange(0.1, len(worddict[int(top_words[1]) - 1])/24414.0625, 0.1), 2), rotation=45, ha='right', fontsize=10)
     plt.colorbar(cax, ax=ax_dict['E'])
 
 
@@ -506,21 +507,23 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     # cax = ax_dict['C'].pcolormesh(t, np.log10(f), Sxx, shading=cmap_color)
     #
     # pxx, freq, t, cax = ax_dict['C'].specgram(worddict[int(top_words[0]) - 1].flatten(), Fs=24414.0625, mode = 'psd', cmap = cmap_color)
-    D = librosa.amplitude_to_db(np.abs(librosa.stft(worddict[int(top_words[0]) - 1].flatten())), ref=np.max)
-    cax = librosa.display.specshow(D, sr=24414.0625, x_axis='time', y_axis='log', ax = ax_dict['C'], cmap = cmap_color)
+    D = librosa.amplitude_to_db(np.abs(librosa.stft(worddict[int(top_words[0]) - 1].flatten())))
+    cax = librosa.display.specshow(D,  x_axis='time', y_axis='log',  sr = 24414.0625, ax = ax_dict['C'], cmap = cmap_color)
     ax_dict['C'].legend()
     ax_dict['C'].set_title(f" instruments")
     ax_dict['C'].set_xlabel('Time (s)')
-    ax_dict['C'].set_xticks(np.arange(0, 0.6, 0.2))
+    ax_dict['C'].set_xticks(np.round(np.arange(0.1, len(worddict[int(top_words[0]) - 1])/24414.0625, 0.1), 2))
+    ax_dict['C'].set_xticklabels(np.round(np.arange(0.1, len(worddict[int(top_words[0]) - 1])/24414.0625, 0.1), 2), rotation=45, ha='right', fontsize=10)
     ax_dict['C'].set_ylabel('Frequency (Hz)')
     plt.colorbar(cax, ax = ax_dict['C'])
 
     # pxx, freq, t, cax = ax_dict['F'].specgram(worddict[int(top_words[2]) - 1].flatten(), Fs=24414.0625, mode = 'psd', cmap = cmap_color)
-    D = librosa.amplitude_to_db(np.abs(librosa.stft(worddict[int(top_words[2]) - 1].flatten())), ref=np.max)
-    cax = librosa.display.specshow(D, sr=24414.0625, x_axis='time', y_axis='log', ax = ax_dict['F'], cmap = cmap_color)
+    D = librosa.amplitude_to_db(np.abs(librosa.stft(worddict[int(top_words[2]) - 1].flatten())))
+    cax = librosa.display.specshow(D, sr = 24414.0625, x_axis='time', y_axis='log', ax = ax_dict['F'], cmap = cmap_color)
     ax_dict['F'].set_title(f"  '{feature_labels_words[2]}'")
     ax_dict['F'].set_xlabel('Time (s)')
-    ax_dict['F'].set_xticks(np.arange(0, 0.6, 0.2))
+    ax_dict['F'].set_xticks(np.round(np.arange(0.1, (len(worddict[int(top_words[2]) - 1])/24414.0625), 0.1), 2))
+    ax_dict['F'].set_xticklabels(np.round(np.arange(0.1, len(worddict[int(top_words[2]) - 1])/24414.0625, 0.1), 2), rotation=45, ha='right', fontsize=10)
     plt.colorbar(cax, ax = ax_dict['F'])
 
 
@@ -530,17 +533,15 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         data_scaled = scaledata(worddict[int(top_words[3]) - 1].flatten(), -7977, 7797)
     else:
         data_scaled = worddict[int(top_words[3]) - 1].flatten()
-    #
-    # f, t, Sxx = scipy.signal.spectrogram(data_scaled, fs=24414.0625, window='hann')
-    # cax = ax_dict['G'].pcolormesh(t, math.log10(f), Sxx, shading=cmap_color)
-    # pxx, freq, t, cax = plt.specgram(worddict[int(top_words[3]) - 1].flatten(), Fs=24414.0625, mode = 'psd')
-    # ax_dict['G'].imshow(pxx, aspect='auto', origin='lower', extent=[t.min(), t.max(), np.log10(freq.min()+0.001), np.log10(freq.max())], cmap = cmap_color)
+
     ax_dict['G'].set_title(f" '{feature_labels_words[3]}'")
 
-    D = librosa.amplitude_to_db(np.abs(librosa.stft(worddict[int(top_words[3]) - 1].flatten())), ref=np.max)
+    D = librosa.amplitude_to_db(np.abs(librosa.stft(data_scaled)))
     # Plot the spectrogram on a logarithmic scale
-    cax = librosa.display.specshow(D, sr=24414.0625, x_axis='time', y_axis='log', ax = ax_dict['G'], cmap = cmap_color)
+    cax = librosa.display.specshow(D, x_axis='time', y_axis='log',  sr = 24414.0625, ax = ax_dict['G'], cmap = cmap_color)
     ax_dict['G'].set_xlabel('Time (s)')
+    ax_dict['G'].set_xticks(np.round(np.arange(0.1, len(data_scaled)/24414.0625, 0.1), 2))
+    ax_dict['G'].set_xticklabels(np.round(np.arange(0.1, len(data_scaled)/24414.0625, 0.1), 2), rotation=45, ha='right', fontsize=10)
     plt.colorbar(cax, ax=ax_dict['G'], )
 
     # ['H', 'I', 'J', 'K'],
