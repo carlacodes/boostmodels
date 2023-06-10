@@ -530,7 +530,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     # f, t, Sxx = scipy.signal.spectrogram(data_scaled, fs=24414.0625, window='hann')
     # cax = ax_dict['G'].pcolormesh(t, math.log10(f), Sxx, shading=cmap_color)
     pxx, freq, t, cax = plt.specgram(worddict[int(top_words[3]) - 1].flatten(), Fs=24414.0625, mode = 'psd')
-    ax_dict['G'].imshow(pxx, aspect='auto', origin='lower', extent=[t.min(), t.max(), freq.min(), freq.max()], cmap = cmap_color)
+    ax_dict['G'].imshow(pxx, aspect='auto', origin='lower', extent=[t.min(), t.max(), np.log10(freq.min()+0.001), np.log10(freq.max())], cmap = cmap_color)
     ax_dict['G'].set_title(f" '{feature_labels_words[3]}'")
     ax_dict['G'].set_xlabel('Time (s)')
     # ax_dict['G'].set_ylabel('Frequency (Hz)')
