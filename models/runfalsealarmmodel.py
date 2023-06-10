@@ -22,6 +22,7 @@ from instruments.behaviouralAnalysis import reactionTimeAnalysis  # outputbehavi
 from instruments.io.BehaviourIO import BehaviourDataSet
 import matplotlib.font_manager as fm
 
+
 def get_axis_limits(ax, scale=1):
     return ax.get_xlim()[0] * scale, (ax.get_ylim()[1] * scale)
 
