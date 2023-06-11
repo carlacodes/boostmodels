@@ -310,6 +310,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     shap.dependence_plot("time to target", shap_values, X)  #
     explainer = shap.Explainer(xg_reg, X)
     shap_values2 = explainer(X_train)
+    shap.plots.scatter(shap_values2[:, "side of audio"], color=shap_values2[:, "ferret ID"], show=True, cmap = matplotlib.colormaps[cmapname])
 
 
     shap.plots.scatter(shap_values2[:, "time to target"], color=shap_values2[:, "trial number"], show=False, cmap = matplotlib.colormaps[cmapname])
