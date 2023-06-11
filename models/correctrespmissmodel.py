@@ -248,6 +248,12 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     plt.show()
 
 
+    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "precursor = target F0"], cmap=cmapcustom, show=True)
+    shap.plots.scatter(shap_values2[:, "audio side"], color=shap_values2[:, "precursor = target F0"], cmap=cmapcustom, show=True)
+    shap.plots.scatter(shap_values2[:, "trial number"], color=shap_values2[:, "precursor = target F0"], cmap=cmapcustom, show=True)
+    shap.plots.scatter(shap_values2[:, "target presentation time"], color=shap_values2[:, "ferret ID"], cmap=cmapcustom, show=True)
+
+    shap.plots.scatter(shap_values2[:, "target F0"], color=shap_values2[:, "precursor = target F0"], cmap=cmapcustom, show=True)
 
 
     mosaic = ['A', 'B', 'C'], ['D', 'B', 'E']
