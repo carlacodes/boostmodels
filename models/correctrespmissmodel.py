@@ -249,7 +249,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
 
 
     shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "precursor = target F0"], cmap=cmapcustom, show=True)
-    shap.plots.scatter(shap_values2[:, "audio side"], color=shap_values2[:, "precursor = target F0"], cmap=cmapcustom, show=True)
+    shap.plots.scatter(shap_values2[:, "audio side"], color=shap_values2[:, "ferret ID"], cmap=cmapcustom, show=True)
     shap.plots.scatter(shap_values2[:, "trial number"], color=shap_values2[:, "precursor = target F0"], cmap=cmapcustom, show=True)
     shap.plots.scatter(shap_values2[:, "target presentation time"], color=shap_values2[:, "ferret ID"], cmap=cmapcustom, show=True)
 
@@ -257,6 +257,8 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
 
 
     mosaic = ['A', 'B', 'C'], ['D', 'B', 'E']
+    ferret_id_only = ['F1702', 'F1815', 'F1803', 'F2002', 'F2105']
+
     fig = plt.figure(figsize=(24, 10))
     ax_dict = fig.subplot_mosaic(mosaic)
 
@@ -292,7 +294,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     cb_ax.set_yticklabels(['precursor ≠ target F0', 'precursor = target F0'])
     ax_dict['E'].set_xlabel('Ferret ID', fontsize=16)
     ax_dict['E'].set_xticks([0, 1, 2, 3, 4])
-    ax_dict['E'].set_xticklabels(ferrets, fontsize=10, rotation = 45, ha='right')
+    ax_dict['E'].set_xticklabels(ferret_id_only, fontsize=10, rotation = 45, ha='right')
 
     shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "target F0"], ax=ax_dict['C'],
                        cmap=cmapcustom, show=False)
@@ -310,7 +312,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     ax_dict['C'].set_ylabel('SHAP value', fontsize=10)
     ax_dict['C'].set_xlabel('Ferret ID', fontsize=16)
     ax_dict['C'].set_xticks([0, 1, 2, 3, 4])
-    ax_dict['C'].set_xticklabels(ferrets, fontsize=10, rotation = 45, ha='right')
+    ax_dict['C'].set_xticklabels(ferret_id_only, fontsize=10, rotation = 45, ha='right')
 
     # ax_dict['C'].set_xticklabels(ferrets, fontsize=16)
 

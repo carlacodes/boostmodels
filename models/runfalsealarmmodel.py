@@ -396,7 +396,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
 
 
 
-    fig, ax = plt.subplots(figsize=(10, 10))
+    fig, ax = plt.subplots(figsize=(5, 5))
     shap.plots.scatter(shap_values2[:, "precursor F0"], color=shap_values2[:, "time since start of trial"], show= False, ax =ax,  cmap=cmapcustom)
     cax = fig.axes[1]
     cax.tick_params(labelsize=15)
@@ -404,8 +404,21 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.xlim(0.8, 5.2)
     plt.xticks([1, 2, 3, 4, 5], labels = ["109", "124", "144", "191", "251"])
     # shap.plots.scatter(shap_values2[:, "time since start of trial"], color=shap_values2[:, "precursor F0"], show= True, ax =ax,  cmap=cmapcustom)
-
     plt.show()
+
+
+
+    fig, ax = plt.subplots(figsize=(5, 5))
+    shap.plots.scatter(shap_values2[:, "intra-trial F0 roving"], color=shap_values2[:, "ferret ID"], show= False, ax =ax,  cmap=cmapcustom)
+    cax = fig.axes[1]
+    cax.tick_params(labelsize=15)
+    cax.set_ylabel("Ferret ID", fontsize=12)
+    # plt.xlim(0.8, 5.2)
+    # plt.xticks([1, 2, 3, 4, 5], labels = ["109", "124", "144", "191", "251"])
+    # shap.plots.scatter(shap_values2[:, "time since start of trial"], color=shap_values2[:, "precursor F0"], show= True, ax =ax,  cmap=cmapcustom)
+    plt.show()
+
+
     plt.tight_layout()
     plt.subplots_adjust(left=-10, right=0.5)
     shap.plots.scatter(shap_values2[:, "time since start of trial"], color=shap_values2[:, "ferret ID"], show= True,
@@ -490,31 +503,43 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     cb_ax = fig.axes[5]
     # Modifying color bar parameters
     cb_ax.tick_params(labelsize=15)
-    cb_ax.set_ylabel("precursor = target F0 word", fontsize=12)
+    cb_ax.set_ylabel("precursor = target F0", fontsize=12)
+    cb_ax.set_yticks([0.25, 0.75])
+    cb_ax.set_yticklabels(['precursor ≠ target F0', 'precursor = target F0'])
+
     ax_dict['E'].set_ylabel('SHAP value', fontsize=10)
     ax_dict['E'].set_title('Ferret ID versus impact on false alarm probability', fontsize=13)
     ax_dict['E'].set_xticks([0, 1, 2, 3, 4])
-    ax_dict['E'].set_xticklabels(ferrets,  rotation=45, ha='right')
+    ferret_id_only = ['F1702', 'F1815', 'F1803', 'F2002', 'F2105']
+    ax_dict['E'].set_xticklabels(ferret_id_only,  rotation=45, ha='right')
     ax_dict['E'].set_xlabel('Ferret ID', fontsize=16)
 
-    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "precursor F0"], ax=ax_dict['C'],
-                       cmap =cmapcustom, show=False)
+    # shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "precursor F0"], ax=ax_dict['C'],
+    #                    cmap =cmapcustom, show=False)
+    # fig, ax = plt.gcf(), plt.gca()
+    # cb_ax = fig.axes[1]
+    # cb_ax.set_yticks([1, 2, 3,4, 5])
+    # cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
+    # cb_ax.tick_params(labelsize=15)
+    # cb_ax.set_ylabel("precursor F0 (Hz)", fontsize=15)
+    shap.plots.scatter(shap_values2[:, "precursor F0"], color=shap_values2[:, "time since start of trial"], show= False, ax =ax_dict['C'],  cmap=cmapcustom)
     fig, ax = plt.gcf(), plt.gca()
-    cb_ax = fig.axes[1]
-    cb_ax.set_yticks([1, 2, 3,4, 5])
-    cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
-    cb_ax.tick_params(labelsize=15)
-    cb_ax.set_ylabel("precursor F0 (Hz)", fontsize=15)
+    cax = fig.axes[7]
+    cax.tick_params(labelsize=15)
+    cax.set_ylabel("Time since start of trial", fontsize=12)
+    ax_dict['C'].set_xlim(0.8, 5.2)
 
-    # Modifying color bar parameters
-    cb_ax.tick_params(labelsize=15)
+    ax_dict['C'].set_xlabel('precursor F0 (Hz)', fontsize=16)
     ax_dict['C'].set_ylabel('SHAP value', fontsize=10)
-    ax_dict['C'].set_xlabel('Ferret ID', fontsize=16)
-    ax_dict['C'].set_title('Ferret ID versus impact on false alarm probability', fontsize=13)
+    ax_dict['C'].set_title('Precursor F0 versus impact on false alarm probability', fontsize=13)
 
-    ax_dict['C'].set_xticks([0, 1, 2, 3, 4])
-    ax_dict['C'].set_xticklabels(ferrets,  rotation=45, ha='right')
-    # ax_dict['C'].set_title('Ferret ID and precursor = target F0 versus SHAP value on miss probability', fontsize=18)
+    # # Modifying color bar parameters
+    # cb_ax.tick_params(labelsize=15)
+    # ax_dict['C'].set_ylabel('SHAP value', fontsize=10)
+    # ax_dict['C'].set_xlabel('Ferret ID', fontsize=16)
+    # ax_dict['C'].set_title('Ferret ID versus impact on false alarm probability', fontsize=13)
+    ax_dict['C'].set_xticks([ 1, 2, 3, 4, 5])
+    ax_dict['C'].set_xticklabels(["109", "124", "144", "191", "251"],  rotation=45, ha='right')
     #remove padding outside the figures
     font_props = fm.FontProperties(weight='bold', size=17)
 

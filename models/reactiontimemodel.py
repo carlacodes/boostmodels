@@ -468,6 +468,8 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
 
 
     mosaic = ['A', 'B', 'C'], ['D', 'B', 'E']
+    ferret_id_only = ['F1702', 'F1815', 'F1803', 'F2002', 'F2105']
+
     fig = plt.figure(figsize=(20, 10))
     ax_dict = fig.subplot_mosaic(mosaic)
 
@@ -501,7 +503,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     ax_dict['E'].set_title('Ferret ID versus impact on reaction time', fontsize=13)
     ax_dict['E'].set_xlabel('Ferret ID', fontsize=16)
     ax_dict['E'].set_xticks([0, 1, 2, 3, 4])
-    ax_dict['E'].set_xticklabels(ferrets, rotation=45, ha='right')
+    ax_dict['E'].set_xticklabels(ferret_id_only, rotation=45, ha='right')
 
     shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "target F0"], ax=ax_dict['C'],
                        cmap = matplotlib.colormaps[cmapname], show=False)
@@ -519,7 +521,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     ax_dict['C'].set_xticks([0, 1, 2, 3, 4])
     ax_dict['C'].set_title('Ferret ID versus impact on reaction time', fontsize=13)
 
-    ax_dict['C'].set_xticklabels(ferrets, rotation=45, ha='right')
+    ax_dict['C'].set_xticklabels(ferret_id_only, rotation=45, ha='right')
     # ax_dict['C'].set_title('Ferret ID and precursor = target F0 versus SHAP value on miss probability', fontsize=18)
     #remove padding outside the figures
     font_props = fm.FontProperties(weight='bold', size=17)
