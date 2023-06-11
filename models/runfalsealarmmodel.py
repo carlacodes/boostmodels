@@ -390,6 +390,12 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     # Plot the scatter plot with the colormap
     shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "intra-trial F0 roving"], cmap=cmapcustom)
     shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "precursor F0"], cmap=cmapcustom)
+    shap.plots.scatter(shap_values2[:, "audio side"], color=shap_values2[:, "ferret ID"], cmap=cmapcustom)
+    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "ferret ID"], cmap=cmapcustom)
+    shap.plots.scatter(shap_values2[:, "past response correct"], color=shap_values2[:, "ferret ID"], cmap=cmapcustom)
+
+
+
     fig, ax = plt.subplots(figsize=(10, 10))
     shap.plots.scatter(shap_values2[:, "precursor F0"], color=shap_values2[:, "time since start of trial"], show= False, ax =ax,  cmap=cmapcustom)
     cax = fig.axes[1]
@@ -402,7 +408,11 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.show()
     plt.tight_layout()
     plt.subplots_adjust(left=-10, right=0.5)
+    shap.plots.scatter(shap_values2[:, "time since start of trial"], color=shap_values2[:, "ferret ID"], show= True,
+                       cmap=cmapcustom)
 
+    shap.plots.scatter(shap_values2[:, "trial number"], color=shap_values2[:, "ferret ID"], show= True,
+                       cmap=cmapcustom)
     shap.plots.scatter(shap_values2[:, "precursor F0"], color=shap_values2[:, "intra-trial F0 roving"], show=False,
                        cmap=cmapcustom)
     fig, ax = plt.gcf(), plt.gca()
@@ -1251,7 +1261,7 @@ def plot_reaction_times_interandintra_swarm(ferrets):
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    plot_reaction_times_interandintra_swarm(ferrets)
+    # plot_reaction_times_interandintra_swarm(ferrets)
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(
         ferrets, optimization=False, ferret_as_feature=True)
     # ferrets = ['F2105_Clove']# 'F2105_Clove'
