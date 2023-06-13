@@ -597,20 +597,23 @@ class behaviouralhelperscg():
                 #figure out the F0 of when the ferret releases by iteratively summing up the duration of each word
                 #and comparing it to the time of the release
                 count = 0
-                for i in range(0, len(newdata['dDurs'].values)):
-                    if np.sum(newdata['dDurs'].values[i]) / fs <= newdata['centreRelease'].values[i] - newdata['absentTime'].values[i]:
-                        count = count + 1
-                    else:
-                        if chosentrial[count] == 8.0:
-                            pitchof0oflastword.append(float(3))
-                        elif chosentrial[count] == 13.0:
-                            pitchof0oflastword.append(float(1))
-                        elif chosentrial[count] == 1.0:
-                            pitchof0oflastword.append(float(4))
+                if newdata['response'].values[i] != 3: #if it's a correct catch trial then the release time is inf
+                    for i in range(0, len(newdata['dDurs'].values)):
+                        if np.sum(newdata['dDurs'].values[i]) / fs <= newdata['centreRelease'].values[i] - newdata['absentTime'].values[i]:
+                            count = count + 1
                         else:
-                            pitchof0oflastword.append(chosentrial[count])
+                            if chosentrial[count] == 8.0:
+                                pitchof0oflastword.append(float(3))
+                            elif chosentrial[count] == 13.0:
+                                pitchof0oflastword.append(float(1))
+                            elif chosentrial[count] == 1.0:
+                                pitchof0oflastword.append(float(4))
+                            else:
+                                pitchof0oflastword.append(chosentrial[count])
 
-                        break
+                            break
+                else:
+                    pitchof0oflastword.append(chosentrial[-1])
 
 
                 try:
