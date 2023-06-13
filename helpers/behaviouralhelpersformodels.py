@@ -523,6 +523,7 @@ class behaviouralhelperscg():
             control_trial = []
             pitchoftarg = []
             pitchofprecur = []
+            pitchof0oflastword = []
             talkerlist2 = np.empty(len(pitchshiftmat))
 
             falsealarm = np.empty(shape=(0, 0))
@@ -593,6 +594,25 @@ class behaviouralhelperscg():
 
 
                 targpos = np.where(chosendisttrial == 1)
+                #figure out the F0 of when the ferret releases by iteratively summing up the duration of each word
+                #and comparing it to the time of the release
+                count = 0
+                for i in range(0, len(newdata['dDurs'].values)):
+                    if np.sum(newdata['dDurs'].values[i]) / fs <= newdata['centreRelease'].values[i] - newdata['absentTime'].values[i]:
+                        count = count + 1
+                    else:
+                        if chosentrial[count] == 8.0:
+                            pitchof0oflastword.append(float(3))
+                        elif chosentrial[count] == 13.0:
+                            pitchof0oflastword.append(float(1))
+                        elif chosentrial[count] == 1.0:
+                            pitchof0oflastword.append(float(4))
+                        else:
+                            pitchof0oflastword.append(chosentrial[count])
+
+                        break
+
+
                 try:
                     targpos = int(targpos[0])
                     precur_pos = targpos - 1
@@ -707,6 +727,7 @@ class behaviouralhelperscg():
 
             newdata['pitchoftarg'] = pitchoftarg
             newdata['pitchofprecur'] = pitchofprecur
+            newdata['pitchof0oflastword'] = pitchof0oflastword
 
             falsealarm = falsealarm.astype(int)
             pastcatchtrial = pastcatchtrial.astype(int)

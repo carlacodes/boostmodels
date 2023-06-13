@@ -202,21 +202,21 @@ def run_optuna_study_falsealarm(dataframe, y, ferret_as_feature=False):
     study = optuna.create_study(direction="minimize", study_name="LGBM Classifier")
     if ferret_as_feature:
         df_to_use = dataframe[
-            ["pitchofprecur", "targTimes", "ferret", "trialNum", "talker", "side", "intra_trial_roving",
+            ["pitchof0oflastword", "targTimes", "ferret", "trialNum", "talker", "side", "intra_trial_roving",
              "pastcorrectresp", "pastcatchtrial",
              "falsealarm"]]
         # dfuse = df[["pitchoftarg", "pastcatchtrial", "trialNum", "talker", "side", "precur_and_targ_same",
         #             "timeToTarget",
         #             "realRelReleaseTimes", "ferret", "pastcorrectresp"]]
-        labels = ["precursor F0", "time since start of trial", "ferret ID", "trial number", "talker", "audio side",
+        labels = ["F0", "time since start of trial", "ferret ID", "trial number", "talker", "audio side",
                   "intra-trial F0 roving", "past response correct", "past trial was catch", "falsealarm"]
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
     else:
         df_to_use = dataframe[
-            ["pitchofprecur", "targTimes", "trialNum", "talker", "side", "intra_trial_roving", "pastcorrectresp",
+            ["pitchof0oflastword", "targTimes", "trialNum", "talker", "side", "intra_trial_roving", "pastcorrectresp",
              "pastcatchtrial",
              "falsealarm"]]
-        labels = ["precursor F0", "time since start of trial", "trial number", "talker", "audio side", "intra-trial F0 roving",
+        labels = ["F0", "time since start of trial", "trial number", "talker", "audio side", "intra-trial F0 roving",
                   "past response correct", "past trial was catch", "falsealarm"]
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
 
@@ -237,7 +237,7 @@ def run_optuna_study_falsealarm(dataframe, y, ferret_as_feature=False):
 def run_optuna_study_correctresponse(dataframe, y):
     study = optuna.create_study(direction="minimize", study_name="LGBM Classifier")
     df_to_use = dataframe[
-        ["cosinesim", "pitchofprecur", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
+        ["cosinesim", "pitchof0oflastword", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
          "falsealarm", "pastcorrectresp", "temporalsim", "pastcatchtrial", "trialNum", "targTimes", ]]
 
     col = 'correctesp'
@@ -257,21 +257,21 @@ def run_optuna_study_correctresponse(dataframe, y):
 def runlgbfaornotwithoptuna(dataframe, paramsinput, ferret_as_feature=False, one_ferret = False, ferrets = None):
     if ferret_as_feature:
         df_to_use = dataframe[
-            ["pitchofprecur", "targTimes", "ferret", "trialNum", "talker", "side", "intra_trial_roving",
+            ["pitchof0oflastword", "targTimes", "ferret", "trialNum", "talker", "side", "intra_trial_roving",
              "pastcorrectresp", "pastcatchtrial",
              "falsealarm"]]
         # dfuse = df[["pitchoftarg", "pastcatchtrial", "trialNum", "talker", "side", "precur_and_targ_same",
         #             "timeToTarget",
         #             "realRelReleaseTimes", "ferret", "pastcorrectresp"]]
-        labels = ["precursor F0", "time since start of trial", "ferret ID", "trial number", "talker", "audio side",
+        labels = ["F0", "time since start of trial", "ferret ID", "trial number", "talker", "audio side",
                   "intra-trial F0 roving", "past response correct", "past trial was catch", "falsealarm"]
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
     else:
         df_to_use = dataframe[
-            ["pitchofprecur", "targTimes", "trialNum", "talker", "side", "intra_trial_roving", "pastcorrectresp",
+            ["pitchof0oflastword", "targTimes", "trialNum", "talker", "side", "intra_trial_roving", "pastcorrectresp",
              "pastcatchtrial",
              "falsealarm"]]
-        labels = ["precursor F0", "time since start of trial", "trial number", "talker", "audio side", "intra-trial F0 roving",
+        labels = ["F0", "time since start of trial", "trial number", "talker", "audio side", "intra-trial F0 roving",
                   "past response correct", "past trial was catch", "falsealarm"]
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
 
@@ -572,7 +572,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
 
 def runlgbfaornot(dataframe):
     df_to_use = dataframe[
-        ["cosinesim", "pitchofprecur", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
+        ["cosinesim", "pitchof0oflastword", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
          "falsealarm", "pastcorrectresp", "pastcatchtrial", "trialNum", "targTimes", ]]
 
     col = 'falsealarm'
@@ -778,13 +778,13 @@ def runfalsealarmpipeline(ferrets, optimization=False, ferret_as_feature=False):
 
     if optimization == False:
         # load the saved params
-        params = np.load('../optuna_results/falsealarm_optunaparams_2005.npy', allow_pickle=True).item()
+        params = np.load('../optuna_results/falsealarm_optunaparams_1306.npy', allow_pickle=True).item()
     else:
         study = run_optuna_study_falsealarm(resultingfa_df, resultingfa_df['falsealarm'].to_numpy(),
                                             ferret_as_feature=ferret_as_feature)
         print(study.best_params)
         params = study.best_params
-        np.save('../optuna_results/falsealarm_optunaparams_2005.npy', study.best_params)
+        np.save('../optuna_results/falsealarm_optunaparams_1306.npy', study.best_params)
 
     resultingfa_df.to_csv(filepath)
 
@@ -1302,7 +1302,7 @@ if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
     # plot_reaction_times_interandintra_swarm(ferrets)
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(
-        ferrets, optimization=False, ferret_as_feature=True)
+        ferrets, optimization=True, ferret_as_feature=True)
     # ferrets = ['F2105_Clove']# 'F2105_Clove'
     # df_by_ferretdict = plot_reaction_times(ferrets)
     # #
