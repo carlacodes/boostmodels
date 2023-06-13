@@ -513,8 +513,7 @@ class behaviouralhelperscg():
             catchtriallist = newdata['catchTrial']
             chosenresponse = newdata['response']
             realrelreleasetimelist = newdata['realRelReleaseTimes']
-            pitchoftarg = np.empty(len(pitchshiftmat))
-            pitchofprecur = np.empty(len(pitchshiftmat))
+
             stepval = np.empty(len(pitchshiftmat))
             distractor_or_fa = np.empty(len(pitchshiftmat))
 
@@ -596,23 +595,40 @@ class behaviouralhelperscg():
                 targpos = np.where(chosendisttrial == 1)
                 #figure out the F0 of when the ferret releases by iteratively summing up the duration of each word
                 #and comparing it to the time of the release
-                count = 0
+                count = -1
                 distractordurationoftrial = newdata['dDurs'].values[i]
                 if newdata['response'].values[i] != 3 and newdata['response'].values[i] != 7: #if it's a correct catch trial then the release time is inf
-                    for k2 in range(0, len(newdata['dDurs'].values[i])):
-                        if np.sum(distractordurationoftrial[0:k2]) / fs <= newdata['centreRelease'].values[i] - newdata['absentTime'].values[i]:
-                            count = count + 1
-                        else:
-                            if chosentrial[count] == 8.0:
-                                pitchof0oflastword.append(float(3))
-                            elif chosentrial[count] == 13.0:
-                                pitchof0oflastword.append(float(1))
-                            elif chosentrial[count] == 1.0:
-                                pitchof0oflastword.append(float(4))
-                            else:
-                                pitchof0oflastword.append(float(chosentrial[count]))
+                    while np.sum(distractordurationoftrial[0:count]) / fs < newdata['centreRelease'].values[i] - newdata['absentTime'].values[i]:
+                        count = count + 1
+                    if chosentrial[count] == 8.0:
+                        pitchof0oflastword.append(float(3))
+                    elif chosentrial[count] == 13.0:
+                        pitchof0oflastword.append(float(1))
+                    elif chosentrial[count] == 1.0:
+                        pitchof0oflastword.append(float(4))
+                    else:
+                        pitchof0oflastword.append(float(chosentrial[count]))
 
-                            break
+
+                    #
+                    # for k2 in range(0, len(distractordurationoftrial)+1):
+                    #     if np.sum(distractordurationoftrial[0:k2]) / fs < newdata['centreRelease'].values[i] - newdata['absentTime'].values[i]:
+                    #         count = count + 1
+                    #     else:
+                    #         if chosentrial[count] == 8.0:
+                    #             pitchof0oflastword.append(float(3))
+                    #             break
+                    #         elif chosentrial[count] == 13.0:
+                    #             pitchof0oflastword.append(float(1))
+                    #             break
+                    #         elif chosentrial[count] == 1.0:
+                    #             pitchof0oflastword.append(float(4))
+                    #             break
+                    #         else:
+                    #             pitchof0oflastword.append(float(chosentrial[count]))
+                    #             break
+
+
                 else:
                     pitchof0oflastword.append(chosentrial[-1])
 
@@ -647,74 +663,9 @@ class behaviouralhelperscg():
                 except:
                     pitchoftarg.append(np.nan)
                     pitchofprecur.append(np.nan)
-                # except:
-                #     pitchoftarg[i] = float("nan")
-                #     pitchofprecur[i] = float("nan")
 
-                # 1 is 191, 2 is 124, 3 is 144hz female, 5 is 251, 8 is 144hz male, 13 is109hz male
-                        # pitchof targ 1 is 124hz male, pitchoftarg4 is 109Hz Male
+                print('at trial'+str(i))
 
-            # try:
-                #     targpos = np.where(chosendisttrial == 1)
-                #     distractor_or_fa[i] = chosendisttrial[targpos[0] - 1]
-                #
-                #     if chosentrial[targpos[0]] == 8.0:
-                #         pitchoftarg[i] == 3.0
-                #     else:
-                #         pitchoftarg[i] = chosentrial[targpos[0]]
-                #
-                #     if chosentrial[targpos[0] - 1] == 8.0:
-                #         pitchofprecur[i] == 3
-                #     else:
-                #         pitchofprecur[i] = chosentrial[targpos[0] - 1]
-                #         # 1 is 191, 2 is 124, 3 is 144hz female, 5 is 251, 8 is 144hz male, 13 is109hz male
-                #         # pitchof targ 1 is 124hz male, pitchoftarg4 is 109Hz Male
-                #
-                #     if chosentrial[targpos[0] - 1] == 3.0:
-                #         stepval[i] = 1.0
-                #     elif chosentrial[targpos[0] - 1] == 8.0:
-                #         stepval[i] = -1.0
-                #     elif chosentrial[targpos[0] - 1] == 13.0:
-                #         stepval[i] = 1.0
-                #     elif chosentrial[targpos[0] - 1] == 5.0:
-                #         stepval[i] = -1.0
-                #     else:
-                #         stepval[i] = 0.0
-                #
-                #     if pitchofprecur[i] == 1.0:
-                #         pitchofprecur[i] = 4.0
-                #
-                #     if pitchofprecur[i] == 13.0:
-                #         pitchofprecur[i] = 1.0
-                #
-                #     if pitchoftarg[i] == 1.0:
-                #         pitchoftarg[i] = 4.0
-                #
-                #     if pitchoftarg[i] == 13.0:
-                #         pitchoftarg[i] = 1.0
-                #
-                #
-                #
-                # except:
-                #
-                #     pitchoftarg[i] = np.nan
-                #     if isinstance(chosentrial, int):
-                #         pitchofprecur[i] = chosentrial
-                #     else:
-                #         pitchofprecur[i] = chosentrial[-1]
-                #     if pitchofprecur[i] == 1.0:
-                #         pitchofprecur[i] = 4.0
-                #
-                #     if pitchofprecur[i] == 13.0:
-                #         pitchofprecur[i] = 1.0
-                #
-                #     if pitchoftarg[i] == 1.0:
-                #         pitchoftarg[i] = 4.0
-                #
-                #     if pitchoftarg[i] == 13.0:
-                #         pitchoftarg[i] = 1.0
-                #     distractor_or_fa[i] = chosendisttrial[-1]
-                #     continue
             newdata.drop(index=newdata.index[0],
                          axis=0,
                          inplace=True)
