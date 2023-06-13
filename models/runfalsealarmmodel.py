@@ -426,6 +426,20 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
 
     shap.plots.scatter(shap_values2[:, "trial number"], color=shap_values2[:, "ferret ID"], show= True,
                        cmap=cmapcustom)
+
+    fig, ax = plt.subplots(figsize=(5, 5))
+    shap.plots.scatter(shap_values2[:, "intra-trial F0 roving"], color=shap_values2[:, "precursor F0"], show= True,
+                       cmap=cmapcustom)
+    # plt.xticks([0, 1], labels = ["No", "Yes"])
+    fig, ax = plt.gcf(), plt.gca()
+    cax = fig.axes[1]
+    cax.tick_params(labelsize=15)
+    cax.set_ylabel("Precursor F0", fontsize=12)
+    cax.set_yticks([1, 2, 3, 4, 5])
+    cax.set_yticklabels(["109", "124", "144", "191", "251"])
+    plt.title('Intra-trial roving \n versus impact in false alarm probability', fontsize=18)
+    plt.show()
+
     shap.plots.scatter(shap_values2[:, "precursor F0"], color=shap_values2[:, "intra-trial F0 roving"], show=False,
                        cmap=cmapcustom)
     fig, ax = plt.gcf(), plt.gca()

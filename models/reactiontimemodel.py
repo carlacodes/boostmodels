@@ -310,7 +310,21 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     shap.dependence_plot("time to target", shap_values, X)  #
     explainer = shap.Explainer(xg_reg, X)
     shap_values2 = explainer(X_train)
-    shap.plots.scatter(shap_values2[:, "side of audio"], color=shap_values2[:, "ferret ID"], show=True, cmap = matplotlib.colormaps[cmapname])
+    # shap.plots.scatter(shap_values2[:, "side of audio"], color=shap_values2[:, "ferret ID"], show=True, cmap = matplotlib.colormaps[cmapname])
+    fig, ax = plt.subplots(figsize=(10,10))
+    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "precursor = target F0"], show=False, cmap = matplotlib.colormaps[cmapname])
+    plt.xticks([1,2], labels = ['male', 'female'])
+    if one_ferret:
+        plt.title('Talker versus impact \n on reaction time for ' + ferrets, fontsize=18)
+    plt.savefig(fig_savedir / 'talker_vs_precursorequaltargF0.png', dpi=300, bbox_inches='tight')
+
+    fig, ax = plt.subplots(figsize=(10, 10))
+    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "target F0"], show=False,
+                       cmap=matplotlib.colormaps[cmapname])
+    plt.xticks([1, 2], labels=['male', 'female'])
+    if one_ferret:
+        plt.title('Talker versus impact \n on reaction time for ' + ferrets, fontsize=18)
+    plt.savefig(fig_savedir / 'talker_vs_targetF0.png', dpi=300, bbox_inches='tight')
 
 
     shap.plots.scatter(shap_values2[:, "time to target"], color=shap_values2[:, "trial number"], show=False, cmap = matplotlib.colormaps[cmapname])
@@ -466,76 +480,78 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         plt.savefig(fig_savedir / 'sidecolouredbyferret.png', dpi=1000)
         plt.show()
 
+    if one_ferret == False:
+        mosaic = ['A', 'B', 'C'], ['D', 'B', 'E']
+        ferret_id_only = ['F1702', 'F1815', 'F1803', 'F2002', 'F2105']
 
-    mosaic = ['A', 'B', 'C'], ['D', 'B', 'E']
-    ferret_id_only = ['F1702', 'F1815', 'F1803', 'F2002', 'F2105']
+        fig = plt.figure(figsize=(20, 10))
+        ax_dict = fig.subplot_mosaic(mosaic)
 
-    fig = plt.figure(figsize=(20, 10))
-    ax_dict = fig.subplot_mosaic(mosaic)
+        # Plot the elbow plot
+        ax_dict['A'].plot(feature_labels, cumulative_importances, marker='o', color='cyan')
+        ax_dict['A'].set_xlabel('Features')
+        ax_dict['A'].set_ylabel('Cumulative Feature Importance')
+        ax_dict['A'].set_title('Elbow Plot of Cumulative Feature Importance for Rxn Time Prediction')
+        ax_dict['A'].set_xticklabels(feature_labels, rotation=45, ha='right')  # rotate x-axis labels for better readability
 
-    # Plot the elbow plot
-    ax_dict['A'].plot(feature_labels, cumulative_importances, marker='o', color='cyan')
-    ax_dict['A'].set_xlabel('Features')
-    ax_dict['A'].set_ylabel('Cumulative Feature Importance')
-    ax_dict['A'].set_title('Elbow Plot of Cumulative Feature Importance for Rxn Time Prediction')
-    ax_dict['A'].set_xticklabels(feature_labels, rotation=45, ha='right')  # rotate x-axis labels for better readability
-
-    # rotate x-axis labels for better readability
-    summary_img = mpimg.imread(fig_savedir / 'shapsummaryplot_allanimals2.png')
-    ax_dict['B'].imshow(summary_img, aspect='auto', )
-    ax_dict['B'].axis('off')  # Turn off axis ticks and labels
-    ax_dict['B'].set_title('Ranked list of features over their \n impact on reaction time', fontsize=13)
-
-
-    ax_dict['D'].barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, color='cyan')
-    ax_dict['D'].set_title("Permutation importances on reaction time")
-    ax_dict['D'].set_xlabel("Permutation importance")
+        # rotate x-axis labels for better readability
+        summary_img = mpimg.imread(fig_savedir / 'shapsummaryplot_allanimals2.png')
+        ax_dict['B'].imshow(summary_img, aspect='auto', )
+        ax_dict['B'].axis('off')  # Turn off axis ticks and labels
+        ax_dict['B'].set_title('Ranked list of features over their \n impact on reaction time', fontsize=13)
 
 
-    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "precursor = target F0"], ax=ax_dict['E'],
-                       cmap=matplotlib.colormaps[cmapname], show=False)
-    fig, ax = plt.gcf(), plt.gca()
-    cb_ax = fig.axes[1]
-    # Modifying color bar parameters
-    cb_ax.tick_params(labelsize=15)
-    cb_ax.set_ylabel("precursor = target F0 word", fontsize=10)
-    ax_dict['E'].set_ylabel('SHAP value', fontsize=10)
-    ax_dict['E'].set_title('Ferret ID versus impact on reaction time', fontsize=13)
-    ax_dict['E'].set_xlabel('Ferret ID', fontsize=16)
-    ax_dict['E'].set_xticks([0, 1, 2, 3, 4])
-    ax_dict['E'].set_xticklabels(ferret_id_only, rotation=45, ha='right')
-
-    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "target F0"], ax=ax_dict['C'],
-                       cmap = matplotlib.colormaps[cmapname], show=False)
-    fig, ax = plt.gcf(), plt.gca()
-    cb_ax = fig.axes[7]
-    cb_ax.set_yticks([1, 2, 3,4, 5])
-    cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
-    cb_ax.tick_params(labelsize=15)
-    cb_ax.set_ylabel("target F0 (Hz)", fontsize=10)
-
-    # Modifying color bar parameters
-    cb_ax.tick_params(labelsize=15)
-    ax_dict['C'].set_ylabel('SHAP value', fontsize=10)
-    ax_dict['C'].set_xlabel('Ferret ID', fontsize=16)
-    ax_dict['C'].set_xticks([0, 1, 2, 3, 4])
-    ax_dict['C'].set_title('Ferret ID versus impact on reaction time', fontsize=13)
-
-    ax_dict['C'].set_xticklabels(ferret_id_only, rotation=45, ha='right')
-    # ax_dict['C'].set_title('Ferret ID and precursor = target F0 versus SHAP value on miss probability', fontsize=18)
-    #remove padding outside the figures
-    font_props = fm.FontProperties(weight='bold', size=17)
-
-    ax_dict['A'].annotate('a)', xy=get_axis_limits(ax_dict['A']), xytext=(-0.1, ax_dict['A'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props, zorder=10)
-    ax_dict['B'].annotate('b)', xy=get_axis_limits(ax_dict['B']), xytext=(-0.1, ax_dict['B'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-    ax_dict['C'].annotate('c)', xy=get_axis_limits(ax_dict['C']), xytext=(-0.1, ax_dict['C'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-    ax_dict['D'].annotate('d)', xy=get_axis_limits(ax_dict['D']), xytext=(-0.1, ax_dict['D'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-    ax_dict['E'].annotate('e)', xy=get_axis_limits(ax_dict['E']), xytext=(-0.1, ax_dict['E'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+        ax_dict['D'].barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, color='cyan')
+        ax_dict['D'].set_title("Permutation importances on reaction time")
+        ax_dict['D'].set_xlabel("Permutation importance")
 
 
-    plt.tight_layout()
-    plt.savefig(fig_savedir / 'big_summary_plot.png', dpi=500, bbox_inches="tight")
-    plt.show()
+        shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "precursor = target F0"], ax=ax_dict['E'],
+                           cmap=matplotlib.colormaps[cmapname], show=False)
+        fig, ax = plt.gcf(), plt.gca()
+        cb_ax = fig.axes[5]
+        # Modifying color bar parameters
+        cb_ax.tick_params(labelsize=15)
+        cb_ax.set_ylabel("precursor = target F0", fontsize=12)
+        cb_ax.set_yticks([0.25, 0.75])
+        cb_ax.set_yticklabels(['precursor ≠ target F0', 'precursor = target F0'])
+        ax_dict['E'].set_ylabel('SHAP value', fontsize=10)
+        ax_dict['E'].set_title('Ferret ID versus impact on reaction time', fontsize=13)
+        ax_dict['E'].set_xlabel('Ferret ID', fontsize=16)
+        ax_dict['E'].set_xticks([0, 1, 2, 3, 4])
+        ax_dict['E'].set_xticklabels(ferret_id_only, rotation=45, ha='right')
+
+        shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "target F0"], ax=ax_dict['C'],
+                           cmap = matplotlib.colormaps[cmapname], show=False)
+        fig, ax = plt.gcf(), plt.gca()
+        cb_ax = fig.axes[7]
+        cb_ax.set_yticks([1, 2, 3,4, 5])
+        cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
+        cb_ax.tick_params(labelsize=15)
+        cb_ax.set_ylabel("target F0 (Hz)", fontsize=10)
+
+        # Modifying color bar parameters
+        cb_ax.tick_params(labelsize=15)
+        ax_dict['C'].set_ylabel('SHAP value', fontsize=10)
+        ax_dict['C'].set_xlabel('Ferret ID', fontsize=16)
+        ax_dict['C'].set_xticks([0, 1, 2, 3, 4])
+        ax_dict['C'].set_title('Ferret ID versus impact on reaction time', fontsize=13)
+
+        ax_dict['C'].set_xticklabels(ferret_id_only, rotation=45, ha='right')
+        # ax_dict['C'].set_title('Ferret ID and precursor = target F0 versus SHAP value on miss probability', fontsize=18)
+        #remove padding outside the figures
+        font_props = fm.FontProperties(weight='bold', size=17)
+
+        ax_dict['A'].annotate('a)', xy=get_axis_limits(ax_dict['A']), xytext=(-0.1, ax_dict['A'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props, zorder=10)
+        ax_dict['B'].annotate('b)', xy=get_axis_limits(ax_dict['B']), xytext=(-0.1, ax_dict['B'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+        ax_dict['C'].annotate('c)', xy=get_axis_limits(ax_dict['C']), xytext=(-0.1, ax_dict['C'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+        ax_dict['D'].annotate('d)', xy=get_axis_limits(ax_dict['D']), xytext=(-0.1, ax_dict['D'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+        ax_dict['E'].annotate('e)', xy=get_axis_limits(ax_dict['E']), xytext=(-0.1, ax_dict['E'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+
+
+        plt.tight_layout()
+        plt.savefig(fig_savedir / 'big_summary_plot.png', dpi=500, bbox_inches="tight")
+        plt.show()
 
     return xg_reg, ypred, y_test, results
 
@@ -637,10 +653,10 @@ def run_correctrxntime_model_for_a_ferret(ferrets, optimization = False, ferret_
 def main():
     ferrets = ['F2105_Clove', 'F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature=True)
+    # run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature=True)
 
-    # for ferret in ferrets:
-    #     run_correctrxntime_model_for_a_ferret([ferret], optimization=False, ferret_as_feature=False)
+    for ferret in ferrets:
+        run_correctrxntime_model_for_a_ferret([ferret], optimization=False, ferret_as_feature=False)
 
 
 
