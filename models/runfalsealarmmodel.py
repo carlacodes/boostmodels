@@ -382,14 +382,13 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     fig.tight_layout()
     plt.savefig(fig_dir / 'permutation_importance.png', dpi=500)
     plt.show()
-    shap.dependence_plot("precursor F0", shap_values1[0], X_train)  #
-    plt.show()
+
 
     # partial dependency plots
 
     # Plot the scatter plot with the colormap
     shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "intra-trial F0 roving"], cmap=cmapcustom)
-    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "precursor F0"], cmap=cmapcustom)
+    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "F0"], cmap=cmapcustom)
     shap.plots.scatter(shap_values2[:, "audio side"], color=shap_values2[:, "ferret ID"], cmap=cmapcustom)
     shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "ferret ID"], cmap=cmapcustom)
     shap.plots.scatter(shap_values2[:, "past response correct"], color=shap_values2[:, "ferret ID"], cmap=cmapcustom)
@@ -397,13 +396,13 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
 
 
     fig, ax = plt.subplots(figsize=(5, 5))
-    shap.plots.scatter(shap_values2[:, "precursor F0"], color=shap_values2[:, "time since start of trial"], show= False, ax =ax,  cmap=cmapcustom)
+    shap.plots.scatter(shap_values2[:, "F0"], color=shap_values2[:, "time since start of trial"], show= False, ax =ax,  cmap=cmapcustom)
     cax = fig.axes[1]
     cax.tick_params(labelsize=15)
     cax.set_ylabel("Time since start of trial", fontsize=12)
     plt.xlim(0.8, 5.2)
     plt.xticks([1, 2, 3, 4, 5], labels = ["109", "124", "144", "191", "251"])
-    # shap.plots.scatter(shap_values2[:, "time since start of trial"], color=shap_values2[:, "precursor F0"], show= True, ax =ax,  cmap=cmapcustom)
+    # shap.plots.scatter(shap_values2[:, "time since start of trial"], color=shap_values2[:, "F0"], show= True, ax =ax,  cmap=cmapcustom)
     plt.show()
 
 
@@ -415,7 +414,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     cax.set_ylabel("Ferret ID", fontsize=12)
     # plt.xlim(0.8, 5.2)
     # plt.xticks([1, 2, 3, 4, 5], labels = ["109", "124", "144", "191", "251"])
-    # shap.plots.scatter(shap_values2[:, "time since start of trial"], color=shap_values2[:, "precursor F0"], show= True, ax =ax,  cmap=cmapcustom)
+    # shap.plots.scatter(shap_values2[:, "time since start of trial"], color=shap_values2[:, "F0"], show= True, ax =ax,  cmap=cmapcustom)
     plt.show()
 
 
@@ -428,19 +427,19 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
                        cmap=cmapcustom)
 
     fig, ax = plt.subplots(figsize=(5, 5))
-    shap.plots.scatter(shap_values2[:, "intra-trial F0 roving"], color=shap_values2[:, "precursor F0"], show= True,
+    shap.plots.scatter(shap_values2[:, "intra-trial F0 roving"], color=shap_values2[:, "F0"], show= True,
                        cmap=cmapcustom)
     # plt.xticks([0, 1], labels = ["No", "Yes"])
     fig, ax = plt.gcf(), plt.gca()
     cax = fig.axes[1]
     cax.tick_params(labelsize=15)
-    cax.set_ylabel("Precursor F0", fontsize=12)
+    cax.set_ylabel("F0", fontsize=12)
     cax.set_yticks([1, 2, 3, 4, 5])
     cax.set_yticklabels(["109", "124", "144", "191", "251"])
     plt.title('Intra-trial roving \n versus impact in false alarm probability', fontsize=18)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "precursor F0"], color=shap_values2[:, "intra-trial F0 roving"], show=False,
+    shap.plots.scatter(shap_values2[:, "F0"], color=shap_values2[:, "intra-trial F0 roving"], show=False,
                        cmap=cmapcustom)
     fig, ax = plt.gcf(), plt.gca()
     cb_ax = fig.axes[1]
@@ -470,7 +469,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.savefig(fig_dir / 'targtimescolouredbytrialnumber.png', dpi=1000)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "time since start of trial"], color=shap_values2[:, "precursor F0"], show=False,
+    shap.plots.scatter(shap_values2[:, "time since start of trial"], color=shap_values2[:, "F0"], show=False,
                        cmap=cmapcustom)
     fig, ax = plt.gcf(), plt.gca()
     # Get colorbar
@@ -479,7 +478,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     cb_ax.tick_params(labelsize=15)
     cb_ax.set_yticks([1, 2, 3, 4, 5])
     cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
-    cb_ax.set_ylabel("precursor F0", fontsize=12)
+    cb_ax.set_ylabel("F0", fontsize=12)
     plt.ylabel('SHAP value', fontsize=10)
     plt.title('Target presentation versus \n impact on false alarm probability', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
@@ -528,7 +527,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     ax_dict['E'].set_xticklabels(ferret_id_only,  rotation=45, ha='right')
     ax_dict['E'].set_xlabel('Ferret ID', fontsize=16)
 
-    # shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "precursor F0"], ax=ax_dict['C'],
+    # shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "F0"], ax=ax_dict['C'],
     #                    cmap =cmapcustom, show=False)
     # fig, ax = plt.gcf(), plt.gca()
     # cb_ax = fig.axes[1]
@@ -536,7 +535,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     # cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
     # cb_ax.tick_params(labelsize=15)
     # cb_ax.set_ylabel("precursor F0 (Hz)", fontsize=15)
-    shap.plots.scatter(shap_values2[:, "precursor F0"], color=shap_values2[:, "time since start of trial"], show= False, ax =ax_dict['C'],  cmap=cmapcustom)
+    shap.plots.scatter(shap_values2[:, "F0"], color=shap_values2[:, "time since start of trial"], show= False, ax =ax_dict['C'],  cmap=cmapcustom)
     fig, ax = plt.gcf(), plt.gca()
     cax = fig.axes[7]
     cax.tick_params(labelsize=15)
@@ -641,7 +640,7 @@ def runlgbfaornot(dataframe):
     plt.savefig('D:/behavmodelfigs/fa_or_not_model/ranked_features.png', dpi=1000, bbox_inches="tight")
     plt.show()
 
-    shap.dependence_plot("precursor F0", shap_values1[0], dfx)  #
+    shap.dependence_plot("F0", shap_values1[0], dfx)  #
     plt.show()
     result = permutation_importance(xg_reg, X_test, y_test, n_repeats=10,
                                     random_state=123, n_jobs=2)
@@ -661,7 +660,7 @@ def runlgbfaornot(dataframe):
     plt.subplots_adjust(left=-10, right=0.5)
 
     plt.show()
-    shap.plots.scatter(shap_values2[:, "precursor F0"], color=shap_values2[:, "talker"])
+    shap.plots.scatter(shap_values2[:, "F0"], color=shap_values2[:, "talker"])
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "intra-trial F0 roving"], show=False)

@@ -597,9 +597,10 @@ class behaviouralhelperscg():
                 #figure out the F0 of when the ferret releases by iteratively summing up the duration of each word
                 #and comparing it to the time of the release
                 count = 0
-                if newdata['response'].values[i] != 3: #if it's a correct catch trial then the release time is inf
-                    for i in range(0, len(newdata['dDurs'].values)):
-                        if np.sum(newdata['dDurs'].values[i]) / fs <= newdata['centreRelease'].values[i] - newdata['absentTime'].values[i]:
+                distractordurationoftrial = newdata['dDurs'].values[i]
+                if newdata['response'].values[i] != 3 and newdata['response'].values[i] != 7: #if it's a correct catch trial then the release time is inf
+                    for k2 in range(0, len(newdata['dDurs'].values[i])):
+                        if np.sum(distractordurationoftrial[0:k2]) / fs <= newdata['centreRelease'].values[i] - newdata['absentTime'].values[i]:
                             count = count + 1
                         else:
                             if chosentrial[count] == 8.0:
@@ -609,7 +610,7 @@ class behaviouralhelperscg():
                             elif chosentrial[count] == 1.0:
                                 pitchof0oflastword.append(float(4))
                             else:
-                                pitchof0oflastword.append(chosentrial[count])
+                                pitchof0oflastword.append(float(chosentrial[count]))
 
                             break
                 else:
@@ -781,6 +782,10 @@ class behaviouralhelperscg():
             newdata = newdata[
                 (newdata.pitchofprecur == 1) | (newdata.pitchofprecur == 2) | (newdata.pitchofprecur == 3) | (
                         newdata.pitchofprecur == 4) | (newdata.pitchofprecur == 5) | (newdata.pitchofprecur.isnull())]
+
+            newdata = newdata[
+                (newdata.pitchof0oflastword == 1) | (newdata.pitchof0oflastword == 2) | (newdata.pitchof0oflastword == 3) | (
+                        newdata.pitchof0oflastword == 4) | (newdata.pitchof0oflastword == 5) ]
 
             newdata = newdata[(newdata.correctionTrial == 0)]  # | (allData.response == 7)
             newdata = newdata[(newdata.currAtten == 0)]  # | (allData.response == 7)

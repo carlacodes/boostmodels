@@ -506,20 +506,20 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         ax_dict['D'].set_xlabel("Permutation importance")
 
 
-        shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "precursor = target F0"], ax=ax_dict['E'],
+        shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "target F0"], ax=ax_dict['E'],
                            cmap=matplotlib.colormaps[cmapname], show=False)
         fig, ax = plt.gcf(), plt.gca()
         cb_ax = fig.axes[5]
         # Modifying color bar parameters
         cb_ax.tick_params(labelsize=15)
-        cb_ax.set_ylabel("precursor = target F0", fontsize=12)
-        cb_ax.set_yticks([0.25, 0.75])
-        cb_ax.set_yticklabels(['precursor ≠ target F0', 'precursor = target F0'])
+        cb_ax.set_ylabel("target F0 (Hz)", fontsize=12)
+        cb_ax.set_yticks([1,2,3,4,5])
+        cb_ax.set_yticklabels(['109', '124', '144 ', '191', '251'])
         ax_dict['E'].set_ylabel('SHAP value', fontsize=10)
-        ax_dict['E'].set_title('Ferret ID versus impact on reaction time', fontsize=13)
-        ax_dict['E'].set_xlabel('Ferret ID', fontsize=16)
-        ax_dict['E'].set_xticks([0, 1, 2, 3, 4])
-        ax_dict['E'].set_xticklabels(ferret_id_only, rotation=45, ha='right')
+        ax_dict['E'].set_title('Talker versus impact on reaction time', fontsize=13)
+        ax_dict['E'].set_xlabel('Talker', fontsize=16)
+        ax_dict['E'].set_xticks([1,2])
+        ax_dict['E'].set_xticklabels(['Male', 'Female'], rotation=45, ha='right')
 
         shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "target F0"], ax=ax_dict['C'],
                            cmap = matplotlib.colormaps[cmapname], show=False)
@@ -551,6 +551,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
 
         plt.tight_layout()
         plt.savefig(fig_savedir / 'big_summary_plot.png', dpi=500, bbox_inches="tight")
+        plt.savefig(fig_savedir / 'big_summary_plot.pdf', dpi=500, bbox_inches="tight")
         plt.show()
 
     return xg_reg, ypred, y_test, results
@@ -651,12 +652,12 @@ def run_correctrxntime_model_for_a_ferret(ferrets, optimization = False, ferret_
 
 
 def main():
-    ferrets = ['F2105_Clove', 'F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni']
+    ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']  # , 'F2105_Clove']
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    # run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature=True)
-
-    for ferret in ferrets:
-        run_correctrxntime_model_for_a_ferret([ferret], optimization=False, ferret_as_feature=False)
+    run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature=True)
+    #
+    # for ferret in ferrets:
+    #     run_correctrxntime_model_for_a_ferret([ferret], optimization=False, ferret_as_feature=False)
 
 
 
