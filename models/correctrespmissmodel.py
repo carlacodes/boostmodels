@@ -246,6 +246,10 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     plt.savefig(summary_plot_file, dpi = 500, bbox_inches='tight')
 
     plt.show()
+    fig, ax = plt.subplots()
+    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "target F0"], cmap=cmapcustom, show=False)
+    plt.xticks([1,2], labels = ['Male', 'Female'], fontsize=18)
+    plt.show()
 
 
     shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "precursor = target F0"], cmap=cmapcustom, show=True)
@@ -486,17 +490,12 @@ def reservoir_sampling_dataframe(df, k):
 def run_correct_responsepipeline(ferrets):
     resultingcr_df = behaviouralhelperscg.get_df_behav(ferrets=ferrets, includefaandmiss=False, includemissonly=True, startdate='04-01-2020',
                                   finishdate='03-01-2023')
+    resultingcr_df['talker'] = resultingcr_df['talker'].replace({1: 2, 2: 1})
+
     filepath = Path('D:/dfformixedmodels/correctresponsemodel_dfuse.csv')
     filepath.parent.mkdir(parents=True, exist_ok=True)
     resultingcr_df.to_csv(filepath)
 
-    # df_pitchtargsame = resultingcr_df[resultingcr_df['precur_and_targ_same'] == 1]
-    # df_pitchtargdiff = resultingcr_df[resultingcr_df['precur_and_targ_same'] == 0]
-    # if len(df_pitchtargsame) > len(df_pitchtargdiff)*1.2:
-    #     df_pitchtargsame = df_pitchtargsame.sample(n=len(df_pitchtargdiff), random_state=123)
-    # elif len(df_pitchtargdiff) > len(df_pitchtargsame)*1.2:
-    #     df_pitchtargdiff = df_pitchtargdiff.sample(n=len(df_pitchtargsame), random_state=123)
-    # resultingcr_df = pd.concat([df_pitchtargsame, df_pitchtargdiff], axis = 0)
 
 
     df_intra = resultingcr_df[resultingcr_df['intra_trial_roving'] == 1]

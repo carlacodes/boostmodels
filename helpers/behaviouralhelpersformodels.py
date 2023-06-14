@@ -679,7 +679,7 @@ class behaviouralhelperscg():
             distractor_or_fa = np.delete(distractor_or_fa, 0)
             stepval = np.delete(stepval, 0)
 
-            pitchof0oflastword = [float(d) for d in pitchof0oflastword]
+            pitchof0oflastword = [int(d) for d in pitchof0oflastword]
             newdata['pitchoftarg'] = pitchoftarg
             newdata['pitchofprecur'] = pitchofprecur
             newdata['pitchof0oflastword'] = pitchof0oflastword
@@ -724,7 +724,7 @@ class behaviouralhelperscg():
             newdata = newdata[(newdata.talker == 1) | (newdata.talker == 2) | (newdata.talker == 3) | (
                     newdata.talker == 4) | (newdata.talker == 5)]
 
-            newdata = newdata[newdata['response'] != 3 & newdata['response'] != 7]
+            # newdata = newdata[(newdata['response'] != 3) &( newdata['response'] != 7)]
 
             # newdata = newdata[
             #     (newdata.pitchofprecur == 1) | (newdata.pitchofprecur == 2) | (newdata.pitchofprecur == 3) | (
