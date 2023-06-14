@@ -427,7 +427,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
                        cmap=cmapcustom)
 
     fig, ax = plt.subplots(figsize=(5, 5))
-    shap.plots.scatter(shap_values2[:, "intra-trial F0 roving"], color=shap_values2[:, "F0"], show= True,
+    shap.plots.scatter(shap_values2[:, "intra-trial F0 roving"], color=shap_values2[:, "F0"], show= False,
                        cmap=cmapcustom)
     # plt.xticks([0, 1], labels = ["No", "Yes"])
     fig, ax = plt.gcf(), plt.gca()
