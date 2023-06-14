@@ -243,7 +243,7 @@ def run_optuna_study_falsealarm(dataframe, y, ferret_as_feature=False):
     study = optuna.create_study(direction="minimize", study_name="LGBM Classifier")
     if ferret_as_feature:
         df_to_use = dataframe[
-            ["pitchof0oflastword", "targTimes", "ferret", "trialNum", "talker", "side", "intra_trial_roving",
+            ["pitchof0oflastword", "time_elapsed", "ferret", "trialNum", "talker", "side", "intra_trial_roving",
              "pastcorrectresp", "pastcatchtrial",
              "falsealarm"]]
         # dfuse = df[["pitchoftarg", "pastcatchtrial", "trialNum", "talker", "side", "precur_and_targ_same",
@@ -254,7 +254,7 @@ def run_optuna_study_falsealarm(dataframe, y, ferret_as_feature=False):
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
     else:
         df_to_use = dataframe[
-            ["pitchof0oflastword", "targTimes", "trialNum", "talker", "side", "intra_trial_roving", "pastcorrectresp",
+            ["pitchof0oflastword", "time_elapsed", "trialNum", "talker", "side", "intra_trial_roving", "pastcorrectresp",
              "pastcatchtrial",
              "falsealarm"]]
         labels = ["F0", "time since start of trial", "trial number", "talker", "audio side", "intra-trial F0 roving",
@@ -279,7 +279,7 @@ def run_optuna_study_correctresponse(dataframe, y):
     study = optuna.create_study(direction="minimize", study_name="LGBM Classifier")
     df_to_use = dataframe[
         ["cosinesim", "pitchof0oflastword", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
-         "falsealarm", "pastcorrectresp", "temporalsim", "pastcatchtrial", "trialNum", "targTimes", ]]
+         "falsealarm", "pastcorrectresp", "temporalsim", "pastcatchtrial", "trialNum", "time_elapsed", ]]
 
     col = 'correctesp'
     X = df_to_use.loc[:, df_to_use.columns != col]
@@ -298,7 +298,7 @@ def run_optuna_study_correctresponse(dataframe, y):
 def runlgbfaornotwithoptuna(dataframe, paramsinput, ferret_as_feature=False, one_ferret = False, ferrets = None):
     if ferret_as_feature:
         df_to_use = dataframe[
-            ["pitchof0oflastword", "targTimes", "ferret", "trialNum", "talker", "side", "intra_trial_roving",
+            ["pitchof0oflastword", "time_elapsed", "ferret", "trialNum", "talker", "side", "intra_trial_roving",
              "pastcorrectresp", "pastcatchtrial",
              "falsealarm"]]
         # dfuse = df[["pitchoftarg", "pastcatchtrial", "trialNum", "talker", "side", "precur_and_targ_same",
@@ -309,7 +309,7 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput, ferret_as_feature=False, one
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
     else:
         df_to_use = dataframe[
-            ["pitchof0oflastword", "targTimes", "trialNum", "talker", "side", "intra_trial_roving", "pastcorrectresp",
+            ["pitchof0oflastword", "time_elapsed", "trialNum", "talker", "side", "intra_trial_roving", "pastcorrectresp",
              "pastcatchtrial",
              "falsealarm"]]
         labels = ["F0", "time since start of trial", "trial number", "talker", "audio side", "intra-trial F0 roving",
@@ -507,7 +507,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.title('Target presentation time \n versus impact in false alarm probability', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
     plt.xlabel('Target presentation time', fontsize=16)
-    plt.savefig(fig_dir / 'targtimescolouredbytrialnumber.png', dpi=1000)
+    plt.savefig(fig_dir / 'time_elapsedcolouredbytrialnumber.png', dpi=1000)
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "time since start of trial"], color=shap_values2[:, "F0"], show=False,
@@ -613,7 +613,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
 def runlgbfaornot(dataframe):
     df_to_use = dataframe[
         ["cosinesim", "pitchof0oflastword", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
-         "falsealarm", "pastcorrectresp", "pastcatchtrial", "trialNum", "targTimes", ]]
+         "falsealarm", "pastcorrectresp", "pastcatchtrial", "trialNum", "time_elapsed", ]]
 
     col = 'falsealarm'
     dfx = df_to_use.loc[:, df_to_use.columns != col]
@@ -735,15 +735,15 @@ def runlgbfaornot(dataframe):
     plt.show()
 
     fig, ax = plt.subplots(figsize=(18, 15))
-    shap.plots.scatter(shap_values2[:, "targTimes"], color=shap_values2[:, "cosinesim"], show=False)
+    shap.plots.scatter(shap_values2[:, "time_elapsed"], color=shap_values2[:, "cosinesim"], show=False)
     plt.title('shap values for FA model as a function of time since start of trial, coloured by cosine similarity')
     fig.tight_layout()
-    plt.savefig('D:/behavmodelfigs/targtimescosinecolor.png', dpi=500)
+    plt.savefig('D:/behavmodelfigs/time_elapsedcosinecolor.png', dpi=500)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "targTimes"], show=False)
-    plt.title('Cosine Similarity as a function of SHAP values, coloured by targTimes')
-    plt.savefig('D:/behavmodelfigs/cosinesimtargtimes.png', dpi=500)
+    shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "time_elapsed"], show=False)
+    plt.title('Cosine Similarity as a function of SHAP values, coloured by time_elapsed')
+    plt.savefig('D:/behavmodelfigs/cosinesimtime_elapsed.png', dpi=500)
     plt.show()
 
     return xg_reg, ypred, y_test, results, shap_values1, X_train, y_train, bal_accuracy, shap_values2
@@ -843,7 +843,7 @@ def run_reaction_time_fa_pipleine_female(ferrets):
     df_use = resultingdf.loc[:, resultingdf.columns != 'ferret']
     df_use = df_use.loc[df_use['intra_trial_roving'] == 0]
     df_use = df_use.loc[df_use['talker'] == 1]
-    df_use = df_use.loc[:, df_use.columns != 'targTimes']
+    df_use = df_use.loc[:, df_use.columns != 'time_elapsed']
     df_use = df_use.loc[:, df_use.columns != 'stepval']
     df_use = df_use.loc[:, df_use.columns != 'side']
     df_use = df_use.loc[:, df_use.columns != 'AM']
@@ -911,7 +911,7 @@ def run_reaction_time_fa_pipleine_male(ferrets):
     df_use = resultingdf.loc[:, resultingdf.columns != 'ferret']
     df_use = df_use.loc[df_use['intra_trial_roving'] == 0]
     df_use = df_use.loc[df_use['talker'] == 2]
-    df_use = df_use.loc[:, df_use.columns != 'targTimes']
+    df_use = df_use.loc[:, df_use.columns != 'time_elapsed']
     df_use = df_use.loc[:, df_use.columns != 'stepval']
     df_use = df_use.loc[:, df_use.columns != 'side']
     df_use = df_use.loc[:, df_use.columns != 'AM']

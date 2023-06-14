@@ -521,6 +521,7 @@ class behaviouralhelperscg():
             inter_trial_roving = []
             control_trial = []
             pitchoftarg = []
+            time_elapsed = []
             pitchofprecur = []
             pitchof0oflastword = []
             talkerlist2 = np.empty(len(pitchshiftmat))
@@ -608,6 +609,7 @@ class behaviouralhelperscg():
                         pitchof0oflastword.append(float(4))
                     else:
                         pitchof0oflastword.append(float(chosentrial[count]))
+                    time_elapsed.append(newdata['centreRelease'].values[i] - newdata['absentTime'].values[i])
 
 
                     #
@@ -631,6 +633,8 @@ class behaviouralhelperscg():
 
                 else:
                     pitchof0oflastword.append(chosentrial[-1])
+                    time_elapsed.append(np.sum(distractordurationoftrial[:]) / fs)
+
 
 
                 try:
@@ -682,6 +686,8 @@ class behaviouralhelperscg():
             pitchof0oflastword = [int(d) for d in pitchof0oflastword]
             newdata['pitchoftarg'] = pitchoftarg
             newdata['pitchofprecur'] = pitchofprecur
+            time_elapsed = [float(d) for d in time_elapsed]
+            newdata['time_elapsed'] = time_elapsed
             newdata['pitchof0oflastword'] = pitchof0oflastword
 
             falsealarm = falsealarm.astype(int)
