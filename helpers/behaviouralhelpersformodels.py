@@ -687,7 +687,11 @@ class behaviouralhelperscg():
             newdata['pitchoftarg'] = pitchoftarg
             newdata['pitchofprecur'] = pitchofprecur
             time_elapsed = [float(d) for d in time_elapsed]
+            #round each number in time_elapsed to 2 decimal places
+            time_elapsed = [round(d, 2) for d in time_elapsed]
             newdata['time_elapsed'] = time_elapsed
+            #remove all trials with release times less than 0.5 seconds
+
             newdata['pitchof0oflastword'] = pitchof0oflastword
 
             falsealarm = falsealarm.astype(int)
@@ -707,6 +711,7 @@ class behaviouralhelperscg():
             newdata['timeToTarget'] = newdata['timeToTarget'] / 24414.0625
             newdata['AM'] = newdata['AM'].astype(int)
             newdata = newdata[newdata['distractor_or_fa'].values <= 57]
+
 
             cosinesimfemale = np.load('D:/Stimuli/cosinesimvectorfemale.npy')
             cosinesimmale = np.load('D:/Stimuli/cosinesimvectormale.npy')
@@ -729,6 +734,8 @@ class behaviouralhelperscg():
 
             newdata = newdata[(newdata.talker == 1) | (newdata.talker == 2) | (newdata.talker == 3) | (
                     newdata.talker == 4) | (newdata.talker == 5)]
+            newdata = newdata[newdata['centreRelease'] - newdata['absentTime'] > 0.5]
+
 
             # newdata = newdata[(newdata['response'] != 3) &( newdata['response'] != 7)]
 

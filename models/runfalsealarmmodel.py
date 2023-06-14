@@ -3,6 +3,7 @@ import lightgbm as lgb
 import matplotlib
 import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
+import numpy as np
 import optuna
 import seaborn as sns
 import shap
@@ -155,41 +156,23 @@ def objective(trial, X, y):
     #         "feature_fraction", 0.2, 0.95, step=0.1
     #     ),
     # }
-    # param_grid = {
-    #     "colsample_bytree": trial.suggest_float("colsample_bytree", 0.1, 1),
-    #     "subsample": trial.suggest_float("subsample", 0.1, 1),
-    #     "learning_rate": trial.suggest_float("learning_rate", 0.0001, 0.5),
-    #     "num_leaves": trial.suggest_int("num_leaves", 20, 500),
-    #     "max_depth": trial.suggest_int("max_depth", 3, 20),
-    #     "min_child_samples": trial.suggest_int("min_child_samples", 1, 200),
-    #     "reg_alpha": trial.suggest_float("reg_alpha", 0.1, 5),
-    #     "reg_lambda": trial.suggest_float("reg_lambda", 0.1, 5),
-    #     "min_split_gain": trial.suggest_float("min_split_gain", 0, 20),
-    #     "bagging_freq": trial.suggest_int("bagging_freq", 1, 20),
-    #     "feature_fraction": trial.suggest_float("feature_fraction", 0.5, 1),
-    #     "scale_pos_weight": trial.suggest_float("scale_pos_weight", 1, 5),
-    #     "min_child_weight": trial.suggest_float("min_child_weight", 0.001, 10),
-    #     "max_bin": trial.suggest_int("max_bin", 100, 1000),
-    #     "min_data_in_leaf": trial.suggest_int("min_data_in_leaf", 10, 200),
-    #     "min_sum_hessian_in_leaf": trial.suggest_float("min_sum_hessian_in_leaf", 0.1, 50),
-    # }
     param_grid = {
-        "colsample_bytree": trial.suggest_float("colsample_bytree", 0.6, 1.0),
-        "subsample": trial.suggest_float("subsample", 0.6, 1.0),
-        "learning_rate": trial.suggest_float("learning_rate", 0.01, 0.5, log=True),
-        "num_leaves": trial.suggest_int("num_leaves", 10, 500),
-        "max_depth": trial.suggest_int("max_depth", 3, 15),
-        "min_child_samples": trial.suggest_int("min_child_samples", 5, 200),
-        "reg_alpha": trial.suggest_float("reg_alpha", 0.1, 10, log=True),
-        "reg_lambda": trial.suggest_float("reg_lambda", 0.1, 10, log=True),
-        "min_split_gain": trial.suggest_float("min_split_gain", 0, 10),
-        "bagging_freq": trial.suggest_int("bagging_freq", 1, 10),
+        "colsample_bytree": trial.suggest_float("colsample_bytree", 0.1, 1),
+        "subsample": trial.suggest_float("subsample", 0.1, 1),
+        "learning_rate": trial.suggest_float("learning_rate", 0.0001, 0.5),
+        "num_leaves": trial.suggest_int("num_leaves", 20, 500),
+        "max_depth": trial.suggest_int("max_depth", 3, 20),
+        "min_child_samples": trial.suggest_int("min_child_samples", 1, 200),
+        "reg_alpha": trial.suggest_float("reg_alpha", 0.1, 5),
+        "reg_lambda": trial.suggest_float("reg_lambda", 0.1, 5),
+        "min_split_gain": trial.suggest_float("min_split_gain", 0, 20),
+        "bagging_freq": trial.suggest_int("bagging_freq", 1, 20),
         "feature_fraction": trial.suggest_float("feature_fraction", 0.5, 1),
-        "scale_pos_weight": trial.suggest_float("scale_pos_weight", 1, 10),
+        "scale_pos_weight": trial.suggest_float("scale_pos_weight", 1, 5),
         "min_child_weight": trial.suggest_float("min_child_weight", 0.001, 10),
-        "max_bin": trial.suggest_int("max_bin", 100, 500),
-        "min_data_in_leaf": trial.suggest_int("min_data_in_leaf", 10, 100),
-        "min_sum_hessian_in_leaf": trial.suggest_float("min_sum_hessian_in_leaf", 0.1, 10),
+        "max_bin": trial.suggest_int("max_bin", 100, 1000),
+        "min_data_in_leaf": trial.suggest_int("min_data_in_leaf", 10, 200),
+        "min_sum_hessian_in_leaf": trial.suggest_float("min_sum_hessian_in_leaf", 0.1, 50),
     }
 
     # param_grid = {
@@ -304,7 +287,7 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput, ferret_as_feature=False, one
         # dfuse = df[["pitchoftarg", "pastcatchtrial", "trialNum", "talker", "side", "precur_and_targ_same",
         #             "timeToTarget",
         #             "realRelReleaseTimes", "ferret", "pastcorrectresp"]]
-        labels = ["F0", "time since start of trial", "ferret ID", "trial number", "talker", "audio side",
+        labels = ["F0", "time since trial start", "ferret ID", "trial number", "talker", "audio side",
                   "intra-trial F0 roving", "past response correct", "past trial was catch", "falsealarm"]
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
     else:
@@ -312,7 +295,7 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput, ferret_as_feature=False, one
             ["pitchof0oflastword", "time_elapsed", "trialNum", "talker", "side", "intra_trial_roving", "pastcorrectresp",
              "pastcatchtrial",
              "falsealarm"]]
-        labels = ["F0", "time since start of trial", "trial number", "talker", "audio side", "intra-trial F0 roving",
+        labels = ["F0", "time since trial start", "trial number", "talker", "audio side", "intra-trial F0 roving",
                   "past response correct", "past trial was catch", "falsealarm"]
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
 
@@ -370,10 +353,9 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
         else:
             fig_dir = Path('D:/behavmodelfigs/fa_or_not_model/')
 
-    shap_values1 = shap.TreeExplainer(xg_reg).shap_values(X_train)
-    explainer = shap.Explainer(xg_reg, dfx)
-    shap_values2 = explainer(dfx)
-    plt.subplots(figsize=(25, 25))
+    shap_values1 = shap.TreeExplainer(xg_reg).shap_values(dfx)
+    explainer = shap.Explainer(xg_reg, X_train, feature_names=X_train.columns)
+    shap_values2 = explainer(X_train)
 
     custom_colors = ['slategray', 'hotpink', "yellow"]  # Add more colors as needed
     cmapcustom = mcolors.LinearSegmentedColormap.from_list('my_custom_cmap', custom_colors, N=1000)
@@ -437,7 +419,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
 
 
     fig, ax = plt.subplots(figsize=(5, 5))
-    shap.plots.scatter(shap_values2[:, "F0"], color=shap_values2[:, "time since start of trial"], show= False, ax =ax,  cmap=cmapcustom)
+    shap.plots.scatter(shap_values2[:, "F0"], color=shap_values2[:, "time since trial start"], show= False, ax =ax,  cmap=cmapcustom)
     cax = fig.axes[1]
     cax.tick_params(labelsize=15)
     cax.set_ylabel("Time since start of trial", fontsize=12)
@@ -461,7 +443,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
 
     plt.tight_layout()
     plt.subplots_adjust(left=-10, right=0.5)
-    shap.plots.scatter(shap_values2[:, "time since start of trial"], color=shap_values2[:, "ferret ID"], show= True,
+    shap.plots.scatter(shap_values2[:, "time since trial startial"], color=shap_values2[:, "ferret ID"], show= True,
                        cmap=cmapcustom)
 
     shap.plots.scatter(shap_values2[:, "trial number"], color=shap_values2[:, "ferret ID"], show= True,
@@ -496,7 +478,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.savefig(fig_dir / 'precursor F0intratrialrove.png', dpi=500)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "time since start of trial"], color=shap_values2[:, "trial number"], show=False, cmap=cmapcustom)
+    shap.plots.scatter(shap_values2[:, "time since trial startial"], color=shap_values2[:, "trial number"], show=False, cmap=cmapcustom)
     fig, ax = plt.gcf(), plt.gca()
     # Get colorbar
     cb_ax = fig.axes[1]
@@ -510,7 +492,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.savefig(fig_dir / 'time_elapsedcolouredbytrialnumber.png', dpi=1000)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "time since start of trial"], color=shap_values2[:, "F0"], show=False,
+    shap.plots.scatter(shap_values2[:, "time since trial startial"], color=shap_values2[:, "F0"], show=False,
                        cmap=cmapcustom)
     fig, ax = plt.gcf(), plt.gca()
     # Get colorbar
@@ -576,11 +558,11 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     # cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
     # cb_ax.tick_params(labelsize=15)
     # cb_ax.set_ylabel("precursor F0 (Hz)", fontsize=15)
-    shap.plots.scatter(shap_values2[:, "F0"], color=shap_values2[:, "time since start of trial"], show= False, ax =ax_dict['C'],  cmap=cmapcustom)
+    shap.plots.scatter(shap_values2[:, "F0"], color=shap_values2[:, "time since trial startial"], show= False, ax =ax_dict['C'],  cmap=cmapcustom)
     fig, ax = plt.gcf(), plt.gca()
     cax = fig.axes[7]
     cax.tick_params(labelsize=15)
-    cax.set_ylabel("Time since start of trial", fontsize=12)
+    cax.set_ylabel("time since trial startial", fontsize=12)
     ax_dict['C'].set_xlim(0.8, 5.2)
 
     ax_dict['C'].set_xlabel('precursor F0 (Hz)', fontsize=16)
@@ -818,13 +800,13 @@ def runfalsealarmpipeline(ferrets, optimization=False, ferret_as_feature=False):
 
     if optimization == False:
         # load the saved params
-        params = np.load('../optuna_results/falsealarm_optunaparams_1406_2.npy', allow_pickle=True).item()
+        params = np.load('../optuna_results/falsealarm_optunaparams_1406_3.npy', allow_pickle=True).item()
     else:
         study = run_optuna_study_falsealarm(resultingfa_df, resultingfa_df['falsealarm'].to_numpy(),
                                             ferret_as_feature=ferret_as_feature)
         print(study.best_params)
         params = study.best_params
-        np.save('../optuna_results/falsealarm_optunaparams_1406_2.npy', study.best_params)
+        np.save('../optuna_results/falsealarm_optunaparams_1406_3.npy', study.best_params)
 
     resultingfa_df.to_csv(filepath)
 
