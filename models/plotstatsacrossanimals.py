@@ -602,7 +602,7 @@ def plot_stats_by_pitch(stats_dict_all_combined, stats_dict_combined, stats_dict
     def get_axis_limits(ax, scale=1):
         return ax.get_xlim()[0] * scale, (ax.get_ylim()[1] * scale)
 
-    # import matplotlib.font_manager as fm
+    import matplotlib.font_manager as fm
     #
     # ax1.annotate('a)', xy=get_axis_limits(ax1))
     # ax2.annotate('b)', xy=get_axis_limits(ax2))
