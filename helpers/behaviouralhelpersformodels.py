@@ -598,7 +598,7 @@ class behaviouralhelperscg():
                 count = -1
                 distractordurationoftrial = newdata['dDurs'].values[i]
                 if newdata['response'].values[i] != 3 and newdata['response'].values[i] != 7: #if it's a correct catch trial then the release time is inf
-                    while np.sum(distractordurationoftrial[0:count]) / fs < newdata['centreRelease'].values[i] - newdata['absentTime'].values[i]:
+                    while np.sum(distractordurationoftrial[0:count+1]) / fs < newdata['centreRelease'].values[i] - newdata['absentTime'].values[i]:
                         count = count + 1
                     if chosentrial[count] == 8.0:
                         pitchof0oflastword.append(float(3))
@@ -679,7 +679,7 @@ class behaviouralhelperscg():
             distractor_or_fa = np.delete(distractor_or_fa, 0)
             stepval = np.delete(stepval, 0)
 
-
+            pitchof0oflastword = [float(d) for d in pitchof0oflastword]
             newdata['pitchoftarg'] = pitchoftarg
             newdata['pitchofprecur'] = pitchofprecur
             newdata['pitchof0oflastword'] = pitchof0oflastword
