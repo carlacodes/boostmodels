@@ -173,6 +173,25 @@ def objective(trial, X, y):
     #     "min_data_in_leaf": trial.suggest_int("min_data_in_leaf", 10, 200),
     #     "min_sum_hessian_in_leaf": trial.suggest_float("min_sum_hessian_in_leaf", 0.1, 50),
     # }
+    # param_grid = {
+    #     "colsample_bytree": trial.suggest_float("colsample_bytree", 0.6, 1.0),
+    #     "subsample": trial.suggest_float("subsample", 0.6, 1.0),
+    #     "learning_rate": trial.suggest_float("learning_rate", 0.01, 0.5, log=True),
+    #     "num_leaves": trial.suggest_int("num_leaves", 10, 500),
+    #     "max_depth": trial.suggest_int("max_depth", 3, 15),
+    #     "min_child_samples": trial.suggest_int("min_child_samples", 5, 200),
+    #     "reg_alpha": trial.suggest_float("reg_alpha", 0.1, 10, log=True),
+    #     "reg_lambda": trial.suggest_float("reg_lambda", 0.1, 10, log=True),
+    #     "min_split_gain": trial.suggest_float("min_split_gain", 0, 10),
+    #     "bagging_freq": trial.suggest_int("bagging_freq", 1, 10),
+    #     "feature_fraction": trial.suggest_float("feature_fraction", 0.5, 1),
+    #     "scale_pos_weight": trial.suggest_float("scale_pos_weight", 1, 10),
+    #     "min_child_weight": trial.suggest_float("min_child_weight", 0.001, 10),
+    #     "max_bin": trial.suggest_int("max_bin", 100, 500),
+    #     "min_data_in_leaf": trial.suggest_int("min_data_in_leaf", 10, 100),
+    #     "min_sum_hessian_in_leaf": trial.suggest_float("min_sum_hessian_in_leaf", 0.1, 10),
+    # }
+
     param_grid = {
         "colsample_bytree": trial.suggest_float("colsample_bytree", 0.6, 1.0),
         "subsample": trial.suggest_float("subsample", 0.6, 1.0),
@@ -180,8 +199,8 @@ def objective(trial, X, y):
         "num_leaves": trial.suggest_int("num_leaves", 10, 500),
         "max_depth": trial.suggest_int("max_depth", 3, 15),
         "min_child_samples": trial.suggest_int("min_child_samples", 5, 200),
-        "reg_alpha": trial.suggest_float("reg_alpha", 0.1, 10, log=True),
-        "reg_lambda": trial.suggest_float("reg_lambda", 0.1, 10, log=True),
+        "reg_alpha": trial.suggest_float("reg_alpha", 0.01, 10, log=True),
+        "reg_lambda": trial.suggest_float("reg_lambda", 0.01, 10, log=True),
         "min_split_gain": trial.suggest_float("min_split_gain", 0, 10),
         "bagging_freq": trial.suggest_int("bagging_freq", 1, 10),
         "feature_fraction": trial.suggest_float("feature_fraction", 0.5, 1),
@@ -190,6 +209,8 @@ def objective(trial, X, y):
         "max_bin": trial.suggest_int("max_bin", 100, 500),
         "min_data_in_leaf": trial.suggest_int("min_data_in_leaf", 10, 100),
         "min_sum_hessian_in_leaf": trial.suggest_float("min_sum_hessian_in_leaf", 0.1, 10),
+        "boosting_type": trial.suggest_categorical("boosting_type", ["gbdt", "dart"]),
+        "n_estimators": trial.suggest_int("n_estimators", 50, 1000, step=50),
     }
 
     cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=123)
@@ -504,8 +525,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.savefig(fig_dir / 'trialtime_colouredbyprecur.png', dpi=1000)
     plt.show()
 
-    mosaic = ['A', 'A', 'B', 'B' , 'C', 'C'], ['D','D', 'E', 'E' ]
-
+    mosaic = ['A', 'B', 'C'], ['D', 'B', 'E']
     fig = plt.figure(figsize=(20, 10))
     ax_dict = fig.subplot_mosaic(mosaic)
 
@@ -796,13 +816,13 @@ def runfalsealarmpipeline(ferrets, optimization=False, ferret_as_feature=False):
 
     if optimization == False:
         # load the saved params
-        params = np.load('../optuna_results/falsealarm_optunaparams_1306.npy', allow_pickle=True).item()
+        params = np.load('../optuna_results/falsealarm_optunaparams_1406.npy', allow_pickle=True).item()
     else:
         study = run_optuna_study_falsealarm(resultingfa_df, resultingfa_df['falsealarm'].to_numpy(),
                                             ferret_as_feature=ferret_as_feature)
         print(study.best_params)
         params = study.best_params
-        np.save('../optuna_results/falsealarm_optunaparams_1306.npy', study.best_params)
+        np.save('../optuna_results/falsealarm_optunaparams_1406.npy', study.best_params)
 
     resultingfa_df.to_csv(filepath)
 
@@ -1242,8 +1262,9 @@ def plot_reaction_times_interandintra_swarm(ferrets):
 
     ferret_labels = ['F1702', 'F1815', 'F1803', 'F2002', 'F2105']
 
-    mosaic = ['0', '1', '2', '3', '4'], ['0', '1', '2', '3', '4']
-    fig = plt.figure(figsize=(20, 5))
+    mosaic = ['0', '1', '2'], [ '3', '4', '5']
+
+    fig = plt.figure(figsize=(10, 10))
     ax_dict = fig.subplot_mosaic(mosaic)
     pitchlist = ['109 Hz', '124 Hz', '144 Hz', '191 Hz', '251 Hz']
     colorlist = ['blue', 'red', 'darkmagenta', 'green', 'orange']
@@ -1279,8 +1300,10 @@ def plot_reaction_times_interandintra_swarm(ferrets):
     ax_dict['4'].annotate('e)', xy=get_axis_limits(ax_dict['4']),
                           xytext=(-0.1, ax_dict['4'].title.get_position()[1] + 0.01), textcoords='axes fraction',
                           fontproperties=font_props, zorder=1)
+    fig.delaxes(ax_dict['5'])  # The indexing is zero-based here
 
     plt.savefig('D:/behavmodelfigs/reaction_times_by_ferret_swarm_byF0_bigmosaic.png', dpi=500)
+    plt.savefig('D:/behavmodelfigs/reaction_times_by_ferret_swarm_byF0_bigmosaic.pdf', dpi=500)
     plt.show()
 
     # mosaic = ['0', '1', '2', '3', '4'], ['0', '1', '2', '3', '4']
@@ -1318,7 +1341,7 @@ def plot_reaction_times_interandintra_swarm(ferrets):
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    plot_reaction_times_interandintra_swarm(ferrets)
+    # plot_reaction_times_interandintra_swarm(ferrets)
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(
         ferrets, optimization=True, ferret_as_feature=True)
     # ferrets = ['F2105_Clove']# 'F2105_Clove'
