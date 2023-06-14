@@ -510,7 +510,7 @@ def plot_stats_by_pitch(stats_dict_all_combined, stats_dict_combined, stats_dict
     width = 0.25  # the width of the bars
     multiplier = 0
     gap_width = 0.2  # Width of the gap between series
-
+    ferret_ids = ['F1702', 'F1815', 'F1803', 'F2002', 'F2105']
     fig, ((ax1, ax2)) = plt.subplots(2,1, layout='constrained',figsize=(5,5))
     #make a panel for the subplots to go into
 
@@ -537,7 +537,7 @@ def plot_stats_by_pitch(stats_dict_all_combined, stats_dict_combined, stats_dict
             multiplier += 1
 
     ax1.set_ylim(0, 1)
-    ax1.set_ylabel('P(hit) by F0 of target word')
+    ax1.set_ylabel('P(hit) by F0 \n  of target word')
     ax1.set_title('Proportion of hits over target F0')
 
     width = 0.25  # the width of the bars
@@ -582,13 +582,18 @@ def plot_stats_by_pitch(stats_dict_all_combined, stats_dict_combined, stats_dict
             for ferret, ferret_data in stats_dict_intra[talker]['intra_trial_roving']['false_alarms'].items():
                 # add jitter to offset
                 offset_jitter = offset + np.random.uniform(-0.05, 0.05)
-                ax2.scatter(offset_jitter, ferret_data, 25, color=color, marker=marker_list[count], label='_nolegend_',
+                if multiplier == 7:
+                    ax2.scatter(offset_jitter, ferret_data, 25, color=color, marker=marker_list[count],
+                                label=ferret_ids[count], edgecolors='black')
+                else:
+                    ax2.scatter(offset_jitter, ferret_data, 25, color=color, marker=marker_list[count], label='_nolegend_',
                             edgecolors='black')
                 count += 1
             multiplier += 1
 
     ax2.set_ylim(0, 1)
-    ax2.set_ylabel('P(false alarm) by F0 of target word')
+    ax2.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.)
+    ax2.set_ylabel('P(FA) by F0 of \n  target word')
     ax2.set_title('Proportion of false alarms over F0')
     ax2.set_xlabel('F0 of audio stream')
     ax2.set_xticks([0, 0.25, 0.5, 0.75, 1.0, 1.5, 1.75], ['109 Hz', '124 Hz', '144 Hz', '191 Hz', '251 Hz', 'intra - female', 'intra - male '], rotation=45)
@@ -599,15 +604,16 @@ def plot_stats_by_pitch(stats_dict_all_combined, stats_dict_combined, stats_dict
 
     # import matplotlib.font_manager as fm
     #
-    # # ax1.annotate('a)', xy=get_axis_limits(ax1))
-    # # ax2.annotate('b)', xy=get_axis_limits(ax2))
+    # ax1.annotate('a)', xy=get_axis_limits(ax1))
+    # ax2.annotate('b)', xy=get_axis_limits(ax2))
     # # ax3.annotate('c)', xy=get_axis_limits(ax3))
     # # ax4.annotate('d)', xy=get_axis_limits(ax4))
     # title_y = ax1.title.get_position()[1]  # Get the y-coordinate of the title
     # font_props = fm.FontProperties(weight='bold')
-    #
-    # ax1.annotate('a)', xy=get_axis_limits(ax1), xytext=(-0.1, ax1.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props, zorder=10)
-    # ax2.annotate('b)', xy=get_axis_limits(ax2), xytext=(-0.1, ax2.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+    font_props = fm.FontProperties(weight='bold', size=17)
+
+    ax1.annotate('a)', xy=get_axis_limits(ax1), xytext=(-0.1, ax1.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props, zorder=10)
+    ax2.annotate('b)', xy=get_axis_limits(ax2), xytext=(-0.1, ax2.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
     # ax3.annotate('c)', xy=get_axis_limits(ax3), xytext=(-0.1, ax3.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
     # ax4.annotate('d)', xy=get_axis_limits(ax4), xytext=(-0.1, ax4.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
     #
@@ -642,7 +648,7 @@ def run_barplot_pipeline():
 
 if __name__ == '__main__':
     stats_dict_empty = {}
-    run_barplot_pipeline()
+    # run_barplot_pipeline()
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
     df = behaviouralhelperscg.get_stats_df(ferrets=ferrets, startdate='04-01-2016', finishdate='01-03-2023')
     stats_dict_all_inter, stats_dict_inter = run_stats_calc_by_pitch(df, ferrets, stats_dict_empty, pitch_param='inter_trial_roving')

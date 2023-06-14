@@ -504,7 +504,8 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.savefig(fig_dir / 'trialtime_colouredbyprecur.png', dpi=1000)
     plt.show()
 
-    mosaic = ['A', 'B', 'C'], ['D', 'B', 'E']
+    mosaic = ['A', 'A', 'B', 'B' , 'C', 'C'], ['D','D', 'E', 'E' ]
+
     fig = plt.figure(figsize=(20, 10))
     ax_dict = fig.subplot_mosaic(mosaic)
 
@@ -1317,7 +1318,7 @@ def plot_reaction_times_interandintra_swarm(ferrets):
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    # plot_reaction_times_interandintra_swarm(ferrets)
+    plot_reaction_times_interandintra_swarm(ferrets)
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(
         ferrets, optimization=True, ferret_as_feature=True)
     # ferrets = ['F2105_Clove']# 'F2105_Clove'
