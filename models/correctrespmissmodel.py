@@ -285,7 +285,22 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     ax_dict['D'].set_xlabel("Permutation importance")
 
 
-    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "precursor = target F0"], ax=ax_dict['E'],
+    # shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "precursor = target F0"], ax=ax_dict['E'],
+    #                    cmap=cmapcustom, show=False)
+    # fig, ax = plt.gcf(), plt.gca()
+    # cb_ax = fig.axes[5]
+    # # # Modifying color bar parameters
+    # # cb_ax.tick_params(labelsize=15)
+    # # cb_ax.set_ylabel("precursor = target F0 word", fontsize=15)
+    # ax_dict['E'].set_ylabel('SHAP value', fontsize=10)
+    # ax_dict['E'].set_title('Ferret ID versus impact on miss probability', fontsize=18)
+    # cb_ax.set_yticks([0.25, 0.75])
+    # cb_ax.set_yticklabels(['precursor ≠ target F0', 'precursor = target F0'])
+    # ax_dict['E'].set_xlabel('Ferret ID', fontsize=16)
+    # ax_dict['E'].set_xticks([0, 1, 2, 3, 4])
+    # ax_dict['E'].set_xticklabels(ferret_id_only, fontsize=10, rotation = 45, ha='right')
+
+    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "target F0"], ax=ax_dict['E'],
                        cmap=cmapcustom, show=False)
     fig, ax = plt.gcf(), plt.gca()
     cb_ax = fig.axes[5]
@@ -293,12 +308,14 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     # cb_ax.tick_params(labelsize=15)
     # cb_ax.set_ylabel("precursor = target F0 word", fontsize=15)
     ax_dict['E'].set_ylabel('SHAP value', fontsize=10)
-    ax_dict['E'].set_title('Ferret ID versus impact on miss probability', fontsize=18)
-    cb_ax.set_yticks([0.25, 0.75])
-    cb_ax.set_yticklabels(['precursor ≠ target F0', 'precursor = target F0'])
-    ax_dict['E'].set_xlabel('Ferret ID', fontsize=16)
-    ax_dict['E'].set_xticks([0, 1, 2, 3, 4])
-    ax_dict['E'].set_xticklabels(ferret_id_only, fontsize=10, rotation = 45, ha='right')
+    ax_dict['E'].set_title('Talker versus impact on miss probability', fontsize=18)
+    cb_ax.set_yticks([1, 2, 3,4, 5])
+    cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
+    cb_ax.set_ylabel("target F0 (Hz)", fontsize=15)
+    cb_ax.tick_params(labelsize=15)
+    ax_dict['E'].set_xlabel('Talker', fontsize=16)
+    ax_dict['E'].set_xticks([1,2])
+    ax_dict['E'].set_xticklabels(['Male', 'Female'], fontsize=10, rotation = 45, ha='right')
 
     shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "target F0"], ax=ax_dict['C'],
                        cmap=cmapcustom, show=False)
@@ -333,6 +350,8 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
 
     plt.tight_layout()
     plt.savefig(fig_dir / 'big_summary_plot.png', dpi=500, bbox_inches="tight")
+    plt.savefig(fig_dir / 'big_summary_plot.pdf', dpi=500, bbox_inches="tight")
+
     plt.show()
     # Plot the scatter plot for trial number and precursor pitch
     # fig, ax = plt.subplots()

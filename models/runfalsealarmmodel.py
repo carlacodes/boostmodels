@@ -193,34 +193,36 @@ def objective(trial, X, y):
     # }
 
     param_grid = {
+        "boosting_type": trial.suggest_categorical("boosting_type", ["gbdt", "dart"]),
+        "num_leaves": trial.suggest_int("num_leaves", 20, 200),
+        "max_depth": trial.suggest_int("max_depth", 5, 15),
+        "learning_rate": trial.suggest_float("learning_rate", 0.01, 0.1, log=True),
+        "subsample_for_bin": trial.suggest_int("subsample_for_bin", 20000, 300000, step=20000),
+        "min_child_samples": trial.suggest_int("min_child_samples", 20, 100),
+        "reg_alpha": trial.suggest_float("reg_alpha", 0.0, 1.0),
+        "reg_lambda": trial.suggest_float("reg_lambda", 0.0, 1.0),
         "colsample_bytree": trial.suggest_float("colsample_bytree", 0.6, 1.0),
         "subsample": trial.suggest_float("subsample", 0.6, 1.0),
-        "learning_rate": trial.suggest_float("learning_rate", 0.01, 0.5, log=True),
-        "num_leaves": trial.suggest_int("num_leaves", 10, 500),
-        "max_depth": trial.suggest_int("max_depth", 3, 15),
-        "min_child_samples": trial.suggest_int("min_child_samples", 5, 200),
-        "reg_alpha": trial.suggest_float("reg_alpha", 0.01, 10, log=True),
-        "reg_lambda": trial.suggest_float("reg_lambda", 0.01, 10, log=True),
-        "min_split_gain": trial.suggest_float("min_split_gain", 0, 10),
-        "bagging_freq": trial.suggest_int("bagging_freq", 1, 10),
-        "feature_fraction": trial.suggest_float("feature_fraction", 0.5, 1),
-        "scale_pos_weight": trial.suggest_float("scale_pos_weight", 1, 10),
+        "min_split_gain": trial.suggest_float("min_split_gain", 0.0, 1.0),
         "min_child_weight": trial.suggest_float("min_child_weight", 0.001, 10),
+        "n_estimators": trial.suggest_int("n_estimators", 100, 1000, step=100),
+        "scale_pos_weight": trial.suggest_float("scale_pos_weight", 1, 10),
+        "feature_fraction": trial.suggest_float("feature_fraction", 0.5, 1),
+        "bagging_fraction": trial.suggest_float("bagging_fraction", 0.5, 1),
+        "bagging_freq": trial.suggest_int("bagging_freq", 1, 10),
         "max_bin": trial.suggest_int("max_bin", 100, 500),
         "min_data_in_leaf": trial.suggest_int("min_data_in_leaf", 10, 100),
         "min_sum_hessian_in_leaf": trial.suggest_float("min_sum_hessian_in_leaf", 0.1, 10),
-        "boosting_type": trial.suggest_categorical("boosting_type", ["gbdt", "dart"]),
-        "n_estimators": trial.suggest_int("n_estimators", 50, 1000, step=50),
     }
 
-    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=123)
+    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 
     cv_scores = np.empty(5)
     for idx, (train_idx, test_idx) in enumerate(cv.split(X, y)):
         X_train, X_test = X[train_idx], X[test_idx]
         y_train, y_test = y[train_idx], y[test_idx]
 
-        model = lgb.LGBMClassifier(objective="binary", random_state=123, **param_grid)
+        model = lgb.LGBMClassifier(objective="binary", random_state=42, **param_grid)
         model.fit(
             X_train,
             y_train,
@@ -317,7 +319,7 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput, ferret_as_feature=False, one
     col = 'falsealarm'
     dfx = df_to_use.loc[:, df_to_use.columns != col]
     # remove ferret as possible feature
-    X_train, X_test, y_train, y_test = train_test_split(dfx, df_to_use['falsealarm'], test_size=0.2, random_state=123)
+    X_train, X_test, y_train, y_test = train_test_split(dfx, df_to_use['falsealarm'], test_size=0.2, random_state=42)
     print(X_train.shape)
     print(X_test.shape)
     # ran optuna study 06/03/2022 to find best params, balanced accuracy 57%, accuracy 63%
@@ -326,13 +328,13 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput, ferret_as_feature=False, one
     #                'min_data_in_leaf': 200, 'lambda_l1': 0, 'lambda_l2': 24, 'min_gain_to_split': 2.34923345270416,
     #                'bagging_fraction': 0.9, 'bagging_freq': 12, 'feature_fraction': 0.9}
 
-    xg_reg = lgb.LGBMClassifier(objective="binary", random_state=123,
+    xg_reg = lgb.LGBMClassifier(objective="binary", random_state=42,
                                 **paramsinput)
 
     xg_reg.fit(X_train, y_train, eval_metric="cross_entropy_lambda", verbose=1000)
     ypred = xg_reg.predict_proba(X_test)
 
-    kfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=123)
+    kfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
     results_training = cross_val_score(xg_reg, X_train, y_train, scoring='balanced_accuracy', cv=kfold)
     results = cross_val_score(xg_reg, X_test, y_test, scoring='accuracy', cv=kfold)
     bal_accuracy = cross_val_score(xg_reg, X_test, y_test, scoring='balanced_accuracy', cv=kfold)
@@ -413,7 +415,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
 
     # calculate permutation importance
     result = permutation_importance(xg_reg, X_test, y_test, n_repeats=100,
-                                    random_state=123, n_jobs=2)
+                                    random_state=42, n_jobs=2)
     sorted_idx = result.importances_mean.argsort()
     fig, ax = plt.subplots()
     ax.barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, color='slategray')
@@ -555,9 +557,9 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     cb_ax = fig.axes[5]
     # Modifying color bar parameters
     cb_ax.tick_params(labelsize=15)
-    cb_ax.set_ylabel("precursor = target F0", fontsize=12)
+    cb_ax.set_ylabel("intra-trial roving", fontsize=12)
     cb_ax.set_yticks([0.25, 0.75])
-    cb_ax.set_yticklabels(['precursor ≠ target F0', 'precursor = target F0'])
+    cb_ax.set_yticklabels(['precursor ≠ target F0', 'intra-trial roving'])
 
     ax_dict['E'].set_ylabel('SHAP value', fontsize=10)
     ax_dict['E'].set_title('Ferret ID versus impact on false alarm probability', fontsize=13)
@@ -617,7 +619,7 @@ def runlgbfaornot(dataframe):
     dfx = df_to_use.loc[:, df_to_use.columns != col]
     # remove ferret as possible feature
 
-    X_train, X_test, y_train, y_test = train_test_split(dfx, df_to_use['falsealarm'], test_size=0.2, random_state=123)
+    X_train, X_test, y_train, y_test = train_test_split(dfx, df_to_use['falsealarm'], test_size=0.2, random_state=42)
     print(X_train.shape)
     print(X_test.shape)
 
@@ -638,13 +640,13 @@ def runlgbfaornot(dataframe):
                "bagging_freq": 1,
                "feature_fraction": 0.6000000000000001}
 
-    xg_reg = lgb.LGBMClassifier(objective="binary", random_state=123,
+    xg_reg = lgb.LGBMClassifier(objective="binary", random_state=42,
                                 **params2)
 
     xg_reg.fit(X_train, y_train, eval_metric="cross_entropy_lambda", verbose=1000)
     ypred = xg_reg.predict_proba(X_test)
 
-    kfold = KFold(n_splits=5, shuffle=True, random_state=123)
+    kfold = KFold(n_splits=5, shuffle=True, random_state=42)
     results_training = cross_val_score(xg_reg, X_train, y_train, scoring='balanced_accuracy', cv=kfold)
     results = cross_val_score(xg_reg, X_test, y_test, scoring='accuracy', cv=kfold)
     bal_accuracy = cross_val_score(xg_reg, X_test, y_test, scoring='balanced_accuracy', cv=kfold)
@@ -682,7 +684,7 @@ def runlgbfaornot(dataframe):
     shap.dependence_plot("F0", shap_values1[0], dfx)  #
     plt.show()
     result = permutation_importance(xg_reg, X_test, y_test, n_repeats=10,
-                                    random_state=123, n_jobs=2)
+                                    random_state=42, n_jobs=2)
     sorted_idx = result.importances_mean.argsort()
 
     fig, ax = plt.subplots(figsize=(20, 15))
@@ -780,14 +782,14 @@ def runfalsealarmpipeline(ferrets, optimization=False, ferret_as_feature=False):
 
     # now we need to balance the data, if it's a fifth more than the other, we need to sample it down
     if len(df_intra) > len(df_inter)*1.2:
-        df_intra = df_intra.sample(n=len(df_inter), random_state=123)
+        df_intra = df_intra.sample(n=len(df_inter), random_state=42)
     elif len(df_inter) > len(df_intra)*1.2:
-        df_inter = df_inter.sample(n=len(df_intra), random_state=123)
+        df_inter = df_inter.sample(n=len(df_intra), random_state=42)
 
     if len(df_control) > len(df_intra)*1.2:
-        df_control = df_control.sample(n=len(df_intra), random_state=123)
+        df_control = df_control.sample(n=len(df_intra), random_state=42)
     elif len(df_control) > len(df_inter)*1.2:
-        df_control = df_control.sample(n=len(df_inter), random_state=123)
+        df_control = df_control.sample(n=len(df_inter), random_state=42)
 
 
 
@@ -804,9 +806,9 @@ def runfalsealarmpipeline(ferrets, optimization=False, ferret_as_feature=False):
     # find the middle point between the length of df
 
     if len(df_nofa) > len(df_fa) * 1.2:
-        df_nofa = df_nofa.sample(n=len(df_fa), random_state=123)
+        df_nofa = df_nofa.sample(n=len(df_fa), random_state=42)
     elif len(df_fa) > len(df_nofa) * 1.2:
-        df_miss = df_fa.sample(n=len(df_nofa), random_state=123)
+        df_miss = df_fa.sample(n=len(df_nofa), random_state=42)
 
     resultingfa_df = pd.concat([df_nofa, df_fa], axis=0)
 
@@ -868,7 +870,7 @@ def run_reaction_time_fa_pipleine_female(ferrets):
             pass
 
     X_train, X_test, y_train, y_test = train_test_split(dfx, df_use['centreRelease'], test_size=0.2,
-                                                        random_state=123)
+                                                        random_state=42)
 
     dtrain = lgb.Dataset(X_train, label=y_train)
     dtest = lgb.Dataset(X_test, label=y_test)
@@ -931,7 +933,7 @@ def run_reaction_time_fa_pipleine_male(ferrets):
             pass
 
     X_train, X_test, y_train, y_test = train_test_split(dfx, df_use['centreRelease'], test_size=0.2,
-                                                        random_state=123)
+                                                        random_state=42)
 
     param = {'max_depth': 2, 'eta': 1, 'objective': 'reg:squarederror'}
     param['nthread'] = 4
