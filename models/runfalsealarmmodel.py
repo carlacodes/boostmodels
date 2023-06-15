@@ -362,19 +362,21 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     custom_colors_summary = ['slategray', 'hotpink', ]  # Add more colors as needed
     cmapsummary = matplotlib.colors.ListedColormap(custom_colors_summary)
 
-    # Calculate the cumulative sum of feature importances
-    cumulative_importances_list = []
-    for shap_values in shap_values1:
-        feature_importances = np.abs(shap_values).sum(axis=0)
-        cumulative_importances = np.cumsum(feature_importances)
-        cumulative_importances_list.append(cumulative_importances)
+
+    feature_importances = np.abs(shap_values1).sum(axis=0)
+    sorted_indices = np.argsort(feature_importances)
+
+    sorted_indices = sorted_indices[::-1]
+    feature_importances = feature_importances[sorted_indices]
+    feature_labels = X_train.columns[sorted_indices]
+    cumulative_importances = np.cumsum(feature_importances)
 
     # Calculate the combined cumulative sum of feature importances
-    cumulative_importances_combined = np.sum(cumulative_importances_list, axis=0)
-    feature_labels = dfx.columns
+    # cumulative_importances_combined = np.sum(cumulative_importances_list, axis=0)
+    # feature_labels = dfx.columns
     # Plot the elbow plot
     plt.figure(figsize=(10, 6))
-    plt.plot(feature_labels, cumulative_importances_combined, marker='o', color='slategray')
+    plt.plot(feature_labels, cumulative_importances, marker='o', color='slategray')
     plt.xlabel('Features')
     plt.ylabel('Cumulative Feature Importance')
     plt.title('Elbow Plot of Cumulative Feature Importance for False Alarm Model')
@@ -793,8 +795,9 @@ def runfalsealarmpipeline(ferrets, optimization=False, ferret_as_feature=False):
 
     if len(df_nofa) > len(df_fa) * 1.2:
         df_nofa = df_nofa.sample(n=len(df_fa), random_state=123)
+
     elif len(df_fa) > len(df_nofa) * 1.2:
-        df_miss = df_fa.sample(n=len(df_nofa), random_state=123)
+        df_fa = df_fa.sample(n=len(df_nofa), random_state=123)
 
     resultingfa_df = pd.concat([df_nofa, df_fa], axis=0)
 
@@ -1331,7 +1334,7 @@ if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
     # plot_reaction_times_interandintra_swarm(ferrets)
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(
-        ferrets, optimization=True, ferret_as_feature=True)
+        ferrets, optimization=False, ferret_as_feature=True)
     # ferrets = ['F2105_Clove']# 'F2105_Clove'
     # df_by_ferretdict = plot_reaction_times(ferrets)
     # #
