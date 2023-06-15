@@ -743,11 +743,11 @@ class behaviouralhelperscg():
             #     (newdata.pitchofprecur == 1) | (newdata.pitchofprecur == 2) | (newdata.pitchofprecur == 3) | (
             #             newdata.pitchofprecur == 4) | (newdata.pitchofprecur == 5)]
             #
-            newdata = newdata[(newdata.pitchoftarg == 1) | (newdata.pitchoftarg == 2) | (newdata.pitchoftarg == 3) | (
-                    newdata.pitchoftarg == 4) | (newdata.pitchoftarg == 5) | (newdata.pitchoftarg.isnull())]
-            newdata = newdata[
-                (newdata.pitchofprecur == 1) | (newdata.pitchofprecur == 2) | (newdata.pitchofprecur == 3) | (
-                        newdata.pitchofprecur == 4) | (newdata.pitchofprecur == 5) | (newdata.pitchofprecur.isnull())]
+            # newdata = newdata[(newdata.pitchoftarg == 1) | (newdata.pitchoftarg == 2) | (newdata.pitchoftarg == 3) | (
+            #         newdata.pitchoftarg == 4) | (newdata.pitchoftarg == 5) | (newdata.pitchoftarg.isnull())]
+            # newdata = newdata[
+            #     (newdata.pitchofprecur == 1) | (newdata.pitchofprecur == 2) | (newdata.pitchofprecur == 3) | (
+            #             newdata.pitchofprecur == 4) | (newdata.pitchofprecur == 5) | (newdata.pitchofprecur.isnull())]
 
             newdata = newdata[
                 (newdata.pitchof0oflastword == 1) | (newdata.pitchof0oflastword == 2) | (newdata.pitchof0oflastword == 3) | (
