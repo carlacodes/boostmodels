@@ -368,7 +368,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
 
     sorted_indices = sorted_indices[::-1]
     feature_importances = feature_importances[sorted_indices]
-    feature_labels = X_train.columns[sorted_indices]
+    feature_labels = dfx.columns[sorted_indices]
     cumulative_importances = np.cumsum(feature_importances)
 
     # Calculate the combined cumulative sum of feature importances
