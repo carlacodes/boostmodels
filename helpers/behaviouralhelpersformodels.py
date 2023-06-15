@@ -595,11 +595,16 @@ class behaviouralhelperscg():
                 targpos = np.where(chosendisttrial == 1)
                 #figure out the F0 of when the ferret releases by iteratively summing up the duration of each word
                 #and comparing it to the time of the release
-                count = -1
+                count = 0
                 distractordurationoftrial = newdata['dDurs'].values[i]
                 if newdata['response'].values[i] != 3 and newdata['response'].values[i] != 7: #if it's a correct catch trial then the release time is inf
-                    while np.sum(distractordurationoftrial[0:count+1]) / fs < newdata['centreRelease'].values[i] - newdata['absentTime'].values[i]:
+                    while np.sum(distractordurationoftrial[0:count]) / fs <= newdata['centreRelease'].values[i] - newdata['absentTime'].values[i]:
                         count = count + 1
+                    if count == len(chosentrial):
+                        print('count is as long as trial')
+                        count = count - 1
+                    elif count - len(chosentrial) >=1:
+                        count = -1
                     if chosentrial[count] == 8.0:
                         pitchof0oflastword.append(float(3))
                     elif chosentrial[count] == 13.0:
