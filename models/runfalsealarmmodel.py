@@ -319,6 +319,7 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput, ferret_as_feature=False, one
 
     kfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=123)
     results_training = cross_val_score(xg_reg, X_train, y_train, scoring='balanced_accuracy', cv=kfold)
+    print('Balanced Accuracy train: %.2f%%' % (np.mean(results_training) * 100.0))
     results = cross_val_score(xg_reg, X_test, y_test, scoring='accuracy', cv=kfold)
     bal_accuracy = cross_val_score(xg_reg, X_test, y_test, scoring='balanced_accuracy', cv=kfold)
     print("Accuracy: %.2f%%" % (np.mean(results) * 100.0))
@@ -363,14 +364,12 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     cmapsummary = matplotlib.colors.ListedColormap(custom_colors_summary)
 
 
-    feature_importances = np.abs(shap_values1).sum(axis=0)
+    feature_importances = np.abs(shap_values1).sum(axis=1).sum(axis=0)
     sorted_indices = np.argsort(feature_importances)
-
     sorted_indices = sorted_indices[::-1]
     feature_importances = feature_importances[sorted_indices]
     feature_labels = dfx.columns[sorted_indices]
     cumulative_importances = np.cumsum(feature_importances)
-
     # Calculate the combined cumulative sum of feature importances
     # cumulative_importances_combined = np.sum(cumulative_importances_list, axis=0)
     # feature_labels = dfx.columns
@@ -739,7 +738,7 @@ def runlgbfaornot(dataframe):
 
 def runfalsealarmpipeline(ferrets, optimization=False, ferret_as_feature=False):
     resultingfa_df = behaviouralhelperscg.get_false_alarm_behavdata(ferrets=ferrets, startdate='04-01-2020',
-                                                                   finishdate='01-03-2023')
+                                                              finishdate='01-03-2023')
     if len(ferrets) == 1:
         one_ferret = True
     len_of_data_male = {}
