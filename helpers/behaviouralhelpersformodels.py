@@ -492,7 +492,6 @@ class behaviouralhelperscg():
             print(ferret)
 
             newdata = allData[allData['ferret'] == ferret]
-            newdata = newdata[newdata['catchTrial'] == 0]
             newdata['targTimes'] = newdata['timeToTarget'] / fs
 
             newdata['centreRelease'] = newdata['lickRelease'] - newdata['startTrialLick']
