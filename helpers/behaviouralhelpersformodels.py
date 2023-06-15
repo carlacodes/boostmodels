@@ -737,7 +737,7 @@ class behaviouralhelperscg():
             # newdata = newdata[newdata['centreRelease'] - newdata['absentTime'] > 0.5]
 
 
-            newdata = newdata[(newdata['response'] != 3) &( newdata['response'] != 7)]
+            newdata = newdata[(newdata['response'] != 0) &( newdata['response'] != 1) &( newdata['response'] != 7)]
 
             # newdata = newdata[
             #     (newdata.pitchofprecur == 1) | (newdata.pitchofprecur == 2) | (newdata.pitchofprecur == 3) | (
@@ -754,7 +754,16 @@ class behaviouralhelperscg():
                         newdata.pitchof0oflastword == 4) | (newdata.pitchof0oflastword == 5) ]
 
             newdata = newdata[(newdata.correctionTrial == 0)]  # | (allData.response == 7)
-            newdata = newdata[(newdata.currAtten == 0)]  # | (allData.response == 7)
+            newdata = newdata[(newdata.currAtten == 0)]
+            listtodrop = []
+            for i3 in range (0, len(newdata)):
+                if np.any(newdata['PitchShiftMat'].values[i3] == 14) or np.any(newdata['PitchShiftMat'].values[i3] == 10)  or np.any(newdata['PitchShiftMat'].values[i3] == 6):
+                    listtodrop.append(True)
+                else:
+                    listtodrop.append(False)
+            newdata = newdata[~np.array(listtodrop)]
+
+            # | (allData.response == 7)
             # newdata = newdata[(newdata.catchTrial == 0)]  # | (allData.response == 7)
 
             bigdata = bigdata.append(newdata)
@@ -957,12 +966,21 @@ class behaviouralhelperscg():
 
             newdata = newdata[(newdata.talker == 1) | (newdata.talker == 2) | (newdata.talker == 3) | (
                     newdata.talker == 4) | (newdata.talker == 5)]
+            listtodrop = []
+            # Assuming `newdata` is a pandas DataFrame
+            for i3 in range (0, len(newdata)):
+                if np.any(newdata['PitchShiftMat'].values[i3] == 14) or np.any(newdata['PitchShiftMat'].values[i3] == 10):
+                    listtodrop.append(True)
+                else:
+                    listtodrop.append(False)
+            newdata = newdata[~np.array(listtodrop)]
 
             # newdata = newdata[
             #     (newdata.pitchofprecur == 1) | (newdata.pitchofprecur == 2) | (newdata.pitchofprecur == 3) | (
             #             newdata.pitchofprecur == 4) | (newdata.pitchofprecur == 5) | (newdata.pitchofprecur.isnull())]
 
             bigdata = bigdata.append(newdata)
+
         return bigdata
 
     def get_reactiontime_data(path=None,

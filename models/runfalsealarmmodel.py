@@ -388,7 +388,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     # Get the plot's Patch objects
     labels = [item.get_text() for item in ax.get_yticklabels()]
     print(labels)
-    fig.set_size_inches(5, 15)
+    fig.set_size_inches(10, 15)
 
     # ax.set_yticklabels(labels)
     fig.tight_layout()
@@ -804,13 +804,13 @@ def runfalsealarmpipeline(ferrets, optimization=False, ferret_as_feature=False):
 
     if optimization == False:
         # load the saved params
-        params = np.load('../optuna_results/falsealarm_optunaparams_1406_5.npy', allow_pickle=True).item()
+        params = np.load('../optuna_results/falsealarm_optunaparams_1406_9.npy', allow_pickle=True).item()
     else:
         study = run_optuna_study_falsealarm(resultingfa_df, resultingfa_df['falsealarm'].to_numpy(),
                                             ferret_as_feature=ferret_as_feature)
         print(study.best_params)
         params = study.best_params
-        np.save('../optuna_results/falsealarm_optunaparams_1406_5.npy', study.best_params)
+        np.save('../optuna_results/falsealarm_optunaparams_1406_9.npy', study.best_params)
 
     resultingfa_df.to_csv(filepath)
 
