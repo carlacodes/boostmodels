@@ -636,7 +636,10 @@ class behaviouralhelperscg():
 
 
                 else:
-                    pitchof0oflastword.append(chosentrial[-1])
+                    try:
+                        pitchof0oflastword.append(chosentrial[-1])
+                    except:
+                        pitchof0oflastword.append(chosentrial)
                     time_elapsed.append(np.sum(distractordurationoftrial[:]) / fs)
 
 
