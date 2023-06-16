@@ -1298,7 +1298,7 @@ def plot_reaction_times_interandintra_swarm(ferrets):
     text_width_inches = text_width_pt / 72.27
     # fig, ((ax1, ax2)) = plt.subplots(2,1, layout='constrained',figsize=(0.75*text_width_inches,0.5*text_width_inches))
     # fig = plt.figure(figsize=(10, 10))
-    fig = plt.figure(figsize = (2*text_width_inches,2*text_width_inches))
+    fig = plt.figure(figsize = (1.5*text_width_inches,1.5*text_width_inches))
     ax_dict = fig.subplot_mosaic(mosaic)
     pitchlist = ['109 Hz', '124 Hz', '144 Hz', '191 Hz', '251 Hz']
     colorlist = ['blue', 'red', 'darkmagenta', 'green', 'orange']
@@ -1317,22 +1317,22 @@ def plot_reaction_times_interandintra_swarm(ferrets):
         ax_dict[str(ferret)].set_xlabel('reaction time relative \n to target presentation (s)', fontsize=10)
     fig.tight_layout()
 
-    font_props = fm.FontProperties(weight='bold', size=9)
+    font_props = fm.FontProperties(weight='bold', size=18)
 
     ax_dict['0'].annotate('A', xy=get_axis_limits(ax_dict['0']),
-                          xytext=(-0.1, ax_dict['0'].title.get_position()[1] + 0.01), textcoords='axes fraction',
+                          xytext=(-0.15, ax_dict['0'].title.get_position()[1] + 0.01), textcoords='axes fraction',
                           fontproperties=font_props, zorder=1)
     ax_dict['1'].annotate('B', xy=get_axis_limits(ax_dict['1']),
-                          xytext=(-0.1, ax_dict['1'].title.get_position()[1] + 0.01), textcoords='axes fraction',
+                          xytext=(-0.15, ax_dict['1'].title.get_position()[1] + 0.01), textcoords='axes fraction',
                           fontproperties=font_props, zorder=1)
     ax_dict['2'].annotate('C', xy=get_axis_limits(ax_dict['2']),
-                          xytext=(-0.1, ax_dict['2'].title.get_position()[1] + 0.01), textcoords='axes fraction',
+                          xytext=(-0.15, ax_dict['2'].title.get_position()[1] + 0.01), textcoords='axes fraction',
                           fontproperties=font_props, zorder=1)
     ax_dict['3'].annotate('D', xy=get_axis_limits(ax_dict['3']),
-                          xytext=(-0.1, ax_dict['3'].title.get_position()[1] + 0.01), textcoords='axes fraction',
+                          xytext=(-0.15, ax_dict['3'].title.get_position()[1] + 0.01), textcoords='axes fraction',
                           fontproperties=font_props, zorder=1)
     ax_dict['4'].annotate('E', xy=get_axis_limits(ax_dict['4']),
-                          xytext=(-0.1, ax_dict['4'].title.get_position()[1] + 0.01), textcoords='axes fraction',
+                          xytext=(-0.15, ax_dict['4'].title.get_position()[1] + 0.01), textcoords='axes fraction',
                           fontproperties=font_props, zorder=1)
     fig.delaxes(ax_dict['5'])  # The indexing is zero-based here
 
@@ -1375,7 +1375,7 @@ def plot_reaction_times_interandintra_swarm(ferrets):
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    plot_reaction_times_interandintra_swarm(ferrets)
+    # plot_reaction_times_interandintra_swarm(ferrets)
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(
         ferrets, optimization=False, ferret_as_feature=True)
     # ferrets = ['F2105_Clove']# 'F2105_Clove'

@@ -452,7 +452,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     ax_dict['A'].set_title(
         'Elbow plot of cumulative feature importance \n on absolute reaction time,' + talker_word + ' talker',
         fontsize=15)
-    ax_dict['A'].set_xticklabels(feature_labels_words, rotation=45, ha='right',
+    ax_dict['A'].set_xticklabels(feature_labels_words, rotation=35, ha='right',
                                  fontsize=10)  # rotate x-axis labels for better readability
     # rotate x-axis labels for better readability
     # summary_img = mpimg.imread(fig_savedir / 'shapsummaryplot_allanimals2.png')
@@ -477,7 +477,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     ax_dict['B'].set_title('Top 5 features for predicting \n absolute release time, ' + talkerlist[talker - 1] + ' talker',
                            fontsize=15)
     ax_dict['B'].set_xticks(np.arange(len(all_labels)))
-    ax_dict['B'].set_xticklabels(all_labels, rotation=45, fontsize=10)
+    ax_dict['B'].set_xticklabels(all_labels, rotation=70, fontsize=10)
     ax_dict['B'].legend()
     # ax_dict['B'].subplots_adjust(bottom=0.3)  # Adjust the bottom margin to accommodate rotated xtick labels
     ax_dict['D'].barh(np.flip(feature_labels_words), result.importances[sorted_idx].mean(axis=1).T, color=talker_color)
@@ -583,10 +583,11 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     # ax_dict['J'].annotate('f)', xy=get_axis_limits(ax_dict['J']), xytext=(-0.1, ax_dict['J'].title.get_position()[1]+0.15), textcoords='axes fraction', fontproperties = font_props,zorder=10)
     # ax_dict['K'].annotate('g)', xy=get_axis_limits(ax_dict['K']), xytext=(-0.1, ax_dict['K'].title.get_position()[1]+0.15), textcoords='axes fraction', fontproperties = font_props,zorder=10)
     # plt.tight_layout()
-    plt.savefig(os.path.join((fig_savedir), str(talker) + '_talker_big_summary_plot_1606.png'), dpi=500)
-    plt.savefig(os.path.join((fig_savedir), str(talker) + '_talker_big_summary_plot_1606.pdf'), dpi=500)
-    fig.tight_layout()
     plt.subplots_adjust(wspace=0.3, hspace=0.48)
+
+    plt.savefig(os.path.join((fig_savedir), str(talker) + '_talker_big_summary_plot_1606.png'), dpi=500)
+    plt.savefig(os.path.join((fig_savedir), str(talker) + '_talker_big_summary_plot_1606.pdf'), dpi=500, bbox_inches='tight')
+    fig.tight_layout()
     plt.show()
 
     # fig, ax = plt.subplots()
@@ -734,7 +735,7 @@ def main():
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']  # , 'F2105_Clove']
 
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=True, talker=2)
+    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=True, talker=1)
     #
     # for ferret in ferrets:
     #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)
