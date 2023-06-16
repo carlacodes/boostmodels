@@ -485,7 +485,7 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
     # ax3.annotate('c)', xy=get_axis_limits(ax3))
     # ax4.annotate('d)', xy=get_axis_limits(ax4))
     title_y = ax1.title.get_position()[1]  # Get the y-coordinate of the title
-    font_props = fm.FontProperties(weight='bold', size = 25)
+    font_props = fm.FontProperties(weight='bold', size = 9)
 
     ax1.annotate('A', xy=get_axis_limits(ax1), xytext=(-0.1, ax1.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props, zorder=10)
     ax2.annotate('B', xy=get_axis_limits(ax2), xytext=(-0.1, ax2.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
@@ -519,7 +519,7 @@ def plot_stats_by_pitch(stats_dict_all_combined, stats_dict_combined, stats_dict
 
     # Convert the text width from points to inches
     text_width_inches = text_width_pt / 72.27
-    fig, ((ax1, ax2)) = plt.subplots(2,1, layout='constrained',figsize=(0.75*text_width_inches,0.5*text_width_inches))
+    fig, ((ax1, ax2)) = plt.subplots(2,1, layout='constrained',figsize=(0.8*text_width_inches,0.9*text_width_inches))
     #make a panel for the subplots to go into
 
     color_map = plt.cm.get_cmap('tab10')  # Choose a colormap
@@ -600,7 +600,7 @@ def plot_stats_by_pitch(stats_dict_all_combined, stats_dict_combined, stats_dict
             multiplier += 1
 
     ax2.set_ylim(0, 1)
-    ax2.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.)
+    ax2.legend( loc='upper left')
     ax2.set_ylabel('P(FA) by F0 of \n  target word')
     ax2.set_title('Proportion of false alarms over F0')
     ax2.set_xlabel('F0 of audio stream')
@@ -618,14 +618,16 @@ def plot_stats_by_pitch(stats_dict_all_combined, stats_dict_combined, stats_dict
     # # ax4.annotate('d)', xy=get_axis_limits(ax4))
     # title_y = ax1.title.get_position()[1]  # Get the y-coordinate of the title
     # font_props = fm.FontProperties(weight='bold')
-    font_props = fm.FontProperties(weight='bold', size=25)
+    font_props = fm.FontProperties(weight='bold', size=9)
 
-    ax1.annotate('A', xy=get_axis_limits(ax1), xytext=(-0.1, ax1.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props, zorder=10)
-    ax2.annotate('B', xy=get_axis_limits(ax2), xytext=(-0.1, ax2.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+    ax1.annotate('A', xy=get_axis_limits(ax1), xytext=(-0.1, ax1.title.get_position()[1]+0.05), textcoords='axes fraction', fontproperties = font_props, zorder=10)
+    ax2.annotate('B', xy=get_axis_limits(ax2), xytext=(-0.1, ax2.title.get_position()[1]+0.05), textcoords='axes fraction', fontproperties = font_props,zorder=10)
     # ax3.annotate('c)', xy=get_axis_limits(ax3), xytext=(-0.1, ax3.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
     # ax4.annotate('d)', xy=get_axis_limits(ax4), xytext=(-0.1, ax4.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
     #
     # plt.suptitle('Proportion of hits, false alarms,\n correct responses and d\' by talker')
+    plt.subplots_adjust(wspace=0.0, hspace=0.38)
+
     plt.savefig('figs/proportionofhitsbyF0.png', dpi = 500, bbox_inches='tight')
     plt.show()
 

@@ -1242,9 +1242,9 @@ def plot_reaction_times_interandintra_swarm(ferrets):
     plt.show()
 
     # now plot by talker, showing reaction times
-    sns.swarmplot(df_female_control['realRelReleaseTimes'], color='blue', label='control F0')
-    sns.swarmplot(df_female_rove['realRelReleaseTimes'], color='red', label='inter-roved F0')
-    sns.swarmplot(df_female_rove_intra['realRelReleaseTimes'], color='darkmagenta', label='intra-roved F0')
+    sns.distplot(df_female_control['realRelReleaseTimes'], color='blue', label='control F0')
+    sns.distplot(df_female_rove['realRelReleaseTimes'], color='red', label='inter-roved F0')
+    sns.distplot(df_female_rove_intra['realRelReleaseTimes'], color='darkmagenta', label='intra-roved F0')
 
     plt.title('Reaction times for the female talker, \n irrespective of ferret', fontsize=15)
     plt.legend(fontsize=10)
@@ -1253,9 +1253,9 @@ def plot_reaction_times_interandintra_swarm(ferrets):
 
     plt.show()
 
-    sns.swarmplot(df_male_control['realRelReleaseTimes'], color='green', label='control F0')
-    sns.swarmplot(df_male_rove['realRelReleaseTimes'], color='orange', label='inter-roved F0')
-    sns.swarmplot(df_male_rove_intra['realRelReleaseTimes'], color='red', label='intra-roved F0')
+    sns.distplot(df_male_control['realRelReleaseTimes'], color='green', label='control F0')
+    sns.distplot(df_male_rove['realRelReleaseTimes'], color='orange', label='inter-roved F0')
+    sns.distplot(df_male_rove_intra['realRelReleaseTimes'], color='red', label='intra-roved F0')
 
     plt.title('Reaction times for the male talker, \n irrespective of ferret', fontsize=15)
     plt.legend(fontsize=10)
@@ -1292,8 +1292,13 @@ def plot_reaction_times_interandintra_swarm(ferrets):
     ferret_labels = ['F1702', 'F1815', 'F1803', 'F2002', 'F2105']
 
     mosaic = ['0', '1', '2'], [ '3', '4', '5']
+    text_width_pt = 419.67816  # Replace with your value
 
-    fig = plt.figure(figsize=(10, 10))
+    # Convert the text width from points to inches
+    text_width_inches = text_width_pt / 72.27
+    # fig, ((ax1, ax2)) = plt.subplots(2,1, layout='constrained',figsize=(0.75*text_width_inches,0.5*text_width_inches))
+    # fig = plt.figure(figsize=(10, 10))
+    fig = plt.figure(figsize = (2*text_width_inches,2*text_width_inches))
     ax_dict = fig.subplot_mosaic(mosaic)
     pitchlist = ['109 Hz', '124 Hz', '144 Hz', '191 Hz', '251 Hz']
     colorlist = ['blue', 'red', 'darkmagenta', 'green', 'orange']
@@ -1308,11 +1313,11 @@ def plot_reaction_times_interandintra_swarm(ferrets):
 
         ax_dict[str(ferret)].set_title('Reaction times for ' + str(ferret_labels[ferret]), fontsize=12)
         if ferret == 0:
-            ax_dict[str(ferret)].legend(fontsize=8)
+            ax_dict[str(ferret)].legend(fontsize=12)
         ax_dict[str(ferret)].set_xlabel('reaction time relative \n to target presentation (s)', fontsize=10)
     fig.tight_layout()
 
-    font_props = fm.FontProperties(weight='bold', size=18)
+    font_props = fm.FontProperties(weight='bold', size=9)
 
     ax_dict['0'].annotate('A', xy=get_axis_limits(ax_dict['0']),
                           xytext=(-0.1, ax_dict['0'].title.get_position()[1] + 0.01), textcoords='axes fraction',
