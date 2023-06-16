@@ -474,7 +474,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
         ax_dict['B'].bar(positions, values, width, bottom=bottom, label=ferret, color=color_list_bar[i])
         bottom += values
     ax_dict['B'].set_ylabel('Permutation importance', fontsize=15)
-    ax_dict['B'].set_title('Top 5 features for predicting absolute release time, ' + talkerlist[talker - 1] + ' talker',
+    ax_dict['B'].set_title('Top 5 features for predicting \n absolute release time, ' + talkerlist[talker - 1] + ' talker',
                            fontsize=15)
     ax_dict['B'].set_xticks(np.arange(len(all_labels)))
     ax_dict['B'].set_xticklabels(all_labels, rotation=45, fontsize=10)
@@ -577,7 +577,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     # ax_dict['F'].annotate('i)', xy=get_axis_limits(ax_dict['F']), xytext=(-0.1, ax_dict['F'].title.get_position()[1]+0.15), textcoords='axes fraction', fontproperties = font_props,zorder=10)
     # ax_dict['G'].annotate('k)', xy=get_axis_limits(ax_dict['G']), xytext=(-0.1, ax_dict['G'].title.get_position()[1]+0.15), textcoords='axes fraction', fontproperties = font_props,zorder=10)
     ax_dict['H'].annotate('D', xy=get_axis_limits(ax_dict['H']),
-                          xytext=(-0.1, ax_dict['H'].title.get_position()[1] + 0.05), textcoords='axes fraction',
+                          xytext=(-0.1, ax_dict['H'].title.get_position()[1] + 0.08), textcoords='axes fraction',
                           fontproperties=font_props, zorder=10)
     # ax_dict['I'].annotate('e)', xy=get_axis_limits(ax_dict['I']), xytext=(-0.1, ax_dict['I'].title.get_position()[1]+0.15), textcoords='axes fraction', fontproperties = font_props,zorder=10)
     # ax_dict['J'].annotate('f)', xy=get_axis_limits(ax_dict['J']), xytext=(-0.1, ax_dict['J'].title.get_position()[1]+0.15), textcoords='axes fraction', fontproperties = font_props,zorder=10)

@@ -783,15 +783,6 @@ def runfalsealarmpipeline(ferrets, optimization=False, ferret_as_feature=False):
     df_inter = resultingfa_df[resultingfa_df['inter_trial_roving'] == 1]
     df_control = resultingfa_df[resultingfa_df['control_trial'] == 1]
     # now we need to balance the data, if it's a fifth more than the other, we need to sample it down
-    if len(df_intra) > len(df_inter)*1.2:
-        df_intra = df_intra.sample(n=len(df_inter), random_state=123)
-    elif len(df_inter) > len(df_intra)*1.2:
-        df_inter = df_inter.sample(n=len(df_intra), random_state=123)
-
-    if len(df_control) > len(df_intra)*1.2:
-        df_control = df_control.sample(n=len(df_intra), random_state=123)
-    elif len(df_control) > len(df_inter)*1.2:
-        df_control = df_control.sample(n=len(df_inter), random_state=123)
 
     df_fa_intra = df_intra[df_intra['falsealarm'] == 1]
     df_nofa_intra = df_intra[df_intra['falsealarm'] == 0]
@@ -806,7 +797,6 @@ def runfalsealarmpipeline(ferrets, optimization=False, ferret_as_feature=False):
 
     if len(df_nofa_intra) > len(df_fa_intra) * 1.2:
         df_nofa_intra = df_nofa_intra.sample(n=len(df_fa_intra), random_state=123)
-
     elif len(df_fa_intra) > len(df_nofa_intra) * 1.2:
         df_fa_intra = df_fa_intra.sample(n=len(df_nofa_intra), random_state=123)
 
@@ -821,14 +811,24 @@ def runfalsealarmpipeline(ferrets, optimization=False, ferret_as_feature=False):
         df_fa_control = df_fa_control.sample(n=len(df_nofa_control), random_state=123)
 
 
-
-
-
-
-
-
     #then reconcatenate the three dfs
     resultingfa_df = pd.concat([df_nofa_intra, df_fa_intra, df_nofa_inter, df_fa_inter, df_nofa_control, df_fa_control], axis = 0)
+
+    #
+    # df_intra = resultingfa_df[resultingfa_df['intra_trial_roving'] == 1]
+    # df_inter = resultingfa_df[resultingfa_df['inter_trial_roving'] == 1]
+    # df_control = resultingfa_df[resultingfa_df['control_trial'] == 1]
+    # # now we need to balance the data, if it's a fifth more than the other, we need to sample it down
+    # if len(df_intra) > len(df_inter)*1.2:
+    #     df_intra = df_intra.sample(n=len(df_inter), random_state=123)
+    # elif len(df_inter) > len(df_intra)*1.2:
+    #     df_inter = df_inter.sample(n=len(df_intra), random_state=123)
+    #
+    # if len(df_control) > len(df_intra)*1.2:
+    #     df_control = df_control.sample(n=len(df_intra), random_state=123)
+    # elif len(df_control) > len(df_inter)*1.2:
+    #     df_control = df_control.sample(n=len(df_inter), random_state=123)
+    #
     # resultingfa_df = pd.concat([df_intra, df_inter, df_control], axis = 0)
 
     # subsample from the distribution of df_miss
@@ -1370,7 +1370,7 @@ def plot_reaction_times_interandintra_swarm(ferrets):
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    # plot_reaction_times_interandintra_swarm(ferrets)
+    plot_reaction_times_interandintra_swarm(ferrets)
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(
         ferrets, optimization=False, ferret_as_feature=True)
     # ferrets = ['F2105_Clove']# 'F2105_Clove'
