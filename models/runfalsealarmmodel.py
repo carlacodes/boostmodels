@@ -512,15 +512,21 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.xlabel('Target presentation time', fontsize=16)
     plt.savefig(fig_dir / 'trialtime_colouredbyprecur.png', dpi=1000)
     plt.show()
+    text_width_pt = 419.67816  # Replace with your value
 
+    # Convert the text width from points to inches
+    text_width_inches = text_width_pt / 72.27
+
+    # Create the figure with the desired figsize
     mosaic = ['A', 'B', 'C'], ['D', 'B', 'E']
-    fig = plt.figure(figsize=(20, 10))
+    # fig = plt.figure(figsize=(20, 10))
+    fig = plt.figure(figsize=(text_width_inches*3, (text_width_inches / 2)*3))
     ax_dict = fig.subplot_mosaic(mosaic)
 
     # Plot the elbow plot
     ax_dict['A'].plot(feature_labels, cumulative_importances, marker='o', color='slategray')
     ax_dict['A'].set_xlabel('Features')
-    ax_dict['A'].set_ylabel('Cumulative Feature Importance')
+    ax_dict['A'].set_ylabel('Cumulative \n feature importance')
     ax_dict['A'].set_title('Elbow plot of cumulative feature importance for false alarm model', fontsize=13)
     ax_dict['A'].set_xticklabels(feature_labels, rotation=45, ha='right')  # rotate x-axis labels for better readability
 
@@ -582,17 +588,23 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     ax_dict['C'].set_xticks([ 1, 2, 3, 4, 5])
     ax_dict['C'].set_xticklabels(["109", "124", "144", "191", "251"],  rotation=45, ha='right')
     #remove padding outside the figures
-    font_props = fm.FontProperties(weight='bold', size=17)
+    font_props = fm.FontProperties(weight='bold', size=27)
 
-    ax_dict['A'].annotate('a)', xy=get_axis_limits(ax_dict['A']), xytext=(-0.1, ax_dict['A'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props, zorder=10)
-    ax_dict['B'].annotate('b)', xy=get_axis_limits(ax_dict['B']), xytext=(-0.1, ax_dict['B'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-    ax_dict['C'].annotate('c)', xy=get_axis_limits(ax_dict['C']), xytext=(-0.1, ax_dict['C'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-    ax_dict['D'].annotate('d)', xy=get_axis_limits(ax_dict['D']), xytext=(-0.1, ax_dict['D'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-    ax_dict['E'].annotate('e)', xy=get_axis_limits(ax_dict['E']), xytext=(-0.1, ax_dict['E'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-
+    # ax_dict['A'].annotate('A', xy=get_axis_limits(ax_dict['A']), xytext=(-0.05, ax_dict['A'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props, zorder=10)
+    # ax_dict['B'].annotate('B', xy=get_axis_limits(ax_dict['B']), xytext=(-0.05, ax_dict['B'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+    # ax_dict['C'].annotate('C', xy=get_axis_limits(ax_dict['C']), xytext=(-0.05, ax_dict['C'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+    # ax_dict['D'].annotate('D', xy=get_axis_limits(ax_dict['D']), xytext=(-0.05, ax_dict['D'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+    # ax_dict['E'].annotate('E', xy=get_axis_limits(ax_dict['E']), xytext=(-0.05, ax_dict['E'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+    import matplotlib.transforms as mtransforms
+    for label, ax in ax_dict.items():
+        # label physical distance to the left and up:
+        trans = mtransforms.ScaledTranslation(-20 / 72, 7 / 72, fig.dpi_scale_trans)
+        ax.text(0.0, 1.2, label, transform=ax.transAxes + trans,
+                fontsize=25, va='bottom', weight = 'bold')
 
     plt.tight_layout()
     plt.savefig(fig_dir / 'big_summary_plot.png', dpi=500, bbox_inches="tight")
+    plt.savefig(fig_dir / 'big_summary_plot.pdf', dpi=500, bbox_inches="tight")
     plt.show()
     return xg_reg, ypred, y_test, results, shap_values1, X_train, y_train, bal_accuracy, shap_values2
 
@@ -1273,21 +1285,21 @@ def plot_reaction_times_interandintra_swarm(ferrets):
         ax_dict[str(ferret)].set_xlabel('reaction time relative \n to target presentation (s)', fontsize=10)
     fig.tight_layout()
 
-    font_props = fm.FontProperties(weight='bold', size=17)
+    font_props = fm.FontProperties(weight='bold', size=18)
 
-    ax_dict['0'].annotate('a)', xy=get_axis_limits(ax_dict['0']),
+    ax_dict['0'].annotate('A', xy=get_axis_limits(ax_dict['0']),
                           xytext=(-0.1, ax_dict['0'].title.get_position()[1] + 0.01), textcoords='axes fraction',
                           fontproperties=font_props, zorder=1)
-    ax_dict['1'].annotate('b)', xy=get_axis_limits(ax_dict['1']),
+    ax_dict['1'].annotate('B', xy=get_axis_limits(ax_dict['1']),
                           xytext=(-0.1, ax_dict['1'].title.get_position()[1] + 0.01), textcoords='axes fraction',
                           fontproperties=font_props, zorder=1)
-    ax_dict['2'].annotate('c)', xy=get_axis_limits(ax_dict['2']),
+    ax_dict['2'].annotate('C', xy=get_axis_limits(ax_dict['2']),
                           xytext=(-0.1, ax_dict['2'].title.get_position()[1] + 0.01), textcoords='axes fraction',
                           fontproperties=font_props, zorder=1)
-    ax_dict['3'].annotate('d)', xy=get_axis_limits(ax_dict['3']),
+    ax_dict['3'].annotate('D', xy=get_axis_limits(ax_dict['3']),
                           xytext=(-0.1, ax_dict['3'].title.get_position()[1] + 0.01), textcoords='axes fraction',
                           fontproperties=font_props, zorder=1)
-    ax_dict['4'].annotate('e)', xy=get_axis_limits(ax_dict['4']),
+    ax_dict['4'].annotate('E', xy=get_axis_limits(ax_dict['4']),
                           xytext=(-0.1, ax_dict['4'].title.get_position()[1] + 0.01), textcoords='axes fraction',
                           fontproperties=font_props, zorder=1)
     fig.delaxes(ax_dict['5'])  # The indexing is zero-based here
