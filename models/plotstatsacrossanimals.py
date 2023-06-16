@@ -323,8 +323,12 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
     width = 0.25  # the width of the bars
     multiplier = 0
     gap_width = 0.2  # Width of the gap between series
+    text_width_pt = 419.67816  # Replace with your value
 
-    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2,2, layout='constrained',figsize=(5,5))
+    # Convert the text width from points to inches
+    text_width_inches = text_width_pt / 72.27
+
+    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2,2, layout='constrained',figsize=(0.8*text_width_inches,0.8*text_width_inches))
     #make a panel for the subplots to go into
 
     color_map = plt.cm.get_cmap('tab10')  # Choose a colormap
@@ -481,12 +485,12 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
     # ax3.annotate('c)', xy=get_axis_limits(ax3))
     # ax4.annotate('d)', xy=get_axis_limits(ax4))
     title_y = ax1.title.get_position()[1]  # Get the y-coordinate of the title
-    font_props = fm.FontProperties(weight='bold')
+    font_props = fm.FontProperties(weight='bold', size = 25)
 
-    ax1.annotate('a)', xy=get_axis_limits(ax1), xytext=(-0.1, ax1.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props, zorder=10)
-    ax2.annotate('b)', xy=get_axis_limits(ax2), xytext=(-0.1, ax2.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-    ax3.annotate('c)', xy=get_axis_limits(ax3), xytext=(-0.1, ax3.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-    ax4.annotate('d)', xy=get_axis_limits(ax4), xytext=(-0.1, ax4.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+    ax1.annotate('A', xy=get_axis_limits(ax1), xytext=(-0.1, ax1.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props, zorder=10)
+    ax2.annotate('B', xy=get_axis_limits(ax2), xytext=(-0.1, ax2.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+    ax3.annotate('C', xy=get_axis_limits(ax3), xytext=(-0.1, ax3.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+    ax4.annotate('D', xy=get_axis_limits(ax4), xytext=(-0.1, ax4.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
 
     plt.suptitle('Proportion of hits, false alarms,\n correct responses and d\' by talker')
     plt.savefig('figs/proportion_hits_falsealarms_correctresp_dprime_bytalker.png', dpi = 500, bbox_inches='tight')
@@ -511,7 +515,11 @@ def plot_stats_by_pitch(stats_dict_all_combined, stats_dict_combined, stats_dict
     multiplier = 0
     gap_width = 0.2  # Width of the gap between series
     ferret_ids = ['F1702', 'F1815', 'F1803', 'F2002', 'F2105']
-    fig, ((ax1, ax2)) = plt.subplots(2,1, layout='constrained',figsize=(5,5))
+    text_width_pt = 419.67816  # Replace with your value
+
+    # Convert the text width from points to inches
+    text_width_inches = text_width_pt / 72.27
+    fig, ((ax1, ax2)) = plt.subplots(2,1, layout='constrained',figsize=(0.75*text_width_inches,0.5*text_width_inches))
     #make a panel for the subplots to go into
 
     color_map = plt.cm.get_cmap('tab10')  # Choose a colormap
@@ -610,10 +618,10 @@ def plot_stats_by_pitch(stats_dict_all_combined, stats_dict_combined, stats_dict
     # # ax4.annotate('d)', xy=get_axis_limits(ax4))
     # title_y = ax1.title.get_position()[1]  # Get the y-coordinate of the title
     # font_props = fm.FontProperties(weight='bold')
-    font_props = fm.FontProperties(weight='bold', size=17)
+    font_props = fm.FontProperties(weight='bold', size=25)
 
-    ax1.annotate('a)', xy=get_axis_limits(ax1), xytext=(-0.1, ax1.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props, zorder=10)
-    ax2.annotate('b)', xy=get_axis_limits(ax2), xytext=(-0.1, ax2.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+    ax1.annotate('A', xy=get_axis_limits(ax1), xytext=(-0.1, ax1.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props, zorder=10)
+    ax2.annotate('B', xy=get_axis_limits(ax2), xytext=(-0.1, ax2.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
     # ax3.annotate('c)', xy=get_axis_limits(ax3), xytext=(-0.1, ax3.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
     # ax4.annotate('d)', xy=get_axis_limits(ax4), xytext=(-0.1, ax4.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
     #
@@ -648,7 +656,7 @@ def run_barplot_pipeline():
 
 if __name__ == '__main__':
     stats_dict_empty = {}
-    # run_barplot_pipeline()
+    run_barplot_pipeline()
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
     df = behaviouralhelperscg.get_stats_df(ferrets=ferrets, startdate='04-01-2016', finishdate='01-03-2023')
     stats_dict_all_inter, stats_dict_inter = run_stats_calc_by_pitch(df, ferrets, stats_dict_empty, pitch_param='inter_trial_roving')

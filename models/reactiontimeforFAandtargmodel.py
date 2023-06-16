@@ -434,7 +434,16 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
 
     mosaic = ['A', 'A', 'A', 'A', 'A'], ['D', 'D', 'D', 'B', 'B'], ['D', 'D', 'D', 'H', 'I'], ['D', 'D', 'D', 'C',  'F', ], ['D', 'D', 'D',  'J', 'K'],\
         ['D', 'D',  'D',  'E','G']
-    fig = plt.figure(figsize=(20, 27))
+
+    text_width_pt = 419.67816  # Replace with your value
+    text_height_pt = 717.00946
+
+    # Convert the text width from points to inches
+    text_width_inches = text_width_pt / 72.27
+    text_height_inches = text_height_pt / 72.27
+
+    fig = plt.figure(figsize=(text_width_inches*3, (text_height_inches)*3))
+    # fig = plt.figure(figsize=(20, 27))
     ax_dict = fig.subplot_mosaic(mosaic)
     # Plot the elbow plot
     ax_dict['A'].plot(feature_labels, cumulative_importances, marker='o', color=talker_color)
@@ -554,28 +563,28 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     ax_dict['K'].set_title(f"'{feature_labels_words[3]}'")
     ax_dict['K'].set_xlabel('Time (s)')
     # remove padding outside the figures
-    font_props = fm.FontProperties(weight='bold', size=17)
-    ax_dict['A'].annotate('a)', xy=get_axis_limits(ax_dict['A']),
-                          xytext=(-0.1, ax_dict['A'].title.get_position()[1] + 0.1), textcoords='axes fraction',
+    font_props = fm.FontProperties(weight='bold', size=25)
+    ax_dict['A'].annotate('A', xy=get_axis_limits(ax_dict['A']),
+                          xytext=(-0.1, ax_dict['A'].title.get_position()[1] + 0.05), textcoords='axes fraction',
                           fontproperties=font_props, zorder=10)
-    ax_dict['B'].annotate('c)', xy=get_axis_limits(ax_dict['B']),
-                          xytext=(-0.1, ax_dict['B'].title.get_position()[1] + 0.1), textcoords='axes fraction',
+    ax_dict['B'].annotate('C', xy=get_axis_limits(ax_dict['B']),
+                          xytext=(-0.1, ax_dict['B'].title.get_position()[1] + 0.05), textcoords='axes fraction',
                           fontproperties=font_props, zorder=10)
     # ax_dict['C'].annotate('h)', xy=get_axis_limits(ax_dict['C']), xytext=(-0.1, ax_dict['C'].title.get_position()[1]+0.15), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-    ax_dict['D'].annotate('b)', xy=get_axis_limits(ax_dict['D']), xytext=(-0.1, ax_dict['D'].title.get_position()[1]),
+    ax_dict['D'].annotate('B', xy=get_axis_limits(ax_dict['D']), xytext=(-0.1, ax_dict['D'].title.get_position()[1]),
                           textcoords='axes fraction', fontproperties=font_props, zorder=10)
     # ax_dict['E'].annotate('j)', xy=get_axis_limits(ax_dict['E']), xytext=(-0.1, ax_dict['E'].title.get_position()[1]+0.15), textcoords='axes fraction', fontproperties = font_props,zorder=10)
     # ax_dict['F'].annotate('i)', xy=get_axis_limits(ax_dict['F']), xytext=(-0.1, ax_dict['F'].title.get_position()[1]+0.15), textcoords='axes fraction', fontproperties = font_props,zorder=10)
     # ax_dict['G'].annotate('k)', xy=get_axis_limits(ax_dict['G']), xytext=(-0.1, ax_dict['G'].title.get_position()[1]+0.15), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-    ax_dict['H'].annotate('d)', xy=get_axis_limits(ax_dict['H']),
-                          xytext=(-0.1, ax_dict['H'].title.get_position()[1] + 0.15), textcoords='axes fraction',
+    ax_dict['H'].annotate('D', xy=get_axis_limits(ax_dict['H']),
+                          xytext=(-0.1, ax_dict['H'].title.get_position()[1] + 0.05), textcoords='axes fraction',
                           fontproperties=font_props, zorder=10)
     # ax_dict['I'].annotate('e)', xy=get_axis_limits(ax_dict['I']), xytext=(-0.1, ax_dict['I'].title.get_position()[1]+0.15), textcoords='axes fraction', fontproperties = font_props,zorder=10)
     # ax_dict['J'].annotate('f)', xy=get_axis_limits(ax_dict['J']), xytext=(-0.1, ax_dict['J'].title.get_position()[1]+0.15), textcoords='axes fraction', fontproperties = font_props,zorder=10)
     # ax_dict['K'].annotate('g)', xy=get_axis_limits(ax_dict['K']), xytext=(-0.1, ax_dict['K'].title.get_position()[1]+0.15), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-    plt.tight_layout()
-    plt.savefig(os.path.join((fig_savedir), str(talker) + '_talker_big_summary_plot.png'), dpi=500, bbox_inches="tight")
-    plt.savefig(os.path.join((fig_savedir), str(talker) + '_talker_big_summary_plot.pdf'), dpi=500, bbox_inches="tight")
+    # plt.tight_layout()
+    plt.savefig(os.path.join((fig_savedir), str(talker) + '_talker_big_summary_plot_1606.png'), dpi=500, bbox_inches="tight")
+    plt.savefig(os.path.join((fig_savedir), str(talker) + '_talker_big_summary_plot_1606.pdf'), dpi=500, bbox_inches="tight")
     fig.tight_layout()
     plt.subplots_adjust(wspace=0.3, hspace=0.48)
     plt.show()
@@ -725,7 +734,7 @@ def main():
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']  # , 'F2105_Clove']
 
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=True, talker=2)
+    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=True, talker=1)
     #
     # for ferret in ferrets:
     #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)

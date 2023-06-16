@@ -528,7 +528,9 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     ax_dict['A'].set_xlabel('Features')
     ax_dict['A'].set_ylabel('Cumulative \n feature importance')
     ax_dict['A'].set_title('Elbow plot of cumulative feature importance for false alarm model', fontsize=13)
-    ax_dict['A'].set_xticklabels(feature_labels, rotation=45, ha='right')  # rotate x-axis labels for better readability
+    #decrease fontsize of xtick labels
+    ax_dict['A'].set_xticklabels(feature_labels, rotation=20, ha='right')  # rotate x-axis labels for better readability
+    ax_dict['A'].tick_params(axis='x', which='major', labelsize=8)
 
     # rotate x-axis labels for better readability
     summary_img = mpimg.imread(fig_dir / 'ranked_features.png')
@@ -599,12 +601,14 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     for label, ax in ax_dict.items():
         # label physical distance to the left and up:
         trans = mtransforms.ScaledTranslation(-20 / 72, 7 / 72, fig.dpi_scale_trans)
-        ax.text(0.0, 1.2, label, transform=ax.transAxes + trans,
+        ax.text(0.0, 1.05, label, transform=ax.transAxes + trans,
                 fontsize=25, va='bottom', weight = 'bold')
 
-    plt.tight_layout()
-    plt.savefig(fig_dir / 'big_summary_plot.png', dpi=500, bbox_inches="tight")
-    plt.savefig(fig_dir / 'big_summary_plot.pdf', dpi=500, bbox_inches="tight")
+    # plt.tight_layout()
+    plt.subplots_adjust(wspace=0.2, hspace=0.4)
+
+    plt.savefig(fig_dir / 'big_summary_plot_2.png', dpi=500, bbox_inches="tight")
+    plt.savefig(fig_dir / 'big_summary_plot_2.pdf', dpi=500, bbox_inches="tight")
     plt.show()
     return xg_reg, ypred, y_test, results, shap_values1, X_train, y_train, bal_accuracy, shap_values2
 
@@ -778,7 +782,6 @@ def runfalsealarmpipeline(ferrets, optimization=False, ferret_as_feature=False):
     df_intra = resultingfa_df[resultingfa_df['intra_trial_roving'] == 1]
     df_inter = resultingfa_df[resultingfa_df['inter_trial_roving'] == 1]
     df_control = resultingfa_df[resultingfa_df['control_trial'] == 1]
-
     # now we need to balance the data, if it's a fifth more than the other, we need to sample it down
     if len(df_intra) > len(df_inter)*1.2:
         df_intra = df_intra.sample(n=len(df_inter), random_state=123)
@@ -790,27 +793,51 @@ def runfalsealarmpipeline(ferrets, optimization=False, ferret_as_feature=False):
     elif len(df_control) > len(df_inter)*1.2:
         df_control = df_control.sample(n=len(df_inter), random_state=123)
 
+    df_fa_intra = df_intra[df_intra['falsealarm'] == 1]
+    df_nofa_intra = df_intra[df_intra['falsealarm'] == 0]
+
+    df_fa_inter = df_inter[df_inter['falsealarm'] == 1]
+    df_nofa_inter = df_inter[df_inter['falsealarm'] == 0]
+
+    df_fa_control = df_control[df_control['falsealarm'] == 1]
+    df_nofa_control = df_control[df_control['falsealarm'] == 0]
+
+
+
+    if len(df_nofa_intra) > len(df_fa_intra) * 1.2:
+        df_nofa_intra = df_nofa_intra.sample(n=len(df_fa_intra), random_state=123)
+
+    elif len(df_fa_intra) > len(df_nofa_intra) * 1.2:
+        df_fa_intra = df_fa_intra.sample(n=len(df_nofa_intra), random_state=123)
+
+    if len(df_nofa_inter) > len(df_fa_inter) * 1.2:
+        df_nofa_inter = df_nofa_inter.sample(n=len(df_fa_inter), random_state=123)
+    elif len(df_fa_inter) > len(df_nofa_inter) * 1.2:
+        df_fa_inter = df_fa_inter.sample(n=len(df_nofa_inter), random_state=123)
+
+    if len(df_nofa_control) > len(df_fa_control) * 1.2:
+        df_nofa_control = df_nofa_control.sample(n=len(df_fa_control), random_state=123)
+    elif len(df_fa_control) > len(df_nofa_control) * 1.2:
+        df_fa_control = df_fa_control.sample(n=len(df_nofa_control), random_state=123)
+
+
+
 
 
 
 
 
     #then reconcatenate the three dfs
-    resultingfa_df = pd.concat([df_intra, df_inter, df_control], axis = 0)
+    resultingfa_df = pd.concat([df_nofa_intra, df_fa_intra, df_nofa_inter, df_fa_inter, df_nofa_control, df_fa_control], axis = 0)
+    # resultingfa_df = pd.concat([df_intra, df_inter, df_control], axis = 0)
 
-    df_fa = resultingfa_df[resultingfa_df['falsealarm'] == 1]
-    df_nofa = resultingfa_df[resultingfa_df['falsealarm'] == 0]
     # subsample from the distribution of df_miss
 
     # find the middle point between the length of df
 
-    if len(df_nofa) > len(df_fa) * 1.2:
-        df_nofa = df_nofa.sample(n=len(df_fa), random_state=123)
 
-    elif len(df_fa) > len(df_nofa) * 1.2:
-        df_fa = df_fa.sample(n=len(df_nofa), random_state=123)
 
-    resultingfa_df = pd.concat([df_nofa, df_fa], axis=0)
+    # resultingfa_df = pd.concat([df_nofa, df_fa], axis=0)
 
 
     filepath = Path('D:/dfformixedmodels/falsealarmmodel_dfuse.csv')

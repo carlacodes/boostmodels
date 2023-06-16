@@ -481,10 +481,17 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         plt.show()
 
     if one_ferret == False:
+        text_width_pt = 419.67816  # Replace with your value
+
+        # Convert the text width from points to inches
+        text_width_inches = text_width_pt / 72.27
+
         mosaic = ['A', 'B', 'C'], ['D', 'B', 'E']
         ferret_id_only = ['F1702', 'F1815', 'F1803', 'F2002', 'F2105']
 
-        fig = plt.figure(figsize=(20, 10))
+        # fig = plt.figure(figsize=(20, 10))
+        fig = plt.figure(figsize=(text_width_inches * 3, (text_width_inches / 2) * 3))
+
         ax_dict = fig.subplot_mosaic(mosaic)
 
         # Plot the elbow plot
@@ -492,7 +499,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         ax_dict['A'].set_xlabel('Features')
         ax_dict['A'].set_ylabel('Cumulative Feature Importance')
         ax_dict['A'].set_title('Elbow Plot of Cumulative Feature Importance for Rxn Time Prediction')
-        ax_dict['A'].set_xticklabels(feature_labels, rotation=45, ha='right')  # rotate x-axis labels for better readability
+        ax_dict['A'].set_xticklabels(feature_labels, rotation=20, ha='right')  # rotate x-axis labels for better readability
 
         # rotate x-axis labels for better readability
         summary_img = mpimg.imread(fig_savedir / 'shapsummaryplot_allanimals2.png')
@@ -541,17 +548,25 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         # ax_dict['C'].set_title('Ferret ID and precursor = target F0 versus SHAP value on miss probability', fontsize=18)
         #remove padding outside the figures
         font_props = fm.FontProperties(weight='bold', size=17)
+        #
+        # ax_dict['A'].annotate('a)', xy=get_axis_limits(ax_dict['A']), xytext=(-0.1, ax_dict['A'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props, zorder=10)
+        # ax_dict['B'].annotate('b)', xy=get_axis_limits(ax_dict['B']), xytext=(-0.1, ax_dict['B'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+        # ax_dict['C'].annotate('c)', xy=get_axis_limits(ax_dict['C']), xytext=(-0.1, ax_dict['C'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+        # ax_dict['D'].annotate('d)', xy=get_axis_limits(ax_dict['D']), xytext=(-0.1, ax_dict['D'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+        # ax_dict['E'].annotate('e)', xy=get_axis_limits(ax_dict['E']), xytext=(-0.1, ax_dict['E'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
 
-        ax_dict['A'].annotate('a)', xy=get_axis_limits(ax_dict['A']), xytext=(-0.1, ax_dict['A'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props, zorder=10)
-        ax_dict['B'].annotate('b)', xy=get_axis_limits(ax_dict['B']), xytext=(-0.1, ax_dict['B'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-        ax_dict['C'].annotate('c)', xy=get_axis_limits(ax_dict['C']), xytext=(-0.1, ax_dict['C'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-        ax_dict['D'].annotate('d)', xy=get_axis_limits(ax_dict['D']), xytext=(-0.1, ax_dict['D'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-        ax_dict['E'].annotate('e)', xy=get_axis_limits(ax_dict['E']), xytext=(-0.1, ax_dict['E'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+        import matplotlib.transforms as mtransforms
+        for label, ax in ax_dict.items():
+            # label physical distance to the left and up:
+            trans = mtransforms.ScaledTranslation(-20 / 72, 7 / 72, fig.dpi_scale_trans)
+            ax.text(0.0, 1.05, label, transform=ax.transAxes + trans,
+                    fontsize=25, va='bottom', weight='bold')
 
+        # plt.tight_layout()
+        plt.subplots_adjust(wspace=0.2, hspace=0.4)
 
-        plt.tight_layout()
-        plt.savefig(fig_savedir / 'big_summary_plot.png', dpi=500, bbox_inches="tight")
-        plt.savefig(fig_savedir / 'big_summary_plot.pdf', dpi=500, bbox_inches="tight")
+        plt.savefig(fig_savedir / 'big_summary_plot_1606.png', dpi=500, bbox_inches="tight")
+        plt.savefig(fig_savedir / 'big_summary_plot_1606.pdf', dpi=500, bbox_inches="tight")
         plt.show()
 
     return xg_reg, ypred, y_test, results
