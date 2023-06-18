@@ -548,7 +548,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     ax_dict['J'].fill_between(np.arange(len(np.abs(worddict[int(top_words[1]) - 1]))) / 24414.0625,
                               (worddict[int(top_words[1]) - 1]).flatten(), color=talker_color, alpha=0.5)
     ax_dict['J'].set_title(f"'{feature_labels_words[1]}'")
-    ax_dict['J'].set_ylabel('Amplitude (a.u.)')
+    # ax_dict['J'].set_ylabel('Amplitude (a.u.)')
     ax_dict['H'].set_xlabel('Time (s)')
     ax_dict['H'].fill_between(np.arange(len(np.abs(worddict[0]))) / 24414.0625, (worddict[0]).flatten(),
                               color=talker_color, alpha=0.5)
@@ -577,13 +577,13 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     # ax_dict['F'].annotate('i)', xy=get_axis_limits(ax_dict['F']), xytext=(-0.1, ax_dict['F'].title.get_position()[1]+0.15), textcoords='axes fraction', fontproperties = font_props,zorder=10)
     # ax_dict['G'].annotate('k)', xy=get_axis_limits(ax_dict['G']), xytext=(-0.1, ax_dict['G'].title.get_position()[1]+0.15), textcoords='axes fraction', fontproperties = font_props,zorder=10)
     ax_dict['H'].annotate('D', xy=get_axis_limits(ax_dict['H']),
-                          xytext=(-0.1, ax_dict['H'].title.get_position()[1] + 0.08), textcoords='axes fraction',
+                          xytext=(-0.15, ax_dict['H'].title.get_position()[1] + 0.08), textcoords='axes fraction',
                           fontproperties=font_props, zorder=10)
     # ax_dict['I'].annotate('e)', xy=get_axis_limits(ax_dict['I']), xytext=(-0.1, ax_dict['I'].title.get_position()[1]+0.15), textcoords='axes fraction', fontproperties = font_props,zorder=10)
     # ax_dict['J'].annotate('f)', xy=get_axis_limits(ax_dict['J']), xytext=(-0.1, ax_dict['J'].title.get_position()[1]+0.15), textcoords='axes fraction', fontproperties = font_props,zorder=10)
     # ax_dict['K'].annotate('g)', xy=get_axis_limits(ax_dict['K']), xytext=(-0.1, ax_dict['K'].title.get_position()[1]+0.15), textcoords='axes fraction', fontproperties = font_props,zorder=10)
     # plt.tight_layout()
-    plt.subplots_adjust(wspace=0.3, hspace=0.48)
+    plt.subplots_adjust(wspace=0.33, hspace=0.53)
 
     plt.savefig(os.path.join((fig_savedir), str(talker) + '_talker_big_summary_plot_1606.png'), dpi=500)
     plt.savefig(os.path.join((fig_savedir), str(talker) + '_talker_big_summary_plot_1606.pdf'), dpi=500, bbox_inches='tight')
@@ -735,7 +735,7 @@ def main():
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']  # , 'F2105_Clove']
 
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=True, talker=1)
+    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=True, talker=2)
     #
     # for ferret in ferrets:
     #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)
