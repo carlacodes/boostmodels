@@ -472,7 +472,7 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
 
     ax4.set_xticks([0.25, 1.25], ['Female', 'Male'])
 
-    ax4.set_ylabel('P(d\')')
+    ax4.set_ylabel('d\'')
     ax4.set_title('d\'')
 
     def get_axis_limits(ax, scale=1):
