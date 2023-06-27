@@ -479,15 +479,32 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     ax_dict['B'].set_xticks(np.arange(len(all_labels)))
     ax_dict['B'].set_xticklabels(all_labels, rotation=70, fontsize=10)
     ax_dict['B'].legend()
-    # ax_dict['B'].subplots_adjust(bottom=0.3)  # Adjust the bottom margin to accommodate rotated xtick labels
-    ax_dict['D'].barh(np.flip(feature_labels_words), result.importances[sorted_idx].mean(axis=1).T, color=talker_color)
+    # # ax_dict['B'].subplots_adjust(bottom=0.3)  # Adjust the bottom margin to accommodate rotated xtick labels
+    # ax_dict['D'].barh(np.flip(feature_labels_words), result.importances[sorted_idx].mean(axis=1).T, color=talker_color)
+    # ax_dict['D'].set_title("Permutation importance features on absolute reaction time, " + talker_word + " talker ",
+    #                        fontsize=15)
+    # ax_dict['D'].set_xlabel("Permutation importance", fontsize=15)
+    # ax_dict['D'].set_ylabel("Feature", fontsize=15)
+    # ax_dict['D'].set_yticks(np.flip(feature_labels_words))
+    # ax_dict['D'].set_yticklabels(np.flip(feature_labels_words), ha='right',
+    #                              fontsize=15)  # rotate x-axis labels for better readability
+    from brokenaxes import brokenaxes
+
+    def create_broken_bar_plot(ax, data, labels):
+        bax = brokenaxes(xlims=[(0, 1), (5, 6)], ax=ax, hspace=0.05)
+        bax.barh(labels, data, color='blue')
+        bax.set_xlabel("Permutation importance", fontsize=15)
+        bax.set_ylabel("Feature", fontsize=15)
+        bax.set_yticklabels(labels, ha='right', fontsize=15)
+
+    # Assuming 'D' is the key for the subplot you want to modify
+    data = result.importances[sorted_idx].mean(axis=1).T
+    labels = np.flip(feature_labels_words)
+
+    create_broken_bar_plot(ax_dict['D'], data, labels)
     ax_dict['D'].set_title("Permutation importance features on absolute reaction time, " + talker_word + " talker ",
                            fontsize=15)
-    ax_dict['D'].set_xlabel("Permutation importance", fontsize=15)
-    ax_dict['D'].set_ylabel("Feature", fontsize=15)
-    ax_dict['D'].set_yticks(np.flip(feature_labels_words))
-    ax_dict['D'].set_yticklabels(np.flip(feature_labels_words), ha='right',
-                                 fontsize=15)  # rotate x-axis labels for better readability
+
     # ax_dict['D'].set_yticklabels(np.flip(feature_labels_words), rotation=45, ha='right', fontsize=10)  # rotate x-axis labels for better readability
     # Plot spectrogram
     if talker == 1:
@@ -564,29 +581,29 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     ax_dict['K'].set_xlabel('Time (s)')
     # remove padding outside the figures
     font_props = fm.FontProperties(weight='bold', size=25)
-    ax_dict['A'].annotate('A', xy=get_axis_limits(ax_dict['A']),
-                          xytext=(-0.1, ax_dict['A'].title.get_position()[1] + 0.05), textcoords='axes fraction',
-                          fontproperties=font_props, zorder=10)
-    ax_dict['B'].annotate('C', xy=get_axis_limits(ax_dict['B']),
-                          xytext=(-0.1, ax_dict['B'].title.get_position()[1] + 0.05), textcoords='axes fraction',
-                          fontproperties=font_props, zorder=10)
-    # ax_dict['C'].annotate('h)', xy=get_axis_limits(ax_dict['C']), xytext=(-0.1, ax_dict['C'].title.get_position()[1]+0.15), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-    ax_dict['D'].annotate('B', xy=get_axis_limits(ax_dict['D']), xytext=(-0.1, ax_dict['D'].title.get_position()[1]),
-                          textcoords='axes fraction', fontproperties=font_props, zorder=10)
-    # ax_dict['E'].annotate('j)', xy=get_axis_limits(ax_dict['E']), xytext=(-0.1, ax_dict['E'].title.get_position()[1]+0.15), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-    # ax_dict['F'].annotate('i)', xy=get_axis_limits(ax_dict['F']), xytext=(-0.1, ax_dict['F'].title.get_position()[1]+0.15), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-    # ax_dict['G'].annotate('k)', xy=get_axis_limits(ax_dict['G']), xytext=(-0.1, ax_dict['G'].title.get_position()[1]+0.15), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-    ax_dict['H'].annotate('D', xy=get_axis_limits(ax_dict['H']),
-                          xytext=(-0.15, ax_dict['H'].title.get_position()[1] + 0.08), textcoords='axes fraction',
-                          fontproperties=font_props, zorder=10)
+    # ax_dict['A'].annotate('A', xy=get_axis_limits(ax_dict['A']),
+    #                       xytext=(-0.1, ax_dict['A'].title.get_position()[1] + 0.05), textcoords='axes fraction',
+    #                       fontproperties=font_props, zorder=10)
+    # ax_dict['B'].annotate('C', xy=get_axis_limits(ax_dict['B']),
+    #                       xytext=(-0.1, ax_dict['B'].title.get_position()[1] + 0.05), textcoords='axes fraction',
+    #                       fontproperties=font_props, zorder=10)
+    # # ax_dict['C'].annotate('h)', xy=get_axis_limits(ax_dict['C']), xytext=(-0.1, ax_dict['C'].title.get_position()[1]+0.15), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+    # ax_dict['D'].annotate('B', xy=get_axis_limits(ax_dict['D']), xytext=(-0.1, ax_dict['D'].title.get_position()[1]),
+    #                       textcoords='axes fraction', fontproperties=font_props, zorder=10)
+    # # ax_dict['E'].annotate('j)', xy=get_axis_limits(ax_dict['E']), xytext=(-0.1, ax_dict['E'].title.get_position()[1]+0.15), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+    # # ax_dict['F'].annotate('i)', xy=get_axis_limits(ax_dict['F']), xytext=(-0.1, ax_dict['F'].title.get_position()[1]+0.15), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+    # # ax_dict['G'].annotate('k)', xy=get_axis_limits(ax_dict['G']), xytext=(-0.1, ax_dict['G'].title.get_position()[1]+0.15), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+    # ax_dict['H'].annotate('D', xy=get_axis_limits(ax_dict['H']),
+    #                       xytext=(-0.15, ax_dict['H'].title.get_position()[1] + 0.08), textcoords='axes fraction',
+    #                       fontproperties=font_props, zorder=10)
     # ax_dict['I'].annotate('e)', xy=get_axis_limits(ax_dict['I']), xytext=(-0.1, ax_dict['I'].title.get_position()[1]+0.15), textcoords='axes fraction', fontproperties = font_props,zorder=10)
     # ax_dict['J'].annotate('f)', xy=get_axis_limits(ax_dict['J']), xytext=(-0.1, ax_dict['J'].title.get_position()[1]+0.15), textcoords='axes fraction', fontproperties = font_props,zorder=10)
     # ax_dict['K'].annotate('g)', xy=get_axis_limits(ax_dict['K']), xytext=(-0.1, ax_dict['K'].title.get_position()[1]+0.15), textcoords='axes fraction', fontproperties = font_props,zorder=10)
     # plt.tight_layout()
     plt.subplots_adjust(wspace=0.33, hspace=0.53)
 
-    plt.savefig(os.path.join((fig_savedir), str(talker) + '_talker_big_summary_plot_1606.png'), dpi=500)
-    plt.savefig(os.path.join((fig_savedir), str(talker) + '_talker_big_summary_plot_1606.pdf'), dpi=500, bbox_inches='tight')
+    plt.savefig(os.path.join((fig_savedir), str(talker) + '_talker_big_summary_plot_1606_noannotation.png'), dpi=500)
+    plt.savefig(os.path.join((fig_savedir), str(talker) + '_talker_big_summary_plot_1606_noannotation.pdf'), dpi=500, bbox_inches='tight')
     fig.tight_layout()
     plt.show()
 

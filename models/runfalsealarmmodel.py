@@ -598,17 +598,17 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     # ax_dict['D'].annotate('D', xy=get_axis_limits(ax_dict['D']), xytext=(-0.05, ax_dict['D'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
     # ax_dict['E'].annotate('E', xy=get_axis_limits(ax_dict['E']), xytext=(-0.05, ax_dict['E'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
     import matplotlib.transforms as mtransforms
-    for label, ax in ax_dict.items():
-        # label physical distance to the left and up:
-        trans = mtransforms.ScaledTranslation(-20 / 72, 7 / 72, fig.dpi_scale_trans)
-        ax.text(0.0, 1.05, label, transform=ax.transAxes + trans,
-                fontsize=25, va='bottom', weight = 'bold')
+    # for label, ax in ax_dict.items():
+    #     # label physical distance to the left and up:
+    #     trans = mtransforms.ScaledTranslation(-20 / 72, 7 / 72, fig.dpi_scale_trans)
+    #     ax.text(0.0, 1.05, label, transform=ax.transAxes + trans,
+    #             fontsize=25, va='bottom', weight = 'bold')
 
     # plt.tight_layout()
     plt.subplots_adjust(wspace=0.2, hspace=0.4)
 
-    plt.savefig(fig_dir / 'big_summary_plot_2.png', dpi=500, bbox_inches="tight")
-    plt.savefig(fig_dir / 'big_summary_plot_2.pdf', dpi=500, bbox_inches="tight")
+    plt.savefig(fig_dir / 'big_summary_plot_2_noannotations.png', dpi=500, bbox_inches="tight")
+    plt.savefig(fig_dir / 'big_summary_plot_2_noannotations.pdf', dpi=500, bbox_inches="tight")
     plt.show()
     return xg_reg, ypred, y_test, results, shap_values1, X_train, y_train, bal_accuracy, shap_values2
 
@@ -1378,7 +1378,7 @@ if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
     # plot_reaction_times_interandintra(ferrets)
 
-    plot_reaction_times_interandintra_swarm(ferrets)
+    # plot_reaction_times_interandintra_swarm(ferrets)
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(
         ferrets, optimization=False, ferret_as_feature=True)
     # ferrets = ['F2105_Clove']# 'F2105_Clove'
