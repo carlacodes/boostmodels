@@ -328,7 +328,7 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
     # Convert the text width from points to inches
     text_width_inches = text_width_pt / 72.27
 
-    fig, (ax1, ax3, ax2, ax4) = plt.subplots(4,1, layout='constrained',figsize=(0.8*text_width_inches,0.8*text_width_inches))
+    fig, (ax1, ax3, ax2, ax4) = plt.subplots(1,4, layout='constrained',figsize=(0.8*text_width_inches,0.8*text_width_inches))
     #make a panel for the subplots to go into
 
     color_map = plt.cm.get_cmap('tab10')  # Choose a colormap

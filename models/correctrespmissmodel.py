@@ -362,19 +362,19 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     # ax_dict['D'].annotate('d)', xy=get_axis_limits(ax_dict['D']), xytext=(-0.1, ax_dict['D'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
     # ax_dict['E'].annotate('e)', xy=get_axis_limits(ax_dict['E']), xytext=(-0.1, ax_dict['E'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
 
-    import matplotlib.transforms as mtransforms
-    for label, ax in ax_dict.items():
-        # label physical distance to the left and up:
-        trans = mtransforms.ScaledTranslation(-20 / 72, 7 / 72, fig.dpi_scale_trans)
-        ax.text(0.0, 1.05, label, transform=ax.transAxes + trans,
-                fontsize=25, va='bottom', weight = 'bold')
+    # import matplotlib.transforms as mtransforms
+    # for label, ax in ax_dict.items():
+    #     # label physical distance to the left and up:
+    #     trans = mtransforms.ScaledTranslation(-20 / 72, 7 / 72, fig.dpi_scale_trans)
+    #     ax.text(0.0, 1.05, label, transform=ax.transAxes + trans,
+    #             fontsize=25, va='bottom', weight = 'bold')
 
     # plt.tight_layout()
     plt.subplots_adjust(wspace=0.2, hspace=0.4)
 
     # plt.tight_layout()
-    plt.savefig(fig_dir / 'big_summary_plot_1606.png', dpi=500, bbox_inches="tight")
-    plt.savefig(fig_dir / 'big_summary_plot_1606.pdf', dpi=500, bbox_inches="tight")
+    plt.savefig(fig_dir / 'big_summary_plot_1606_noannotation.png', dpi=500, bbox_inches="tight")
+    plt.savefig(fig_dir / 'big_summary_plot_1606_noannotation.pdf', dpi=500, bbox_inches="tight")
 
     plt.show()
     # Plot the scatter plot for trial number and precursor pitch
@@ -587,15 +587,7 @@ def run_correct_responsepipeline(ferrets):
     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
 
-# def test_function(ferrets):
-#     resultingcr_df = behaviouralhelperscg.get_df_behav(ferrets=ferrets, includefaandmiss=False, includemissonly=True, startdate='04-01-2020',
-#                                   finishdate='03-01-2023')
-#     filepath = Path('D:/dfformixedmodels/correctresponsemodel_dfuse.csv')
-#     filepath.parent.mkdir(parents=True, exist_ok=True)
-#     resultingcr_df.to_csv(filepath)
-#     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbcorrectrespornotwithoptuna(
-#         resultingcr_df, optimization=True, ferret_as_feature=True)
-#     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
+
 
 def run_models_for_all_or_one_ferret(run_individual_ferret_models):
     if run_individual_ferret_models:
