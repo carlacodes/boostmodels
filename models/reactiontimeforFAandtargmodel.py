@@ -491,19 +491,30 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     from brokenaxes import brokenaxes
 
     def create_broken_bar_plot(ax, data, labels):
-        bax = brokenaxes(xlims=[(0, 1), (5, 6)], ax=ax, hspace=0.05)
-        bax.barh(labels, data, color='blue')
-        bax.set_xlabel("Permutation importance", fontsize=15)
-        bax.set_ylabel("Feature", fontsize=15)
-        bax.set_yticklabels(labels, ha='right', fontsize=15)
+        ax.barh(labels, data, color='blue')
+        ax.set_xlabel("Permutation importance", fontsize=15)
+        ax.set_ylabel("Feature", fontsize=15)
+        ax.set_yticklabels(labels, ha='right', fontsize=15)
 
     # Assuming 'D' is the key for the subplot you want to modify
     data = result.importances[sorted_idx].mean(axis=1).T
     labels = np.flip(feature_labels_words)
 
-    create_broken_bar_plot(ax_dict['D'], data, labels)
-    ax_dict['D'].set_title("Permutation importance features on absolute reaction time, " + talker_word + " talker ",
-                           fontsize=15)
+    fig, ax = plt.subplots(figsize=(8, 6))
+    create_broken_bar_plot(ax, data, labels)
+    ax.set_title("Permutation importance features on absolute reaction time, " + talker_word + " talker ", fontsize=15)
+
+    # Manually create the broken x-axis effect
+    xlims = [(0, 1), (5, 6)]
+    xticks = np.concatenate([np.linspace(xlim[0], xlim[1], num=5) for xlim in xlims])
+    xticklabels = ['{:.1f}'.format(xtick) if xtick < 1 or xtick > 5 else '' for xtick in xticks]
+    ax.set_xlim(min(xlims[0]), max(xlims[1]))
+    ax.set_xticks(xticks)
+    ax.set_xticklabels(xticklabels)
+
+
+    # Update the ax_dict with the modified 'D' subplot
+    ax_dict['D'] = ax
 
     # ax_dict['D'].set_yticklabels(np.flip(feature_labels_words), rotation=45, ha='right', fontsize=10)  # rotate x-axis labels for better readability
     # Plot spectrogram

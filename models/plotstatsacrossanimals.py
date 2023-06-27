@@ -630,7 +630,7 @@ def plot_stats_by_pitch(stats_dict_all_combined, stats_dict_combined, stats_dict
     # plt.suptitle('Proportion of hits, false alarms,\n correct responses and d\' by talker')
     plt.subplots_adjust(wspace=0.0, hspace=0.38)
 
-    plt.savefig('figs/proportionofhitsbyF0_noaxisannotation.png', dpi = 500, bbox_inches='tight')
+    plt.savefig('figs/proportionofhitsbyF0_noaxisannotation.pdf', dpi = 500, bbox_inches='tight')
     plt.show()
 
 
