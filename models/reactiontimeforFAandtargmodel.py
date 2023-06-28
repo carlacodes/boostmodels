@@ -675,44 +675,54 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     # ax.fill_between(np.arange(len(data_scaled)) / 24414.0625, np.abs(data_scaled.flatten()), color='red', alpha=0.5)
     # plt.show()
     from brokenaxes import brokenaxes
-    fig, ax = plt.subplots(figsize=(8, 6))
+
+    # Assuming 'D' is the key for the subplot you want to modify
+    fig, (ax, ax2) = plt.subplots(1, 2, figsize=(12, 6), sharey=True)
 
     # Data for the bar plot
     data = result.importances[sorted_idx].mean(axis=1).T
     labels = np.flip(feature_labels_words)
     talker_color = 'blue'
 
-    # Create a mask for the part of the bar plot to be broken
-    mask = data > 0.16
-
-    # Plot the complete bar plot
+    # Plot the complete bar plot on ax
     ax.barh(labels[:-1], data[:-1], color=talker_color)
-
-    # Set the title, labels, and tick labels
+    ax.set_yticks(labels[:-1])
+    ax.set_yticklabels(labels[:-1], ha='right', fontsize=10)
     ax.set_title("Permutation importance features on absolute reaction time, " + talker_word + " talker", fontsize=15)
     ax.set_xlabel("Permutation importance", fontsize=15)
     ax.set_ylabel("Feature", fontsize=15)
-    ax.set_yticklabels(labels, ha='right', fontsize=15)
 
-    # Create a secondary y-axis for the broken part of the bar plot
-    ax2 = ax.twiny().twinx()
+    # Plot the broken part of the bar plot on ax2
+    bar_height = 0.5  # Adjust the height of the bars
+    threshold = 0.1  # Set the threshold for the broken axis
+    mask = data > threshold  # Create a mask for the broken part
+    ax2.barh(labels[mask], data[mask], color=talker_color, height=bar_height)
+    ax2.set_yticks(labels)
+    ax2.set_yticklabels(labels, ha='right', fontsize=10)
+    ax2.set_xlim(0, threshold*1.8)  # Set the x-axis limits for ax2
 
-    # Plot the broken part of the bar plot
-    ax2.barh(labels[mask], data[mask], color=talker_color)
 
-    # Set the limits for the secondary y-axis
-    ax2.set_xlim(0, np.max(data) * 1.2)
 
-    # Hide the spines and ticks for the secondary y-axis
+    # Hide the spines between ax and ax2
+    ax.spines['right'].set_visible(False)
     ax2.spines['left'].set_visible(False)
-    ax2.spines['right'].set_visible(False)
-    ax2.spines['bottom'].set_visible(False)
-    ax2.spines['top'].set_visible(False)
-    ax2.yaxis.set_ticks_position('none')
-    ax2.xaxis.set_ticks_position('none')
-    plt.subplots_adjust(wspace=0.05)
 
+
+
+
+    # Create diagonal lines for the broken axis effect
+    d = .015  # How big to make the diagonal lines in axes coordinates
+    kwargs = dict(transform=ax.transAxes, color='k', clip_on=False)
+    ax.plot((1 - d, 1 + d), (-d, +d), **kwargs)  # Top-left diagonal
+    ax.plot((1 - d, 1 + d), (1 - d, 1 + d), **kwargs)  # Bottom-left diagonal
+
+    kwargs.update(transform=ax2.transAxes)  # Switch to the bottom axes
+    ax2.plot((-d, d), (-d, +d), **kwargs)  # Top-right diagonal
+    ax2.plot((-d, d), (1 - d, 1 + d), **kwargs)  # Bottom-right diagonal
+
+    plt.subplots_adjust(wspace=0.15)  # Adjust the spacing between subplots
     plt.show()
+
     return xg_reg, ypred, y_test, results
 
 
