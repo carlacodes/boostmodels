@@ -1,4 +1,5 @@
 import npyx
+import numpy as np
 import sklearn.metrics
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import KFold
@@ -668,28 +669,16 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     fig.tight_layout()
     plt.show()
 
-    # fig, ax = plt.subplots()
-    # ax.specgram(worddict[int(top_words[3]) - 1].flatten(), Fs=24414.0625)
-    # #rescale -7977, 7977 the amplitude of worddict
-    # data_scaled = scaledata(worddict[int(top_words[3]) - 1].flatten(), -7797, 7797)
-    # ax.fill_between(np.arange(len(data_scaled)) / 24414.0625, np.abs(data_scaled.flatten()), color='red', alpha=0.5)
-    # plt.show()
-    from brokenaxes import brokenaxes
-
     # Assuming 'D' is the key for the subplot you want to modify
-    fig, (ax, ax2) = plt.subplots(1, 2, figsize=(12, 6), sharey=True)
-
+    fig, (ax, ax2) = plt.subplots(1, 2, figsize=(8, 10), sharey=True)
     # Data for the bar plot
     data = result.importances[sorted_idx].mean(axis=1).T
     labels = np.flip(feature_labels_words)
-    talker_color = 'blue'
 
     # Plot the complete bar plot on ax
     ax.barh(labels[:-1], data[:-1], color=talker_color)
-    ax.set_yticks(labels[:-1])
-    ax.set_yticklabels(labels[:-1], ha='right', fontsize=10)
-    ax.set_title("Permutation importance features on absolute reaction time, " + talker_word + " talker", fontsize=15)
-    ax.set_xlabel("Permutation importance", fontsize=15)
+    ax.set_yticks([])
+    # ax.set_yticklabels(labels[:-1], ha='right', fontsize=10)
     ax.set_ylabel("Feature", fontsize=15)
 
     # Plot the broken part of the bar plot on ax2
@@ -697,17 +686,14 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     threshold = 0.1  # Set the threshold for the broken axis
     mask = data > threshold  # Create a mask for the broken part
     ax2.barh(labels[mask], data[mask], color=talker_color, height=bar_height)
-    ax2.set_yticks(labels)
-    ax2.set_yticklabels(labels, ha='right', fontsize=10)
     ax2.set_xlim(0, threshold*1.8)  # Set the x-axis limits for ax2
+    ax2.set_yticks([])
 
 
 
     # Hide the spines between ax and ax2
     ax.spines['right'].set_visible(False)
     ax2.spines['left'].set_visible(False)
-
-
 
 
     # Create diagonal lines for the broken axis effect
@@ -719,8 +705,15 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     kwargs.update(transform=ax2.transAxes)  # Switch to the bottom axes
     ax2.plot((-d, d), (-d, +d), **kwargs)  # Top-right diagonal
     ax2.plot((-d, d), (1 - d, 1 + d), **kwargs)  # Bottom-right diagonal
+    fig.text(0.5, 0.04, "Permutation importance", ha='center', fontsize=15)
+    plt.suptitle('Permutation importance features on absolute reaction time, ' + talker_word + ' talker', fontsize=15)
 
     plt.subplots_adjust(wspace=0.15)  # Adjust the spacing between subplots
+    ax.set_yticks(np.arange(len(labels)))
+    ax2.set_yticklabels( labels, fontsize=8)
+    plt.setp(ax.get_yticklabels(), rotation=40, fontsize = 10, ha="right")
+    plt.savefig(os.path.join((fig_savedir), str(talker) + '_talker_permutation_importance_1606_mod.pdf'), dpi=500, bbox_inches='tight')
+
     plt.show()
 
     return xg_reg, ypred, y_test, results
@@ -861,7 +854,7 @@ def main():
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']  # , 'F2105_Clove']
 
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=True, talker=2)
+    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=True, talker=1)
     #
     # for ferret in ferrets:
     #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)
