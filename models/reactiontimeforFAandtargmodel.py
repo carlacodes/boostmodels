@@ -520,7 +520,6 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     # Data for the bar plot
     data = (result.importances[sorted_idx].mean(axis=1).T)
     labels = (feature_labels_words)
-    talker_color = 'blue'
 
     # Bar plot on the first axes
     ax_dict['D1'].barh(labels[0], data[-1], color=talker_color)
