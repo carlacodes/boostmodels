@@ -432,8 +432,8 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     # remove the word with the word number
     top_words = np.delete(top_words, [0, 1, 2, 3])
 
-    mosaic = ['A', 'A', 'A', 'A', 'A'], ['D1', 'D1', 'D1', 'B', 'B'], ['D2', 'D2', 'D2', 'H', 'I'], ['D', 'D', 'D', 'C',  'F', ], ['D', 'D', 'D',  'J', 'K'],\
-        ['D', 'D',  'D',  'E','G']
+    mosaic = ['A', 'A', 'A', 'A', 'A'], ['D1', 'D1', 'D1', 'B', 'B'], ['D2', 'D2', 'D2', 'H', 'I'], ['D2', 'D2', 'D2', 'C',  'F', ], ['D2', 'D2', 'D2',  'J', 'K'],\
+        ['D2', 'D2',  'D2',  'E','G']
 
     text_width_pt = 419.67816  # Replace with your value
     text_height_pt = 717.00946
@@ -674,7 +674,45 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     # data_scaled = scaledata(worddict[int(top_words[3]) - 1].flatten(), -7797, 7797)
     # ax.fill_between(np.arange(len(data_scaled)) / 24414.0625, np.abs(data_scaled.flatten()), color='red', alpha=0.5)
     # plt.show()
+    from brokenaxes import brokenaxes
+    fig, ax = plt.subplots(figsize=(8, 6))
 
+    # Data for the bar plot
+    data = result.importances[sorted_idx].mean(axis=1).T
+    labels = np.flip(feature_labels_words)
+    talker_color = 'blue'
+
+    # Create a mask for the part of the bar plot to be broken
+    mask = data > 0.16
+
+    # Plot the complete bar plot
+    ax.barh(labels[:-1], data[:-1], color=talker_color)
+
+    # Set the title, labels, and tick labels
+    ax.set_title("Permutation importance features on absolute reaction time, " + talker_word + " talker", fontsize=15)
+    ax.set_xlabel("Permutation importance", fontsize=15)
+    ax.set_ylabel("Feature", fontsize=15)
+    ax.set_yticklabels(labels, ha='right', fontsize=15)
+
+    # Create a secondary y-axis for the broken part of the bar plot
+    ax2 = ax.twiny().twinx()
+
+    # Plot the broken part of the bar plot
+    ax2.barh(labels[mask], data[mask], color=talker_color)
+
+    # Set the limits for the secondary y-axis
+    ax2.set_xlim(0, np.max(data) * 1.2)
+
+    # Hide the spines and ticks for the secondary y-axis
+    ax2.spines['left'].set_visible(False)
+    ax2.spines['right'].set_visible(False)
+    ax2.spines['bottom'].set_visible(False)
+    ax2.spines['top'].set_visible(False)
+    ax2.yaxis.set_ticks_position('none')
+    ax2.xaxis.set_ticks_position('none')
+    plt.subplots_adjust(wspace=0.05)
+
+    plt.show()
     return xg_reg, ypred, y_test, results
 
 
