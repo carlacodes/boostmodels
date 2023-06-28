@@ -1311,11 +1311,10 @@ def plot_reaction_times_interandintra_swarm(ferrets):
             sns.swarmplot(dict_by_ferret[ferret][pitch]['realRelReleaseTimes'], color=colorlist[count], label=pitchlist[count], ax = ax_dict[str(ferret)], alpha =0.5)
             count += 1
 
-        ax_dict[str(ferret)].set_title('Reaction times for ' + str(ferret_labels[ferret]), fontsize=12)
-        if ferret == 0:
-            ax_dict[str(ferret)].legend(fontsize=12)
-        ax_dict[str(ferret)].set_xlabel('reaction time relative \n to target presentation (s)', fontsize=10)
-        ax_dict[str(ferret)].set_ylabel('reaction time (s)', fontsize=10)
+        ax_dict[str(ferret)].set_title(str(ferret_labels[ferret]), fontsize=12)
+        ax_dict[str(ferret)].set_xticks([0,0.5, 1.5, 2.0])
+        if ferret==str(0) or ferret==str(3):
+            ax_dict[str(ferret)].set_ylabel('reaction time (s)', fontsize=15)
     fig.tight_layout()
 
     font_props = fm.FontProperties(weight='bold', size=18)
@@ -1335,7 +1334,14 @@ def plot_reaction_times_interandintra_swarm(ferrets):
     # ax_dict['4'].annotate('E', xy=get_axis_limits(ax_dict['4']),
     #                       xytext=(-0.15, ax_dict['4'].title.get_position()[1] + 0.01), textcoords='axes fraction',
     #                       fontproperties=font_props, zorder=1)
-    fig.delaxes(ax_dict['5'])  # The indexing is zero-based here
+
+    ax_dict['5'].legend(fontsize=12)
+    #remove spines from ax_dict['5']
+    ax_dict['5'].spines['right'].set_visible(False)
+    ax_dict['5'].spines['top'].set_visible(False)
+    ax_dict['5'].spines['left'].set_visible(False)
+    ax_dict['5'].spines['bottom'].set_visible(False)
+
 
     plt.savefig('D:/behavmodelfigs/reaction_times_by_ferret_swarm_byF0_bigmosaic_noannotation.png', dpi=500)
     plt.savefig('D:/behavmodelfigs/reaction_times_by_ferret_swarm_byF0_bigmosaic_noannotation.pdf', dpi=500)
@@ -1376,7 +1382,7 @@ def plot_reaction_times_interandintra_swarm(ferrets):
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    # plot_reaction_times_interandintra(ferrets)
+    plot_reaction_times_interandintra(ferrets)
 
     # plot_reaction_times_interandintra_swarm(ferrets)
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(
