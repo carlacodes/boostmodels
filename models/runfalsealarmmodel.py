@@ -1311,13 +1311,25 @@ def plot_reaction_times_interandintra_swarm(ferrets):
             print(colorlist[count])
             print(pitch)
             sns.swarmplot(dict_by_ferret[ferret][pitch]['realRelReleaseTimes'], color=colorlist[count], label=pitchlist[count], ax = ax_dict[str(ferret)], alpha =0.5)
-            count += 1
+
+        ax_dict[str(ferret)].set_xlabel('')
+        if ferret == 0:
+            #put legend in last box
+
+            handles, labels = ax_dict['0'].get_legend_handles_labels()
+            ax_dict['5'].legend(handles, labels, fontsize=10, loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=5)
+
+        if ferret == 0 or ferret == 3:
+            ax_dict[str(ferret)].set_ylabel('reaction time (s)', fontsize=15)
+        else:
+            ax_dict[str(ferret)].set_ylabel('')
+        count += 1
 
         ax_dict[str(ferret)].set_title(str(ferret_labels[ferret]), fontsize=12)
-        ax_dict[str(ferret)].set_xticks([0,0.5, 1.5, 2.0], fontsize = 12)
-        if ferret==str(0) or ferret==str(3):
-            ax_dict[str(ferret)].set_ylabel('reaction time (s)', fontsize=15)
+        ax_dict[str(ferret)].set_yticks([0,0.5, 1.0, 1.5, 2.0], fontsize = 12)
+
     fig.tight_layout()
+    #have the legend go to axdict[5] but information is from other plot
 
     font_props = fm.FontProperties(weight='bold', size=18)
 
@@ -1337,12 +1349,14 @@ def plot_reaction_times_interandintra_swarm(ferrets):
     #                       xytext=(-0.15, ax_dict['4'].title.get_position()[1] + 0.01), textcoords='axes fraction',
     #                       fontproperties=font_props, zorder=1)
 
-    fig.legend(fontsize=12, loc='upper center', bbox_to_anchor=(0.5, 0.95), ncol=5, frameon=False)
-    #remove spines from ax_dict['5']
+    # #remove spines from ax_dict['5']
     ax_dict['5'].spines['right'].set_visible(False)
     ax_dict['5'].spines['top'].set_visible(False)
     ax_dict['5'].spines['left'].set_visible(False)
     ax_dict['5'].spines['bottom'].set_visible(False)
+    ax_dict['5'].set_xticks([])
+    ax_dict['5'].set_yticks([])
+
 
 
     plt.savefig('D:/behavmodelfigs/reaction_times_by_ferret_swarm_byF0_bigmosaic_noannotation.png', dpi=500)
