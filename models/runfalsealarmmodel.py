@@ -1208,7 +1208,9 @@ def plot_reaction_times_interandintra(ferrets):
     ax_dict['4'].annotate('e)', xy=get_axis_limits(ax_dict['4']), xytext=(-0.1, ax_dict['4'].title.get_position()[1]+0.01), textcoords='axes fraction', fontproperties = font_props,zorder=1)
 
 
-    plt.savefig('D:/behavmodelfigs/reaction_times_by_ferret_interbigmosaic.png', dpi=500)
+    # plt.savefig('D:/behavmodelfigs/reaction_times_by_ferret_interbigmosaic_2806.png', dpi=500)
+    # plt.savefig('D:/behavmodelfigs/reaction_times_by_ferret_interbigmosaic_2806.pdf', dpi=500)
+
     plt.show()
 
     return df_by_ferret
@@ -1312,7 +1314,7 @@ def plot_reaction_times_interandintra_swarm(ferrets):
             count += 1
 
         ax_dict[str(ferret)].set_title(str(ferret_labels[ferret]), fontsize=12)
-        ax_dict[str(ferret)].set_xticks([0,0.5, 1.5, 2.0])
+        ax_dict[str(ferret)].set_xticks([0,0.5, 1.5, 2.0], fontsize = 12)
         if ferret==str(0) or ferret==str(3):
             ax_dict[str(ferret)].set_ylabel('reaction time (s)', fontsize=15)
     fig.tight_layout()
@@ -1335,7 +1337,7 @@ def plot_reaction_times_interandintra_swarm(ferrets):
     #                       xytext=(-0.15, ax_dict['4'].title.get_position()[1] + 0.01), textcoords='axes fraction',
     #                       fontproperties=font_props, zorder=1)
 
-    ax_dict['5'].legend(fontsize=12)
+    fig.legend(fontsize=12, loc='upper center', bbox_to_anchor=(0.5, 0.95), ncol=5, frameon=False)
     #remove spines from ax_dict['5']
     ax_dict['5'].spines['right'].set_visible(False)
     ax_dict['5'].spines['top'].set_visible(False)
@@ -1382,9 +1384,9 @@ def plot_reaction_times_interandintra_swarm(ferrets):
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    plot_reaction_times_interandintra(ferrets)
+    #plot_reaction_times_interandintra(ferrets)
 
-    # plot_reaction_times_interandintra_swarm(ferrets)
+    plot_reaction_times_interandintra_swarm(ferrets)
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(
         ferrets, optimization=False, ferret_as_feature=True)
     # ferrets = ['F2105_Clove']# 'F2105_Clove'
