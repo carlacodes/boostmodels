@@ -518,29 +518,29 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
 
     # Data for the bar plot
     data = (result.importances[sorted_idx].mean(axis=1).T)
-    labels = np.flip(feature_labels_words)
+    labels = (feature_labels_words)
     talker_color = 'blue'
 
     # Bar plot on the first axes
-    ax_dict['D1'].barh(labels[0], data[0], color=talker_color)
+    ax_dict['D1'].barh(labels[0], data[-1], color=talker_color)
     ax_dict['D1'].set_title("Permutation importance features on absolute reaction time, " + talker_word + " talker",
                             fontsize=15)
-    ax_dict['D1'].set_xlabel("Permutation importance", fontsize=15)
+    # ax_dict['D1'].set_xlabel("Permutation importance", fontsize=15)
     ax_dict['D1'].set_ylabel("Feature", fontsize=15)
-    ax_dict['D1'].set_yticks(labels)
-    ax_dict['D1'].set_yticklabels(labels, ha='right', fontsize=15)
+    ax_dict['D1'].set_yticks(labels[0])
+    # ax_dict['D1'].set_yticklabels(labels[0], ha='right', fontsize=15)
 
     # Bar plot on the second axes
     ax_dict['D2'].barh(labels[1:], data[1:], color=talker_color)
-    ax_dict['D2'].set_title("Permutation importance features on absolute reaction time, " + talker_word + " talker",
-                            fontsize=15)
+    # ax_dict['D2'].set_title("Permutation importance features on absolute reaction time, " + talker_word + " talker",
+    #                         fontsize=15)
     ax_dict['D2'].set_xlabel("Permutation importance", fontsize=15)
-    ax_dict['D2'].set_yticks(labels)
-    ax_dict['D2'].set_yticklabels(labels, ha='right', fontsize=15)
+    ax_dict['D2'].set_yticks(labels[1:])
+    ax_dict['D2'].set_yticklabels(labels[1:], ha='right', fontsize=15)
 
     # zoom-in / limit the view to different portions of the data
     ax_dict['D1'].set_xlim(0, np.max(data) * 1.1)  # Adjust the limit based on your data
-    ax_dict['D2'].set_xlim(0, 0.2)  # Adjust the limit based on your data
+    ax_dict['D2'].set_xlim(0, 0.06)  # Adjust the limit based on your data
 
     # hide the spines between ax_dict['D1'] and ax_dict['D2']
     ax_dict['D1'].spines['right'].set_visible(False)
@@ -565,8 +565,6 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     ax_dict['D2'].plot((-d, d), (1 - d, 1 + d), **kwargs)  # bottom-right diagonal
 
 
-    # Update the ax_dict with the modified 'D' subplot
-    # ax_dict['D'] = ax
 
     # ax_dict['D'].set_yticklabels(np.flip(feature_labels_words), rotation=45, ha='right', fontsize=10)  # rotate x-axis labels for better readability
     # Plot spectrogram
