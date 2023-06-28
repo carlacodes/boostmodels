@@ -432,7 +432,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     # remove the word with the word number
     top_words = np.delete(top_words, [0, 1, 2, 3])
 
-    mosaic = ['A', 'A', 'A', 'A', 'A'], ['D', 'D', 'D', 'B', 'B'], ['D', 'D', 'D', 'H', 'I'], ['D', 'D', 'D', 'C',  'F', ], ['D', 'D', 'D',  'J', 'K'],\
+    mosaic = ['A', 'A', 'A', 'A', 'A'], ['D1', 'D1', 'D1', 'B', 'B'], ['D2', 'D2', 'D2', 'H', 'I'], ['D', 'D', 'D', 'C',  'F', ], ['D', 'D', 'D',  'J', 'K'],\
         ['D', 'D',  'D',  'E','G']
 
     text_width_pt = 419.67816  # Replace with your value
@@ -490,27 +490,79 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     #                              fontsize=15)  # rotate x-axis labels for better readability
     from brokenaxes import brokenaxes
 
-    def create_broken_bar_plot(ax, data, labels):
-        ax.barh(labels, data, color='blue')
-        ax.set_xlabel("Permutation importance", fontsize=15)
-        ax.set_ylabel("Feature", fontsize=15)
-        ax.set_yticklabels(labels, ha='right', fontsize=15)
+    # def create_broken_bar_plot(ax, data, labels):
+    #     ax.barh(labels, data, color='blue')
+    #     ax.set_xlabel("Permutation importance", fontsize=15)
+    #     ax.set_ylabel("Feature", fontsize=15)
+    #     ax.set_yticklabels(labels, ha='right', fontsize=15)
+    #
+    # # Assuming 'D' is the key for the subplot you want to modify
+    # data = result.importances[sorted_idx].mean(axis=1).T
+    # labels = np.flip(feature_labels_words)
+    #
+    # # fig, ax = plt.subplots(figsize=(8, 6))
+    # create_broken_bar_plot(ax_dict['D'], data, labels)
+    # ax_dict['D'].set_title("Permutation importance features on absolute reaction time, " + talker_word + " talker ", fontsize=15)
+    #
+    # # Manually create the broken x-axis effect
+    # xlims = [(0, 0.2), (0, 1)]
+    # xticks = np.concatenate([np.linspace(xlim[0], xlim[1], num=5) for xlim in xlims])
+    # xticklabels = ['{:.1f}'.format(xtick) if xtick < 1 or xtick > 5 else '' for xtick in xticks]
+    # ax_dict['D'].set_xlim(min(xlims[0]), max(xlims[1]))
+    # ax_dict['D'].set_xticks(xticks)
+    # ax_dict['D'].set_xticklabels(xticklabels)
 
-    # Assuming 'D' is the key for the subplot you want to modify
-    data = result.importances[sorted_idx].mean(axis=1).T
+    # # Create the broken x-axis effect
+    # xlims = [(0, 0.2), (0, 1)]
+    # Assuming 'D1' and 'D2' are the keys for the subplots you want to modify
+
+    # Data for the bar plot
+    data = (result.importances[sorted_idx].mean(axis=1).T)
     labels = np.flip(feature_labels_words)
+    talker_color = 'blue'
 
-    # fig, ax = plt.subplots(figsize=(8, 6))
-    create_broken_bar_plot(ax_dict['D'], data, labels)
-    ax_dict['D'].set_title("Permutation importance features on absolute reaction time, " + talker_word + " talker ", fontsize=15)
+    # Bar plot on the first axes
+    ax_dict['D1'].barh(labels[0], data[0], color=talker_color)
+    ax_dict['D1'].set_title("Permutation importance features on absolute reaction time, " + talker_word + " talker",
+                            fontsize=15)
+    ax_dict['D1'].set_xlabel("Permutation importance", fontsize=15)
+    ax_dict['D1'].set_ylabel("Feature", fontsize=15)
+    ax_dict['D1'].set_yticks(labels)
+    ax_dict['D1'].set_yticklabels(labels, ha='right', fontsize=15)
 
-    # Manually create the broken x-axis effect
-    xlims = [(0, 0.2), (0, 1)]
-    xticks = np.concatenate([np.linspace(xlim[0], xlim[1], num=5) for xlim in xlims])
-    xticklabels = ['{:.1f}'.format(xtick) if xtick < 1 or xtick > 5 else '' for xtick in xticks]
-    ax_dict['D'].set_xlim(min(xlims[0]), max(xlims[1]))
-    ax_dict['D'].set_xticks(xticks)
-    ax_dict['D'].set_xticklabels(xticklabels)
+    # Bar plot on the second axes
+    ax_dict['D2'].barh(labels[1:], data[1:], color=talker_color)
+    ax_dict['D2'].set_title("Permutation importance features on absolute reaction time, " + talker_word + " talker",
+                            fontsize=15)
+    ax_dict['D2'].set_xlabel("Permutation importance", fontsize=15)
+    ax_dict['D2'].set_yticks(labels)
+    ax_dict['D2'].set_yticklabels(labels, ha='right', fontsize=15)
+
+    # zoom-in / limit the view to different portions of the data
+    ax_dict['D1'].set_xlim(0, np.max(data) * 1.1)  # Adjust the limit based on your data
+    ax_dict['D2'].set_xlim(0, 0.2)  # Adjust the limit based on your data
+
+    # hide the spines between ax_dict['D1'] and ax_dict['D2']
+    ax_dict['D1'].spines['right'].set_visible(False)
+    ax_dict['D2'].spines['left'].set_visible(False)
+    ax_dict['D1'].yaxis.tick_left()
+    ax_dict['D1'].tick_params(labeltop='off')  # don't put tick labels at the top
+    ax_dict['D2'].yaxis.tick_right()
+
+    # Make the spacing between the two axes a bit smaller
+    plt.subplots_adjust(wspace=0.15)
+
+
+
+    d = 0.015  # how big to make the diagonal lines in axes coordinates
+    # arguments to pass plot, just so we don't keep repeating them
+    kwargs = dict(transform=ax_dict['D1'].transAxes, color='k', clip_on=False)
+    ax_dict['D1'].plot((1 - d, 1 + d), (-d, +d), **kwargs)  # top-left diagonal
+    ax_dict['D1'].plot((1 - d, 1 + d), (1 - d, 1 + d), **kwargs)  # bottom-left diagonal
+
+    kwargs.update(transform=ax_dict['D2'].transAxes)  # switch to the bottom axes
+    ax_dict['D2'].plot((-d, d), (-d, +d), **kwargs)  # top-right diagonal
+    ax_dict['D2'].plot((-d, d), (1 - d, 1 + d), **kwargs)  # bottom-right diagonal
 
 
     # Update the ax_dict with the modified 'D' subplot
