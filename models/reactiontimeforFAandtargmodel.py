@@ -668,142 +668,21 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     fig.tight_layout()
     plt.show()
 
-    # Assuming 'D' is the key for the subplot you want to modify
-    fig, (ax, ax2) = plt.subplots(1, 2, figsize=(8, 10), sharey=True)
-    # Data for the bar plot
-    data = result.importances[sorted_idx].mean(axis=1).T
-    labels = np.flip(feature_labels_words)
 
-    # Plot the complete bar plot on ax
-    ax.barh(labels[:-1], data[:-1], color=talker_color)
-    ax.set_yticks([])
-    # ax.set_yticklabels(labels[:-1], ha='right', fontsize=10)
-    ax.set_ylabel("Feature", fontsize=15)
-
-    # Plot the broken part of the bar plot on ax2
-    bar_height = 0.5  # Adjust the height of the bars
-    threshold = 0.1  # Set the threshold for the broken axis
-    mask = data > threshold  # Create a mask for the broken part
-    ax2.barh(labels[mask], data[mask], color=talker_color, height=bar_height)
-    ax2.set_xlim(0, threshold*1.8)  # Set the x-axis limits for ax2
-    ax2.set_yticks([])
-
-
-
-    # Hide the spines between ax and ax2
-    ax.spines['right'].set_visible(False)
-    ax2.spines['left'].set_visible(False)
-
-
-    # Create diagonal lines for the broken axis effect
-    d = .015  # How big to make the diagonal lines in axes coordinates
-    kwargs = dict(transform=ax.transAxes, color='k', clip_on=False)
-    ax.plot((1 - d, 1 + d), (-d, +d), **kwargs)  # Top-left diagonal
-    ax.plot((1 - d, 1 + d), (1 - d, 1 + d), **kwargs)  # Bottom-left diagonal
-
-    kwargs.update(transform=ax2.transAxes)  # Switch to the bottom axes
-    ax2.plot((-d, d), (-d, +d), **kwargs)  # Top-right diagonal
-    ax2.plot((-d, d), (1 - d, 1 + d), **kwargs)  # Bottom-right diagonal
-    fig.text(0.5, 0.04, "Permutation importance", ha='center', fontsize=15)
-    plt.suptitle('Permutation importance features on absolute reaction time, ' + talker_word + ' talker', fontsize=15)
-
-    plt.subplots_adjust(wspace=0.15)  # Adjust the spacing between subplots
-    ax.set_yticks(np.arange(len(labels)))
-    ax2.set_yticklabels( labels, fontsize=8)
-    plt.setp(ax.get_yticklabels(), rotation=40, fontsize = 10, ha="right")
-    plt.savefig(os.path.join((fig_savedir), str(talker) + '_talker_permutation_importance_1606_mod.pdf'), dpi=500, bbox_inches='tight')
-
-    plt.show()
-    from matplotlib.gridspec import GridSpec
-
-    mm = (146, 90)  # x value then y value
-    inches = (mm[0] / 25.4, mm[1] / 25.4)
-
-    fig = plt.figure(figsize=inches)
-    fig.text(0.02, 0.6, r"Y axis label", va="center", rotation="vertical", fontsize=12)
-    gs = GridSpec(2, 2, height_ratios=[1, 4])
-
-    ax2 = fig.add_subplot(gs.new_subplotspec((0, 0), colspan=2))
-    ax = fig.add_subplot(gs.new_subplotspec((1, 0), colspan=2))
-    palette = plt.get_cmap("tab20")
-
-
-    # labs = data.index.tolist()
-    # labs.insert(0, "")
-
-    ax.tick_params(axis="both", which="major", labelsize=10)
-    ax2.tick_params(axis="both", which="major", labelsize=10)
-    ax2.set_yticklabels((data), rotation=45, fontsize=10, horizontalalignment="right")
-    ax.set_xticklabels(())
-    ax.set_yticks(np.arange(-1, len(data) + 1, 1.0))
-    ax2.set_yticks(np.arange(-1, len(data) + 1, 1.0))
-
-    ax.set_xticks(np.arange(0, max(data) + 10, 100))
-    ax2.set_xticks(np.arange(0, max(data) + 10, 100))
-
-    # plot the same data on both axes
-    bar_height = 0.5  # Adjust the height of the bars
-    threshold = 0.1  # Set the threshold for the broken axis
-    mask = data > threshold  # Create a mask for the broken part
-    bar_upper = ax2.barh(labels[mask], data[mask], color=talker_color)
-
-    bar_lower = ax.barh(labels[:-1], data[:-1], color=talker_color)
-
-
-
-    # zoom-in / limit the view to different portions of the data
-    ax.set_xlim(0, 0.03)  # outliers only
-    ax2.set_xlim(0.10, 0.17)  # most of the data
-    # ax.set_xlim(-0.5, len(data) - 0.25)  # outliers only
-    # ax2.set_xlim(-0.5, len(data) - 0.25)  # most of the data
-
-    ax.spines["bottom"].set_visible(False)
-    ax2.spines["top"].set_visible(False)
-
-    ax.grid(color="k", alpha=0.5, linestyle=":", zorder=1)
-    ax2.grid(color="k", alpha=0.5, linestyle=":", zorder=1)
-
-    ax.tick_params(axis="x", which="both", length=0)
-    ax.tick_params(labeltop="off")
-    ax2.tick_params(labeltop="off")
-    ax2.xaxis.tick_bottom()
-
-    d = 0.015  # how big to make the diagonal lines in axes coordinates
-    # arguments to pass to plot, just so we don't keep repeating them
-    axis_break1 = 0.09
-    axis_break2 = 0.1
-    x_min = 1
-    x_max = len(data)
-    l = 0.2  # "break" line length
-    kwargs = dict(color="k", clip_on=False, linewidth=1)
-    ax.plot((axis_break2, axis_break2),(x_min - l, x_min + l), **kwargs)  # top-left
-    ax.plot( (axis_break2, axis_break2), (x_max - l, x_max + l), **kwargs)  # top-right
-    ax2.plot((axis_break1, axis_break1), (x_min - l, x_min + l), **kwargs)  # bottom-left
-    ax2.plot((axis_break1, axis_break1),(x_max - l, x_max + l),  **kwargs)  #
-
-    plt.subplots_adjust(
-        top=0.943, bottom=0.214, left=0.103, right=0.97, hspace=0.133, wspace=0.062
-    )
-    plt.show()
-
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 6), gridspec_kw={'width_ratios': [4, 1]})
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 15), gridspec_kw={'width_ratios': [4, 1]})
     # Plotting the majority of values on the first subplot
-    ax2.barh(labels[:], data[:], color='red')
+    ax2.barh(labels[:], data[:], color=talker_color)
     ax2.set_xlim(max(data[:-1])+0.002, data[-1] +0.05 )  # Adjust xlim for the outlier
     ax2.set_yticklabels([])
 
-    ax1.barh(labels[:], data[:])
+    ax1.barh(labels[:], data[:], color = talker_color)
     ax1.set_xlim(0, max(data[:-1])+0.002)  # Adjust xlim for the majority of values
-    ax1.set_title('Majority of Values')
+    ax1.set_yticks(labels[:])
+    ax1.set_yticklabels(labels[:], rotation = 45)
 
-    # Plotting the outlier on the second subplot
-
-    # ax2.set_title('Outlier')
-
-    # Adjusting the layout and labels
     plt.tight_layout()
     fig.subplots_adjust(top=0.85)
-    ax1.set_xlabel('Value')
+    # ax1.set_xlabel('Value')
     fig.subplots_adjust(wspace=0)
     #remove # Reduce the spacing between subplots
     #remove spine between the two subplots
@@ -818,11 +697,10 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     kwargs = dict(transform=ax1.transAxes, color='k', clip_on=False)
     ax1.plot((1 - d, 1 + d), (-d, +d), **kwargs)
     ax1.plot((1 - d, 1 + d), (1 - d, 1 + d), **kwargs)
-
-
-
+    fig.text(0.5, 0.00, 'Permutation Importance', ha='center', va='center', fontsize = 12)  # Add a common x-axis label
 
     # Display the chart
+    plt.savefig(os.path.join((fig_savedir), str(talker) + '_permutationimportance_plot_2906_noannotation.png'), dpi=500, bbox_inches='tight')
     plt.show()
 
     return xg_reg, ypred, y_test, results
@@ -963,7 +841,7 @@ def main():
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']  # , 'F2105_Clove']
 
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=True, talker=2)
+    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=True, talker=1)
     #
     # for ferret in ferrets:
     #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)
