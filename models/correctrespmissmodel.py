@@ -337,9 +337,9 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
     cb_ax.set_ylabel("target F0 (Hz)", fontsize=15)
     cb_ax.tick_params(labelsize=15)
-    ax_dict['E'].set_xlabel('Talker', fontsize=16)
+    # ax_dict['E'].set_xlabel('Talker', fontsize=16)
     ax_dict['E'].set_xticks([1,2])
-    ax_dict['E'].set_xticklabels(['Male', 'Female'], fontsize=10, rotation = 45, ha='right')
+    ax_dict['E'].set_xticklabels(['Male', 'Female'], fontsize=16, rotation = 45, ha='right')
 
     shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "target F0"], ax=ax_dict['C'],
                        cmap=cmapcustom, show=False)
@@ -355,9 +355,9 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     # Modifying color bar parameters
     cb_ax.tick_params(labelsize=15)
     ax_dict['C'].set_ylabel('SHAP value', fontsize=10)
-    ax_dict['C'].set_xlabel('Ferret ID', fontsize=16)
+    # ax_dict['C'].set_xlabel('Ferret ID', fontsize=16)
     ax_dict['C'].set_xticks([0, 1, 2, 3, 4])
-    ax_dict['C'].set_xticklabels(ferret_id_only, fontsize=10, rotation = 45, ha='right')
+    ax_dict['C'].set_xticklabels(ferret_id_only, fontsize=12, rotation = 45, ha='right')
 
     # ax_dict['C'].set_xticklabels(ferrets, fontsize=16)
 

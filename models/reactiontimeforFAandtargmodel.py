@@ -728,18 +728,18 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     palette = plt.get_cmap("tab20")
 
 
-    labs = data.index.tolist()
-    labs.insert(0, "")
+    # labs = data.index.tolist()
+    # labs.insert(0, "")
 
     ax.tick_params(axis="both", which="major", labelsize=10)
     ax2.tick_params(axis="both", which="major", labelsize=10)
-    ax2.set_xticklabels((labs), rotation=45, fontsize=10, horizontalalignment="right")
+    ax2.set_yticklabels((data), rotation=45, fontsize=10, horizontalalignment="right")
     ax.set_xticklabels(())
-    ax.set_xticks(np.arange(-1, len(data.index) + 1, 1.0))
-    ax2.set_xticks(np.arange(-1, len(data.index) + 1, 1.0))
+    ax.set_yticks(np.arange(-1, len(data) + 1, 1.0))
+    ax2.set_yticks(np.arange(-1, len(data) + 1, 1.0))
 
-    ax.set_yticks(np.arange(0, max(data["high"]) + 10, 100))
-    ax2.set_yticks(np.arange(0, max(data["high"]) + 10, 100))
+    ax.set_xticks(np.arange(0, max(data) + 10, 100))
+    ax2.set_xticks(np.arange(0, max(data) + 10, 100))
 
     # plot the same data on both axes
     bar_height = 0.5  # Adjust the height of the bars
