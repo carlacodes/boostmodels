@@ -240,14 +240,21 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     fig.set_size_inches(9, 12)
     ax.set_xlabel('SHAP Value (impact on model output)', fontsize=18)
     ax.set_yticks(range(len(feature_labels)))
-    ax.set_yticklabels(feature_labels, fontsize=18)
+    ax.set_yticklabels(feature_labels, fontsize=25)
     ax.set_ylabel('Features', fontsize=18)
+    #pull legend from figure
+    # Pull legend from figure
+    legend_handles, legend_labels = ax.get_legend_handles_labels()
+    #reinsert the legend_hanldes and labels
+    ax.legend(legend_handles, ['Hit', 'Miss'], loc='upper right', fontsize=18)
 
-    #make the y labels smaller
 
-    plt.savefig(summary_plot_file, dpi = 500, bbox_inches='tight')
+    plt.savefig(summary_plot_file, dpi=500, bbox_inches='tight')
 
     plt.show()
+    #make the y labels smaller
+
+
     fig, ax = plt.subplots()
     shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "target F0"], cmap=cmapcustom, show=False)
     plt.xticks([1,2], labels = ['Male', 'Female'], fontsize=18)
