@@ -566,7 +566,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     ax_dict['E'].set_xticks([0,1])
     ferret_id_only = ['F1702', 'F1815', 'F1803', 'F2002', 'F2105']
     ax_dict['E'].set_xticklabels(['non-intra-trial roving', 'intra-trial roving'],  rotation=45, ha='right')
-    ax_dict['E'].set_xlabel('Intra trial roving', fontsize=16)
+    # ax_dict['E'].set_xlabel('Intra trial roving', fontsize=16)
 
     # shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "F0"], ax=ax_dict['C'],
     #                    cmap =cmapcustom, show=False)
