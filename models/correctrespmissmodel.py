@@ -240,7 +240,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     fig.set_size_inches(6, 12)
     ax.set_xlabel('Mean SHAP value', fontsize=18)
     ax.set_yticks(range(len(feature_labels)))
-    ax.set_yticklabels(feature_labels, fontsize=15, rotation = 45)
+    ax.set_yticklabels(feature_labels, fontsize=17, rotation = 45)
     ax.set_ylabel('Features', fontsize=18)
     #pull legend from figure
     # Pull legend from figure
@@ -338,6 +338,8 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     cb_ax.set_ylabel("target F0 (Hz)", fontsize=15)
     cb_ax.tick_params(labelsize=15)
     # ax_dict['E'].set_xlabel('Talker', fontsize=16)
+    ax_dict['E'].set_xlabel('')
+
     ax_dict['E'].set_xticks([1,2])
     ax_dict['E'].set_xticklabels(['Male', 'Female'], fontsize=16, rotation = 45, ha='right')
 
@@ -356,6 +358,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     cb_ax.tick_params(labelsize=15)
     ax_dict['C'].set_ylabel('SHAP value', fontsize=10)
     # ax_dict['C'].set_xlabel('Ferret ID', fontsize=16)
+    ax_dict['C'].set_xlabel('')
     ax_dict['C'].set_xticks([0, 1, 2, 3, 4])
     ax_dict['C'].set_xticklabels(ferret_id_only, fontsize=12, rotation = 45, ha='right')
 

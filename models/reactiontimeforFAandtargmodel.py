@@ -362,57 +362,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
 
     positions = np.arange(len(all_labels))
 
-    # fig, ax = plt.subplots()
-    # width = 0.5
-    # values = []
-    # labels = []
-    # for i, ferret in enumerate(permutation_importance_dict.keys()):
-    #
-    #     #     positions = np.arange(len(values))
-    #     #
-    #     labels_ferrets = permutation_importance_labels_dict[ferret].tolist()
-    #     common_labels = list(set(labels_ferrets) - (set(labels_ferrets) - set(labels)))
-    #     positions = np.arange(len(common_labels))
-    #     #if it is the first ferret, just plot the values
-    #     if i == 0:
-    #         values = permutation_importance_dict[ferret][0:len(common_labels)]
-    #         labels = common_labels
-    #         ax.bar(positions, values, width, label=ferret)
-    #     else:
-    #         #if it is not the first ferret, plot the values on top of the previous ferret
-    #         values = permutation_importance_dict[ferret][0:len(common_labels)]
-    #         labels = common_labels
-    #         ax.bar(positions, values, width, label=ferret, bottom=np.sum(list(permutation_importance_dict.values())[:i], axis=0))
-    #
-    #     labels.append(labels_ferrets)
-    #
-    #
-    # ax.set_ylabel('Importance')
-    # ax.set_title('Top 5 Common Features by Ferret')
-    # ax.set_xticks(positions)
-    # ax.set_xticklabels(common_labels)
-    # ax.legend()
-    #
-    # plt.show()
-    #
-    # # Plotting the stacked bar plot
-    # fig, ax = plt.subplots()
-    # width = 0.5
-    #
-    # for i, ferret in enumerate(permutation_importance_dict.keys()):
-    #     values = permutation_importance_dict[ferret]
-    #     labels = permutation_importance_labels_dict[ferret]
-    #     positions = np.arange(len(values))
-    #
-    #     ax.bar(positions, values, width, label=ferret,
-    #            bottom=np.sum(list(permutation_importance_dict.values())[:i], axis=0))
-    #
-    # ax.set_ylabel('Importance')
-    # ax.set_title('Top 6 Features by Subject')
-    # ax.set_xticks(positions)
-    # ax.legend()
-    #
-    # plt.show()
+
 
     dirfemale = 'D:/Stimuli/19122022/FemaleSounds24k_addedPinkNoiseRevTargetdB.mat'
     dirmale = 'D:/Stimuli/19122022/MaleSounds24k_addedPinkNoiseRevTargetdB.mat'
@@ -442,6 +392,17 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     # Convert the text width from points to inches
     text_width_inches = text_width_pt / 72.27
     text_height_inches = text_height_pt / 72.27
+
+    fig, ax = plt.subplots(figsize=(15,5))
+    ax.plot(feature_labels, cumulative_importances, marker='o', color=talker_color)
+    # ax_dict['A'].set_xlabel('Features', fontsize=15)
+    ax.set_ylabel('Cumulative feature importance', fontsize=15)
+    ax.set_title(
+        'Elbow plot of cumulative feature importance \n on absolute reaction time,' + talker_word + ' talker',
+        fontsize=15)
+    ax.set_xticklabels(feature_labels_words, rotation=35, ha='right',fontsize=10)
+    plt.savefig(os.path.join((fig_savedir), str(talker) + 'elobowplot_1606_noannotation.pdf'), dpi=500, bbox_inches='tight')
+    plt.show()
 
     fig = plt.figure(figsize=(text_width_inches*3, (text_height_inches)*3))
     # fig = plt.figure(figsize=(20, 27))
@@ -841,7 +802,7 @@ def main():
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']  # , 'F2105_Clove']
 
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=True, talker=1)
+    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=True, talker=2)
     #
     # for ferret in ferrets:
     #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)
