@@ -389,9 +389,10 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     # Get the plot's Patch objects
     labels = [item.get_text() for item in ax.get_yticklabels()]
     print(labels)
-    fig.set_size_inches(7, 15)
+    fig.set_size_inches(12, 15)
+    ax.set_xlabel('Mean SHAP value', fontsize=18)
     ax.set_yticks(range(len(feature_labels)))
-    ax.set_yticklabels(feature_labels, fontsize=20, rotation = 45)
+    ax.set_yticklabels(feature_labels, fontsize=17, rotation = 45)
     legend_handles, legend_labels = ax.get_legend_handles_labels()
     #reinsert the legend_hanldes and labels
     ax.legend(legend_handles, ['Correct Rejection', 'False Alarm'], loc='upper right', fontsize=18)
@@ -565,8 +566,8 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     # ax_dict['E'].set_title('Intra-trial roving versus impact on false alarm probability', fontsize=13)
     ax_dict['E'].set_xticks([0,1])
     ferret_id_only = ['F1702', 'F1815', 'F1803', 'F2002', 'F2105']
-    ax_dict['E'].set_xticklabels(['non-intra-trial roving', 'intra-trial roving'],  rotation=45, ha='right')
-    # ax_dict['E'].set_xlabel('Intra trial roving', fontsize=16)
+    ax_dict['E'].set_xticklabels(['False', 'True'],  rotation=45, ha='right')
+    ax_dict['E'].set_xlabel('Intra trial roving', fontsize=16)
 
     # shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "F0"], ax=ax_dict['C'],
     #                    cmap =cmapcustom, show=False)
