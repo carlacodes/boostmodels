@@ -727,7 +727,6 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     ax2 = fig.add_subplot(gs.new_subplotspec((1, 0), colspan=2))
     palette = plt.get_cmap("tab20")
 
-    indx = np.arange(len(data.index))
 
     labs = data.index.tolist()
     labs.insert(0, "")

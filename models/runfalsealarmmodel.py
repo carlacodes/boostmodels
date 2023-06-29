@@ -389,12 +389,12 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     # Get the plot's Patch objects
     labels = [item.get_text() for item in ax.get_yticklabels()]
     print(labels)
-    fig.set_size_inches(10, 15)
+    fig.set_size_inches(7, 15)
     ax.set_yticks(range(len(feature_labels)))
-    ax.set_yticklabels(feature_labels, fontsize=12, rotation = 45)
+    ax.set_yticklabels(feature_labels, fontsize=20, rotation = 45)
     legend_handles, legend_labels = ax.get_legend_handles_labels()
     #reinsert the legend_hanldes and labels
-    ax.legend(legend_handles, ['False Alarm', 'Correct Rejection'], loc='upper right', fontsize=18)
+    ax.legend(legend_handles, ['Correct Rejection', 'False Alarm'], loc='upper right', fontsize=18)
 
     # ax.set_yticklabels(labels)
     fig.tight_layout()
@@ -545,7 +545,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
 
 
     ax_dict['D'].barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, color='slategray')
-    ax_dict['D'].set_title("Permutation importances on false alarm probability")
+    # ax_dict['D'].set_title("Permutation importances on false alarm probability")
     # ax_dict['D'].set_xlabel("Permutation importance")
 
 

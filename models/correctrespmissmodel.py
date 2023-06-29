@@ -240,7 +240,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     fig.set_size_inches(6, 12)
     ax.set_xlabel('SHAP Value (impact on model output)', fontsize=18)
     ax.set_yticks(range(len(feature_labels)))
-    ax.set_yticklabels(feature_labels, fontsize=20, rotation = 45)
+    ax.set_yticklabels(feature_labels, fontsize=15, rotation = 45)
     ax.set_ylabel('Features', fontsize=18)
     #pull legend from figure
     # Pull legend from figure
