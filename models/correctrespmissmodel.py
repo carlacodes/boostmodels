@@ -237,10 +237,10 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     shap.summary_plot(shap_values1, X_train, show=False, color=cmapsummary)
     fig, ax = plt.gcf(), plt.gca()
 
-    fig.set_size_inches(9, 12)
+    fig.set_size_inches(6, 12)
     ax.set_xlabel('SHAP Value (impact on model output)', fontsize=18)
     ax.set_yticks(range(len(feature_labels)))
-    ax.set_yticklabels(feature_labels, fontsize=25)
+    ax.set_yticklabels(feature_labels, fontsize=20, rotation = 45)
     ax.set_ylabel('Features', fontsize=18)
     #pull legend from figure
     # Pull legend from figure
@@ -344,7 +344,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "target F0"], ax=ax_dict['C'],
                        cmap=cmapcustom, show=False)
     fig, ax = plt.gcf(), plt.gca()
-    ax_dict['C'].set_title('Miss vs hit', fontsize=18)
+    ax_dict['C'].set_title('Miss vs hit', fontsize=12)
 
     cb_ax = fig.axes[7]
     cb_ax.set_yticks([1, 2, 3,4, 5])
@@ -372,11 +372,11 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     # ax_dict['E'].annotate('e)', xy=get_axis_limits(ax_dict['E']), xytext=(-0.1, ax_dict['E'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
 
     import matplotlib.transforms as mtransforms
-    for label, ax in ax_dict.items():
-        # label physical distance to the left and up:
-        trans = mtransforms.ScaledTranslation(-20 / 72, 7 / 72, fig.dpi_scale_trans)
-        ax.text(0.0, 1.05, label, transform=ax.transAxes + trans,
-                fontsize=25, va='bottom', weight = 'bold')
+    # for label, ax in ax_dict.items():
+    #     # label physical distance to the left and up:
+    #     trans = mtransforms.ScaledTranslation(-20 / 72, 7 / 72, fig.dpi_scale_trans)
+    #     ax.text(0.0, 1.05, label, transform=ax.transAxes + trans,
+    #             fontsize=25, va='bottom', weight = 'bold')
 
     # plt.tight_layout()
     plt.subplots_adjust(wspace=0.2, hspace=0.4)

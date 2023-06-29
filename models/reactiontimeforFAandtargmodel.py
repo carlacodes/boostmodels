@@ -714,6 +714,78 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     plt.savefig(os.path.join((fig_savedir), str(talker) + '_talker_permutation_importance_1606_mod.pdf'), dpi=500, bbox_inches='tight')
 
     plt.show()
+    from matplotlib.gridspec import GridSpec
+
+    mm = (146, 90)  # x value then y value
+    inches = (mm[0] / 25.4, mm[1] / 25.4)
+
+    fig = plt.figure(figsize=inches)
+    fig.text(0.02, 0.6, r"Y axis label", va="center", rotation="vertical", fontsize=12)
+    gs = GridSpec(2, 2, height_ratios=[1, 4])
+
+    ax = fig.add_subplot(gs.new_subplotspec((0, 0), colspan=2))
+    ax2 = fig.add_subplot(gs.new_subplotspec((1, 0), colspan=2))
+    palette = plt.get_cmap("tab20")
+
+    indx = np.arange(len(data.index))
+
+    labs = data.index.tolist()
+    labs.insert(0, "")
+
+    ax.tick_params(axis="both", which="major", labelsize=10)
+    ax2.tick_params(axis="both", which="major", labelsize=10)
+    ax2.set_xticklabels((labs), rotation=45, fontsize=10, horizontalalignment="right")
+    ax.set_xticklabels(())
+    ax.set_xticks(np.arange(-1, len(data.index) + 1, 1.0))
+    ax2.set_xticks(np.arange(-1, len(data.index) + 1, 1.0))
+
+    ax.set_yticks(np.arange(0, max(data["high"]) + 10, 100))
+    ax2.set_yticks(np.arange(0, max(data["high"]) + 10, 100))
+
+    # plot the same data on both axes
+    bar_height = 0.5  # Adjust the height of the bars
+    threshold = 0.1  # Set the threshold for the broken axis
+    mask = data > threshold  # Create a mask for the broken part
+    bar_upper = ax2.barh(labels[mask], data[mask], color=talker_color, height=bar_height)
+
+    bar_lower = ax.barh(labels[:-1], data[:-1], color=talker_color)
+
+
+
+    # zoom-in / limit the view to different portions of the data
+    ax.set_ylim(9950, 10050)  # outliers only
+    ax2.set_ylim(0, 450)  # most of the data
+    ax.set_xlim(-0.5, len(data.index) - 0.25)  # outliers only
+    ax2.set_xlim(-0.5, len(data.index) - 0.25)  # most of the data
+
+    ax.spines["bottom"].set_visible(False)
+    ax2.spines["top"].set_visible(False)
+
+    ax.grid(color="k", alpha=0.5, linestyle=":", zorder=1)
+    ax2.grid(color="k", alpha=0.5, linestyle=":", zorder=1)
+
+    ax.tick_params(axis="x", which="both", length=0)
+    ax.tick_params(labeltop="off")
+    ax2.tick_params(labeltop="off")
+    ax2.xaxis.tick_bottom()
+
+    d = 0.015  # how big to make the diagonal lines in axes coordinates
+    # arguments to pass to plot, just so we don't keep repeating them
+    axis_break1 = 0.09
+    axis_break2 = 0.1
+    x_min = -0.75
+    x_max = len(data.index)
+    l = 0.2  # "break" line length
+    kwargs = dict(color="k", clip_on=False, linewidth=1)
+    ax.plot((axis_break2, axis_break2),(x_min - l, x_min + l), **kwargs)  # top-left
+    ax.plot( (axis_break2, axis_break2), (x_max - l, x_max + l), **kwargs)  # top-right
+    ax2.plot((axis_break1, axis_break1), (x_min - l, x_min + l), **kwargs)  # bottom-left
+    ax2.plot((axis_break1, axis_break1),(x_max - l, x_max + l),  **kwargs)  #
+
+    plt.subplots_adjust(
+        top=0.943, bottom=0.214, left=0.103, right=0.97, hspace=0.133, wspace=0.062
+    )
+    plt.show()
 
     return xg_reg, ypred, y_test, results
 
