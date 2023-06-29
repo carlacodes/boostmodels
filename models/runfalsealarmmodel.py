@@ -390,6 +390,8 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     labels = [item.get_text() for item in ax.get_yticklabels()]
     print(labels)
     fig.set_size_inches(10, 15)
+    ax.set_yticks(range(len(feature_labels)))
+    ax.set_yticklabels(feature_labels, fontsize=18)
 
     # ax.set_yticklabels(labels)
     fig.tight_layout()
@@ -530,7 +532,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     # ax_dict['A'].set_title('Elbow plot of cumulative feature importance for false alarm model', fontsize=13)
     #decrease fontsize of xtick labels
     ax_dict['A'].set_xticklabels(feature_labels, rotation=20, ha='right')  # rotate x-axis labels for better readability
-    ax_dict['A'].tick_params(axis='x', which='major', labelsize=8)
+    ax_dict['A'].tick_params(axis='x', which='major', labelsize=12)
 
     # rotate x-axis labels for better readability
     summary_img = mpimg.imread(fig_dir / 'ranked_features.png')
@@ -1401,9 +1403,9 @@ def plot_reaction_times_interandintra_swarm(ferrets):
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    plot_reaction_times_interandintra(ferrets)
+    # plot_reaction_times_interandintra(ferrets)
 
-    # plot_reaction_times_interandintra_swarm(ferrets)
+    plot_reaction_times_interandintra_swarm(ferrets)
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(
         ferrets, optimization=False, ferret_as_feature=True)
     # ferrets = ['F2105_Clove']# 'F2105_Clove'

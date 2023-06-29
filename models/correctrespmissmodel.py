@@ -239,6 +239,8 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
 
     fig.set_size_inches(9, 12)
     ax.set_xlabel('SHAP Value (impact on model output)', fontsize=18)
+    ax.set_yticks(range(len(feature_labels)))
+    ax.set_yticklabels(feature_labels, fontsize=18)
     ax.set_ylabel('Features', fontsize=18)
 
     #make the y labels smaller
@@ -285,18 +287,18 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     ax_dict['A'].plot(feature_labels, cumulative_importances, marker='o', color='gold')
     # ax_dict['A'].set_xlabel('Features')
     ax_dict['A'].set_ylabel('Cumulative Feature Importance')
-    ax_dict['A'].set_title('Elbow Plot of Cumulative Feature Importance for Miss Model')
+    ax_dict['A'].set_title('Elbow plot for miss vs hit', fontsize=13)
     ax_dict['A'].set_xticklabels(feature_labels, rotation=20, ha='right')  # rotate x-axis labels for better readability
 
     # rotate x-axis labels for better readability
     summary_img = mpimg.imread(summary_plot_file)
     ax_dict['B'].imshow(summary_img, aspect='auto', )
     ax_dict['B'].axis('off')  # Turn off axis ticks and labels
-    ax_dict['B'].set_title('Ranked list of features over their \n impact on miss probability', fontsize=13)
+    ax_dict['B'].set_title('Miss vs hit', fontsize=13)
 
 
     ax_dict['D'].barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, color='peru')
-    ax_dict['D'].set_title("Permutation importances on predicting a miss")
+    # ax_dict['D'].set_title("Permutation importances on predicting a miss")
     ax_dict['D'].set_xlabel("Permutation importance")
 
 
@@ -323,7 +325,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     # cb_ax.tick_params(labelsize=15)
     # cb_ax.set_ylabel("precursor = target F0 word", fontsize=15)
     ax_dict['E'].set_ylabel('SHAP value', fontsize=10)
-    ax_dict['E'].set_title('Talker versus impact on miss probability', fontsize=18)
+    # ax_dict['E'].set_title('Talker versus impact on miss probability', fontsize=18)
     cb_ax.set_yticks([1, 2, 3,4, 5])
     cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
     cb_ax.set_ylabel("target F0 (Hz)", fontsize=15)
@@ -335,7 +337,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "target F0"], ax=ax_dict['C'],
                        cmap=cmapcustom, show=False)
     fig, ax = plt.gcf(), plt.gca()
-    ax_dict['C'].set_title('Ferret ID versus impact on miss probability', fontsize=18)
+    ax_dict['C'].set_title('Miss vs hit', fontsize=18)
 
     cb_ax = fig.axes[7]
     cb_ax.set_yticks([1, 2, 3,4, 5])
