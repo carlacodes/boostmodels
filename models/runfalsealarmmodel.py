@@ -1319,7 +1319,7 @@ def plot_reaction_times_interandintra_swarm(ferrets):
             #put legend in last box
 
             handles, labels = ax_dict['0'].get_legend_handles_labels()
-            ax_dict['5'].legend(handles, labels, fontsize=10, loc='upper center', ncol=1)
+            ax_dict['5'].legend(handles, labels, fontsize=15, loc='upper center', ncol=1)
 
         if ferret == 0 or ferret == 3:
             ax_dict[str(ferret)].set_ylabel('reaction time (s)', fontsize=15)
@@ -1401,7 +1401,7 @@ def plot_reaction_times_interandintra_swarm(ferrets):
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    #plot_reaction_times_interandintra(ferrets)
+    plot_reaction_times_interandintra(ferrets)
 
     # plot_reaction_times_interandintra_swarm(ferrets)
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(
