@@ -723,8 +723,8 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     fig.text(0.02, 0.6, r"Y axis label", va="center", rotation="vertical", fontsize=12)
     gs = GridSpec(2, 2, height_ratios=[1, 4])
 
-    ax = fig.add_subplot(gs.new_subplotspec((0, 0), colspan=2))
-    ax2 = fig.add_subplot(gs.new_subplotspec((1, 0), colspan=2))
+    ax2 = fig.add_subplot(gs.new_subplotspec((0, 0), colspan=2))
+    ax = fig.add_subplot(gs.new_subplotspec((1, 0), colspan=2))
     palette = plt.get_cmap("tab20")
 
 
@@ -745,17 +745,17 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     bar_height = 0.5  # Adjust the height of the bars
     threshold = 0.1  # Set the threshold for the broken axis
     mask = data > threshold  # Create a mask for the broken part
-    bar_upper = ax2.barh(labels[mask], data[mask], color=talker_color, height=bar_height)
+    bar_upper = ax2.barh(labels[mask], data[mask], color=talker_color)
 
     bar_lower = ax.barh(labels[:-1], data[:-1], color=talker_color)
 
 
 
     # zoom-in / limit the view to different portions of the data
-    ax.set_ylim(9950, 10050)  # outliers only
-    ax2.set_ylim(0, 450)  # most of the data
-    ax.set_xlim(-0.5, len(data.index) - 0.25)  # outliers only
-    ax2.set_xlim(-0.5, len(data.index) - 0.25)  # most of the data
+    ax.set_xlim(0, 0.03)  # outliers only
+    ax2.set_xlim(0.10, 0.17)  # most of the data
+    # ax.set_xlim(-0.5, len(data) - 0.25)  # outliers only
+    # ax2.set_xlim(-0.5, len(data) - 0.25)  # most of the data
 
     ax.spines["bottom"].set_visible(False)
     ax2.spines["top"].set_visible(False)
@@ -772,8 +772,8 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     # arguments to pass to plot, just so we don't keep repeating them
     axis_break1 = 0.09
     axis_break2 = 0.1
-    x_min = -0.75
-    x_max = len(data.index)
+    x_min = 1
+    x_max = len(data)
     l = 0.2  # "break" line length
     kwargs = dict(color="k", clip_on=False, linewidth=1)
     ax.plot((axis_break2, axis_break2),(x_min - l, x_min + l), **kwargs)  # top-left
@@ -784,6 +784,45 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     plt.subplots_adjust(
         top=0.943, bottom=0.214, left=0.103, right=0.97, hspace=0.133, wspace=0.062
     )
+    plt.show()
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 6), gridspec_kw={'width_ratios': [4, 1]})
+    # Plotting the majority of values on the first subplot
+    ax2.barh(labels[:], data[:], color='red')
+    ax2.set_xlim(max(data[:-1])+0.002, data[-1] +0.05 )  # Adjust xlim for the outlier
+    ax2.set_yticklabels([])
+
+    ax1.barh(labels[:], data[:])
+    ax1.set_xlim(0, max(data[:-1])+0.002)  # Adjust xlim for the majority of values
+    ax1.set_title('Majority of Values')
+
+    # Plotting the outlier on the second subplot
+
+    # ax2.set_title('Outlier')
+
+    # Adjusting the layout and labels
+    plt.tight_layout()
+    fig.subplots_adjust(top=0.85)
+    ax1.set_xlabel('Value')
+    fig.subplots_adjust(wspace=0)
+    #remove # Reduce the spacing between subplots
+    #remove spine between the two subplots
+    ax1.spines['right'].set_visible(False)
+    ax2.spines['left'].set_visible(False)
+    #remove ticks in the middle
+    ax1.tick_params(right=False)
+    ax2.tick_params(left=False)
+    #add a break in the x-axis
+    d = .015  # how big to make the diagonal lines in axes coordinates
+    #plot the diagonal lines on the first subplot
+    kwargs = dict(transform=ax1.transAxes, color='k', clip_on=False)
+    ax1.plot((1 - d, 1 + d), (-d, +d), **kwargs)
+    ax1.plot((1 - d, 1 + d), (1 - d, 1 + d), **kwargs)
+
+
+
+
+    # Display the chart
     plt.show()
 
     return xg_reg, ypred, y_test, results
