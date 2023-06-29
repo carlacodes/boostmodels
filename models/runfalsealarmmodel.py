@@ -527,7 +527,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     ax_dict['A'].plot(feature_labels, cumulative_importances, marker='o', color='slategray')
     ax_dict['A'].set_xlabel('Features')
     ax_dict['A'].set_ylabel('Cumulative \n feature importance')
-    ax_dict['A'].set_title('Elbow plot of cumulative feature importance for false alarm model', fontsize=13)
+    # ax_dict['A'].set_title('Elbow plot of cumulative feature importance for false alarm model', fontsize=13)
     #decrease fontsize of xtick labels
     ax_dict['A'].set_xticklabels(feature_labels, rotation=20, ha='right')  # rotate x-axis labels for better readability
     ax_dict['A'].tick_params(axis='x', which='major', labelsize=8)
@@ -536,12 +536,12 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     summary_img = mpimg.imread(fig_dir / 'ranked_features.png')
     ax_dict['B'].imshow(summary_img, aspect='auto', )
     ax_dict['B'].axis('off')  # Turn off axis ticks and labels
-    ax_dict['B'].set_title('Ranked list of features over their \n impact on false alarm probability', fontsize=13)
+    # ax_dict['B'].set_title('Ranked list of features over their \n impact on false alarm probability', fontsize=13)
 
 
     ax_dict['D'].barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, color='slategray')
     ax_dict['D'].set_title("Permutation importances on false alarm probability")
-    ax_dict['D'].set_xlabel("Permutation importance")
+    # ax_dict['D'].set_xlabel("Permutation importance")
 
 
     shap.plots.scatter(shap_values2[:, "intra-trial F0 roving"], color=shap_values2[:, "F0"], ax=ax_dict['E'],
@@ -557,7 +557,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
 
 
     ax_dict['E'].set_ylabel('SHAP value', fontsize=10)
-    ax_dict['E'].set_title('Intra-trial roving versus impact on false alarm probability', fontsize=13)
+    # ax_dict['E'].set_title('Intra-trial roving versus impact on false alarm probability', fontsize=13)
     ax_dict['E'].set_xticks([0,1])
     ferret_id_only = ['F1702', 'F1815', 'F1803', 'F2002', 'F2105']
     ax_dict['E'].set_xticklabels(['non-intra-trial roving', 'intra-trial roving'],  rotation=45, ha='right')
@@ -580,7 +580,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
 
     ax_dict['C'].set_xlabel('F0 (Hz)', fontsize=16)
     ax_dict['C'].set_ylabel('SHAP value', fontsize=10)
-    ax_dict['C'].set_title('F0 versus impact on false alarm probability', fontsize=13)
+    # ax_dict['C'].set_title('F0 versus impact on false alarm probability', fontsize=13)
 
     # # Modifying color bar parameters
     # cb_ax.tick_params(labelsize=15)
@@ -605,6 +605,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     #             fontsize=25, va='bottom', weight = 'bold')
 
     # plt.tight_layout()
+    plt.suptitle('False alarm versus correct rejection', fontsize=18)
     plt.subplots_adjust(wspace=0.2, hspace=0.4)
 
     plt.savefig(fig_dir / 'big_summary_plot_2_noannotations.png', dpi=500, bbox_inches="tight")
@@ -1311,22 +1312,24 @@ def plot_reaction_times_interandintra_swarm(ferrets):
             print(colorlist[count])
             print(pitch)
             sns.swarmplot(dict_by_ferret[ferret][pitch]['realRelReleaseTimes'], color=colorlist[count], label=pitchlist[count], ax = ax_dict[str(ferret)], alpha =0.5)
+            count += 1
 
         ax_dict[str(ferret)].set_xlabel('')
         if ferret == 0:
             #put legend in last box
 
             handles, labels = ax_dict['0'].get_legend_handles_labels()
-            ax_dict['5'].legend(handles, labels, fontsize=10, loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=5)
+            ax_dict['5'].legend(handles, labels, fontsize=10, loc='upper center', ncol=1)
 
         if ferret == 0 or ferret == 3:
             ax_dict[str(ferret)].set_ylabel('reaction time (s)', fontsize=15)
         else:
             ax_dict[str(ferret)].set_ylabel('')
-        count += 1
 
-        ax_dict[str(ferret)].set_title(str(ferret_labels[ferret]), fontsize=12)
-        ax_dict[str(ferret)].set_yticks([0,0.5, 1.0, 1.5, 2.0], fontsize = 12)
+        ax_dict[str(ferret)].set_title(str(ferret_labels[ferret]), fontsize=18)
+        ax_dict[str(ferret)].set_yticks([0,0.5, 1.0, 1.5, 2.0], fontsize = 18)
+        ax_dict[str(ferret)].set_yticklabels([0,0.5, 1.0, 1.5, 2.0], fontsize = 18)
+
 
     fig.tight_layout()
     #have the legend go to axdict[5] but information is from other plot
@@ -1400,7 +1403,7 @@ if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
     #plot_reaction_times_interandintra(ferrets)
 
-    plot_reaction_times_interandintra_swarm(ferrets)
+    # plot_reaction_times_interandintra_swarm(ferrets)
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(
         ferrets, optimization=False, ferret_as_feature=True)
     # ferrets = ['F2105_Clove']# 'F2105_Clove'
