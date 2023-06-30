@@ -304,9 +304,12 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     result = permutation_importance(xg_reg, X_test, y_test, n_repeats=100,
                                     random_state=123, n_jobs=2)
 
-    sorted_idx = result.importances_mean.argsort()
+    # sorted_idx = result.importances_mean.argsort()
+    sorted_idx = (result.importances.mean(axis=1)).argsort()
+    # sorted_idx = result.importances.argsort() # sort from lowest to highest
     fig, ax = plt.subplots(figsize=(8, 18))
-    ax.barh(feature_labels_words, result.importances[sorted_idx].mean(axis=1).T, height=0.3, color='cyan')
+    test = result.importances[sorted_idx].mean(axis=1).T
+    ax.barh(feature_labels_words, result.importances[sorted_idx].mean(axis=1), color='cyan')
     # save the permutation importance values
 
     if one_ferret:
@@ -368,10 +371,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     dirmale = 'D:/Stimuli/19122022/MaleSounds24k_addedPinkNoiseRevTargetdB.mat'
     word_times, worddictionary_female = run_word_durations(dirfemale)
     word_times_male, worddict_male = run_word_durations_male(dirmale)
-    # Load the male sounds dictionary
 
-    # plot the spectrogram and amplittude waveform of each word
-    # take the top 5 words from the permutation importance plot
     # GET THE TOP 5 WORDS
     top_words = np.flip(X_test.columns[sorted_idx])[0:4]
     for top_word in top_words:
@@ -398,7 +398,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     # ax_dict['A'].set_xlabel('Features', fontsize=15)
     ax.set_ylabel('Cumulative feature importance', fontsize=15)
     ax.set_title(
-        'Elbow plot of cumulative feature importance \n on absolute reaction time,' + talker_word + ' talker',
+        'Elbow plot of cumulative feature importance in absolute reaction time model, ' + talker_word + ' talker',
         fontsize=15)
     ax.set_xticklabels(feature_labels_words, rotation=35, ha='right',fontsize=10)
     plt.savefig(os.path.join((fig_savedir), str(talker) + 'elobowplot_1606_noannotation.pdf'), dpi=500, bbox_inches='tight')
@@ -450,40 +450,12 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     # ax_dict['D'].set_yticks(np.flip(feature_labels_words))
     # ax_dict['D'].set_yticklabels(np.flip(feature_labels_words), ha='right',
     #                              fontsize=15)  # rotate x-axis labels for better readability
-    from brokenaxes import brokenaxes
 
-    # def create_broken_bar_plot(ax, data, labels):
-    #     ax.barh(labels, data, color='blue')
-    #     ax.set_xlabel("Permutation importance", fontsize=15)
-    #     ax.set_ylabel("Feature", fontsize=15)
-    #     ax.set_yticklabels(labels, ha='right', fontsize=15)
-    #
-    # # Assuming 'D' is the key for the subplot you want to modify
-    # data = result.importances[sorted_idx].mean(axis=1).T
-    # labels = np.flip(feature_labels_words)
-    #
-    # # fig, ax = plt.subplots(figsize=(8, 6))
-    # create_broken_bar_plot(ax_dict['D'], data, labels)
-    # ax_dict['D'].set_title("Permutation importance features on absolute reaction time, " + talker_word + " talker ", fontsize=15)
-    #
-    # # Manually create the broken x-axis effect
-    # xlims = [(0, 0.2), (0, 1)]
-    # xticks = np.concatenate([np.linspace(xlim[0], xlim[1], num=5) for xlim in xlims])
-    # xticklabels = ['{:.1f}'.format(xtick) if xtick < 1 or xtick > 5 else '' for xtick in xticks]
-    # ax_dict['D'].set_xlim(min(xlims[0]), max(xlims[1]))
-    # ax_dict['D'].set_xticks(xticks)
-    # ax_dict['D'].set_xticklabels(xticklabels)
-
-    # # Create the broken x-axis effect
-    # xlims = [(0, 0.2), (0, 1)]
-    # Assuming 'D1' and 'D2' are the keys for the subplots you want to modify
-
-    # Data for the bar plot
-    data = (result.importances[sorted_idx].mean(axis=1).T)
+    data_perm_importance = (result.importances[sorted_idx].mean(axis=1).T)
     labels = (feature_labels_words)
 
     # Bar plot on the first axes
-    ax_dict['D1'].barh(labels[0], data[-1], color=talker_color)
+    ax_dict['D1'].barh(labels[0], data_perm_importance[-1], color=talker_color)
     ax_dict['D1'].set_title("Permutation importance features on absolute reaction time, " + talker_word + " talker",
                             fontsize=15)
     # ax_dict['D1'].set_xlabel("Permutation importance", fontsize=15)
@@ -492,7 +464,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     # ax_dict['D1'].set_yticklabels(labels[0], ha='right', fontsize=15)
 
     # Bar plot on the second axes
-    ax_dict['D2'].barh(labels[1:], data[1:], color=talker_color)
+    ax_dict['D2'].barh(labels[1:], data_perm_importance[1:], color=talker_color)
     # ax_dict['D2'].set_title("Permutation importance features on absolute reaction time, " + talker_word + " talker",
     #                         fontsize=15)
     ax_dict['D2'].set_xlabel("Permutation importance", fontsize=15)
@@ -500,7 +472,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     ax_dict['D2'].set_yticklabels(labels[1:], ha='right', fontsize=15)
 
     # zoom-in / limit the view to different portions of the data
-    ax_dict['D1'].set_xlim(0, np.max(data) * 1.1)  # Adjust the limit based on your data
+    ax_dict['D1'].set_xlim(0, np.max(data_perm_importance) * 1.1)  # Adjust the limit based on your data
     ax_dict['D2'].set_xlim(0, 0.06)  # Adjust the limit based on your data
 
     # hide the spines between ax_dict['D1'] and ax_dict['D2']
@@ -621,7 +593,6 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     # ax_dict['I'].annotate('e)', xy=get_axis_limits(ax_dict['I']), xytext=(-0.1, ax_dict['I'].title.get_position()[1]+0.15), textcoords='axes fraction', fontproperties = font_props,zorder=10)
     # ax_dict['J'].annotate('f)', xy=get_axis_limits(ax_dict['J']), xytext=(-0.1, ax_dict['J'].title.get_position()[1]+0.15), textcoords='axes fraction', fontproperties = font_props,zorder=10)
     # ax_dict['K'].annotate('g)', xy=get_axis_limits(ax_dict['K']), xytext=(-0.1, ax_dict['K'].title.get_position()[1]+0.15), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-    # plt.tight_layout()
     plt.subplots_adjust(wspace=0.33, hspace=0.53)
 
     plt.savefig(os.path.join((fig_savedir), str(talker) + '_talker_big_summary_plot_1606_noannotation.png'), dpi=500)
@@ -632,14 +603,14 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 15), gridspec_kw={'width_ratios': [4, 1]})
     # Plotting the majority of values on the first subplot
-    ax2.barh(labels[:], data[:], color=talker_color)
-    ax2.set_xlim(max(data[:-1])+0.002, data[-1] +0.05 )  # Adjust xlim for the outlier
+    ax2.barh(np.arange(0,len(data_perm_importance),1), data_perm_importance[:], color=talker_color)
+    ax2.set_xlim(max(data_perm_importance[:-1])+0.002, data_perm_importance[-1] +0.05 )  # Adjust xlim for the outlier
     ax2.set_yticklabels([])
 
-    ax1.barh(labels[:], data[:], color = talker_color)
-    ax1.set_xlim(0, max(data[:-1])+0.002)  # Adjust xlim for the majority of values
-    ax1.set_yticks(labels[:])
-    ax1.set_yticklabels(labels[:], rotation = 45)
+    ax1.barh(np.arange(0,len(data_perm_importance),1), data_perm_importance[:], color = talker_color)
+    ax1.set_xlim(0, max(data_perm_importance[:-1])+0.002)  # Adjust xlim for the majority of values
+    ax1.set_yticks(np.arange(0,len(data_perm_importance),1))
+    ax1.set_yticklabels(np.flip(labels[:]), rotation = 45)
 
     plt.tight_layout()
     fig.subplots_adjust(top=0.85)
