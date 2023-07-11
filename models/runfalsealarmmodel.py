@@ -389,7 +389,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     # Get the plot's Patch objects
     labels = [item.get_text() for item in ax.get_yticklabels()]
     print(labels)
-    fig.set_size_inches(6, 12)
+    fig.set_size_inches(9, 12)
     ax.set_xlabel('Mean SHAP value', fontsize=18)
     ax.set_yticks(range(len(feature_labels)))
     ax.set_yticklabels(np.flip(feature_labels), fontsize=13)

@@ -764,6 +764,15 @@ def predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feat
         ferrets = ferrets[0]
     else:
         one_ferret = False
+
+    #plot distribution of dfx by counting the number of non naans in each column
+    # dfx.count(axis=0).plot(kind='bar')
+    # plt.show()
+    # plot distribution of dfx by counting the number of non naans in each row
+    fig, ax = plt.subplots()
+    dfx.count(axis=1).plot(kind='bar')
+    plt.show()
+
     xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx, df_use[col], paramsinput=best_params,
                                                         ferret_as_feature=ferret_as_feature, one_ferret=one_ferret,
                                                         ferrets=ferrets, talker=talker)
