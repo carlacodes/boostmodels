@@ -392,7 +392,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     fig.set_size_inches(6, 12)
     ax.set_xlabel('Mean SHAP value', fontsize=18)
     ax.set_yticks(range(len(feature_labels)))
-    ax.set_yticklabels(feature_labels, fontsize=17, rotation = 45)
+    ax.set_yticklabels(np.flip(feature_labels), fontsize=13)
     legend_handles, legend_labels = ax.get_legend_handles_labels()
     #reinsert the legend_hanldes and labels
     ax.legend(legend_handles, ['Correct Rejection', 'False Alarm'], loc='upper right', fontsize=18)
