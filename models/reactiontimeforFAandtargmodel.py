@@ -403,6 +403,30 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     ax.set_xticklabels(feature_labels_words, rotation=35, ha='right',fontsize=10)
     plt.savefig(os.path.join((fig_savedir), str(talker) + 'elobowplot_1606_noannotation.pdf'), dpi=500, bbox_inches='tight')
     plt.show()
+    if talker == 1:
+        color_list_bar = ['purple', 'crimson', 'darkorange', 'gold', 'burlywood']
+    else:
+        color_list_bar = ['red', 'chocolate', 'lightsalmon', 'peachpuff', 'orange']
+    bottom = np.zeros(len(all_labels))
+    fig, ax = plt.figure(figsize=(text_width_inches, (text_height_inches)))
+    for i, ferret in enumerate(permutation_importance_dict.keys()):
+        values = np.zeros(len(all_labels))
+        labels_ferret = permutation_importance_labels_dict[ferret]
+        for j, label in enumerate(all_labels):
+            if label in labels_ferret:
+                index = labels_ferret.tolist().index(label)
+                values[j] = permutation_importance_dict[ferret][index]
+        ax.bar(positions, values, width, bottom=bottom, label=ferret, color=color_list_bar[i])
+        bottom += values
+    ax.set_ylabel('Permutation importance', fontsize=15)
+    ax.set_title('Top 5 features for predicting \n absolute release time, ' + talkerlist[talker - 1] + ' talker',
+                           fontsize=15)
+    ax.set_xticks(np.arange(len(all_labels)))
+    ax.set_xticklabels(all_labels, rotation=70, fontsize=10)
+    ax.legend()
+    plt.savefig(os.path.join((fig_savedir), str(talker) + 'stackedbarplot_1606_noannotation.pdf'), dpi=500, bbox_inches='tight')
+    plt.show()
+
 
     fig = plt.figure(figsize=(text_width_inches*3, (text_height_inches)*3))
     # fig = plt.figure(figsize=(20, 27))
@@ -420,10 +444,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     # summary_img = mpimg.imread(fig_savedir / 'shapsummaryplot_allanimals2.png')
     bottom = np.zeros(len(all_labels))
     import matplotlib.cm as cm
-    if talker == 1:
-        color_list_bar = ['purple', 'crimson', 'darkorange', 'gold', 'burlywood']
-    else:
-        color_list_bar = ['red', 'chocolate', 'lightsalmon', 'peachpuff', 'orange']
+
     # Your code here...
     my_cmap = cm.get_cmap(cmap_color)  # Choose a colormap
     for i, ferret in enumerate(permutation_importance_dict.keys()):
@@ -769,8 +790,37 @@ def predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feat
     # dfx.count(axis=0).plot(kind='bar')
     # plt.show()
     # plot distribution of dfx by counting the number of non naans in each row
-    fig, ax = plt.subplots()
-    dfx.count(axis=1).plot(kind='bar')
+
+    female_word_labels = ['instruments', 'when a', 'sailor', 'in a small', 'craft', 'faces', 'of the might',
+                          'of the vast', 'atlantic', 'ocean', 'today', 'he takes', 'the same', 'risks',
+                          'that generations', 'took', 'before', 'him', 'but', 'in contrast', 'them', 'he can meet',
+                          'any', 'emergency', 'that comes', 'his way', 'confidence', 'that stems', 'profound', 'trust',
+                          'advance', 'of science', 'boats', 'stronger', 'more stable', 'protecting', 'against',
+                          'and du', 'exposure', 'tools and', 'more ah', 'accurate', 'the more', 'reliable',
+                          'helping in', 'normal weather', 'and conditions', 'food', 'and drink', 'of better',
+                          'researched', 'than easier', 'to cook', 'than ever', 'before', 'rev. instruments',
+                          'pink noise']
+    male_word_labels = ['instruments', 'when a', 'sailor', 'in a', 'small', 'craft', 'faces', 'the might', 'of the',
+                        'vast', 'atlantic', 'ocean', 'today', 'he', 'takes', 'the same', 'risks', 'that generations',
+                        'took', 'before him', 'but', 'in contrast', 'to them', 'he', 'can meet', 'any', 'emergency',
+                        'that comes', 'his way', 'with a', 'confidence', 'that stems', 'from', 'profound', 'trust',
+                        'in the', 'advances', 'of science', 'boats', 'as stronger', 'and more', 'stable', 'protecting',
+                        'against', 'undue', 'exposure', 'tools', 'and', 'accurate', 'and more', 'reliable', 'helping',
+                        'in all', 'weather', 'and', 'rev. instruments', 'pink noise']
+
+    fig, ax = plt.subplots(figsize=(30, 10))
+    dfx.count(axis=0).plot(kind='bar')
+    ax.set_xticks(np.arange(0,57,1))
+    ax.set_yticks(np.arange(0, 5000, 200))
+    if talker==1:
+        ax.set_xticklabels(female_word_labels, rotation=45, fontsize=8)
+        plt.title('Distribution of non nan values by column in dfx for female talker')
+
+    else:
+        ax.set_xticklabels(male_word_labels, rotation=45, fontsize=8)
+        plt.title('Distribution of non nan values by column in dfx for male talker')
+
+    plt.savefig('D:\mixedeffectmodelsbehavioural\models/figs/absolutereleasemodel/distribution_non_nan_values_by_column_dfx_talker' + str(talker) + '.png')
     plt.show()
 
     xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx, df_use[col], paramsinput=best_params,
@@ -782,7 +832,7 @@ def main():
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']  # , 'F2105_Clove']
 
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=True, talker=2)
+    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=True, talker=1)
     #
     # for ferret in ferrets:
     #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)
