@@ -408,7 +408,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     else:
         color_list_bar = ['red', 'chocolate', 'lightsalmon', 'peachpuff', 'orange']
     bottom = np.zeros(len(all_labels))
-    fig, ax = plt.figure(figsize=(text_width_inches, (text_height_inches)))
+    fig, ax = plt.subplots()
     for i, ferret in enumerate(permutation_importance_dict.keys()):
         values = np.zeros(len(all_labels))
         labels_ferret = permutation_importance_labels_dict[ferret]
@@ -832,7 +832,7 @@ def main():
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']  # , 'F2105_Clove']
 
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=True, talker=1)
+    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=True, talker=2)
     #
     # for ferret in ferrets:
     #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)
