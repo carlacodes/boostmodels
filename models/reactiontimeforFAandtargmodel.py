@@ -408,7 +408,9 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     else:
         color_list_bar = ['red', 'chocolate', 'lightsalmon', 'peachpuff', 'orange']
     bottom = np.zeros(len(all_labels))
-    fig, ax = plt.subplots()
+    # fig = plt.figure(figsize=(text_width_inches*3, (text_height_inches)*3))
+
+    fig, ax = plt.subplots(figsize=(text_width_inches, (text_height_inches)))
     for i, ferret in enumerate(permutation_importance_dict.keys()):
         values = np.zeros(len(all_labels))
         labels_ferret = permutation_importance_labels_dict[ferret]
