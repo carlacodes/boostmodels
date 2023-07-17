@@ -1,7 +1,7 @@
 import sklearn.metrics
 # from rpy2.robjects import pandas2ri
 import seaborn as sns
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_squared_error, log_loss
 from sklearn.model_selection import KFold
 from sklearn.model_selection import cross_val_score
 from sklearn.inspection import permutation_importance
@@ -109,7 +109,10 @@ def runlgbreleasetimes_for_a_ferret(data, paramsinput=None, ferret=1, ferret_nam
 
     mse_test = mean_squared_error(ypred, y_test)
     mse_test = cross_val_score(xg_reg, X_test, y_test, scoring='neg_mean_squared_error', cv=kfold)
+    log_loss_test = cross_val_score(xg_reg, X_test, y_test, scoring='neg_log_loss', cv=kfold)
+
     print("MSE on test: %.4f" % (mse_test) + ferret_name)
+    print('Log loss on test: %.4f' % (log_loss_test) + ferret_name)
     print("negative MSE training: %.2f%%" % (np.mean(mse_train) * 100.0))
     print(mse_train)
     shap_values = shap.TreeExplainer(xg_reg).shap_values(dfx)
@@ -242,9 +245,11 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     kfold = KFold(n_splits=10)
     results = cross_val_score(xg_reg, X_train, y_train, scoring='neg_mean_squared_error', cv=kfold)
     mse_train = mean_squared_error(ypred, y_test)
+    log_loss_testset = log_loss(y_test, ypred)
 
     mse = mean_squared_error(ypred, y_test)
     print("MSE on test: %.4f" % (mse))
+    print('log loss on test: %.4f' % (log_loss_testset))
     print("negative MSE training: %.2f%%" % (np.mean(results) * 100.0))
     print(results)
     shap_values = shap.TreeExplainer(xg_reg).shap_values(X)
