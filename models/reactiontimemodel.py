@@ -1,7 +1,7 @@
 import sklearn.metrics
 # from rpy2.robjects import pandas2ri
 import seaborn as sns
-from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.metrics import mean_squared_error, mean_absolute_percentage_error, r2_score, mean_absolute_error
 from sklearn.model_selection import KFold
 from sklearn.model_selection import cross_val_score
 from sklearn.inspection import permutation_importance
@@ -243,11 +243,11 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     kfold = KFold(n_splits=10)
     results = cross_val_score(xg_reg, X_train, y_train, scoring='neg_mean_squared_error', cv=kfold)
     mse_train = mean_squared_error(ypred, y_test)
-    r2_test = r2_score(y_test, ypred)
+    mabps = mean_absolute_percentage_error(y_test, ypred)
 
     mse = mean_squared_error(ypred, y_test)
     print("MSE on test: %.4f" % (mse))
-    print('r2_score on test: %.4f' % (r2_test))
+    print('mabps on test: %.4f' % (mabps))
     print("negative MSE training: %.2f%%" % (np.mean(results) * 100.0))
     print(results)
     shap_values = shap.TreeExplainer(xg_reg).shap_values(X)
