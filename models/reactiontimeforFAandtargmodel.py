@@ -423,7 +423,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
         ax.bar(positions, values, width, bottom=bottom, label=ferret, color=color_list_bar[i])
         bottom += values
     ax.set_ylabel('Permutation importance', fontsize=15)
-    ax.set_title('Top 5 features for predicting \n absolute release time, ' + talkerlist[talker - 1] + ' talker',
+    ax.set_title('Top 5 features for predicting absolute release time, ' + talkerlist[talker - 1] + ' talker',
                            fontsize=15)
     ax.set_xticks(np.arange(len(all_labels)))
     ax.set_xticklabels(all_labels, rotation=70, fontsize=10)
@@ -836,7 +836,7 @@ def main():
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']  # , 'F2105_Clove']
 
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=True, talker=1)
+    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=True, talker=2)
     #
     # for ferret in ferrets:
     #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)
