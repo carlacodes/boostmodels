@@ -324,7 +324,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     plt.savefig(fig_savedir / 'talker_vs_precursorequaltargF0.png', dpi=300, bbox_inches='tight')
 
 
-    shap.plots.scatter(shap_values2[:, "precursor = target F0"], color=shap_values2[:, "ferret ID"], show=True, cmap = matplotlib.colormaps[cmapname])
+    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "precursor = target F0"], show=True, cmap = matplotlib.colormaps[cmapname])
 
     fig, ax = plt.subplots(figsize=(10, 10))
     shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "target F0"], show=False,
