@@ -48,12 +48,14 @@ def run_stats_calc(df, ferrets, pitch_param = 'control_trial'):
     stats_dict[1][pitch_param]['false_alarms']= {}
     stats_dict[1][pitch_param]['correct_response']= {}
     stats_dict[1][pitch_param]['dprime']= {}
+    stats_dict[1][pitch_param]['bias']= {}
 
 
     stats_dict[2][pitch_param]['hits'] ={}
     stats_dict[2][pitch_param]['false_alarms'] = {}
     stats_dict[2][pitch_param]['correct_response'] = {}
     stats_dict[2][pitch_param]['dprime']= {}
+    stats_dict[2][pitch_param]['bias']= {}
 
     count = 0
     for ferret in ferrets:
@@ -73,7 +75,7 @@ def run_stats_calc(df, ferrets, pitch_param = 'control_trial'):
             stats_dict[talker][pitch_param]['hits'][ferret] = np.mean(selected_ferret_talker_hitrate['hit'])
             stats_dict[talker][pitch_param]['false_alarms'][ferret] = np.mean(selected_ferret_all_talker['falsealarm'])
             stats_dict[talker][pitch_param]['dprime'][ferret] = CalculateStats.dprime(np.mean(selected_ferret_talker_hitrate['hit']), np.mean(selected_ferret_all_talker['falsealarm']))
-
+            stats_dict[talker][pitch_param]['bias'][ferret] = CalculateStats.bias(np.mean(selected_ferret_talker_hitrate['hit']), np.mean(selected_ferret_all_talker['falsealarm']))
             #%Correct(hit + CR / hits + misses + CR + FA)
             stats_dict[talker][pitch_param]['correct_response'][ferret] = (len(selected_ferret_talker[selected_ferret_talker['hit']==True]) + len(selected_ferret_catch_talker[selected_ferret_catch_talker['response'] == 3]))/ (len(selected_ferret_talker) + len(selected_ferret_catch_talker))
         count += 1
@@ -105,6 +107,7 @@ def run_stats_calc(df, ferrets, pitch_param = 'control_trial'):
         stats_dict_all[talker][pitch_param]['false_alarms'] = false_alarms
         stats_dict_all[talker][pitch_param]['correct_response'] = correct_response
         stats_dict_all[talker][pitch_param]['dprime'] = CalculateStats.dprime(hits, false_alarms)
+        stats_dict_all[talker][pitch_param]['bias'] = CalculateStats.bias(hits, false_alarms)
 
     return stats_dict_all, stats_dict
 def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'control_trial'):
@@ -128,28 +131,32 @@ def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'control_tria
     stats_dict[1]['false_alarms']= {}
     stats_dict[1]['correct_response']= {}
     stats_dict[1]['dprime']= {}
+    stats_dict[1]['bias']= {}
 
 
     stats_dict[2]['hits'] ={}
     stats_dict[2]['false_alarms'] = {}
     stats_dict[2]['correct_response'] = {}
     stats_dict[2]['dprime']= {}
+    stats_dict[2]['bias']= {}
 
     stats_dict[3]['hits'] ={}
-
     stats_dict[3]['false_alarms'] = {}
     stats_dict[3]['correct_response'] = {}
     stats_dict[3]['dprime']= {}
+    stats_dict[3]['bias']= {}
 
     stats_dict[4]['hits'] ={}
     stats_dict[4]['false_alarms'] = {}
     stats_dict[4]['correct_response'] = {}
     stats_dict[4]['dprime']= {}
+    stats_dict[4]['bias']= {}
 
     stats_dict[5]['hits'] ={}
     stats_dict[5]['false_alarms'] = {}
     stats_dict[5]['correct_response'] = {}
     stats_dict[5]['dprime']= {}
+    stats_dict[5]['bias']= {}
 
 
     count = 0
@@ -171,7 +178,7 @@ def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'control_tria
             stats_dict[pitch]['hits'][ferret] = np.mean(selected_ferret_talker_hitrate['hit'])
             stats_dict[pitch]['false_alarms'][ferret] = np.mean(selected_ferret_all_talker['falsealarm'])
             stats_dict[pitch]['dprime'][ferret] = CalculateStats.dprime(np.mean(selected_ferret_talker_hitrate['hit']), np.mean(selected_ferret_all_talker['falsealarm']))
-
+            stats_dict[pitch]['bias'][ferret] = CalculateStats.bias(np.mean(selected_ferret_talker_hitrate['hit']), np.mean(selected_ferret_all_talker['falsealarm']))
             #%Correct(hit + CR / hits + misses + CR + FA)
             stats_dict[pitch]['correct_response'][ferret] = (len(selected_ferret_talker[selected_ferret_talker['hit']==True]) + len(selected_ferret_catch_talker[selected_ferret_catch_talker['response'] == 3]))/ (len(selected_ferret_talker) + len(selected_ferret_catch_talker))
         count += 1
@@ -205,6 +212,7 @@ def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'control_tria
         stats_dict_all[pitch]['false_alarms'] = false_alarms
         stats_dict_all[pitch]['correct_response'] = correct_response
         stats_dict_all[pitch]['dprime'] = CalculateStats.dprime(hits, false_alarms)
+        stats_dict_all[pitch]['bias'] = CalculateStats.bias(hits, false_alarms)
 
     return stats_dict_all, stats_dict
 
@@ -235,28 +243,33 @@ def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'inter_trial_
     stats_dict[1]['false_alarms']= {}
     stats_dict[1]['correct_response']= {}
     stats_dict[1]['dprime']= {}
+    stats_dict[1]['bias']= {}
 
 
     stats_dict[2]['hits'] ={}
     stats_dict[2]['false_alarms'] = {}
     stats_dict[2]['correct_response'] = {}
     stats_dict[2]['dprime']= {}
+    stats_dict[2]['bias'] = {}
 
     stats_dict[3]['hits'] ={}
 
     stats_dict[3]['false_alarms'] = {}
     stats_dict[3]['correct_response'] = {}
     stats_dict[3]['dprime']= {}
+    stats_dict[3]['bias'] = {}
 
     stats_dict[4]['hits'] ={}
     stats_dict[4]['false_alarms'] = {}
     stats_dict[4]['correct_response'] = {}
     stats_dict[4]['dprime']= {}
+    stats_dict[4]['bias'] = {}
 
     stats_dict[5]['hits'] ={}
     stats_dict[5]['false_alarms'] = {}
     stats_dict[5]['correct_response'] = {}
     stats_dict[5]['dprime']= {}
+    stats_dict[5]['bias'] = {}
 
 
     count = 0
@@ -278,7 +291,7 @@ def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'inter_trial_
             stats_dict[pitch]['hits'][ferret] = np.mean(selected_ferret_talker_hitrate['hit'])
             stats_dict[pitch]['false_alarms'][ferret] = np.mean(selected_ferret_all_talker['falsealarm'])
             stats_dict[pitch]['dprime'][ferret] = CalculateStats.dprime(np.mean(selected_ferret_talker_hitrate['hit']), np.mean(selected_ferret_all_talker['falsealarm']))
-
+            stats_dict[pitch]['bias'][ferret] = CalculateStats.bias(np.mean(selected_ferret_talker_hitrate['hit']), np.mean(selected_ferret_all_talker['falsealarm']))
             #%Correct(hit + CR / hits + misses + CR + FA)
             stats_dict[pitch]['correct_response'][ferret] = (len(selected_ferret_talker[selected_ferret_talker['hit']==True]) + len(selected_ferret_catch_talker[selected_ferret_catch_talker['response'] == 3]))/ (len(selected_ferret_talker) + len(selected_ferret_catch_talker))
         count += 1
@@ -312,6 +325,7 @@ def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'inter_trial_
         stats_dict_all[pitch]['false_alarms'] = false_alarms
         stats_dict_all[pitch]['correct_response'] = correct_response
         stats_dict_all[pitch]['dprime'] = CalculateStats.dprime(hits, false_alarms)
+        stats_dict_all[pitch]['bias'] = CalculateStats.bias(hits, false_alarms)
 
     return stats_dict_all, stats_dict
 
