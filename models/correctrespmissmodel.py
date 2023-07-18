@@ -269,6 +269,14 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     shap.plots.scatter(shap_values2[:, "target F0"], color=shap_values2[:, "precursor = target F0"], cmap=cmapcustom, show=True)
 
 
+    fig, ax = plt.subplots()
+    shap.plots.scatter(shap_values2[:, "target F0"], color=shap_values2[:, "audio side"], cmap=cmapcustom, show=False)
+    ax.set_xticks([1,2,3,4,5])
+    ax.set_xticklabels(['109', '124', '144', '191', '251'], fontsize=18)
+    ax.set_xlabel('Target F0 (Hz)', fontsize=18)
+    ax.set_ylabel('Audio Side', fontsize=18)
+    plt.show()
+
     # mosaic = ['A', 'B', 'C'], ['D', 'B', 'E']
     # ferret_id_only = ['F1702', 'F1815', 'F1803', 'F2002', 'F2105']
     #
