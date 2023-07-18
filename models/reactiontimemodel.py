@@ -323,8 +323,18 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         plt.title('Talker versus impact \n on reaction time for ' + ferrets, fontsize=18)
     plt.savefig(fig_savedir / 'talker_vs_precursorequaltargF0.png', dpi=300, bbox_inches='tight')
 
-
+    fig, ax = plt.subplots()
     shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "precursor = target F0"], show=True, cmap = matplotlib.colormaps[cmapname])
+    colorbar_scatter = fig.axes[1]
+    colorbar_scatter.set_yticks([0,1])
+    colorbar_scatter.set_yticklabels(['False', 'True'], fontsize=18)
+    ax.set_xticks([0,1,2,3,4])
+    ax.set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18, rotation=45)
+    ax.set_xlabel('Ferret ID', fontsize=18)
+    ax.set_ylabel('SHAP value', fontsize=18)
+    plt.title('Mean SHAP value over ferret ID', fontsize=18)
+    plt.savefig(fig_savedir /'ferretIDbyprecurequaltargF0.png', dpi=500, bbox_inches='tight')
+    plt.show()
 
     fig, ax = plt.subplots(figsize=(10, 10))
     shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "target F0"], show=False,
