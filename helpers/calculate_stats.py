@@ -17,6 +17,12 @@ class CalculateStats:
 
         return d
 
+    def bias(pHit, pFA):
+        zHit = norm.ppf(pHit)
+        zFA = norm.ppf(pFA)
+        c = -0.5 * (zHit+ zFA)
+        return c
+
     def get_stats(currData,
                  respTimeWind=[],
                  TargTimeWind=[],
