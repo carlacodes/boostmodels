@@ -376,7 +376,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         plt.title('Precursor = target F0 over reaction time impact', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
     plt.xlabel('Precursor = target F0', fontsize=16)
-    plt.savefig(fig_savedir /'pitchofprecur_equals_target_colouredbytalker.png', dpi=1000)
+    plt.savefig(fig_savedir /'pitchofprecur_equals_target_colouredbytalker.png', dpi=500)
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "target F0"], color=shap_values2[:, "precursor = target F0"], show=False, cmap = matplotlib.colormaps[cmapname])

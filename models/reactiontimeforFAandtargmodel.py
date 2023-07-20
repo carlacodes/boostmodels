@@ -216,15 +216,14 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
                           'advance', 'of science', 'boats', 'stronger', 'more stable', 'protecting', 'against',
                           'and du', 'exposure', 'tools and', 'more ah', 'accurate', 'the more', 'reliable',
                           'helping in', 'normal weather', 'and conditions', 'food', 'and drink', 'of better',
-                          'researched', 'than easier', 'to cook', 'than ever', 'before', 'rev. instruments',
-                          'pink noise']
+                          'researched', 'than easier', 'to cook', 'than ever', 'before']
     male_word_labels = ['instruments', 'when a', 'sailor', 'in a', 'small', 'craft', 'faces', 'the might', 'of the',
                         'vast', 'atlantic', 'ocean', 'today', 'he', 'takes', 'the same', 'risks', 'that generations',
                         'took', 'before him', 'but', 'in contrast', 'to them', 'he', 'can meet', 'any', 'emergency',
                         'that comes', 'his way', 'with a', 'confidence', 'that stems', 'from', 'profound', 'trust',
                         'in the', 'advances', 'of science', 'boats', 'as stronger', 'and more', 'stable', 'protecting',
                         'against', 'undue', 'exposure', 'tools', 'and', 'accurate', 'and more', 'reliable', 'helping',
-                        'in all', 'weather', 'and', 'rev. instruments', 'pink noise']
+                        'in all', 'weather', 'and']
 
     kfold = KFold(n_splits=10)
     results = cross_val_score(xg_reg, X_train, y_train, scoring='neg_mean_squared_error', cv=kfold)
@@ -688,12 +687,29 @@ def extract_releasedata_withdist(ferrets, talker=1):
     df = pd.concat([df_intra, df_inter, df_control], axis=0)
     # get a dataframe with only the dist_cols and then combine with two other columns
     df_dist = df[dist_cols]
+    #remove dist56 and dist57
+    df_dist = df_dist.drop(['dist56', 'dist57'], axis=1)
+
     #subsample along the dist columns so the length corresponding to each word token column is the same length
 
-    for col in dist_cols:
+    for col in df_dist:
+        #get all the nan entries and all the non-nan entries
+        df_dist_nonan = df_dist[df_dist[col].notna()]
+        df_dist_nan = df_dist[df_dist[col].isna()]
+        #get the length of the non-nan entries
+        len_nonan = len(df_dist_nonan)
+        #get the length of the nan entries
+        len_nan = len(df_dist_nan)
+        #if the length of the nan entries is greater than 0.5 of the length of the non-nan entries
+        if len_nan > len_nonan * 0.5:
+            #subsample the nan entries to be the same length as the non-nan entries
+            df_dist_nan = df_dist_nan.sample(n=len_nonan, random_state=123)
+            #recombine the two dfs
+            df_dist = pd.concat([df_dist_nonan, df_dist_nan], axis=0)
+            #sort the index
+            df_dist = df_dist.sort_index()
 
 
-        df_dist[col] = df_dist[col].apply(lambda x: x[:np.min([len(x), 100])])#
 
     # if talker == 1:
     #     labels = ['instruments', 'when a', 'sailor', 'in a small', 'craft', 'faces', 'of the might', 'of the vast', 'atlantic', 'ocean', 'today', 'he takes', 'the same', 'risks', 'that generations', 'took', 'before', 'him', 'but', 'in contrast', 'them', 'he can meet', 'any', 'emergency', 'that comes', 'his way', 'confidence', 'that stems', 'profound', 'trust', 'advance', 'of science', 'boats', 'stronger', 'more stable', 'protecting', 'against', 'and du', 'exposure', 'tools and', 'more ah', 'accurate', 'the more', 'reliable', 'helping in', 'normal weather', 'and conditions', 'food', 'and drink', 'of better', 'researched', 'than easier', 'to cook', 'than ever', 'before', 'rev. instruments', 'pink noise']
@@ -809,19 +825,18 @@ def predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feat
                           'advance', 'of science', 'boats', 'stronger', 'more stable', 'protecting', 'against',
                           'and du', 'exposure', 'tools and', 'more ah', 'accurate', 'the more', 'reliable',
                           'helping in', 'normal weather', 'and conditions', 'food', 'and drink', 'of better',
-                          'researched', 'than easier', 'to cook', 'than ever', 'before', 'rev. instruments',
-                          'pink noise']
+                          'researched', 'than easier', 'to cook', 'than ever', 'before']
     male_word_labels = ['instruments', 'when a', 'sailor', 'in a', 'small', 'craft', 'faces', 'the might', 'of the',
                         'vast', 'atlantic', 'ocean', 'today', 'he', 'takes', 'the same', 'risks', 'that generations',
                         'took', 'before him', 'but', 'in contrast', 'to them', 'he', 'can meet', 'any', 'emergency',
                         'that comes', 'his way', 'with a', 'confidence', 'that stems', 'from', 'profound', 'trust',
                         'in the', 'advances', 'of science', 'boats', 'as stronger', 'and more', 'stable', 'protecting',
                         'against', 'undue', 'exposure', 'tools', 'and', 'accurate', 'and more', 'reliable', 'helping',
-                        'in all', 'weather', 'and', 'rev. instruments', 'pink noise']
+                        'in all', 'weather', 'and']
 
     fig, ax = plt.subplots(figsize=(30, 10))
     dfx.count(axis=0).plot(kind='bar')
-    ax.set_xticks(np.arange(0,57,1))
+    ax.set_xticks(np.arange(0,55,1))
     ax.set_yticks(np.arange(0, 5000, 200))
     if talker==1:
         ax.set_xticklabels(female_word_labels, rotation=45, fontsize=8)
