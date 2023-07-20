@@ -706,11 +706,11 @@ def extract_releasedata_withdist(ferrets, talker=1):
         #get the length of the nan entries
         len_nan = len(df_dist_nan)
         #if the length of the nan entries is greater than 0.5 of the length of the non-nan entries
-        if len_nonan > median_count*1.1 and col !='dist1':
+        if len_nonan > median_count*1.05 and col !='dist1':
             print('high frequency distractor')
             print(col)
             #subsample the nan entries to be the same length as the non-nan entries
-            df_dist_nonan = df_dist_nonan.sample(n=int(0.9*median_count), random_state=123)
+            df_dist_nonan = df_dist_nonan.sample(n=int(0.6*median_count), random_state=123)
             #recombine the two dfs
             df_dist = pd.concat([df_dist_nonan, df_dist_nan], axis=0)
             #sort the index
