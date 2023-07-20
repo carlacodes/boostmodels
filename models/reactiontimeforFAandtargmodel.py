@@ -692,12 +692,16 @@ def extract_releasedata_withdist(ferrets, talker=1):
 
     #subsample along the dist columns so the length corresponding to each word token column is the same length
     #get the counts of each column in the dataframe and then find the mean count
-    df_dist_counts = df_dist.count(axis=0)
-    mean_count = df_dist_counts.mean()
-    #get median
-    median_count = df_dist_counts.median()
+
+
 
     for col in df_dist:
+        df_exclude_targ = df_dist.drop(['dist1'], axis=1)
+        df_dist_counts = df_exclude_targ.count(axis=0)
+
+        mean_count = df_dist_counts.mean()
+        # get median
+        median_count = df_dist_counts.median()
         #get all the nan entries and all the non-nan entries
         df_dist_nonan = df_dist[df_dist[col].notna()]
         df_dist_nan = df_dist[df_dist[col].isna()]
@@ -706,11 +710,11 @@ def extract_releasedata_withdist(ferrets, talker=1):
         #get the length of the nan entries
         len_nan = len(df_dist_nan)
         #if the length of the nan entries is greater than 0.5 of the length of the non-nan entries
-        if len_nonan > median_count*1.05 and col !='dist1':
+        if len_nonan > int(median_count*1.1) and col !='dist1':
             print('high frequency distractor')
             print(col)
             #subsample the nan entries to be the same length as the non-nan entries
-            df_dist_nonan = df_dist_nonan.sample(n=int(0.6*median_count), random_state=123)
+            df_dist_nonan = df_dist_nonan.sample(n=int(0.9*median_count), random_state=123)
             #recombine the two dfs
             df_dist = pd.concat([df_dist_nonan, df_dist_nan], axis=0)
             #sort the index
