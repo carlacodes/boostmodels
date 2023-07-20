@@ -275,7 +275,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     colorbar_scatter = fig.axes[1]
     colorbar_scatter.set_yticks([0,1])
     colorbar_scatter.set_yticklabels(['Left', 'Right'], fontsize=18)
-    ax.set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18)
+    ax.set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18, rotation = 45)
     ax.set_xlabel('Ferret ID', fontsize=18)
     ax.set_ylabel('SHAP value', fontsize=18)
     plt.title('Target F0 vs. Audio Side', fontsize=18)

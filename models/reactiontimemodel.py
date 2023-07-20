@@ -324,7 +324,10 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     plt.savefig(fig_savedir / 'talker_vs_precursorequaltargF0.png', dpi=300, bbox_inches='tight')
 
     fig, ax = plt.subplots()
-    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "precursor = target F0"], show=False, ax=ax, cmap = matplotlib.colormaps[cmapname])
+
+    custom_colors = ['dodgerblue',  'green', "limegreen"]  # Add more colors as needed
+    cmapcustom = mcolors.LinearSegmentedColormap.from_list('my_custom_cmap', custom_colors, N=1000)
+    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "precursor = target F0"], show=False, ax=ax, cmap = cmapcustom)
     colorbar_scatter = fig.axes[1]
     colorbar_scatter.set_yticks([0,1])
     colorbar_scatter.set_yticklabels(['False', 'True'], fontsize=18)
