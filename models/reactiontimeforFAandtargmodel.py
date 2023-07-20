@@ -688,6 +688,13 @@ def extract_releasedata_withdist(ferrets, talker=1):
     df = pd.concat([df_intra, df_inter, df_control], axis=0)
     # get a dataframe with only the dist_cols and then combine with two other columns
     df_dist = df[dist_cols]
+    #subsample along the dist columns so the length corresponding to each word token column is the same length
+
+    for col in dist_cols:
+
+
+        df_dist[col] = df_dist[col].apply(lambda x: x[:np.min([len(x), 100])])#
+
     # if talker == 1:
     #     labels = ['instruments', 'when a', 'sailor', 'in a small', 'craft', 'faces', 'of the might', 'of the vast', 'atlantic', 'ocean', 'today', 'he takes', 'the same', 'risks', 'that generations', 'took', 'before', 'him', 'but', 'in contrast', 'them', 'he can meet', 'any', 'emergency', 'that comes', 'his way', 'confidence', 'that stems', 'profound', 'trust', 'advance', 'of science', 'boats', 'stronger', 'more stable', 'protecting', 'against', 'and du', 'exposure', 'tools and', 'more ah', 'accurate', 'the more', 'reliable', 'helping in', 'normal weather', 'and conditions', 'food', 'and drink', 'of better', 'researched', 'than easier', 'to cook', 'than ever', 'before', 'rev. instruments', 'pink noise']
     # else:

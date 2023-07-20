@@ -270,16 +270,16 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
 
 
     fig, ax = plt.subplots()
-    shap.plots.scatter(shap_values2[:, "target F0"], color=shap_values2[:, "audio side"], cmap=cmapcustom,ax=ax,  show=False)
-    ax.set_xticks([1,2,3,4,5])
+    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "audio side"], cmap=cmapcustom,ax=ax,  show=False)
+    ax.set_xticks([0,1,2,3,4])
     colorbar_scatter = fig.axes[1]
     colorbar_scatter.set_yticks([0,1])
     colorbar_scatter.set_yticklabels(['Left', 'Right'], fontsize=18)
-    ax.set_xticklabels(['109', '124', '144', '191', '251'], fontsize=18)
-    ax.set_xlabel('Target F0 (Hz)', fontsize=18)
+    ax.set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18)
+    ax.set_xlabel('Ferret ID', fontsize=18)
     ax.set_ylabel('SHAP value', fontsize=18)
     plt.title('Target F0 vs. Audio Side', fontsize=18)
-    plt.savefig(fig_dir /'targetF0_vs_audioSide.png', dpi=500, bbox_inches='tight')
+    plt.savefig(fig_dir /'ferretID_vs_audioSide.png', dpi=500, bbox_inches='tight')
     plt.show()
 
 
