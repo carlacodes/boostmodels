@@ -694,6 +694,8 @@ def extract_releasedata_withdist(ferrets, talker=1):
     #get the counts of each column in the dataframe and then find the mean count
     df_dist_counts = df_dist.count(axis=0)
     mean_count = df_dist_counts.mean()
+    #get median
+    median_count = df_dist_counts.median()
 
     for col in df_dist:
         #get all the nan entries and all the non-nan entries
@@ -704,13 +706,45 @@ def extract_releasedata_withdist(ferrets, talker=1):
         #get the length of the nan entries
         len_nan = len(df_dist_nan)
         #if the length of the nan entries is greater than 0.5 of the length of the non-nan entries
-        if len_nonan > mean_count*1.2 and col !='dist1':
+        if len_nonan > median_count*1.1 and col !='dist1':
+            print('high frequency distractor')
+            print(col)
             #subsample the nan entries to be the same length as the non-nan entries
-            df_dist_nonan = df_dist_nonan.sample(n=mean_count, random_state=123)
+            df_dist_nonan = df_dist_nonan.sample(n=int(0.9*median_count), random_state=123)
             #recombine the two dfs
             df_dist = pd.concat([df_dist_nonan, df_dist_nan], axis=0)
             #sort the index
             df_dist = df_dist.sort_index()
+    female_word_labels = ['instruments', 'when a', 'sailor', 'in a small', 'craft', 'faces', 'of the might',
+                          'of the vast', 'atlantic', 'ocean', 'today', 'he takes', 'the same', 'risks',
+                          'that generations', 'took', 'before', 'him', 'but', 'in contrast', 'them', 'he can meet',
+                          'any', 'emergency', 'that comes', 'his way', 'confidence', 'that stems', 'profound', 'trust',
+                          'advance', 'of science', 'boats', 'stronger', 'more stable', 'protecting', 'against',
+                          'and du', 'exposure', 'tools and', 'more ah', 'accurate', 'the more', 'reliable',
+                          'helping in', 'normal weather', 'and conditions', 'food', 'and drink', 'of better',
+                          'researched', 'than easier', 'to cook', 'than ever', 'before']
+    male_word_labels = ['instruments', 'when a', 'sailor', 'in a', 'small', 'craft', 'faces', 'the might', 'of the',
+                        'vast', 'atlantic', 'ocean', 'today', 'he', 'takes', 'the same', 'risks', 'that generations',
+                        'took', 'before him', 'but', 'in contrast', 'to them', 'he', 'can meet', 'any', 'emergency',
+                        'that comes', 'his way', 'with a', 'confidence', 'that stems', 'from', 'profound', 'trust',
+                        'in the', 'advances', 'of science', 'boats', 'as stronger', 'and more', 'stable', 'protecting',
+                        'against', 'undue', 'exposure', 'tools', 'and', 'accurate', 'and more', 'reliable', 'helping',
+                        'in all', 'weather', 'and']
+
+    fig, ax = plt.subplots(figsize=(30, 10))
+    df_dist.count(axis=0).plot(kind='bar')
+    ax.set_xticks(np.arange(0,55,1))
+    ax.set_yticks(np.arange(0, 5000, 200))
+    if talker==1:
+        ax.set_xticklabels(female_word_labels, rotation=45, fontsize=8)
+        plt.title('Distribution of non nan values by column in dfx for female talker')
+
+    else:
+        ax.set_xticklabels(male_word_labels, rotation=45, fontsize=8)
+        plt.title('Distribution of non nan values by column in dfx for male talker')
+
+    plt.savefig('D:\mixedeffectmodelsbehavioural\models/figs/absolutereleasemodel/distribution_non_nan_values_by_column_dfx_talker' + str(talker) + '.png')
+    plt.show()
 
 
 
@@ -790,25 +824,25 @@ def predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feat
         if optimization == False:
             best_params = np.load(
                 'D:/mixedeffectmodelsbehavioural/optuna_results/best_paramsreleastime_dist_model_' + ferrets[
-                    0] + 'talker' + str(talker) + '.npy', allow_pickle=True).item()
+                    0] + 'talker' + str(talker) + '2007.npy', allow_pickle=True).item()
         else:
             best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
             best_params = best_study_results.best_params
             np.save(
                 'D:\mixedeffectmodelsbehavioural/optuna_results/best_paramsreleastime_dist_model_' + ferrets[0] + str(
-                    talker) + '.npy', best_params)
+                    talker) + '2007.npy', best_params)
     else:
         dfx = dfx
         if optimization == False:
             best_params = np.load(
                 'D:\mixedeffectmodelsbehavioural/optuna_results/best_paramsreleastimemodel_dist_ferretasfeature_2805' + 'talker' + str(
-                    talker) + '.npy', allow_pickle=True).item()
+                    talker) + '2007.npy', allow_pickle=True).item()
         else:
             best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
             best_params = best_study_results.best_params
             np.save(
                 'D:\mixedeffectmodelsbehavioural/optuna_results/best_paramsreleastimemodel_dist_ferretasfeature_2805' + 'talker' + str(
-                    talker) + '.npy', best_params)
+                    talker) + '2007.npy', best_params)
     if len(ferrets) == 1:
         one_ferret = True
         ferrets = ferrets[0]
@@ -860,7 +894,7 @@ def main():
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']  # , 'F2105_Clove']
 
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=True, talker=2)
+    predict_rxn_time_with_dist_model(ferrets, optimization=True, ferret_as_feature=True, talker=2)
     #
     # for ferret in ferrets:
     #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)
