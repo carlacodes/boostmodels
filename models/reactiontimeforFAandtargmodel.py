@@ -688,9 +688,12 @@ def extract_releasedata_withdist(ferrets, talker=1):
     # get a dataframe with only the dist_cols and then combine with two other columns
     df_dist = df[dist_cols]
     #remove dist56 and dist57
-    df_dist = df_dist.drop(['dist56', 'dist57'], axis=1)
+    df_dist = df_dist.drop(['dist56', 'dist57', 'distLvl', 'distractors', 'distractorAtten'], axis=1)
 
     #subsample along the dist columns so the length corresponding to each word token column is the same length
+    #get the counts of each column in the dataframe and then find the mean count
+    df_dist_counts = df_dist.count(axis=0)
+    mean_count = df_dist_counts.mean()
 
     for col in df_dist:
         #get all the nan entries and all the non-nan entries
@@ -701,9 +704,9 @@ def extract_releasedata_withdist(ferrets, talker=1):
         #get the length of the nan entries
         len_nan = len(df_dist_nan)
         #if the length of the nan entries is greater than 0.5 of the length of the non-nan entries
-        if len_nan > len_nonan * 0.5:
+        if len_nonan > mean_count*1.2 and col !='dist1':
             #subsample the nan entries to be the same length as the non-nan entries
-            df_dist_nan = df_dist_nan.sample(n=len_nonan, random_state=123)
+            df_dist_nonan = df_dist_nonan.sample(n=mean_count, random_state=123)
             #recombine the two dfs
             df_dist = pd.concat([df_dist_nonan, df_dist_nan], axis=0)
             #sort the index
@@ -718,7 +721,6 @@ def extract_releasedata_withdist(ferrets, talker=1):
 
     df_use = pd.concat([df_dist, df['centreRelease']], axis=1)
     # drop the distractors column
-    df_use = df_use.drop(['distractors'], axis=1)
     if 'distractorAtten' in df_use.columns:
         df_use = df_use.drop(['distractorAtten'], axis=1)
     if 'distLvl' in df_use.columns:
