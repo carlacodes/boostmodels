@@ -694,31 +694,52 @@ def extract_releasedata_withdist(ferrets, talker=1):
     #get the counts of each column in the dataframe and then find the mean count
 
 
+    #
+    # for col in df_dist:
+    #     df_exclude_targ = df_dist.drop(['dist1'], axis=1)
+    #     df_dist_counts = df_exclude_targ.count(axis=0)
+    #
+    #     mean_count = df_dist_counts.mean()
+    #     # get median
+    #     median_count = df_dist_counts.median()
+    #     #get all the nan entries and all the non-nan entries
+    #     df_dist_nonan = df_dist[df_dist[col].notna()]
+    #     df_dist_nan = df_dist[df_dist[col].isna()]
+    #     #get the length of the non-nan entries
+    #     len_nonan = len(df_dist_nonan)
+    #     #get the length of the nan entries
+    #     len_nan = len(df_dist_nan)
+    #     #if the length of the nan entries is greater than 0.5 of the length of the non-nan entries
+    #     if len_nonan > int(median_count*1.1) and col !='dist1':
+    #         print('high frequency distractor')
+    #         print(col)
+    #         #subsample the nan entries to be the same length as the non-nan entries
+    #         df_dist_nonan = df_dist_nonan.sample(n=int(0.9*median_count), random_state=123)
+    #         #recombine the two dfs
+    #         df_dist = pd.concat([df_dist_nonan, df_dist_nan], axis=0)
+    #         #sort the index
+    #         df_dist = df_dist.sort_index()
 
-    for col in df_dist:
-        df_exclude_targ = df_dist.drop(['dist1'], axis=1)
-        df_dist_counts = df_exclude_targ.count(axis=0)
+    # Calculate the mean count of each word (excluding 'dist1') in the dataframe
+    word_counts = df_dist.drop('dist1', axis=1).apply(lambda col: col.value_counts().mean())
 
-        mean_count = df_dist_counts.mean()
-        # get median
-        median_count = df_dist_counts.median()
-        #get all the nan entries and all the non-nan entries
-        df_dist_nonan = df_dist[df_dist[col].notna()]
-        df_dist_nan = df_dist[df_dist[col].isna()]
-        #get the length of the non-nan entries
-        len_nonan = len(df_dist_nonan)
-        #get the length of the nan entries
-        len_nan = len(df_dist_nan)
-        #if the length of the nan entries is greater than 0.5 of the length of the non-nan entries
-        if len_nonan > int(median_count*1.1) and col !='dist1':
-            print('high frequency distractor')
-            print(col)
-            #subsample the nan entries to be the same length as the non-nan entries
-            df_dist_nonan = df_dist_nonan.sample(n=int(0.9*median_count), random_state=123)
-            #recombine the two dfs
-            df_dist = pd.concat([df_dist_nonan, df_dist_nan], axis=0)
-            #sort the index
-            df_dist = df_dist.sort_index()
+    # Determine the minimum count among the words (excluding 'dist1')
+    min_count = word_counts.min()
+
+    # List to hold subsampled DataFrames for each word
+    subsampled_dfs = []
+
+    # Iterate through each word (excluding 'dist1')
+    for col in df_dist.columns.drop('dist1'):
+        word_df = df_dist[df_dist[col].notna()]
+        # Randomly subsample the rows to match the minimum count
+        subsampled_df = word_df.sample(n=min_count, random_state=123)
+        subsampled_dfs.append(subsampled_df)
+
+    # Concatenate the subsampled DataFrames for each word to create the final dataframe
+    df_dist = pd.concat(subsampled_dfs, axis=0)
+
+
     female_word_labels = ['instruments', 'when a', 'sailor', 'in a small', 'craft', 'faces', 'of the might',
                           'of the vast', 'atlantic', 'ocean', 'today', 'he takes', 'the same', 'risks',
                           'that generations', 'took', 'before', 'him', 'but', 'in contrast', 'them', 'he can meet',
@@ -898,7 +919,7 @@ def main():
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']  # , 'F2105_Clove']
 
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    predict_rxn_time_with_dist_model(ferrets, optimization=True, ferret_as_feature=True, talker=1)
+    predict_rxn_time_with_dist_model(ferrets, optimization=True, ferret_as_feature=True, talker=2)
     #
     # for ferret in ferrets:
     #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)
