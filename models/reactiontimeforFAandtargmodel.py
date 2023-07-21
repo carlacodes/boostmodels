@@ -670,7 +670,7 @@ def extract_releasedata_withdist(ferrets, talker=1):
     df_control = df[df['control_trial'] == 1]
     # subsample df_control so it is equal to the length of df_intra, maintain the column values
     # get names of all columns that start with lowercase dist
-    dist_cols = [col for col in df_control.columns if col.startswith('dist')]
+    dist_cols = [col for col in df_control.columns if col.startswith('dist') or col.startswith('centreRelease')]
     # get a dataframe with only these columns
 
     if len(df_intra) > len(df_inter) * 1.2:
@@ -730,11 +730,11 @@ def extract_releasedata_withdist(ferrets, talker=1):
     subsampled_dfs = []
 
     # Iterate through each word (excluding 'dist1')
-    for col in df_dist.columns.drop('dist1'):
+    for col in df_dist.columns.drop('dist1', 'centreRelease'):
         word_df_notna = df_dist[df_dist[col].notna()]
         word_df_na = df_dist[df_dist[col].isna()]
         # Randomly subsample the rows to match the minimum count
-        subsampled_df_notna = word_df_notna.sample(n=int(min_count)*30, random_state=123)
+        subsampled_df_notna = word_df_notna.sample(n=int(min_count)*30, random_state=123, replace = True)
         # Combine the subsampled DataFrame with the rows that were originally missing
         # subsampled_df = pd.concat([subsampled_df_notna, word_df_na], axis=0)
         # # Shuffle the DataFrame
@@ -784,7 +784,8 @@ def extract_releasedata_withdist(ferrets, talker=1):
     # else:
     #     labels = ['instruments', 'when a', 'sailor', 'in a', 'small', 'craft', 'faces', 'the might', 'of the', 'vast', 'atlantic', 'ocean', 'today', 'he', 'takes', 'the same', 'risks', 'that generations', 'took', 'before him', 'but', 'in contrast', 'to them', 'he', 'can meet', 'any', 'emergency', 'that comes', 'his way', 'with a', 'confidence', 'that stems', 'from', 'profound', 'trust', 'in the', 'advances', 'of science', 'boats', 'as stronger', 'and more', 'stable', 'protecting', 'against', 'undue', 'exposure', 'tools', 'and', 'accurate', 'and more', 'reliable', 'helping', 'in all', 'weather', 'and', 'rev. instruments', 'pink noise']
 
-    df_use = pd.concat([df_dist, df['centreRelease']], axis=1)
+    # df_use = pd.concat([df_dist, df['centreRelease']], axis=1)
+    df_use = df_dist
     # drop the distractors column
     if 'distractorAtten' in df_use.columns:
         df_use = df_use.drop(['distractorAtten'], axis=1)
