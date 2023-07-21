@@ -721,7 +721,7 @@ def extract_releasedata_withdist(ferrets, talker=1):
     #         df_dist = df_dist.sort_index()
 
     # Calculate the mean count of each word (excluding 'dist1') in the dataframe
-    word_counts = df_dist.drop('dist1', axis=1).apply(lambda col: col.value_counts().mean())
+    word_counts = df_dist.count(axis=0)
 
     # Determine the minimum count among the words (excluding 'dist1')
     min_count = word_counts.min()
@@ -731,10 +731,16 @@ def extract_releasedata_withdist(ferrets, talker=1):
 
     # Iterate through each word (excluding 'dist1')
     for col in df_dist.columns.drop('dist1'):
-        word_df = df_dist[df_dist[col].notna()]
+        word_df_notna = df_dist[df_dist[col].notna()]
+        word_df_na = df_dist[df_dist[col].isna()]
         # Randomly subsample the rows to match the minimum count
-        subsampled_df = word_df.sample(n=int(min_count), random_state=123)
-        subsampled_dfs.append(subsampled_df)
+        subsampled_df_notna = word_df_notna.sample(n=int(min_count)*30, random_state=123)
+        # Combine the subsampled DataFrame with the rows that were originally missing
+        # subsampled_df = pd.concat([subsampled_df_notna, word_df_na], axis=0)
+        # # Shuffle the DataFrame
+        # subsampled_df = subsampled_df.sample(frac=1, random_state=123)
+        # Append to list of DataFrames
+        subsampled_dfs.append(subsampled_df_notna)
 
     # Concatenate the subsampled DataFrames for each word to create the final dataframe
     df_dist = pd.concat(subsampled_dfs, axis=0)
@@ -758,9 +764,9 @@ def extract_releasedata_withdist(ferrets, talker=1):
 
     fig, ax = plt.subplots(figsize=(30, 10))
     df_dist.count(axis=0).plot(kind='bar')
-    ax.set_xticks(np.arange(0,55,1))
-    ax.set_yticks(np.arange(0, 5000, 200))
-    if talker==1:
+    ax.set_xticks(np.arange(0, 55, 1))
+    # ax.set_yticks(np.arange(0, 5000, 200))
+    if talker == 1:
         ax.set_xticklabels(female_word_labels, rotation=45, fontsize=8)
         plt.title('Distribution of non nan values by column in dfx for female talker')
 
