@@ -733,7 +733,7 @@ def extract_releasedata_withdist(ferrets, talker=1):
     for col in df_dist.columns.drop('dist1'):
         word_df = df_dist[df_dist[col].notna()]
         # Randomly subsample the rows to match the minimum count
-        subsampled_df = word_df.sample(n=min_count, random_state=123)
+        subsampled_df = word_df.sample(n=int(min_count), random_state=123)
         subsampled_dfs.append(subsampled_df)
 
     # Concatenate the subsampled DataFrames for each word to create the final dataframe
