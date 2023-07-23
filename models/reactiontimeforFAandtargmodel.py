@@ -726,23 +726,50 @@ def extract_releasedata_withdist(ferrets, talker=1):
     # Determine the minimum count among the words (excluding 'dist1')
     min_count = word_counts.min()
 
+    # # List to hold subsampled DataFrames for each word
+    # subsampled_dfs = []
+    #
+    # # Iterate through each word (excluding 'dist1')
+    # for col in df_dist.columns.drop(['dist1', 'dist2', 'centreRelease']):
+    #     word_df_notna = df_dist[df_dist[col].notna()]
+    #     word_df_na = df_dist[df_dist[col].isna()]
+    #     # Randomly subsample the rows to match the minimum count
+    #     subsampled_df_notna = word_df_notna.sample(n=int(min_count)*30, random_state=123, replace = True)
+    #     # Combine the subsampled DataFrame with the rows that were originally missing
+    #     # subsampled_df = pd.concat([subsampled_df_notna, word_df_na], axis=0)
+    #     # # Shuffle the DataFrame
+    #     # subsampled_df = subsampled_df.sample(frac=1, random_state=123)
+    #     # Append to list of DataFrames
+    #     subsampled_dfs.append(subsampled_df_notna)
+    #
+    # # Concatenate the subsampled DataFrames for each word to create the final dataframe
+    # df_dist = pd.concat(subsampled_dfs, axis=0)
+
     # List to hold subsampled DataFrames for each word
     subsampled_dfs = []
 
-    # Iterate through each word (excluding 'dist1')
-    for col in df_dist.columns.drop('dist1', 'centreRelease'):
-        word_df_notna = df_dist[df_dist[col].notna()]
-        word_df_na = df_dist[df_dist[col].isna()]
-        # Randomly subsample the rows to match the minimum count
-        subsampled_df_notna = word_df_notna.sample(n=int(min_count)*30, random_state=123, replace = True)
-        # Combine the subsampled DataFrame with the rows that were originally missing
-        # subsampled_df = pd.concat([subsampled_df_notna, word_df_na], axis=0)
-        # # Shuffle the DataFrame
-        # subsampled_df = subsampled_df.sample(frac=1, random_state=123)
-        # Append to list of DataFrames
-        subsampled_dfs.append(subsampled_df_notna)
+    # Iterate through each word (excluding 'dist1', 'dist2', and 'centreRelease')
+    import random
+    for k in range(1, 30):
+        count = 0
+        col_list = df_dist.columns.drop(['dist1', 'centreRelease'])
+        #shuffle the columns
+        col_list = random.shuffle(col_list)
 
-    # Concatenate the subsampled DataFrames for each word to create the final dataframe
+
+        for col in col_list:
+            word_df_notna = df_dist[df_dist[col].notna()]
+            word_df_na = df_dist[df_dist[col].isna()]
+
+            # Stratified subsampling based on the original frequencies
+            n_samples = int(min_count)
+            word_df_notna_subsampled = word_df_notna.sample(n=n_samples, random_state=123, replace=True)
+            word_df_na_subsampled = word_df_na.sample(n=n_samples, random_state=123, replace=True)
+
+            # Append to list of DataFrames
+            subsampled_dfs.append(pd.concat([word_df_notna_subsampled, word_df_na_subsampled], axis=0))
+
+        # Concatenate the subsampled DataFrames for each word to create the final dataframe
     df_dist = pd.concat(subsampled_dfs, axis=0)
 
 
@@ -763,7 +790,15 @@ def extract_releasedata_withdist(ferrets, talker=1):
                         'in all', 'weather', 'and']
 
     fig, ax = plt.subplots(figsize=(30, 10))
-    df_dist.count(axis=0).plot(kind='bar')
+    #plot them in order in a bar plot from highest to lowest
+    df_dist_counts = df_dist.count(axis=0)
+    df_dist_counts = df_dist_counts.sort_values(ascending=False)
+    df_dist_counts.plot.bar(ax=ax)
+    ax.set_xlabel('Word')
+
+
+
+
     ax.set_xticks(np.arange(0, 55, 1))
     # ax.set_yticks(np.arange(0, 5000, 200))
     if talker == 1:
@@ -926,7 +961,7 @@ def main():
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']  # , 'F2105_Clove']
 
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    predict_rxn_time_with_dist_model(ferrets, optimization=True, ferret_as_feature=True, talker=2)
+    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=True, talker=1)
     #
     # for ferret in ferrets:
     #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)
