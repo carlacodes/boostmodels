@@ -1,6 +1,8 @@
 import npyx
 import numpy as np
 import sklearn.metrics
+import random
+
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import KFold
 from sklearn.model_selection import cross_val_score
@@ -693,33 +695,6 @@ def extract_releasedata_withdist(ferrets, talker=1):
     #subsample along the dist columns so the length corresponding to each word token column is the same length
     #get the counts of each column in the dataframe and then find the mean count
 
-
-    #
-    # for col in df_dist:
-    #     df_exclude_targ = df_dist.drop(['dist1'], axis=1)
-    #     df_dist_counts = df_exclude_targ.count(axis=0)
-    #
-    #     mean_count = df_dist_counts.mean()
-    #     # get median
-    #     median_count = df_dist_counts.median()
-    #     #get all the nan entries and all the non-nan entries
-    #     df_dist_nonan = df_dist[df_dist[col].notna()]
-    #     df_dist_nan = df_dist[df_dist[col].isna()]
-    #     #get the length of the non-nan entries
-    #     len_nonan = len(df_dist_nonan)
-    #     #get the length of the nan entries
-    #     len_nan = len(df_dist_nan)
-    #     #if the length of the nan entries is greater than 0.5 of the length of the non-nan entries
-    #     if len_nonan > int(median_count*1.1) and col !='dist1':
-    #         print('high frequency distractor')
-    #         print(col)
-    #         #subsample the nan entries to be the same length as the non-nan entries
-    #         df_dist_nonan = df_dist_nonan.sample(n=int(0.9*median_count), random_state=123)
-    #         #recombine the two dfs
-    #         df_dist = pd.concat([df_dist_nonan, df_dist_nan], axis=0)
-    #         #sort the index
-    #         df_dist = df_dist.sort_index()
-
     # Calculate the mean count of each word (excluding 'dist1') in the dataframe
     word_counts = df_dist.count(axis=0)
 
@@ -749,12 +724,14 @@ def extract_releasedata_withdist(ferrets, talker=1):
     subsampled_dfs = []
 
     # Iterate through each word (excluding 'dist1', 'dist2', and 'centreRelease')
-    import random
+    col_list = df_dist.columns.drop(['dist1', 'centreRelease']).to_list()
+
     for k in range(1, 30):
         count = 0
-        col_list = df_dist.columns.drop(['dist1', 'centreRelease'])
         #shuffle the columns
-        col_list = random.shuffle(col_list)
+
+        # random.shuffle(col_list)
+        col_list = np.flip(col_list)
 
 
         for col in col_list:
@@ -762,9 +739,16 @@ def extract_releasedata_withdist(ferrets, talker=1):
             word_df_na = df_dist[df_dist[col].isna()]
 
             # Stratified subsampling based on the original frequencies
-            n_samples = int(min_count)
-            word_df_notna_subsampled = word_df_notna.sample(n=n_samples, random_state=123, replace=True)
-            word_df_na_subsampled = word_df_na.sample(n=n_samples, random_state=123, replace=True)
+            if col == 'dist20' or col =='dist42'or col=='dist5':
+                print('higher freq word')
+                n_samples = int(min_count * 0.025)
+            elif col =='dist32' or col =='dist2':
+                print('super high freq word')
+                continue
+            else:
+                n_samples = int(min_count)
+            word_df_notna_subsampled = word_df_notna.sample(n=n_samples, random_state=123, replace=False)
+            word_df_na_subsampled = word_df_na.sample(n=n_samples, random_state=123, replace=False)
 
             # Append to list of DataFrames
             subsampled_dfs.append(pd.concat([word_df_notna_subsampled, word_df_na_subsampled], axis=0))
@@ -791,8 +775,13 @@ def extract_releasedata_withdist(ferrets, talker=1):
 
     fig, ax = plt.subplots(figsize=(30, 10))
     #plot them in order in a bar plot from highest to lowest
-    df_dist_counts = df_dist.count(axis=0)
+    #drop centrelrease
+    df_dist_counts = df_dist.drop(['centreRelease'], axis=1)
+    df_dist_counts = df_dist_counts.count(axis=0)
+    #sort the values, get the index
     df_dist_counts = df_dist_counts.sort_values(ascending=False)
+    #get the index
+
     df_dist_counts.plot.bar(ax=ax)
     ax.set_xlabel('Word')
 
@@ -802,11 +791,11 @@ def extract_releasedata_withdist(ferrets, talker=1):
     ax.set_xticks(np.arange(0, 55, 1))
     # ax.set_yticks(np.arange(0, 5000, 200))
     if talker == 1:
-        ax.set_xticklabels(female_word_labels, rotation=45, fontsize=8)
+        # ax.set_xticklabels(female_word_labels, rotation=45, fontsize=8)
         plt.title('Distribution of non nan values by column in dfx for female talker')
 
     else:
-        ax.set_xticklabels(male_word_labels, rotation=45, fontsize=8)
+        # ax.set_xticklabels(male_word_labels, rotation=45, fontsize=8)
         plt.title('Distribution of non nan values by column in dfx for male talker')
 
     plt.savefig('D:\mixedeffectmodelsbehavioural\models/figs/absolutereleasemodel/distribution_non_nan_values_by_column_dfx_talker' + str(talker) + '.png')
@@ -961,9 +950,9 @@ def main():
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']  # , 'F2105_Clove']
 
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=True, talker=1)
+    predict_rxn_time_with_dist_model(ferrets, optimization=True, ferret_as_feature=True, talker=1)
     #
-    # for ferret in ferrets:
+    # for ferret in ferrets:col_list
     #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)
     #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 2)
 
