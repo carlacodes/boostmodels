@@ -747,8 +747,8 @@ def extract_releasedata_withdist(ferrets, talker=1):
                 continue
             else:
                 n_samples = int(min_count)
-            word_df_notna_subsampled = word_df_notna.sample(n=n_samples, random_state=123, replace=False)
-            word_df_na_subsampled = word_df_na.sample(n=n_samples, random_state=123, replace=False)
+            word_df_notna_subsampled = word_df_notna.sample(n=n_samples, random_state=123, replace=True)
+            word_df_na_subsampled = word_df_na.sample(n=n_samples, random_state=123, replace=True)
 
             # Append to list of DataFrames
             subsampled_dfs.append(pd.concat([word_df_notna_subsampled, word_df_na_subsampled], axis=0))
@@ -778,8 +778,12 @@ def extract_releasedata_withdist(ferrets, talker=1):
     #drop centrelrease
     df_dist_counts = df_dist.drop(['centreRelease'], axis=1)
     df_dist_counts = df_dist_counts.count(axis=0)
-    #sort the values, get the index
+    #sort the values as well as female_word_labels
     df_dist_counts = df_dist_counts.sort_values(ascending=False)
+    if talker ==1:
+        female_word_labels = sorted(female_word_labels, reverse=True)
+    else:
+        male_word_labels = sorted(male_word_labels, reverse=True)
     #get the index
 
     df_dist_counts.plot.bar(ax=ax)
@@ -791,11 +795,11 @@ def extract_releasedata_withdist(ferrets, talker=1):
     ax.set_xticks(np.arange(0, 55, 1))
     # ax.set_yticks(np.arange(0, 5000, 200))
     if talker == 1:
-        # ax.set_xticklabels(female_word_labels, rotation=45, fontsize=8)
+        #ax.set_xticklabels(female_word_labels, rotation=45, fontsize=8)
         plt.title('Distribution of non nan values by column in dfx for female talker')
 
     else:
-        # ax.set_xticklabels(male_word_labels, rotation=45, fontsize=8)
+        #ax.set_xticklabels(male_word_labels, rotation=45, fontsize=8)
         plt.title('Distribution of non nan values by column in dfx for male talker')
 
     plt.savefig('D:\mixedeffectmodelsbehavioural\models/figs/absolutereleasemodel/distribution_non_nan_values_by_column_dfx_talker' + str(talker) + '.png')
