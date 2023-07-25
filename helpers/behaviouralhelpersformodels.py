@@ -742,8 +742,8 @@ class behaviouralhelperscg():
             newdata = newdata[
                 (newdata.pitchof0oflastword == 1) | (newdata.pitchof0oflastword == 2) | (newdata.pitchof0oflastword == 3) | (
                         newdata.pitchof0oflastword == 4) | (newdata.pitchof0oflastword == 5) ]
-            pitchof0oflastword = [d / 5 for d in newdata['pitchof0oflastword']]
-            newdata['pitchof0oflastword'] = pitchof0oflastword
+            # pitchof0oflastword = [d / 5 for d in newdata['pitchof0oflastword']]
+            # newdata['pitchof0oflastword'] = pitchof0oflastword
 
 
             newdata = newdata[(newdata.correctionTrial == 0)]  # | (allData.response == 7)

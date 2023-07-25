@@ -277,8 +277,8 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     colorbar_scatter.set_yticklabels(['Left', 'Right'], fontsize=18)
     ax.set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18, rotation = 45)
     ax.set_xlabel('Ferret ID', fontsize=18)
-    ax.set_ylabel('SHAP value', fontsize=18)
-    plt.title('Target F0 vs. Audio Side', fontsize=18)
+    ax.set_ylabel('Influence on miss probability', fontsize=18)
+    plt.title('Mean SHAP value over ferret ID', fontsize=18)
     plt.savefig(fig_dir /'ferretID_vs_audioSide.png', dpi=500, bbox_inches='tight')
     plt.show()
 
@@ -293,8 +293,8 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     # colorbar_scatter.set_yticklabels(['Left', 'Right'], fontsize=18)
     ax.set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18, rotation=45)
     ax.set_xlabel('Ferret ID', fontsize=18)
-    ax.set_ylabel('SHAP value', fontsize=18)
-    plt.title('Ferret ID by target presentation time', fontsize=18)
+    ax.set_ylabel('Influence on miss probability', fontsize=18)
+    plt.title('Mean SHAP value over ferret ID', fontsize=18)
     plt.savefig(fig_dir /'ferretidbytargettime.png', dpi=500, bbox_inches='tight')
     plt.show()
 

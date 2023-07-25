@@ -338,18 +338,39 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     plt.title('Mean SHAP value over ferret ID', fontsize=18)
     plt.savefig(fig_savedir /'ferretIDbyprecurequaltargF0.png', dpi=500, bbox_inches='tight')
     plt.show()
+    import seaborn as sns
+    import pandas as pd
+    import seaborn as sns
 
-    fig, ax = plt.subplots()
-    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "side of audio"], show=False, ax=ax, cmap = cmapcustom)
-    colorbar_scatter = fig.axes[1]
-    colorbar_scatter.set_yticks([0,1])
-    colorbar_scatter.set_yticklabels(['Left', 'Right'], fontsize=18)
-    ax.set_xticks([0,1,2,3,4])
+    ferret_ids = shap_values2[:, "ferret ID"].data
+    precursor_values = shap_values2[:, "precursor = target F0"].data
+    shap_values = shap_values2[:, "ferret ID"].values
+
+    # Create a DataFrame with the necessary data
+    data_df = pd.DataFrame({
+        "ferret ID": ferret_ids,
+        "precursor = target F0": precursor_values,
+        "SHAP value": shap_values
+    })
+
+    custom_colors = ['dodgerblue', 'green', 'limegreen']
+    cmapcustom = mcolors.LinearSegmentedColormap.from_list('my_custom_cmap', custom_colors, N=1000)
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+    sns.violinplot(x="ferret ID", y="SHAP value", hue="precursor = target F0", data=data_df, split=True, inner="quart",
+                   palette=custom_colors, ax=ax)
+
+    ax.set_xticks([0, 1, 2, 3, 4])
     ax.set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18, rotation=45)
     ax.set_xlabel('Ferret ID', fontsize=18)
-    ax.set_ylabel('Infleunce on reaction time', fontsize=18)
+    ax.set_ylabel('Infleunce on reaction time', fontsize=18)  # Corrected y-label
+
     plt.title('Mean SHAP value over ferret ID', fontsize=18)
-    plt.savefig(fig_savedir /'ferretIDbysideofaudio.png', dpi=500, bbox_inches='tight')
+
+    # Optionally add a legend
+    ax.legend(title="precursor = target F0", fontsize=14, title_fontsize=16)
+
+    plt.savefig(fig_savedir / 'ferretIDbyprecurequaltargF0_violin.png', dpi=500, bbox_inches='tight')
     plt.show()
 
     fig, ax = plt.subplots(figsize=(10, 10))

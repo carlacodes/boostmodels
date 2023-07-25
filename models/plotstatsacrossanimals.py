@@ -512,6 +512,41 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
     plt.savefig('figs/proportion_hits_falsealarms_correctresp_dprime_bytalker_2706.png', dpi = 500, bbox_inches='tight')
     plt.show()
 
+    #plot the bias in a separate figure
+    fig, ax = plt.subplots()
+    multiplier = 0
+    for attribute, measurement in stats_dict_all_combined.items():
+        for talker, measurement_data in measurement.items():
+            print(measurement_data)
+            if multiplier < 3:
+                offset = width * multiplier
+            else:
+                offset = (gap_width) + (width * multiplier)  # Add gap offset for the second series
+
+            color = color_map(
+                np.where(np.array(list(measurement.keys())) == talker)[0][0])  # Assign color based on label
+            rects = ax.bar(offset, measurement_data['dprime'], width, label=talker, color=color)
+            # scatter plot the corresponding individual ferret data, each ferret is a different marker shape
+            marker_list = ['o', 's', '<', 'd', "*"]
+            count = 0
+            for ferret, ferret_data in stats_dict_combined[attribute][talker]['bias'].items():
+                # add jitter to offset
+                print('ferret', ferret)
+                print('ferret data', ferret_data)
+                offset_jitter = offset + np.random.uniform(-0.05, 0.05)
+                ax.scatter(offset_jitter, ferret_data, 25, color=color, marker=marker_list[count], label='_nolegend_',
+                            edgecolors='black')
+                count += 1
+
+            multiplier += 1
+
+    ax.set_xticks([0.25, 1.25], ['Female', 'Male'])
+
+    ax.set_ylabel('bias')
+    ax.set_title('bias')
+    plt.show()
+
+
 
 
 

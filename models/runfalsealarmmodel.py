@@ -281,22 +281,22 @@ def run_optuna_study_correctresponse(dataframe, y):
 def runlgbfaornotwithoptuna(dataframe, paramsinput, ferret_as_feature=False, one_ferret = False, ferrets = None):
     if ferret_as_feature:
         df_to_use = dataframe[
-            ["pitchof0oflastword", "time_elapsed", "ferret", "trialNum", "talker", "side", "intra_trial_roving",
+            [ "time_elapsed", "ferret", "trialNum", "talker", "side", "intra_trial_roving",
              "pastcorrectresp", "pastcatchtrial",
-             "falsealarm"]]
+             "falsealarm", "pitchof0oflastword"]]
         # dfuse = df[["pitchoftarg", "pastcatchtrial", "trialNum", "talker", "side", "precur_and_targ_same",
         #             "timeToTarget",
         #             "realRelReleaseTimes", "ferret", "pastcorrectresp"]]
-        labels = ["F0", "time since trial start", "ferret ID", "trial number", "talker", "audio side",
-                  "intra-trial F0 roving", "past response correct", "past trial was catch", "falsealarm"]
+        labels = ["time since trial start", "ferret ID", "trial number", "talker", "audio side",
+                  "intra-trial F0 roving", "past response correct", "past trial was catch", "falsealarm", "F0"]
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
     else:
         df_to_use = dataframe[
-            ["pitchof0oflastword", "time_elapsed", "trialNum", "talker", "side", "intra_trial_roving", "pastcorrectresp",
+            ["time_elapsed", "trialNum", "talker", "side", "intra_trial_roving", "pastcorrectresp",
              "pastcatchtrial",
-             "falsealarm"]]
-        labels = ["F0", "time since trial start", "trial number", "talker", "audio side", "intra-trial F0 roving",
-                  "past response correct", "past trial was catch", "falsealarm"]
+             "falsealarm", "pitchof0oflastword"]]
+        labels = [ "time since trial start", "trial number", "talker", "audio side", "intra-trial F0 roving",
+                  "past response correct", "past trial was catch", "falsealarm", "F0"]
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
 
     col = 'falsealarm'
@@ -382,6 +382,37 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.xticks(rotation=45, ha='right')  # rotate x-axis labels for better readability
     plt.savefig(fig_dir / 'elbowplot.png', dpi=500, bbox_inches='tight')
     plt.show()
+    fig, ax = plt.subplots()
+    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "time since trial start"], show=False, ax=ax, cmap = cmapcustom)
+    colorbar_scatter = fig.axes[1]
+    # colorbar_scatter.set_yticks([0,1])
+    # colorbar_scatter.set_yticklabels(['Left', 'Right'], fontsize=18)
+    colorbar_scatter.set_ylabel('Time since trial start (s)', fontsize=18)
+    ax.set_xticks([0,1,2,3,4])
+    ax.set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18, rotation=45)
+    ax.set_xlabel('Ferret ID', fontsize=18)
+    ax.set_ylabel('Influence on false alarm probability', fontsize=18)
+    plt.title('Mean SHAP value over ferret ID', fontsize=18)
+    plt.savefig(fig_dir /'ferretIDbyside_timesincestartoftrial.png', dpi=500, bbox_inches='tight')
+    plt.show()
+    #ferret x audio side and ferret x response time
+    fig, ax = plt.subplots()
+    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "audio side"], show=False, ax=ax, cmap = cmapcustom)
+    colorbar_scatter = fig.axes[1]
+    colorbar_scatter.set_yticks([0,1])
+    colorbar_scatter.set_yticklabels(['Left', 'Right'], fontsize=18)
+    ax.set_xticks([0,1,2,3,4])
+    ax.set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18, rotation=45)
+    ax.set_xlabel('Ferret ID', fontsize=18)
+    ax.set_ylabel('Influence on false alarm probability', fontsize=18)
+    plt.title('Mean SHAP value over ferret ID', fontsize=18)
+    plt.savefig(fig_dir /'ferretIDbysideofaudio.png', dpi=500, bbox_inches='tight')
+    plt.show()
+    #time since start of trial
+
+
+
+
 
     shap.summary_plot(shap_values1, dfx, show=False, color=cmapsummary)
     fig, ax = plt.gcf(), plt.gca()
@@ -426,7 +457,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
 
 
     fig, ax = plt.subplots(figsize=(5, 5))
-    shap.plots.scatter(shap_values2[:, "F0"], color=shap_values2[:, "time since trial start"], show= True,  cmap=cmapcustom)
+    shap.plots.scatter(shap_values2[:, "F0"], color=shap_values2[:, "time since trial start"], show= False,  ax=ax, cmap=cmapcustom)
     cax = fig.axes[1]
     cax.tick_params(labelsize=15)
     cax.set_ylabel("Time since start of trial", fontsize=12)
