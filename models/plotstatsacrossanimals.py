@@ -479,6 +479,7 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
                 print('ferret', ferret)
                 print('ferret data', ferret_data)
                 offset_jitter = offset + np.random.uniform(-0.05, 0.05)
+
                 ax4.scatter(offset_jitter, ferret_data, 25, color=color, marker=marker_list[count],  label='_nolegend_', edgecolors='black')
                 count += 1
 
@@ -518,14 +519,18 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
     for attribute, measurement in stats_dict_all_combined.items():
         for talker, measurement_data in measurement.items():
             print(measurement_data)
-            if multiplier < 3:
+            if multiplier <= 3:
                 offset = width * multiplier
             else:
                 offset = (gap_width) + (width * multiplier)  # Add gap offset for the second series
 
             color = color_map(
                 np.where(np.array(list(measurement.keys())) == talker)[0][0])  # Assign color based on label
-            rects = ax.bar(offset, measurement_data['dprime'], width, label=talker, color=color)
+            if multiplier > 3:
+                label = talker
+            else:
+                label = '_nolegend_'
+            rects = ax.bar(offset, measurement_data['bias'], width, label=label, color=color)
             # scatter plot the corresponding individual ferret data, each ferret is a different marker shape
             marker_list = ['o', 's', '<', 'd', "*"]
             count = 0
@@ -534,16 +539,22 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
                 print('ferret', ferret)
                 print('ferret data', ferret_data)
                 offset_jitter = offset + np.random.uniform(-0.05, 0.05)
-                ax.scatter(offset_jitter, ferret_data, 25, color=color, marker=marker_list[count], label='_nolegend_',
+                if multiplier < 1:
+                    label_text = ferret
+                else:
+                    label_text = '_nolegend_'
+                ax.scatter(offset_jitter, ferret_data, 25, color=color, marker=marker_list[count], label=label_text,
                             edgecolors='black')
                 count += 1
 
             multiplier += 1
 
-    ax.set_xticks([0.25, 1.25], ['Female', 'Male'])
+    ax.set_xticks([0.25, 1.25], ['Female', 'Male'], fontsize = 15)
 
-    ax.set_ylabel('bias')
-    ax.set_title('bias')
+    ax.set_ylabel('bias', fontsize = 15)
+    ax.set_title('Bias across talkers', fontsize = 18)
+    plt.legend(fontsize=8, loc = 'lower right')
+    plt.savefig('figs/bias_bytalker_2706.png', dpi=500, bbox_inches='tight')
     plt.show()
 
 
