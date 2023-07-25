@@ -616,24 +616,6 @@ class behaviouralhelperscg():
                     time_elapsed.append(newdata['centreRelease'].values[i] - newdata['absentTime'].values[i])
 
 
-                    #
-                    # for k2 in range(0, len(distractordurationoftrial)+1):
-                    #     if np.sum(distractordurationoftrial[0:k2]) / fs < newdata['centreRelease'].values[i] - newdata['absentTime'].values[i]:
-                    #         count = count + 1
-                    #     else:
-                    #         if chosentrial[count] == 8.0:
-                    #             pitchof0oflastword.append(float(3))
-                    #             break
-                    #         elif chosentrial[count] == 13.0:
-                    #             pitchof0oflastword.append(float(1))
-                    #             break
-                    #         elif chosentrial[count] == 1.0:
-                    #             pitchof0oflastword.append(float(4))
-                    #             break
-                    #         else:
-                    #             pitchof0oflastword.append(float(chosentrial[count]))
-                    #             break
-
 
                 else:
                     try:
@@ -675,14 +657,12 @@ class behaviouralhelperscg():
                     pitchoftarg.append(np.nan)
                     pitchofprecur.append(np.nan)
 
-                # print('at trial'+str(i))
 
             newdata.drop(index=newdata.index[0],
                          axis=0,
                          inplace=True)
 
-            # pitchoftarg = pitchoftarg.astype(int)
-            # pitchofprecur = pitchofprecur.astype(int)
+
             falsealarm = falsealarm[~np.isnan(falsealarm)]
             correctresp = correctresp[~np.isnan(correctresp)]
 
