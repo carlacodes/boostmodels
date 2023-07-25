@@ -670,7 +670,10 @@ class behaviouralhelperscg():
             distractor_or_fa = np.delete(distractor_or_fa, 0)
             stepval = np.delete(stepval, 0)
 
-            pitchof0oflastword = [int(d) for d in pitchof0oflastword]
+            pitchof0oflastword = [float(d) for d in pitchof0oflastword]
+            #divide by 5 for each number for pitchof0oflastword
+            pitchof0oflastword = [d / 5 for d in pitchof0oflastword]
+
             newdata['pitchoftarg'] = pitchoftarg
             newdata['pitchofprecur'] = pitchofprecur
             time_elapsed = [float(d) for d in time_elapsed]
