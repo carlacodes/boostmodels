@@ -672,7 +672,6 @@ class behaviouralhelperscg():
 
             pitchof0oflastword = [float(d) for d in pitchof0oflastword]
             #divide by 5 for each number for pitchof0oflastword
-            pitchof0oflastword = [d / 5 for d in pitchof0oflastword]
 
             newdata['pitchoftarg'] = pitchoftarg
             newdata['pitchofprecur'] = pitchofprecur
@@ -743,6 +742,9 @@ class behaviouralhelperscg():
             newdata = newdata[
                 (newdata.pitchof0oflastword == 1) | (newdata.pitchof0oflastword == 2) | (newdata.pitchof0oflastword == 3) | (
                         newdata.pitchof0oflastword == 4) | (newdata.pitchof0oflastword == 5) ]
+            pitchof0oflastword = [d / 5 for d in newdata['pitchof0oflastword']]
+            newdata['pitchof0oflastword'] = pitchof0oflastword
+
 
             newdata = newdata[(newdata.correctionTrial == 0)]  # | (allData.response == 7)
             newdata = newdata[(newdata.currAtten == 0)]

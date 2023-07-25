@@ -337,329 +337,310 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     # load the permutation importances by ferret and do a stacked bar plot based on the top 5 words:
     permutation_importance_dict = {}
     permutation_importance_labels_dict = {}
-    for ferret in ferrets:
-        load_dir = Path('figs/absolutereleasemodel/' + ferret + 'talker' + str(talker))
+    if one_ferret == False:
+        for ferret in ferrets:
+            load_dir = Path('figs/absolutereleasemodel/' + ferret + 'talker' + str(talker))
 
-        permutation_importance_values = np.load(load_dir / 'permutation_importance_values.npy')
-        permutation_importance_labels = np.load(load_dir / 'permutation_importance_labels.npy')
-        # put into dictionary
-        # get the top 5 words
-        # need permutation importances in descending order rather than ascending order to match labels
-        permutation_importance_values = np.flip(permutation_importance_values)
-        top_words = permutation_importance_values[1:6]
-        top_labels = permutation_importance_labels[1:6]
-        # get the top 5 words
+            permutation_importance_values = np.load(load_dir / 'permutation_importance_values.npy')
+            permutation_importance_labels = np.load(load_dir / 'permutation_importance_labels.npy')
+            # put into dictionary
+            # get the top 5 words
+            # need permutation importances in descending order rather than ascending order to match labels
+            permutation_importance_values = np.flip(permutation_importance_values)
+            top_words = permutation_importance_values[1:6]
+            top_labels = permutation_importance_labels[1:6]
+            # get the top 5 words
 
-        permutation_importance_dict[ferret] = top_words
-        permutation_importance_labels_dict[ferret] = top_labels
+            permutation_importance_dict[ferret] = top_words
+            permutation_importance_labels_dict[ferret] = top_labels
 
-    # common_labels = set.intersection(*[set(labels) for labels in permutation_importance_labels_dict.values()])
+        # common_labels = set.intersection(*[set(labels) for labels in permutation_importance_labels_dict.values()])
 
-    # Plotting the stacked bar plot
-    # Determine the unique set of all labels
-    # Determine the unique set of all labels
-    all_labels = set().union(*[set(labels) for labels in permutation_importance_labels_dict.values()])
+        # Plotting the stacked bar plot
+        # Determine the unique set of all labels
+        # Determine the unique set of all labels
+        all_labels = set().union(*[set(labels) for labels in permutation_importance_labels_dict.values()])
 
-    # Plotting the stacked bar plot
-    fig, ax = plt.subplots()
-    width = 0.5
+        # Plotting the stacked bar plot
+        fig, ax = plt.subplots()
+        width = 0.5
 
-    positions = np.arange(len(all_labels))
-
-
-
-    dirfemale = 'D:/Stimuli/19122022/FemaleSounds24k_addedPinkNoiseRevTargetdB.mat'
-    dirmale = 'D:/Stimuli/19122022/MaleSounds24k_addedPinkNoiseRevTargetdB.mat'
-    word_times, worddictionary_female = run_word_durations(dirfemale)
-    word_times_male, worddict_male = run_word_durations_male(dirmale)
-
-    # GET THE TOP 5 WORDS
-    top_words = np.flip(X_test.columns[sorted_idx])[0:4]
-    for top_word in top_words:
-        top_word = top_word[4:]
-        # replace the word with the word number
-        top_word = int(top_word)
-        # re-add it to the list
-        top_words = np.append(top_words, top_word)
-    # remove the word with the word number
-    top_words = np.delete(top_words, [0, 1, 2, 3])
-
-    mosaic = ['A', 'A', 'A', 'A', 'A'], ['D1', 'D1', 'D1', 'B', 'B'], ['D2', 'D2', 'D2', 'H', 'I'], ['D2', 'D2', 'D2', 'C',  'F', ], ['D2', 'D2', 'D2',  'J', 'K'],\
-        ['D2', 'D2',  'D2',  'E','G']
-
-    text_width_pt = 419.67816  # Replace with your value
-    text_height_pt = 717.00946
-
-    # Convert the text width from points to inches
-    text_width_inches = text_width_pt / 72.27
-    text_height_inches = text_height_pt / 72.27
-
-    fig, ax = plt.subplots(figsize=(15,5))
-    ax.plot(feature_labels, cumulative_importances, marker='o', color=talker_color)
-    # ax_dict['A'].set_xlabel('Features', fontsize=15)
-    ax.set_ylabel('Cumulative feature importance', fontsize=15)
-    ax.set_title(
-        'Elbow plot of cumulative feature importance in absolute reaction time model, ' + talker_word + ' talker',
-        fontsize=15)
-    ax.set_xticklabels(feature_labels_words, rotation=35, ha='right',fontsize=10)
-    plt.savefig(os.path.join((fig_savedir), str(talker) + 'elobowplot_1606_noannotation.pdf'), dpi=500, bbox_inches='tight')
-    plt.show()
-    if talker == 1:
-        color_list_bar = ['purple', 'crimson', 'darkorange', 'gold', 'burlywood']
-    else:
-        color_list_bar = ['red', 'chocolate', 'lightsalmon', 'peachpuff', 'orange']
-    bottom = np.zeros(len(all_labels))
-    # fig = plt.figure(figsize=(text_width_inches*3, (text_height_inches)*3))
-
-    fig, ax = plt.subplots(figsize=(15,5))
-
-
-    for i, ferret in enumerate(permutation_importance_dict.keys()):
-        values = np.zeros(len(all_labels))
-        labels_ferret = permutation_importance_labels_dict[ferret]
-        for j, label in enumerate(all_labels):
-            if label in labels_ferret:
-                index = labels_ferret.tolist().index(label)
-                values[j] = permutation_importance_dict[ferret][index]
-        ax.bar(positions, values, width, bottom=bottom, label=ferret, color=color_list_bar[i])
-        bottom += values
-    ax.set_ylabel('Permutation importance', fontsize=15)
-    ax.set_title('Top 5 features for predicting absolute release time, ' + talkerlist[talker - 1] + ' talker',
-                           fontsize=15)
-    ax.set_xticks(np.arange(len(all_labels)))
-    ax.set_xticklabels(all_labels, rotation=70, fontsize=10)
-    ax.legend()
-    plt.savefig(os.path.join((fig_savedir), str(talker) + 'stackedbarplot_1606_noannotation.pdf'), dpi=500, bbox_inches='tight')
-    plt.show()
-
-
-    fig = plt.figure(figsize=(text_width_inches*3, (text_height_inches)*3))
-    # fig = plt.figure(figsize=(20, 27))
-    ax_dict = fig.subplot_mosaic(mosaic)
-    # Plot the elbow plot
-    ax_dict['A'].plot(feature_labels, cumulative_importances, marker='o', color=talker_color)
-    # ax_dict['A'].set_xlabel('Features', fontsize=15)
-    ax_dict['A'].set_ylabel('Cumulative feature importance', fontsize=15)
-    ax_dict['A'].set_title(
-        'Elbow plot of cumulative feature importance \n on absolute reaction time,' + talker_word + ' talker',
-        fontsize=15)
-    ax_dict['A'].set_xticklabels(feature_labels_words, rotation=35, ha='right',
-                                 fontsize=10)  # rotate x-axis labels for better readability
-    # rotate x-axis labels for better readability
-    # summary_img = mpimg.imread(fig_savedir / 'shapsummaryplot_allanimals2.png')
-    bottom = np.zeros(len(all_labels))
-    import matplotlib.cm as cm
-
-    # Your code here...
-    my_cmap = cm.get_cmap(cmap_color)  # Choose a colormap
-    for i, ferret in enumerate(permutation_importance_dict.keys()):
-        values = np.zeros(len(all_labels))
-        labels_ferret = permutation_importance_labels_dict[ferret]
-        for j, label in enumerate(all_labels):
-            if label in labels_ferret:
-                index = labels_ferret.tolist().index(label)
-                values[j] = permutation_importance_dict[ferret][index]
-        ax_dict['B'].bar(positions, values, width, bottom=bottom, label=ferret, color=color_list_bar[i])
-        bottom += values
-    ax_dict['B'].set_ylabel('Permutation importance', fontsize=15)
-    ax_dict['B'].set_title('Top 5 features for predicting \n absolute release time, ' + talkerlist[talker - 1] + ' talker',
-                           fontsize=15)
-    ax_dict['B'].set_xticks(np.arange(len(all_labels)))
-    ax_dict['B'].set_xticklabels(all_labels, rotation=70, fontsize=10)
-    ax_dict['B'].legend()
-    # # ax_dict['B'].subplots_adjust(bottom=0.3)  # Adjust the bottom margin to accommodate rotated xtick labels
-    # ax_dict['D'].barh(np.flip(feature_labels_words), result.importances[sorted_idx].mean(axis=1).T, color=talker_color)
-    # ax_dict['D'].set_title("Permutation importance features on absolute reaction time, " + talker_word + " talker ",
-    #                        fontsize=15)
-    # ax_dict['D'].set_xlabel("Permutation importance", fontsize=15)
-    # ax_dict['D'].set_ylabel("Feature", fontsize=15)
-    # ax_dict['D'].set_yticks(np.flip(feature_labels_words))
-    # ax_dict['D'].set_yticklabels(np.flip(feature_labels_words), ha='right',
-    #                              fontsize=15)  # rotate x-axis labels for better readability
-
-    data_perm_importance = (result.importances[sorted_idx].mean(axis=1).T)
-    labels = (feature_labels_words)
-
-    # Bar plot on the first axes
-    ax_dict['D1'].barh(labels[0], data_perm_importance[-1], color=talker_color)
-    ax_dict['D1'].set_title("Permutation importance features on absolute reaction time, " + talker_word + " talker",
-                            fontsize=15)
-    # ax_dict['D1'].set_xlabel("Permutation importance", fontsize=15)
-    ax_dict['D1'].set_ylabel("Feature", fontsize=15)
-    ax_dict['D1'].set_yticks(labels[0])
-    # ax_dict['D1'].set_yticklabels(labels[0], ha='right', fontsize=15)
-
-    # Bar plot on the second axes
-    ax_dict['D2'].barh(labels[1:], data_perm_importance[1:], color=talker_color)
-    # ax_dict['D2'].set_title("Permutation importance features on absolute reaction time, " + talker_word + " talker",
-    #                         fontsize=15)
-    ax_dict['D2'].set_xlabel("Permutation importance", fontsize=15)
-    ax_dict['D2'].set_yticks(labels[1:])
-    ax_dict['D2'].set_yticklabels(labels[1:], ha='right', fontsize=15)
-
-    # zoom-in / limit the view to different portions of the data
-    ax_dict['D1'].set_xlim(0, np.max(data_perm_importance) * 1.1)  # Adjust the limit based on your data
-    ax_dict['D2'].set_xlim(0, 0.06)  # Adjust the limit based on your data
-
-    # hide the spines between ax_dict['D1'] and ax_dict['D2']
-    ax_dict['D1'].spines['right'].set_visible(False)
-    ax_dict['D2'].spines['left'].set_visible(False)
-    ax_dict['D1'].yaxis.tick_left()
-    ax_dict['D1'].tick_params(labeltop='off')  # don't put tick labels at the top
-    ax_dict['D2'].yaxis.tick_right()
-
-    # Make the spacing between the two axes a bit smaller
-    plt.subplots_adjust(wspace=0.15)
+        positions = np.arange(len(all_labels))
 
 
 
-    d = 0.015  # how big to make the diagonal lines in axes coordinates
-    # arguments to pass plot, just so we don't keep repeating them
-    kwargs = dict(transform=ax_dict['D1'].transAxes, color='k', clip_on=False)
-    ax_dict['D1'].plot((1 - d, 1 + d), (-d, +d), **kwargs)  # top-left diagonal
-    ax_dict['D1'].plot((1 - d, 1 + d), (1 - d, 1 + d), **kwargs)  # bottom-left diagonal
+        dirfemale = 'D:/Stimuli/19122022/FemaleSounds24k_addedPinkNoiseRevTargetdB.mat'
+        dirmale = 'D:/Stimuli/19122022/MaleSounds24k_addedPinkNoiseRevTargetdB.mat'
+        word_times, worddictionary_female = run_word_durations(dirfemale)
+        word_times_male, worddict_male = run_word_durations_male(dirmale)
 
-    kwargs.update(transform=ax_dict['D2'].transAxes)  # switch to the bottom axes
-    ax_dict['D2'].plot((-d, d), (-d, +d), **kwargs)  # top-right diagonal
-    ax_dict['D2'].plot((-d, d), (1 - d, 1 + d), **kwargs)  # bottom-right diagonal
+        # GET THE TOP 5 WORDS
+        top_words = np.flip(X_test.columns[sorted_idx])[0:4]
+        for top_word in top_words:
+            top_word = top_word[4:]
+            # replace the word with the word number
+            top_word = int(top_word)
+            # re-add it to the list
+            top_words = np.append(top_words, top_word)
+        # remove the word with the word number
+        top_words = np.delete(top_words, [0, 1, 2, 3])
 
+        mosaic = ['A', 'A', 'A', 'A', 'A'], ['D1', 'D1', 'D1', 'B', 'B'], ['D2', 'D2', 'D2', 'H', 'I'], ['D2', 'D2', 'D2', 'C',  'F', ], ['D2', 'D2', 'D2',  'J', 'K'],\
+            ['D2', 'D2',  'D2',  'E','G']
 
+        text_width_pt = 419.67816  # Replace with your value
+        text_height_pt = 717.00946
 
-    # ax_dict['D'].set_yticklabels(np.flip(feature_labels_words), rotation=45, ha='right', fontsize=10)  # rotate x-axis labels for better readability
-    # Plot spectrogram
-    if talker == 1:
-        worddict = worddictionary_female
-    elif talker == 2:
-        worddict = worddict_male
-    # pxx, freq, t, cax = ax_dict['E'].specgram(worddict[int(top_words[1]) - 1].flatten(), Fs=24414.0625, mode = 'psd', cmap = cmap_color)
-    D = librosa.amplitude_to_db(np.abs(librosa.stft(worddict[int(top_words[1]) - 1].flatten())))
-    cax = librosa.display.specshow(D, x_axis='time', y_axis='log', ax=ax_dict['E'], sr=24414.0625, cmap=cmap_color)
-    # remove colorbar
-    # fig.colorbar(cax, ax=None)
-    ax_dict['E'].set_title(f" '{feature_labels_words[1]}'")
-    ax_dict['E'].set_xlabel('Time (s)')
-    ax_dict['E'].set_xticks(np.round(np.arange(0.1, len(worddict[int(top_words[1]) - 1]) / 24414.0625, 0.1), 2))
-    ax_dict['E'].set_xticklabels(np.round(np.arange(0.1, len(worddict[int(top_words[1]) - 1]) / 24414.0625, 0.1), 2),
-                                 rotation=45, ha='right', fontsize=10)
-    # plt.colorbar(cax, ax=None)
-    # f, t, Sxx = scipy.signal.spectrogram(worddict[int(top_words[0]) - 1].flatten(), fs=24414.0625, window='hann')
-    # cax = ax_dict['C'].pcolormesh(t, np.log10(f), Sxx, shading=cmap_color)
-    #
-    # pxx, freq, t, cax = ax_dict['C'].specgram(worddict[int(top_words[0]) - 1].flatten(), Fs=24414.0625, mode = 'psd', cmap = cmap_color)
-    D = librosa.amplitude_to_db(np.abs(librosa.stft(worddict[int(top_words[0]) - 1].flatten())))
-    cax = librosa.display.specshow(D, x_axis='time', y_axis='log', sr=24414.0625, ax=ax_dict['C'], cmap=cmap_color)
-    # fig.colorbar(cax, ax=None)
-    ax_dict['C'].legend()
-    ax_dict['C'].set_title(f" instruments")
-    ax_dict['C'].set_xlabel('Time (s)')
-    ax_dict['C'].set_xticks(np.round(np.arange(0.1, len(worddict[int(top_words[0]) - 1]) / 24414.0625, 0.1), 2))
-    ax_dict['C'].set_xticklabels(np.round(np.arange(0.1, len(worddict[int(top_words[0]) - 1]) / 24414.0625, 0.1), 2),
-                                 rotation=45, ha='right', fontsize=10)
-    ax_dict['C'].set_ylabel('Frequency (Hz)')
-    # plt.colorbar(cax, ax = ax_dict['C'])
-    # pxx, freq, t, cax = ax_dict['F'].specgram(worddict[int(top_words[2]) - 1].flatten(), Fs=24414.0625, mode = 'psd', cmap = cmap_color)
-    D = librosa.amplitude_to_db(np.abs(librosa.stft(worddict[int(top_words[2]) - 1].flatten())))
-    cax = librosa.display.specshow(D, sr=24414.0625, x_axis='time', y_axis='log', ax=ax_dict['F'], cmap=cmap_color)
-    # fig.colorbar(cax, ax=None)
-    ax_dict['F'].set_title(f"  '{feature_labels_words[2]}'")
-    ax_dict['F'].set_xlabel('Time (s)')
-    ax_dict['F'].set_xticks(np.round(np.arange(0.1, (len(worddict[int(top_words[2]) - 1]) / 24414.0625), 0.1), 2))
-    ax_dict['F'].set_xticklabels(np.round(np.arange(0.1, len(worddict[int(top_words[2]) - 1]) / 24414.0625, 0.1), 2),
-                                 rotation=45, ha='right', fontsize=10)
-    # plt.colorbar(cax, ax = None)
-    # take spectrogram of the word, log10 of frequency
-    if talker == 2:
-        data_scaled = scaledata(worddict[int(top_words[3]) - 1].flatten(), -7977, 7797)
-    else:
-        data_scaled = worddict[int(top_words[3]) - 1].flatten()
-    ax_dict['G'].set_title(f" '{feature_labels_words[3]}'")
-    D = librosa.amplitude_to_db(np.abs(librosa.stft(data_scaled)))
-    # Plot the spectrogram on a logarithmic scale
-    cax = librosa.display.specshow(D, x_axis='time', y_axis='log', sr=24414.0625, ax=ax_dict['G'], cmap=cmap_color)
-    ax_dict['G'].set_xlabel('Time (s)')
-    ax_dict['G'].set_xticks(np.round(np.arange(0.1, len(data_scaled) / 24414.0625, 0.1), 2))
-    ax_dict['G'].set_xticklabels(np.round(np.arange(0.1, len(data_scaled) / 24414.0625, 0.1), 2), rotation=45,
-                                 ha='right', fontsize=10)
-    # plt.colorbar(cax, ax=None )
-    # ['H', 'I', 'J', 'K'],
-    ax_dict['J'].fill_between(np.arange(len(np.abs(worddict[int(top_words[1]) - 1]))) / 24414.0625,
-                              (worddict[int(top_words[1]) - 1]).flatten(), color=talker_color, alpha=0.5)
-    ax_dict['J'].set_title(f"'{feature_labels_words[1]}'")
-    # ax_dict['J'].set_ylabel('Amplitude (a.u.)')
-    ax_dict['H'].set_xlabel('Time (s)')
-    ax_dict['H'].fill_between(np.arange(len(np.abs(worddict[0]))) / 24414.0625, (worddict[0]).flatten(),
-                              color=talker_color, alpha=0.5)
-    ax_dict['H'].set_title(f" '{feature_labels_words[0]}'")
-    ax_dict['H'].set_xlabel('Time (s)')
-    ax_dict['I'].fill_between(np.arange(len(np.abs(worddict[int(top_words[2]) - 1]))) / 24414.0625,
-                              (worddict[int(top_words[2]) - 1]).flatten(), color=talker_color, alpha=0.5)
-    ax_dict['I'].set_title(f"'{feature_labels_words[2]}'")
-    ax_dict['I'].set_xlabel('Time (s)')
-    ax_dict['K'].fill_between(np.arange(len(data_scaled)) / 24414.0625, (data_scaled.flatten()), color=talker_color,
-                              alpha=0.5)
-    ax_dict['K'].set_title(f"'{feature_labels_words[3]}'")
-    ax_dict['K'].set_xlabel('Time (s)')
-    # remove padding outside the figures
-    font_props = fm.FontProperties(weight='bold', size=25)
-    # ax_dict['A'].annotate('A', xy=get_axis_limits(ax_dict['A']),
-    #                       xytext=(-0.1, ax_dict['A'].title.get_position()[1] + 0.05), textcoords='axes fraction',
-    #                       fontproperties=font_props, zorder=10)
-    # ax_dict['B'].annotate('C', xy=get_axis_limits(ax_dict['B']),
-    #                       xytext=(-0.1, ax_dict['B'].title.get_position()[1] + 0.05), textcoords='axes fraction',
-    #                       fontproperties=font_props, zorder=10)
-    # # ax_dict['C'].annotate('h)', xy=get_axis_limits(ax_dict['C']), xytext=(-0.1, ax_dict['C'].title.get_position()[1]+0.15), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-    # ax_dict['D'].annotate('B', xy=get_axis_limits(ax_dict['D']), xytext=(-0.1, ax_dict['D'].title.get_position()[1]),
-    #                       textcoords='axes fraction', fontproperties=font_props, zorder=10)
-    # # ax_dict['E'].annotate('j)', xy=get_axis_limits(ax_dict['E']), xytext=(-0.1, ax_dict['E'].title.get_position()[1]+0.15), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-    # # ax_dict['F'].annotate('i)', xy=get_axis_limits(ax_dict['F']), xytext=(-0.1, ax_dict['F'].title.get_position()[1]+0.15), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-    # # ax_dict['G'].annotate('k)', xy=get_axis_limits(ax_dict['G']), xytext=(-0.1, ax_dict['G'].title.get_position()[1]+0.15), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-    # ax_dict['H'].annotate('D', xy=get_axis_limits(ax_dict['H']),
-    #                       xytext=(-0.15, ax_dict['H'].title.get_position()[1] + 0.08), textcoords='axes fraction',
-    #                       fontproperties=font_props, zorder=10)
-    # ax_dict['I'].annotate('e)', xy=get_axis_limits(ax_dict['I']), xytext=(-0.1, ax_dict['I'].title.get_position()[1]+0.15), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-    # ax_dict['J'].annotate('f)', xy=get_axis_limits(ax_dict['J']), xytext=(-0.1, ax_dict['J'].title.get_position()[1]+0.15), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-    # ax_dict['K'].annotate('g)', xy=get_axis_limits(ax_dict['K']), xytext=(-0.1, ax_dict['K'].title.get_position()[1]+0.15), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-    plt.subplots_adjust(wspace=0.33, hspace=0.53)
+        # Convert the text width from points to inches
+        text_width_inches = text_width_pt / 72.27
+        text_height_inches = text_height_pt / 72.27
 
-    plt.savefig(os.path.join((fig_savedir), str(talker) + '_talker_big_summary_plot_1606_noannotation.png'), dpi=500)
-    plt.savefig(os.path.join((fig_savedir), str(talker) + '_talker_big_summary_plot_1606_noannotation.pdf'), dpi=500, bbox_inches='tight')
-    fig.tight_layout()
-    plt.show()
+        fig, ax = plt.subplots(figsize=(15,5))
+        ax.plot(feature_labels, cumulative_importances, marker='o', color=talker_color)
+        # ax_dict['A'].set_xlabel('Features', fontsize=15)
+        ax.set_ylabel('Cumulative feature importance', fontsize=15)
+        ax.set_title(
+            'Elbow plot of cumulative feature importance in absolute reaction time model, ' + talker_word + ' talker',
+            fontsize=15)
+        ax.set_xticklabels(feature_labels_words, rotation=35, ha='right',fontsize=10)
+        plt.savefig(os.path.join((fig_savedir), str(talker) + 'elobowplot_1606_noannotation.pdf'), dpi=500, bbox_inches='tight')
+        plt.show()
+        if talker == 1:
+            color_list_bar = ['purple', 'crimson', 'darkorange', 'gold', 'burlywood']
+        else:
+            color_list_bar = ['red', 'chocolate', 'lightsalmon', 'peachpuff', 'orange']
+        bottom = np.zeros(len(all_labels))
+        # fig = plt.figure(figsize=(text_width_inches*3, (text_height_inches)*3))
+
+        fig, ax = plt.subplots(figsize=(15,5))
 
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 15), gridspec_kw={'width_ratios': [4, 1]})
-    # Plotting the majority of values on the first subplot
-    ax2.barh(np.arange(0,len(data_perm_importance),1), data_perm_importance[:], color=talker_color)
-    ax2.set_xlim(max(data_perm_importance[:-1])+0.002, data_perm_importance[-1] +0.05 )  # Adjust xlim for the outlier
-    ax2.set_yticklabels([])
+        for i, ferret in enumerate(permutation_importance_dict.keys()):
+            values = np.zeros(len(all_labels))
+            labels_ferret = permutation_importance_labels_dict[ferret]
+            for j, label in enumerate(all_labels):
+                if label in labels_ferret:
+                    index = labels_ferret.tolist().index(label)
+                    values[j] = permutation_importance_dict[ferret][index]
+            ax.bar(positions, values, width, bottom=bottom, label=ferret, color=color_list_bar[i])
+            bottom += values
+        ax.set_ylabel('Permutation importance', fontsize=15)
+        ax.set_title('Top 5 features for predicting absolute release time, ' + talkerlist[talker - 1] + ' talker',
+                               fontsize=15)
+        ax.set_xticks(np.arange(len(all_labels)))
+        ax.set_xticklabels(all_labels, rotation=70, fontsize=10)
+        ax.legend()
+        plt.savefig(os.path.join((fig_savedir), str(talker) + 'stackedbarplot_1606_noannotation.pdf'), dpi=500, bbox_inches='tight')
+        plt.show()
 
-    ax1.barh(np.arange(0,len(data_perm_importance),1), data_perm_importance[:], color = talker_color)
-    ax1.set_xlim(0, max(data_perm_importance[:-1])+0.002)  # Adjust xlim for the majority of values
-    ax1.set_yticks(np.arange(0,len(data_perm_importance),1))
-    ax1.set_yticklabels(np.flip(labels[:]), rotation = 45)
 
-    plt.tight_layout()
-    fig.subplots_adjust(top=0.85)
-    # ax1.set_xlabel('Value')
-    fig.subplots_adjust(wspace=0)
-    #remove # Reduce the spacing between subplots
-    #remove spine between the two subplots
-    ax1.spines['right'].set_visible(False)
-    ax2.spines['left'].set_visible(False)
-    #remove ticks in the middle
-    ax1.tick_params(right=False)
-    ax2.tick_params(left=False)
-    #add a break in the x-axis
-    d = .015  # how big to make the diagonal lines in axes coordinates
-    #plot the diagonal lines on the first subplot
-    kwargs = dict(transform=ax1.transAxes, color='k', clip_on=False)
-    ax1.plot((1 - d, 1 + d), (-d, +d), **kwargs)
-    ax1.plot((1 - d, 1 + d), (1 - d, 1 + d), **kwargs)
-    fig.text(0.5, 0.00, 'Permutation Importance', ha='center', va='center', fontsize = 12)  # Add a common x-axis label
+        fig = plt.figure(figsize=(text_width_inches*3, (text_height_inches)*3))
+        # fig = plt.figure(figsize=(20, 27))
+        ax_dict = fig.subplot_mosaic(mosaic)
+        # Plot the elbow plot
+        ax_dict['A'].plot(feature_labels, cumulative_importances, marker='o', color=talker_color)
+        # ax_dict['A'].set_xlabel('Features', fontsize=15)
+        ax_dict['A'].set_ylabel('Cumulative feature importance', fontsize=15)
+        ax_dict['A'].set_title(
+            'Elbow plot of cumulative feature importance \n on absolute reaction time,' + talker_word + ' talker',
+            fontsize=15)
+        ax_dict['A'].set_xticklabels(feature_labels_words, rotation=35, ha='right',
+                                     fontsize=10)  # rotate x-axis labels for better readability
+        # rotate x-axis labels for better readability
+        # summary_img = mpimg.imread(fig_savedir / 'shapsummaryplot_allanimals2.png')
+        bottom = np.zeros(len(all_labels))
+        import matplotlib.cm as cm
 
-    # Display the chart
-    plt.savefig(os.path.join((fig_savedir), str(talker) + '_permutationimportance_plot_2906_noannotation.png'), dpi=500, bbox_inches='tight')
-    plt.show()
+        # Your code here...
+        my_cmap = cm.get_cmap(cmap_color)  # Choose a colormap
+        for i, ferret in enumerate(permutation_importance_dict.keys()):
+            values = np.zeros(len(all_labels))
+            labels_ferret = permutation_importance_labels_dict[ferret]
+            for j, label in enumerate(all_labels):
+                if label in labels_ferret:
+                    index = labels_ferret.tolist().index(label)
+                    values[j] = permutation_importance_dict[ferret][index]
+            ax_dict['B'].bar(positions, values, width, bottom=bottom, label=ferret, color=color_list_bar[i])
+            bottom += values
+        ax_dict['B'].set_ylabel('Permutation importance', fontsize=15)
+        ax_dict['B'].set_title('Top 5 features for predicting \n absolute release time, ' + talkerlist[talker - 1] + ' talker',
+                               fontsize=15)
+        ax_dict['B'].set_xticks(np.arange(len(all_labels)))
+        ax_dict['B'].set_xticklabels(all_labels, rotation=70, fontsize=10)
+        ax_dict['B'].legend()
+        # # ax_dict['B'].subplots_adjust(bottom=0.3)  # Adjust the bottom margin to accommodate rotated xtick labels
+        # ax_dict['D'].barh(np.flip(feature_labels_words), result.importances[sorted_idx].mean(axis=1).T, color=talker_color)
+        # ax_dict['D'].set_title("Permutation importance features on absolute reaction time, " + talker_word + " talker ",
+        #                        fontsize=15)
+        # ax_dict['D'].set_xlabel("Permutation importance", fontsize=15)
+        # ax_dict['D'].set_ylabel("Feature", fontsize=15)
+        # ax_dict['D'].set_yticks(np.flip(feature_labels_words))
+        # ax_dict['D'].set_yticklabels(np.flip(feature_labels_words), ha='right',
+        #                              fontsize=15)  # rotate x-axis labels for better readability
+
+        data_perm_importance = (result.importances[sorted_idx].mean(axis=1).T)
+        labels = (feature_labels_words)
+
+        # Bar plot on the first axes
+        ax_dict['D1'].barh(labels[0], data_perm_importance[-1], color=talker_color)
+        ax_dict['D1'].set_title("Permutation importance features on absolute reaction time, " + talker_word + " talker",
+                                fontsize=15)
+        # ax_dict['D1'].set_xlabel("Permutation importance", fontsize=15)
+        ax_dict['D1'].set_ylabel("Feature", fontsize=15)
+        ax_dict['D1'].set_yticks(labels[0])
+        # ax_dict['D1'].set_yticklabels(labels[0], ha='right', fontsize=15)
+
+        # Bar plot on the second axes
+        ax_dict['D2'].barh(labels[1:], data_perm_importance[1:], color=talker_color)
+        # ax_dict['D2'].set_title("Permutation importance features on absolute reaction time, " + talker_word + " talker",
+        #                         fontsize=15)
+        ax_dict['D2'].set_xlabel("Permutation importance", fontsize=15)
+        ax_dict['D2'].set_yticks(labels[1:])
+        ax_dict['D2'].set_yticklabels(labels[1:], ha='right', fontsize=15)
+
+        # zoom-in / limit the view to different portions of the data
+        ax_dict['D1'].set_xlim(0, np.max(data_perm_importance) * 1.1)  # Adjust the limit based on your data
+        ax_dict['D2'].set_xlim(0, 0.06)  # Adjust the limit based on your data
+
+        # hide the spines between ax_dict['D1'] and ax_dict['D2']
+        ax_dict['D1'].spines['right'].set_visible(False)
+        ax_dict['D2'].spines['left'].set_visible(False)
+        ax_dict['D1'].yaxis.tick_left()
+        ax_dict['D1'].tick_params(labeltop='off')  # don't put tick labels at the top
+        ax_dict['D2'].yaxis.tick_right()
+
+        # Make the spacing between the two axes a bit smaller
+        plt.subplots_adjust(wspace=0.15)
+
+
+
+        d = 0.015  # how big to make the diagonal lines in axes coordinates
+        # arguments to pass plot, just so we don't keep repeating them
+        kwargs = dict(transform=ax_dict['D1'].transAxes, color='k', clip_on=False)
+        ax_dict['D1'].plot((1 - d, 1 + d), (-d, +d), **kwargs)  # top-left diagonal
+        ax_dict['D1'].plot((1 - d, 1 + d), (1 - d, 1 + d), **kwargs)  # bottom-left diagonal
+
+        kwargs.update(transform=ax_dict['D2'].transAxes)  # switch to the bottom axes
+        ax_dict['D2'].plot((-d, d), (-d, +d), **kwargs)  # top-right diagonal
+        ax_dict['D2'].plot((-d, d), (1 - d, 1 + d), **kwargs)  # bottom-right diagonal
+
+
+
+        # ax_dict['D'].set_yticklabels(np.flip(feature_labels_words), rotation=45, ha='right', fontsize=10)  # rotate x-axis labels for better readability
+        # Plot spectrogram
+        if talker == 1:
+            worddict = worddictionary_female
+        elif talker == 2:
+            worddict = worddict_male
+        # pxx, freq, t, cax = ax_dict['E'].specgram(worddict[int(top_words[1]) - 1].flatten(), Fs=24414.0625, mode = 'psd', cmap = cmap_color)
+        D = librosa.amplitude_to_db(np.abs(librosa.stft(worddict[int(top_words[1]) - 1].flatten())))
+        cax = librosa.display.specshow(D, x_axis='time', y_axis='log', ax=ax_dict['E'], sr=24414.0625, cmap=cmap_color)
+        # remove colorbar
+        # fig.colorbar(cax, ax=None)
+        ax_dict['E'].set_title(f" '{feature_labels_words[1]}'")
+        ax_dict['E'].set_xlabel('Time (s)')
+        ax_dict['E'].set_xticks(np.round(np.arange(0.1, len(worddict[int(top_words[1]) - 1]) / 24414.0625, 0.1), 2))
+        ax_dict['E'].set_xticklabels(np.round(np.arange(0.1, len(worddict[int(top_words[1]) - 1]) / 24414.0625, 0.1), 2),
+                                     rotation=45, ha='right', fontsize=10)
+        # plt.colorbar(cax, ax=None)
+        # f, t, Sxx = scipy.signal.spectrogram(worddict[int(top_words[0]) - 1].flatten(), fs=24414.0625, window='hann')
+        # cax = ax_dict['C'].pcolormesh(t, np.log10(f), Sxx, shading=cmap_color)
+        #
+        # pxx, freq, t, cax = ax_dict['C'].specgram(worddict[int(top_words[0]) - 1].flatten(), Fs=24414.0625, mode = 'psd', cmap = cmap_color)
+        D = librosa.amplitude_to_db(np.abs(librosa.stft(worddict[int(top_words[0]) - 1].flatten())))
+        cax = librosa.display.specshow(D, x_axis='time', y_axis='log', sr=24414.0625, ax=ax_dict['C'], cmap=cmap_color)
+        # fig.colorbar(cax, ax=None)
+        ax_dict['C'].legend()
+        ax_dict['C'].set_title(f" instruments")
+        ax_dict['C'].set_xlabel('Time (s)')
+        ax_dict['C'].set_xticks(np.round(np.arange(0.1, len(worddict[int(top_words[0]) - 1]) / 24414.0625, 0.1), 2))
+        ax_dict['C'].set_xticklabels(np.round(np.arange(0.1, len(worddict[int(top_words[0]) - 1]) / 24414.0625, 0.1), 2),
+                                     rotation=45, ha='right', fontsize=10)
+        ax_dict['C'].set_ylabel('Frequency (Hz)')
+        # plt.colorbar(cax, ax = ax_dict['C'])
+        # pxx, freq, t, cax = ax_dict['F'].specgram(worddict[int(top_words[2]) - 1].flatten(), Fs=24414.0625, mode = 'psd', cmap = cmap_color)
+        D = librosa.amplitude_to_db(np.abs(librosa.stft(worddict[int(top_words[2]) - 1].flatten())))
+        cax = librosa.display.specshow(D, sr=24414.0625, x_axis='time', y_axis='log', ax=ax_dict['F'], cmap=cmap_color)
+        # fig.colorbar(cax, ax=None)
+        ax_dict['F'].set_title(f"  '{feature_labels_words[2]}'")
+        ax_dict['F'].set_xlabel('Time (s)')
+        ax_dict['F'].set_xticks(np.round(np.arange(0.1, (len(worddict[int(top_words[2]) - 1]) / 24414.0625), 0.1), 2))
+        ax_dict['F'].set_xticklabels(np.round(np.arange(0.1, len(worddict[int(top_words[2]) - 1]) / 24414.0625, 0.1), 2),
+                                     rotation=45, ha='right', fontsize=10)
+        # plt.colorbar(cax, ax = None)
+        # take spectrogram of the word, log10 of frequency
+        if talker == 2:
+            data_scaled = scaledata(worddict[int(top_words[3]) - 1].flatten(), -7977, 7797)
+        else:
+            data_scaled = worddict[int(top_words[3]) - 1].flatten()
+        ax_dict['G'].set_title(f" '{feature_labels_words[3]}'")
+        D = librosa.amplitude_to_db(np.abs(librosa.stft(data_scaled)))
+        # Plot the spectrogram on a logarithmic scale
+        cax = librosa.display.specshow(D, x_axis='time', y_axis='log', sr=24414.0625, ax=ax_dict['G'], cmap=cmap_color)
+        ax_dict['G'].set_xlabel('Time (s)')
+        ax_dict['G'].set_xticks(np.round(np.arange(0.1, len(data_scaled) / 24414.0625, 0.1), 2))
+        ax_dict['G'].set_xticklabels(np.round(np.arange(0.1, len(data_scaled) / 24414.0625, 0.1), 2), rotation=45,
+                                     ha='right', fontsize=10)
+        # plt.colorbar(cax, ax=None )
+        # ['H', 'I', 'J', 'K'],
+        ax_dict['J'].fill_between(np.arange(len(np.abs(worddict[int(top_words[1]) - 1]))) / 24414.0625,
+                                  (worddict[int(top_words[1]) - 1]).flatten(), color=talker_color, alpha=0.5)
+        ax_dict['J'].set_title(f"'{feature_labels_words[1]}'")
+        # ax_dict['J'].set_ylabel('Amplitude (a.u.)')
+        ax_dict['H'].set_xlabel('Time (s)')
+        ax_dict['H'].fill_between(np.arange(len(np.abs(worddict[0]))) / 24414.0625, (worddict[0]).flatten(),
+                                  color=talker_color, alpha=0.5)
+        ax_dict['H'].set_title(f" '{feature_labels_words[0]}'")
+        ax_dict['H'].set_xlabel('Time (s)')
+        ax_dict['I'].fill_between(np.arange(len(np.abs(worddict[int(top_words[2]) - 1]))) / 24414.0625,
+                                  (worddict[int(top_words[2]) - 1]).flatten(), color=talker_color, alpha=0.5)
+        ax_dict['I'].set_title(f"'{feature_labels_words[2]}'")
+        ax_dict['I'].set_xlabel('Time (s)')
+        ax_dict['K'].fill_between(np.arange(len(data_scaled)) / 24414.0625, (data_scaled.flatten()), color=talker_color,
+                                  alpha=0.5)
+        ax_dict['K'].set_title(f"'{feature_labels_words[3]}'")
+        ax_dict['K'].set_xlabel('Time (s)')
+
+        plt.subplots_adjust(wspace=0.33, hspace=0.53)
+
+        plt.savefig(os.path.join((fig_savedir), str(talker) + '_talker_big_summary_plot_1606_noannotation.png'), dpi=500)
+        plt.savefig(os.path.join((fig_savedir), str(talker) + '_talker_big_summary_plot_1606_noannotation.pdf'), dpi=500, bbox_inches='tight')
+        fig.tight_layout()
+        plt.show()
+
+
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 15), gridspec_kw={'width_ratios': [4, 1]})
+        # Plotting the majority of values on the first subplot
+        ax2.barh(np.arange(0,len(data_perm_importance),1), data_perm_importance[:], color=talker_color)
+        ax2.set_xlim(max(data_perm_importance[:-1])+0.002, data_perm_importance[-1] +0.05 )  # Adjust xlim for the outlier
+        ax2.set_yticklabels([])
+
+        ax1.barh(np.arange(0,len(data_perm_importance),1), data_perm_importance[:], color = talker_color)
+        ax1.set_xlim(0, max(data_perm_importance[:-1])+0.002)  # Adjust xlim for the majority of values
+        ax1.set_yticks(np.arange(0,len(data_perm_importance),1))
+        ax1.set_yticklabels(np.flip(labels[:]), rotation = 45)
+
+        plt.tight_layout()
+        fig.subplots_adjust(top=0.85)
+        # ax1.set_xlabel('Value')
+        fig.subplots_adjust(wspace=0)
+
+        ax1.spines['right'].set_visible(False)
+        ax2.spines['left'].set_visible(False)
+        #remove ticks in the middle
+        ax1.tick_params(right=False)
+        ax2.tick_params(left=False)
+        #add a break in the x-axis
+        d = .015  # how big to make the diagonal lines in axes coordinates
+        #plot the diagonal lines on the first subplot
+        kwargs = dict(transform=ax1.transAxes, color='k', clip_on=False)
+        ax1.plot((1 - d, 1 + d), (-d, +d), **kwargs)
+        ax1.plot((1 - d, 1 + d), (1 - d, 1 + d), **kwargs)
+        fig.text(0.5, 0.00, 'Permutation Importance', ha='center', va='center', fontsize = 12)  # Add a common x-axis label
+
+        # Display the chart
+        plt.savefig(os.path.join((fig_savedir), str(talker) + '_permutationimportance_plot_2906_noannotation.png'), dpi=500, bbox_inches='tight')
+        plt.show()
 
     return xg_reg, ypred, y_test, results
 
@@ -690,7 +671,11 @@ def extract_releasedata_withdist(ferrets, talker=1):
     # get a dataframe with only the dist_cols and then combine with two other columns
     df_dist = df[dist_cols]
     #remove dist56 and dist57
-    df_dist = df_dist.drop(['dist56', 'dist57', 'distLvl', 'distractors', 'distractorAtten'], axis=1)
+    if 'distractorAtten' in df_dist.columns:
+        df_dist = df_dist.drop(['distractorAtten'], axis=1)
+    if 'distLvl' in df_dist.columns:
+        df_dist = df_dist.drop(['distLvl'], axis=1)
+    df_dist = df_dist.drop(['dist56', 'dist57', 'distractors'], axis=1)
 
     #subsample along the dist columns so the length corresponding to each word token column is the same length
     #get the counts of each column in the dataframe and then find the mean count
@@ -700,25 +685,6 @@ def extract_releasedata_withdist(ferrets, talker=1):
 
     # Determine the minimum count among the words (excluding 'dist1')
     min_count = word_counts.min()
-
-    # # List to hold subsampled DataFrames for each word
-    # subsampled_dfs = []
-    #
-    # # Iterate through each word (excluding 'dist1')
-    # for col in df_dist.columns.drop(['dist1', 'dist2', 'centreRelease']):
-    #     word_df_notna = df_dist[df_dist[col].notna()]
-    #     word_df_na = df_dist[df_dist[col].isna()]
-    #     # Randomly subsample the rows to match the minimum count
-    #     subsampled_df_notna = word_df_notna.sample(n=int(min_count)*30, random_state=123, replace = True)
-    #     # Combine the subsampled DataFrame with the rows that were originally missing
-    #     # subsampled_df = pd.concat([subsampled_df_notna, word_df_na], axis=0)
-    #     # # Shuffle the DataFrame
-    #     # subsampled_df = subsampled_df.sample(frac=1, random_state=123)
-    #     # Append to list of DataFrames
-    #     subsampled_dfs.append(subsampled_df_notna)
-    #
-    # # Concatenate the subsampled DataFrames for each word to create the final dataframe
-    # df_dist = pd.concat(subsampled_dfs, axis=0)
 
     # List to hold subsampled DataFrames for each word
     subsampled_dfs = []
@@ -809,10 +775,7 @@ def extract_releasedata_withdist(ferrets, talker=1):
     # df_use = pd.concat([df_dist, df['centreRelease']], axis=1)
     df_use = df_dist
     # drop the distractors column
-    if 'distractorAtten' in df_use.columns:
-        df_use = df_use.drop(['distractorAtten'], axis=1)
-    if 'distLvl' in df_use.columns:
-        df_use = df_use.drop(['distLvl'], axis=1)
+
 
     # df_use = df_use.rename(columns=dict(zip(df_use.columns, labels)))
 
@@ -878,7 +841,7 @@ def predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feat
         if optimization == False:
             best_params = np.load(
                 'D:/mixedeffectmodelsbehavioural/optuna_results/best_paramsreleastime_dist_model_' + ferrets[
-                    0] + 'talker' + str(talker) + '2007.npy', allow_pickle=True).item()
+                    0] + str(talker) + '.npy', allow_pickle=True).item()
         else:
             best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
             best_params = best_study_results.best_params
@@ -948,11 +911,11 @@ def main():
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']  # , 'F2105_Clove']
 
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    predict_rxn_time_with_dist_model(ferrets, optimization=True, ferret_as_feature=True, talker=2)
+    # predict_rxn_time_with_dist_model(ferrets, optimization=True, ferret_as_feature=True, talker=2)
     #
-    # for ferret in ferrets:col_list
-    #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)
-    #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 2)
+    for ferret in ferrets:
+        predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)
+        predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 2)
 
 
 if __name__ == '__main__':

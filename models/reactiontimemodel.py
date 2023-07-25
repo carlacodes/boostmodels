@@ -334,9 +334,22 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     ax.set_xticks([0,1,2,3,4])
     ax.set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18, rotation=45)
     ax.set_xlabel('Ferret ID', fontsize=18)
-    ax.set_ylabel('SHAP value', fontsize=18)
+    ax.set_ylabel('Influence on reaction time', fontsize=18)
     plt.title('Mean SHAP value over ferret ID', fontsize=18)
     plt.savefig(fig_savedir /'ferretIDbyprecurequaltargF0.png', dpi=500, bbox_inches='tight')
+    plt.show()
+
+    fig, ax = plt.subplots()
+    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "side of audio"], show=False, ax=ax, cmap = cmapcustom)
+    colorbar_scatter = fig.axes[1]
+    colorbar_scatter.set_yticks([0,1])
+    colorbar_scatter.set_yticklabels(['Left', 'Right'], fontsize=18)
+    ax.set_xticks([0,1,2,3,4])
+    ax.set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18, rotation=45)
+    ax.set_xlabel('Ferret ID', fontsize=18)
+    ax.set_ylabel('Infleunce on reaction time', fontsize=18)
+    plt.title('Mean SHAP value over ferret ID', fontsize=18)
+    plt.savefig(fig_savedir /'ferretIDbysideofaudio.png', dpi=500, bbox_inches='tight')
     plt.show()
 
     fig, ax = plt.subplots(figsize=(10, 10))

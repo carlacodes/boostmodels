@@ -426,7 +426,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
 
 
     fig, ax = plt.subplots(figsize=(5, 5))
-    shap.plots.scatter(shap_values2[:, "F0"], color=shap_values2[:, "time since trial start"], show= True, ax =ax,  cmap=cmapcustom)
+    shap.plots.scatter(shap_values2[:, "F0"], color=shap_values2[:, "time since trial start"], show= True,  cmap=cmapcustom)
     cax = fig.axes[1]
     cax.tick_params(labelsize=15)
     cax.set_ylabel("Time since start of trial", fontsize=12)
