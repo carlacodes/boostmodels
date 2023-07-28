@@ -390,13 +390,13 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     colorbar_scatter = fig.axes[1]
     # colorbar_scatter.set_yticks([0,1])
     # colorbar_scatter.set_yticklabels(['Left', 'Right'], fontsize=18)
-    colorbar_scatter.set_ylabel('Time since trial start (s)', fontsize=15)
+    colorbar_scatter.set_ylabel('Time since trial start', fontsize=15)
     ax.set_xticks([0,1,2,3,4])
     ax.set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18, rotation=45)
     ax.set_xlabel('Ferret ID', fontsize=18)
     ax.set_ylabel('Impact on p(FA)', fontsize=18)
-    plt.title('Time since trial start', fontsize=25)
-    plt.savefig(fig_dir /'ferretIDbyside_timesincestartoftrial.png', dpi=500, bbox_inches='tight')
+    plt.title('Time since trial start', fontsize=18)
+    plt.savefig(fig_dir /'ferretIDby_timesincestartoftrial.png', dpi=500, bbox_inches='tight')
     plt.show()
 
 
@@ -415,37 +415,6 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.show()
     #time since start of trial
 
-    ferret_ids = shap_values2[:, "ferret ID"].data
-    side_values = shap_values2[:, "side of audio"].data
-    shap_values = shap_values2[:, "ferret ID"].values
-
-    # Create a DataFrame with the necessary data
-    data_df = pd.DataFrame({
-        "ferret ID": ferret_ids,
-        "side": side_values,
-        "SHAP value": shap_values
-    })
-    fig, ax = plt.subplots(figsize=(10, 6))
-    sns.violinplot(x="ferret ID", y="SHAP value", hue="side", data=data_df, split=True, inner="quart",
-                   palette=cmapcustom, ax=ax)
-
-    ax.set_xticks([0, 1, 2, 3, 4])
-    ax.set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18, rotation=45)
-    ax.set_xlabel('Ferret ID', fontsize=18)
-    ax.set_ylabel('Impact on reaction time', fontsize=18)  # Corrected y-label
-
-    # plt.title('Mean SHAP value over ferret ID', fontsize=18)
-
-    # Optionally add a legend
-    ax.legend(title="side of audio", fontsize=14, title_fontsize=16)
-    # change legend labels
-    handles, labels = ax.get_legend_handles_labels()
-    labels = ['left', 'right']
-    ax.legend(handles=handles[0:], labels=labels[0:], title="side of audio", fontsize=14, title_fontsize=16)
-    ax.set_title('Side of audio presentation', fontsize=25)
-
-    plt.savefig(fig_dir / 'ferretIDbysideofaudio_violin.png', dpi=500, bbox_inches='tight')
-    plt.show()
 
 
 
@@ -503,6 +472,37 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     # shap.plots.scatter(shap_values2[:, "time since start of trial"], color=shap_values2[:, "F0"], show= True, ax =ax,  cmap=cmapcustom)
     plt.show()
 
+    ferret_ids = shap_values2[:, "ferret ID"].data
+    side_values = shap_values2[:, "audio side"].data
+    shap_values = shap_values2[:, "ferret ID"].values
+
+    # Create a DataFrame with the necessary data
+    data_df = pd.DataFrame({
+        "ferret ID": ferret_ids,
+        "side": side_values,
+        "SHAP value": shap_values
+    })
+    fig, ax = plt.subplots(figsize=(10, 6))
+    sns.violinplot(x="ferret ID", y="SHAP value", hue="side", data=data_df, split=True, inner="quart",
+                   palette=custom_colors, ax=ax)
+
+    ax.set_xticks([0, 1, 2, 3, 4])
+    ax.set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18, rotation=45)
+    ax.set_xlabel('Ferret ID', fontsize=18)
+    ax.set_ylabel('Impact on p(FA)', fontsize=18)  # Corrected y-label
+
+    # plt.title('Mean SHAP value over ferret ID', fontsize=18)
+
+    # Optionally add a legend
+    ax.legend(title="side of audio", fontsize=14, title_fontsize=16)
+    # change legend labels
+    handles, labels = ax.get_legend_handles_labels()
+    labels = ['left', 'right']
+    ax.legend(handles=handles[0:], labels=labels[0:], title="side of audio", fontsize=14, title_fontsize=16)
+    ax.set_title('Side of audio presentation', fontsize=25)
+
+    plt.savefig(fig_dir / 'ferretIDbysideofaudio_violin.png', dpi=500, bbox_inches='tight')
+    plt.show()
 
 
     fig, ax = plt.subplots(figsize=(5, 5))

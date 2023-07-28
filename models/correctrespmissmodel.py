@@ -294,12 +294,12 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     ax.set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18, rotation=45)
     ax.set_xlabel('Ferret ID', fontsize=18)
     ax.set_ylabel('Impact on p(miss)', fontsize=18)
-    plt.title('Time to target presentation', fontsize=25)
+    plt.title('Time to target presentation', fontsize=18)
     plt.savefig(fig_dir /'ferretidbytargettime.png', dpi=500, bbox_inches='tight')
     plt.show()
 
     ferret_ids = shap_values2[:, "ferret ID"].data
-    side_values = shap_values2[:, "side of audio"].data
+    side_values = shap_values2[:, "audio side"].data
     shap_values = shap_values2[:, "ferret ID"].values
 
     # Create a DataFrame with the necessary data
@@ -310,12 +310,12 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     })
     fig, ax = plt.subplots(figsize=(10, 6))
     sns.violinplot(x="ferret ID", y="SHAP value", hue="side", data=data_df, split=True, inner="quart",
-                   palette=cmapcustom, ax=ax)
+                   palette=custom_colors, ax=ax)
 
     ax.set_xticks([0, 1, 2, 3, 4])
     ax.set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18, rotation=45)
     ax.set_xlabel('Ferret ID', fontsize=18)
-    ax.set_ylabel('Impact on reaction time', fontsize=18)  # Corrected y-label
+    ax.set_ylabel('Impact on p(miss)', fontsize=18)  # Corrected y-label
 
     # plt.title('Mean SHAP value over ferret ID', fontsize=18)
 
