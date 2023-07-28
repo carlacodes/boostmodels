@@ -649,18 +649,18 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         ax_dict['A'].plot(feature_labels, cumulative_importances, marker='o', color='cyan')
         ax_dict['A'].set_xlabel('Features')
         ax_dict['A'].set_ylabel('Cumulative Feature Importance')
-        ax_dict['A'].set_title('Elbow Plot of Cumulative Feature Importance for Rxn Time Prediction')
+        # ax_dict['A'].set_title('Elbow Plot of Cumulative Feature Importance for Rxn Time Prediction')
         ax_dict['A'].set_xticklabels(feature_labels, rotation=20, ha='right')  # rotate x-axis labels for better readability
 
         # rotate x-axis labels for better readability
         summary_img = mpimg.imread(fig_savedir / 'shapsummaryplot_allanimals2.png')
         ax_dict['B'].imshow(summary_img, aspect='auto', )
         ax_dict['B'].axis('off')  # Turn off axis ticks and labels
-        ax_dict['B'].set_title('Ranked list of features over their \n impact on reaction time', fontsize=13)
+        # ax_dict['B'].set_title('Ranked list of features over their \n impact on reaction time', fontsize=13)
 
 
         ax_dict['D'].barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, color='cyan')
-        ax_dict['D'].set_title("Permutation importances on reaction time")
+        # ax_dict['D'].set_title("Permutation importances on reaction time")
         ax_dict['D'].set_xlabel("Permutation importance")
 
 
@@ -673,8 +673,8 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         cb_ax.set_ylabel("target F0 (Hz)", fontsize=12)
         cb_ax.set_yticks([1,2,3,4,5])
         cb_ax.set_yticklabels(['109', '124', '144 ', '191', '251'])
-        ax_dict['E'].set_ylabel('SHAP value', fontsize=10)
-        ax_dict['E'].set_title('Talker versus impact on reaction time', fontsize=13)
+        ax_dict['E'].set_ylabel('Impact on reaction time', fontsize=10)
+        # ax_dict['E'].set_title('Talker versus impact on reaction time', fontsize=13)
         ax_dict['E'].set_xlabel('Talker', fontsize=16)
         ax_dict['E'].set_xticks([1,2])
         ax_dict['E'].set_xticklabels(['Male', 'Female'], rotation=45, ha='right')
@@ -690,10 +690,10 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
 
         # Modifying color bar parameters
         cb_ax.tick_params(labelsize=15)
-        ax_dict['C'].set_ylabel('SHAP value', fontsize=10)
+        ax_dict['C'].set_ylabel('Impact on reaction time', fontsize=10)
         ax_dict['C'].set_xlabel('Ferret ID', fontsize=16)
         ax_dict['C'].set_xticks([0, 1, 2, 3, 4])
-        ax_dict['C'].set_title('Ferret ID versus impact on reaction time', fontsize=13)
+        # ax_dict['C'].set_title('Ferret ID versus impact on reaction time', fontsize=13)
 
         ax_dict['C'].set_xticklabels(ferret_id_only, rotation=45, ha='right')
         # ax_dict['C'].set_title('Ferret ID and precursor = target F0 versus SHAP value on miss probability', fontsize=18)
@@ -714,6 +714,8 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         #             fontsize=25, va='bottom', weight='bold')
 
         # plt.tight_layout()
+        plt.suptitle('Correct hit response reaction times', fontsize=18)
+
         plt.subplots_adjust(wspace=0.2, hspace=0.4)
 
         plt.savefig(fig_savedir / 'big_summary_plot_1606.png', dpi=500, bbox_inches="tight")
