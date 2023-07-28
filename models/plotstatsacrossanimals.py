@@ -519,7 +519,7 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
     for attribute, measurement in stats_dict_all_combined.items():
         for talker, measurement_data in measurement.items():
             print(measurement_data)
-            if multiplier <= 3:
+            if multiplier < 3:
                 offset = width * multiplier
             else:
                 offset = (gap_width) + (width * multiplier)  # Add gap offset for the second series

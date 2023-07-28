@@ -338,6 +338,21 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     plt.title('Mean SHAP value over ferret ID', fontsize=18)
     plt.savefig(fig_savedir /'ferretIDbyprecurequaltargF0.png', dpi=500, bbox_inches='tight')
     plt.show()
+
+    fig, ax = plt.subplots()
+    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "time to target"], show=False, ax=ax, cmap = 'viridis')
+    colorbar_scatter = fig.axes[1]
+    colorbar_scatter.set_ylabel('time to target (s)', fontsize=18)
+    # colorbar_scatter.set_yticks([0,1])
+    # colorbar_scatter.set_yticklabels(['False', 'True'], fontsize=18)
+    ax.set_xticks([0,1,2,3,4])
+    ax.set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18, rotation=45)
+    ax.set_xlabel('Ferret ID', fontsize=18)
+    ax.set_ylabel('Impact on reaction time', fontsize=18)
+    # plt.title('Mean SHAP value over ferret ID', fontsize=18)
+    plt.title('Time to target presentation', fontsize = 20)
+    plt.savefig(fig_savedir /'ferretIDbytimetotarget.png', dpi=500, bbox_inches='tight')
+    plt.show()
     import seaborn as sns
     import pandas as pd
     import seaborn as sns
@@ -363,15 +378,95 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     ax.set_xticks([0, 1, 2, 3, 4])
     ax.set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18, rotation=45)
     ax.set_xlabel('Ferret ID', fontsize=18)
-    ax.set_ylabel('Infleunce on reaction time', fontsize=18)  # Corrected y-label
+    ax.set_ylabel('Impact on reaction time', fontsize=18)  # Corrected y-label
+    handles, labels = ax.get_legend_handles_labels()
+    labels = ['false', 'true']
+    ax.legend(handles=handles[0:], labels=labels[0:], title="precursor = target F0", fontsize=14, title_fontsize=16)
 
-    plt.title('Mean SHAP value over ferret ID', fontsize=18)
+
+    # plt.title('Mean SHAP value over ferret ID', fontsize=18)
 
     # Optionally add a legend
     ax.legend(title="precursor = target F0", fontsize=14, title_fontsize=16)
+    ax.set_title('Precursor = target F0',  fontsize = 25)
 
     plt.savefig(fig_savedir / 'ferretIDbyprecurequaltargF0_violin.png', dpi=500, bbox_inches='tight')
     plt.show()
+
+    ferret_ids = shap_values2[:, "ferret ID"].data
+    talker_values = shap_values2[:, "talker"].data
+    shap_values = shap_values2[:, "ferret ID"].values
+
+    # Create a DataFrame with the necessary data
+    data_df = pd.DataFrame({
+        "ferret ID": ferret_ids,
+        "talker": talker_values,
+        "SHAP value": shap_values
+    })
+    fig, ax = plt.subplots(figsize=(10, 6))
+    sns.violinplot(x="ferret ID", y="SHAP value", hue="talker", data=data_df, split=True, inner="quart",
+                   palette=custom_colors, ax=ax)
+
+    ax.set_xticks([0, 1, 2, 3, 4])
+    ax.set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18, rotation=45)
+    ax.set_xlabel('Ferret ID', fontsize=18)
+    ax.set_ylabel('Impact on reaction time', fontsize=18)  # Corrected y-label
+
+    # plt.title('Mean SHAP value over ferret ID', fontsize=18)
+
+    # Optionally add a legend
+    ax.legend(title="talker", fontsize=14, title_fontsize=16)
+    handles, labels = ax.get_legend_handles_labels()
+    labels = ['male', 'female']
+    ax.legend(handles=handles[0:], labels=labels[0:], title="talker", fontsize=14, title_fontsize=16)
+    ax.set_title('Talker', fontsize = 25)
+
+    plt.savefig(fig_savedir / 'ferretIDbytalker_violin.png', dpi=500, bbox_inches='tight')
+    plt.show()
+
+    ferret_ids = shap_values2[:, "ferret ID"].data
+    side_values = shap_values2[:, "side of audio"].data
+    shap_values = shap_values2[:, "ferret ID"].values
+
+    # Create a DataFrame with the necessary data
+    data_df = pd.DataFrame({
+        "ferret ID": ferret_ids,
+        "side": side_values,
+        "SHAP value": shap_values
+    })
+    fig, ax = plt.subplots(figsize=(10, 6))
+    sns.violinplot(x="ferret ID", y="SHAP value", hue="side", data=data_df, split=True, inner="quart",
+                   palette=custom_colors, ax=ax)
+
+    ax.set_xticks([0, 1, 2, 3, 4])
+    ax.set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18, rotation=45)
+    ax.set_xlabel('Ferret ID', fontsize=18)
+    ax.set_ylabel('Impact on reaction time', fontsize=18)  # Corrected y-label
+
+    # plt.title('Mean SHAP value over ferret ID', fontsize=18)
+
+    # Optionally add a legend
+    ax.legend(title="side of audio", fontsize=14, title_fontsize=16)
+    #change legend labels
+    handles, labels = ax.get_legend_handles_labels()
+    labels = ['left', 'right']
+    ax.legend(handles=handles[0:], labels=labels[0:], title="side of audio", fontsize=14, title_fontsize=16)
+    ax.set_title('Side of audio presentation', fontsize = 25)
+
+
+    plt.savefig(fig_savedir / 'ferretIDbysideofaudio_violin.png', dpi=500, bbox_inches='tight')
+    plt.show()
+    # - talker
+    #
+    # - precursor = target
+    #
+    # - side
+    # of
+    # audio
+    #
+    # - time
+    # to
+    # target
 
     fig, ax = plt.subplots(figsize=(10, 10))
     shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "target F0"], show=False,
@@ -459,6 +554,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
         plt.savefig( fig_savedir /'ferretcolouredbytargtimes.png', dpi=1000)
         plt.show()
+
         if ferret_as_feature:
             shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "precursor = target F0"], show=False,
                                cmap=matplotlib.colormaps[cmapname])
