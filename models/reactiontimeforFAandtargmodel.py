@@ -608,6 +608,91 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
         fig.tight_layout()
         plt.show()
 
+        # #separate spectrogram plots
+        # fig, ax = plt.subplots(figsize=(15,6))
+        # #remove spines
+        # ax.spines['top'].set_visible(False)
+        # ax.spines['right'].set_visible(False)
+        # ax.spines['left'].set_visible(False)
+        # ax.spines['bottom'].set_visible(False)
+        # #remove ticks
+        # ax.tick_params(axis=u'both', which=u'both',length=0)
+        # #remove y axis
+        # ax.yaxis.set_visible(False)
+        # ax.axis('off')
+        #
+        # plt.show()
+        fig = plt.figure(figsize=(15,7))
+
+        mosaic = [ 'H', 'I' ,'J', 'K'], [ 'C',  'F', 'E','G' ]
+        ax_dict = fig.subplot_mosaic(mosaic)
+
+        if talker == 1:
+            worddict = worddictionary_female
+        elif talker == 2:
+            worddict = worddict_male
+        # pxx, freq, t, cax = ax_dict['E'].specgram(worddict[int(top_words[1]) - 1].flatten(), Fs=24414.0625, mode = 'psd', cmap = cmap_color)
+        D = librosa.amplitude_to_db(np.abs(librosa.stft(worddict[int(top_words[1]) - 1].flatten())))
+        cax = librosa.display.specshow(D, x_axis='time', y_axis='log', ax=ax_dict['E'], sr=24414.0625, cmap=cmap_color)
+        # remove colorbar
+        ax_dict['E'].set_title(f" '{feature_labels_words[1]}'")
+        ax_dict['E'].set_xlabel('Time (s)')
+        ax_dict['E'].set_xticks(np.round(np.arange(0.1, len(worddict[int(top_words[1]) - 1]) / 24414.0625, 0.1), 2))
+        ax_dict['E'].set_xticklabels(
+            np.round(np.arange(0.1, len(worddict[int(top_words[1]) - 1]) / 24414.0625, 0.1), 2),
+            rotation=45, ha='right', fontsize=10)
+
+        D = librosa.amplitude_to_db(np.abs(librosa.stft(worddict[int(top_words[0]) - 1].flatten())))
+        cax = librosa.display.specshow(D, x_axis='time', y_axis='log', sr=24414.0625, ax=ax_dict['C'], cmap=cmap_color)
+        ax_dict['C'].legend()
+        ax_dict['C'].set_title(f" instruments")
+        ax_dict['C'].set_xlabel('Time (s)')
+        ax_dict['C'].set_xticks(np.round(np.arange(0.1, len(worddict[int(top_words[0]) - 1]) / 24414.0625, 0.1), 2))
+        ax_dict['C'].set_xticklabels(
+            np.round(np.arange(0.1, len(worddict[int(top_words[0]) - 1]) / 24414.0625, 0.1), 2),
+            rotation=45, ha='right', fontsize=10)
+        ax_dict['C'].set_ylabel('Frequency (Hz)')
+        D = librosa.amplitude_to_db(np.abs(librosa.stft(worddict[int(top_words[2]) - 1].flatten())))
+        cax = librosa.display.specshow(D, sr=24414.0625, x_axis='time', y_axis='log', ax=ax_dict['F'], cmap=cmap_color)
+        ax_dict['F'].set_title(f"  '{feature_labels_words[2]}'")
+        ax_dict['F'].set_xlabel('Time (s)')
+        ax_dict['F'].set_xticks(np.round(np.arange(0.1, (len(worddict[int(top_words[2]) - 1]) / 24414.0625), 0.1), 2))
+        ax_dict['F'].set_xticklabels(
+            np.round(np.arange(0.1, len(worddict[int(top_words[2]) - 1]) / 24414.0625, 0.1), 2),
+            rotation=45, ha='right', fontsize=10)
+        if talker == 2:
+            data_scaled = scaledata(worddict[int(top_words[3]) - 1].flatten(), -7977, 7797)
+        else:
+            data_scaled = worddict[int(top_words[3]) - 1].flatten()
+        ax_dict['G'].set_title(f" '{feature_labels_words[3]}'")
+        D = librosa.amplitude_to_db(np.abs(librosa.stft(data_scaled)))
+        # Plot the spectrogram on a logarithmic scale
+        cax = librosa.display.specshow(D, x_axis='time', y_axis='log', sr=24414.0625, ax=ax_dict['G'], cmap=cmap_color)
+        ax_dict['G'].set_xlabel('Time (s)')
+        ax_dict['G'].set_xticks(np.round(np.arange(0.1, len(data_scaled) / 24414.0625, 0.1), 2))
+        ax_dict['G'].set_xticklabels(np.round(np.arange(0.1, len(data_scaled) / 24414.0625, 0.1), 2), rotation=45,
+                                     ha='right', fontsize=10)
+
+        ax_dict['J'].fill_between(np.arange(len(np.abs(worddict[int(top_words[1]) - 1]))) / 24414.0625,
+                                  (worddict[int(top_words[1]) - 1]).flatten(), color=talker_color, alpha=0.5)
+        ax_dict['J'].set_title(f"'{feature_labels_words[1]}'")
+        ax_dict['H'].set_xlabel('Time (s)')
+        ax_dict['H'].fill_between(np.arange(len(np.abs(worddict[0]))) / 24414.0625, (worddict[0]).flatten(),
+                                  color=talker_color, alpha=0.5)
+        ax_dict['H'].set_title(f" '{feature_labels_words[0]}'")
+        ax_dict['H'].set_xlabel('Time (s)')
+        ax_dict['I'].fill_between(np.arange(len(np.abs(worddict[int(top_words[2]) - 1]))) / 24414.0625,
+                                  (worddict[int(top_words[2]) - 1]).flatten(), color=talker_color, alpha=0.5)
+        ax_dict['I'].set_title(f"'{feature_labels_words[2]}'")
+        ax_dict['I'].set_xlabel('Time (s)')
+        ax_dict['K'].fill_between(np.arange(len(data_scaled)) / 24414.0625, (data_scaled.flatten()), color=talker_color,
+                                  alpha=0.5)
+        ax_dict['K'].set_title(f"'{feature_labels_words[3]}'")
+        ax_dict['K'].set_xlabel('Time (s)')
+        plt.subplots_adjust(wspace=0.50, hspace=0.53)
+        plt.savefig(os.path.join((fig_savedir), str(talker) + '_spectrograms_1606_noannotation.png'), dpi=500)
+        plt.show()
+
 
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 15), gridspec_kw={'width_ratios': [4, 1]})
         # Plotting the majority of values on the first subplot
@@ -910,7 +995,7 @@ def predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feat
 def main():
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']  # , 'F2105_Clove']
 
-    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=True, talker=1)
+    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=True, talker=2)
 
     # for ferret in ferrets:
     #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)
