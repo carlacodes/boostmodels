@@ -358,14 +358,14 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     ax_dict['A'].plot(feature_labels, cumulative_importances, marker='o', color='gold')
     # ax_dict['A'].set_xlabel('Features')
     ax_dict['A'].set_ylabel('Cumulative Feature Importance')
-    ax_dict['A'].set_title('Elbow plot for miss vs hit', fontsize=13)
+    # ax_dict['A'].set_title('Elbow plot for miss vs hit', fontsize=13)
     ax_dict['A'].set_xticklabels(feature_labels, rotation=20, ha='right')  # rotate x-axis labels for better readability
 
     # rotate x-axis labels for better readability
     summary_img = mpimg.imread(summary_plot_file)
     ax_dict['B'].imshow(summary_img, aspect='auto', )
     ax_dict['B'].axis('off')  # Turn off axis ticks and labels
-    ax_dict['B'].set_title('Miss vs hit', fontsize=13)
+    # ax_dict['B'].set_title('Miss vs hit', fontsize=13)
 
 
     ax_dict['D'].barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, color='peru')
@@ -410,7 +410,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "target F0"], ax=ax_dict['C'],
                        cmap=cmapcustom, show=False)
     fig, ax = plt.gcf(), plt.gca()
-    ax_dict['C'].set_title('Miss vs hit', fontsize=12)
+    # ax_dict['C'].set_title('Miss vs hit', fontsize=12)
 
     cb_ax = fig.axes[7]
     cb_ax.set_yticks([1, 2, 3,4, 5])
@@ -446,6 +446,8 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     #             fontsize=25, va='bottom', weight = 'bold')
 
     # plt.tight_layout()
+
+    plt.suptitle('Miss versus correct hit response', fontsize=18)
     plt.subplots_adjust(wspace=0.2, hspace=0.4)
 
     # plt.tight_layout()

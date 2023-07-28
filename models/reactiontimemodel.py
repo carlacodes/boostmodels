@@ -707,11 +707,11 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         # ax_dict['E'].annotate('e)', xy=get_axis_limits(ax_dict['E']), xytext=(-0.1, ax_dict['E'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
 
         import matplotlib.transforms as mtransforms
-        for label, ax in ax_dict.items():
-            # label physical distance to the left and up:
-            trans = mtransforms.ScaledTranslation(-20 / 72, 7 / 72, fig.dpi_scale_trans)
-            ax.text(0.0, 1.05, label, transform=ax.transAxes + trans,
-                    fontsize=25, va='bottom', weight='bold')
+        # for label, ax in ax_dict.items():
+        #     # label physical distance to the left and up:
+        #     trans = mtransforms.ScaledTranslation(-20 / 72, 7 / 72, fig.dpi_scale_trans)
+        #     ax.text(0.0, 1.05, label, transform=ax.transAxes + trans,
+        #             fontsize=25, va='bottom', weight='bold')
 
         # plt.tight_layout()
         plt.subplots_adjust(wspace=0.2, hspace=0.4)
