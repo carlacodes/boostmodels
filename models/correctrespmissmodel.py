@@ -456,15 +456,17 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
 
     plt.show()
     # Plot the scatter plot for trial number and precursor pitch
-    # fig, ax = plt.subplots()
+    fig, ax = plt.subplots()
     shap.plots.scatter(shap_values2[:, "trial number"], color=shap_values2[:, "precursor = target F0"],
                        ax=ax, cmap=cmapcustom, show=False)
     cb_ax = fig.axes[1]
     cb_ax.tick_params(labelsize=15)
     cb_ax.set_ylabel("precursor = target F0", fontsize=15)
-    plt.title('Trial number and its effect on the miss probability', fontsize=18)
+    cb_ax.set_yticks([0.25, 0.75])
+    cb_ax.set_yticklabels(['True', 'False'])
+    plt.title('Trial number', fontsize=18)
     plt.xlabel('Trial number', fontsize=15)
-    plt.ylabel('SHAP value', fontsize=15)
+    plt.ylabel('Impact on p(miss)', fontsize=15)
     plt.savefig(fig_dir / 'trialnum_vs_precurpitch.png', dpi=1000, bbox_inches="tight")
     plt.show()
 
