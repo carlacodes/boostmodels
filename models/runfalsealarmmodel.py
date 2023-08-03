@@ -426,15 +426,15 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     # Get the plot's Patch objects
     labels = [item.get_text() for item in ax.get_yticklabels()]
     print(labels)
-    fig.set_size_inches(9, 12)
+    fig.set_size_inches(6, 12)
     ax.set_xlabel('Mean SHAP value', fontsize=18)
     ax.set_yticks(range(len(feature_labels)))
-    ax.set_yticklabels(np.flip(feature_labels), fontsize=13)
+    ax.set_yticklabels(np.flip(feature_labels), fontsize=17, rotation = 45)
     legend_handles, legend_labels = ax.get_legend_handles_labels()
     #reinsert the legend_hanldes and labels
     ax.legend(legend_handles, ['Correct Rejection', 'False Alarm'], loc='upper right', fontsize=18)
 
-    # ax.set_yticklabels(labels)
+    ax.set_xlabel('Impact on p(FA)')
     fig.tight_layout()
     plt.savefig(fig_dir / 'ranked_features.png', dpi=1000, bbox_inches="tight")
     plt.show()
@@ -603,7 +603,6 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     ax.set_xlabel('Ferret ID', fontsize=18)
     ax.set_ylabel('Impact on p(FA)', fontsize=18)  # Corrected y-label
 
-    # plt.title('Mean SHAP value over ferret ID', fontsize=18)
 
     # Optionally add a legend
     ax.legend(title="side of audio", fontsize=14, title_fontsize=16)
@@ -765,11 +764,11 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     cax.set_yticks([1, 2, 3, 4, 5])
     cax.set_yticklabels(['109', '124', '144', '191', '251'])
     cax.set_ylabel("F0", fontsize=12)
-    ax_dict['C'].set_xlim(0.8, 5.2)
+    # ax_dict['C'].set_xlim(0.8, 5.2)
 
     ax_dict['C'].set_xlabel('talker', fontsize=16)
     ax_dict['C'].set_xticks([1,2])
-    ax_dict['C'].set_xticklabels['Female', 'Male']
+    ax_dict['C'].set_xticklabels(['Female', 'Male'])
 
     ax_dict['C'].set_ylabel('Impact on p(FA)', fontsize=10)
 
