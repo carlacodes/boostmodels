@@ -833,17 +833,21 @@ def extract_releasedata_withdist(ferrets, talker=1):
     # Sort the values as well as female_word_labels
     sorted_idx_distlabels = df_dist_counts.argsort()
     df_dist_counts = df_dist_counts.sort_values(ascending=False)
-
-    df_dist_counts.plot.bar(ax=ax)
-    ax.set_xlabel('Word')
+    if talker == 1:
+        talker_color = 'r'
+    else:
+        talker_color = 'b'
+    df_dist_counts.plot.bar(ax=ax, color = talker_color)
+    ax.set_xlabel('Word', fontsize = 18)
+    ax.set_ylabel('Number of occurrences', fontsize = 18)
 
     ax.set_xticks(np.arange(0, 55, 1))
     if talker == 1:
-        ax.set_xticklabels(np.flip(np.array(female_word_labels)[sorted_idx_distlabels]), rotation=45, fontsize=8)
-        plt.title('Distribution of non nan values by column in dfx for female talker')
+        ax.set_xticklabels(np.flip(np.array(female_word_labels)[sorted_idx_distlabels]), rotation=45, fontsize=15)
+        plt.title('Distribution of bootstrapped words for female talker', fontsize = 25)
     else:
-        ax.set_xticklabels(np.flip(np.array(male_word_labels)[sorted_idx_distlabels]), rotation=45, fontsize=8)
-        plt.title('Distribution of non nan values by column in dfx for male talker')
+        ax.set_xticklabels(np.flip(np.array(male_word_labels)[sorted_idx_distlabels]), rotation=45, fontsize=15)
+        plt.title('Distribution of bootstrapped words for male talker', fontsize = 25)
 
     plt.savefig(
         'D:\mixedeffectmodelsbehavioural\models/figs/absolutereleasemodel/distribution_non_nan_values_by_column_dfx_talker' + str(
@@ -995,7 +999,7 @@ def predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feat
 def main():
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']  # , 'F2105_Clove']
 
-    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=True, talker=2)
+    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=True, talker=1)
 
     # for ferret in ferrets:
     #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)
