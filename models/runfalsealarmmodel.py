@@ -503,6 +503,89 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
 
     plt.savefig(fig_dir / 'ferretIDbysideofaudio_violin.png', dpi=500, bbox_inches='tight')
     plt.show()
+
+
+    fig, ax = plt.subplots(figsize=(5, 5))
+    shap.plots.scatter(shap_values2[:, "F0"], color=shap_values2[:, "time since start of trial"], show=False, ax=ax,
+                       cmap=cmapcustom)
+    cax = fig.axes[1]
+    cax.tick_params(labelsize=15)
+    cax.set_ylabel("Time since start of trial", fontsize=12)
+    plt.title('F0', fontsize=18)
+    ax.set_xticks([1, 2, 3, 4, 5])
+    ax.set_xticklabels(['109', '124', '144', '191', '251'], fontsize=18, rotation=45)
+    plt.savefig(fig_dir / 'F0bytimestart_supplemental.png', dpi=500, bbox_inches='tight')
+    # plt.xlim(0.8, 5.2)
+    # plt.xticks([1, 2, 3, 4, 5], labels = ["109", "124", "144", "191", "251"])
+    # shap.plots.scatter(shap_values2[:, "time since start of trial"], color=shap_values2[:, "F0"], show= True, ax =ax,  cmap=cmapcustom)
+    plt.show()
+
+    fig, ax = plt.subplots(figsize=(5, 5))
+    shap.plots.scatter(shap_values2[:, "F0"], color=shap_values2[:, "trial number"], show=False, ax=ax,
+                       cmap=cmapcustom)
+    cax = fig.axes[1]
+    cax.tick_params(labelsize=15)
+    cax.set_ylabel("Trial number", fontsize=12)
+    # cax.set_yticks([0, 1, 2, 3, 4])
+    # cax.set_yticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18, rotation=45)
+    plt.title('F0', fontsize=18)
+    ax.set_xticks([1, 2, 3, 4, 5])
+    ax.set_xticklabels(['109', '124', '144', '191', '251'], fontsize=18, rotation=45)
+    plt.savefig(fig_dir / 'F0bytrialnum_supplemental.png', dpi=500, bbox_inches='tight')
+    # plt.xlim(0.8, 5.2)
+    # plt.xticks([1, 2, 3, 4, 5], labels = ["109", "124", "144", "191", "251"])
+    # shap.plots.scatter(shap_values2[:, "time since start of trial"], color=shap_values2[:, "F0"], show= True, ax =ax,  cmap=cmapcustom)
+    plt.show()
+
+    fig, ax = plt.subplots(figsize=(5, 5))
+    shap.plots.scatter(shap_values2[:, "F0"], color=shap_values2[:, "ferret ID"], show=False, ax=ax,
+                       cmap=cmapcustom)
+    cax = fig.axes[1]
+    cax.tick_params(labelsize=15)
+    cax.set_ylabel("Ferret ID", fontsize=12)
+    cax.set_yticks([0, 1, 2, 3, 4])
+    cax.set_yticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18, rotation=45)
+    plt.title('F0', fontsize=18)
+    ax.set_xticks([1, 2, 3, 4, 5])
+    ax.set_xticklabels(['109', '124', '144', '191', '251'], fontsize=18, rotation=45)
+    plt.savefig(fig_dir / 'F0byferretID_supplemental.png', dpi=500, bbox_inches='tight')
+    # plt.xlim(0.8, 5.2)
+    # plt.xticks([1, 2, 3, 4, 5], labels = ["109", "124", "144", "191", "251"])
+    # shap.plots.scatter(shap_values2[:, "time since start of trial"], color=shap_values2[:, "F0"], show= True, ax =ax,  cmap=cmapcustom)
+    plt.show()
+
+    #F0 by talker violin plot, supp.
+    F0s = shap_values2[:, "F0"].data
+    talker_values = shap_values2[:, "talker"].data
+    shap_values = shap_values2[:, "F0"].values
+
+    # Create a DataFrame with the necessary data
+    data_df = pd.DataFrame({
+        "F0": F0s,
+        "talker": talker_values,
+        "SHAP value": shap_values
+    })
+    fig, ax = plt.subplots(figsize=(10, 6))
+    sns.violinplot(x="F0", y="SHAP value", hue="talker", data=data_df, split=True, inner="quart",
+                   palette=custom_colors, ax=ax)
+
+    ax.set_xticks([ 1, 2, 3, 4, 5])
+    ax.set_xticklabels(['109', '124', '144', '191', '251'], fontsize=18, rotation=45)
+    ax.set_xlabel('F0', fontsize=18)
+    ax.set_ylabel('Impact on p(FA)', fontsize=18)  # Corrected y-label
+
+
+    # Optionally add a legend
+    ax.legend(title="Talker", fontsize=14, title_fontsize=16)
+    # change legend labels
+    handles, labels = ax.get_legend_handles_labels()
+    labels = ['Female', 'Male']
+    ax.legend(handles=handles[0:], labels=labels[0:], title="talker", fontsize=14, title_fontsize=16)
+    ax.set_title('Talker type', fontsize=25)
+
+    plt.savefig(fig_dir / 'F0byutalker_violin.png', dpi=500, bbox_inches='tight')
+    plt.show()
+
     ferret_ids = shap_values2[:, "ferret ID"].data
     talker_values = shap_values2[:, "talker"].data
     shap_values = shap_values2[:, "ferret ID"].values
@@ -658,7 +741,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
 
 
-    ax_dict['E'].set_ylabel('SHAP value', fontsize=10)
+    ax_dict['E'].set_ylabel('Impact on p(FA)', fontsize=10)
     # ax_dict['E'].set_title('Intra-trial roving versus impact on false alarm probability', fontsize=13)
     ax_dict['E'].set_xticks([0,1])
     ferret_id_only = ['F1702', 'F1815', 'F1803', 'F2002', 'F2105']
@@ -673,24 +756,23 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     # cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
     # cb_ax.tick_params(labelsize=15)
     # cb_ax.set_ylabel("precursor F0 (Hz)", fontsize=15)
-    shap.plots.scatter(shap_values2[:, "F0"], color=shap_values2[:, "time since trial start"], show= False, ax =ax_dict['C'],  cmap=cmapcustom)
+    # shap.plots.scatter(shap_values2[:, "F0"], color=shap_values2[:, "time since trial start"], show= False, ax =ax_dict['C'],  cmap=cmapcustom)
+    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "F0"], show= False, ax =ax_dict['C'],  cmap=cmapcustom)
+
     fig, ax = plt.gcf(), plt.gca()
     cax = fig.axes[7]
     cax.tick_params(labelsize=15)
-    cax.set_ylabel("time since trial start", fontsize=12)
+    cax.set_yticks([1, 2, 3, 4, 5])
+    cax.set_yticklabels(['109', '124', '144', '191', '251'])
+    cax.set_ylabel("F0", fontsize=12)
     ax_dict['C'].set_xlim(0.8, 5.2)
 
-    ax_dict['C'].set_xlabel('F0 (Hz)', fontsize=16)
-    ax_dict['C'].set_ylabel('SHAP value', fontsize=10)
-    # ax_dict['C'].set_title('F0 versus impact on false alarm probability', fontsize=13)
+    ax_dict['C'].set_xlabel('talker', fontsize=16)
+    ax_dict['C'].set_xticks([0,1])
 
-    # # Modifying color bar parameters
-    # cb_ax.tick_params(labelsize=15)
-    # ax_dict['C'].set_ylabel('SHAP value', fontsize=10)
-    # ax_dict['C'].set_xlabel('Ferret ID', fontsize=16)
-    # ax_dict['C'].set_title('Ferret ID versus impact on false alarm probability', fontsize=13)
-    ax_dict['C'].set_xticks([ 1, 2, 3, 4, 5])
-    ax_dict['C'].set_xticklabels(["109", "124", "144", "191", "251"],  rotation=45, ha='right')
+    ax_dict['C'].set_ylabel('Impact on p(FA)', fontsize=10)
+
+
     #remove padding outside the figures
     font_props = fm.FontProperties(weight='bold', size=27)
 
@@ -1501,8 +1583,127 @@ def plot_reaction_times_interandintra_swarm(ferrets):
 
     return df_by_ferret
 
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+def plot_reaction_times_interandintra_violin(ferrets):
+    # plot the reaction times by animal
+    resultingdf = behaviouralhelperscg.get_reactiontime_data(ferrets=ferrets, startdate='04-01-2020',
+                                                             finishdate='01-10-2022')
+    #only get correct hit trials for the swarm plot
+    df_use = resultingdf[(resultingdf['realRelReleaseTimes'] >= 0) & (resultingdf['realRelReleaseTimes'] <= 2)]
+
+    df_female = df_use.loc[(df_use['talker'] == 1) | (df_use['talker'] == 3) | (df_use['talker'] == 5)]
+    df_female_control = df_female.loc[df_female['control_trial'] == 1]
+    df_female_rove = df_female.loc[df_female['inter_trial_roving'] == 1]
+    df_female_rove_intra = df_female.loc[df_female['intra_trial_roving'] == 1]
+
+    df_male = df_use.loc[(df_use['talker'] == 2) | (df_use['talker'] == 8) | (df_use['talker'] == 13)]
+    df_male_control = df_male.loc[df_male['control_trial'] == 1]
+    df_male_rove = df_male.loc[df_male['inter_trial_roving'] == 1]
+    df_male_rove_intra = df_male.loc[df_male['intra_trial_roving'] == 1]
+
+    df_use['female_talker'] = df_use['talker'].isin([1, 3, 5]).astype(int)
+    pitch_type_array = []
+    custom_colors = ['slategray', 'hotpink', "yellow"]  # Add more colors as needed
+
+    for i in range(0, len(df_use)):
+        if df_use['inter_trial_roving'].iloc[i] == 1:
+            pitch_type_array.append(1)
+        elif df_use['intra_trial_roving'].iloc[i] == 1:
+            pitch_type_array.append(2)
+        else:
+            pitch_type_array.append(0)
+    df_use['roving_type'] = pitch_type_array
+
+
+
+
+
+    roving_type = df_use['roving_type'].values
+    talker_values = df_use["female_talker"].values
+    release_values = df_use["realRelReleaseTimes"].values
+    data_df = pd.DataFrame({
+        "roving_type": roving_type,
+        "talker": talker_values,
+        "release_values": release_values
+    })
+    fig, ax = plt.subplots(figsize=(10, 6))
+    sns.violinplot(x="roving_type", y="release_values", hue="talker", data=data_df, split=True, inner="quart",
+                   palette='Set2', ax=ax)
+
+    ax.set_xticks([0, 1, 2])
+    ax.set_xticklabels(['control', 'inter', 'intra'], fontsize=18, rotation=45)
+    ax.set_xlabel('Ferret ID', fontsize=18)
+    ax.set_ylabel('Release time relative to target', fontsize=18)  # Corrected y-label
+
+
+    # Optionally add a legend
+    # change legend labels
+    handles, labels = ax.get_legend_handles_labels()
+    labels = ['Male', 'Female']
+    ax.legend(handles=handles[0:], labels=labels[0:], title="talker", fontsize=14, title_fontsize=16)
+    ax.set_title('Talker type', fontsize=25)
+    plt.savefig( 'D:/behavmodelfigs/rovingtypebytalker_violin.png', dpi=500, bbox_inches='tight')
+    plt.show()
+    print('done')
+
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+import seaborn as sns
+import matplotlib.pyplot as plt
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+def plot_reaction_times_interandintra_swarm(ferrets):
+    # plot the reaction times by animal
+    resultingdf = behaviouralhelperscg.get_reactiontime_data(ferrets=ferrets, startdate='04-01-2020',
+                                                             finishdate='01-10-2022')
+    #only get correct hit trials for the swarm plot
+    df_use = resultingdf[(resultingdf['realRelReleaseTimes'] >= 0) & (resultingdf['realRelReleaseTimes'] <= 2)]
+
+    df_female = df_use.loc[(df_use['talker'] == 1) | (df_use['talker'] == 3) | (df_use['talker'] == 5)]
+    df_female_control = df_female.loc[df_female['control_trial'] == 1]
+    df_female_rove = df_female.loc[df_female['inter_trial_roving'] == 1]
+    df_female_rove_intra = df_female.loc[df_female['intra_trial_roving'] == 1]
+
+    df_male = df_use.loc[(df_use['talker'] == 2) | (df_use['talker'] == 8) | (df_use['talker'] == 13)]
+    df_male_control = df_male.loc[df_male['control_trial'] == 1]
+    df_male_rove = df_male.loc[df_male['inter_trial_roving'] == 1]
+    df_male_rove_intra = df_male.loc[df_male['intra_trial_roving'] == 1]
+
+    # Set a manual palette with colors for female and male talkers
+    palette = {'Female': 'blue', 'Male': 'red'}
+
+    # now plot generally by all ferrets
+    ax, fig = plt.subplots(figsize=(10, 12))
+    sns.swarmplot(x=df_use['realRelReleaseTimes'], hue=df_use['talker'].map({1: 'Female', 2: 'Male', 3: 'Female', 5: 'Female', 8: 'Male', 13: 'Male'}), palette=palette)
+    plt.title('Distribution of reaction times, \n irrespective of talker and ferret', fontsize=15)
+    plt.show()
+
+    # now plot by talker, showing reaction times
+    data = [df_female_control['realRelReleaseTimes'], df_female_rove['realRelReleaseTimes'], df_female_rove_intra['realRelReleaseTimes']]
+    labels = ['control F0', 'inter-roved F0', 'intra-roved F0']
+
+    ax, fig = plt.subplots(figsize=(10, 8))
+    sns.swarmplot(data=data, hue=df_female_control['talker'].map({1: 'Female', 3: 'Female', 5: 'Female'}), palette={'Female': 'blue'})
+    sns.swarmplot(data=[df_male_control['realRelReleaseTimes'], df_male_rove['realRelReleaseTimes'], df_male_rove_intra['realRelReleaseTimes']], hue=df_male_control['talker'].map({2: 'Male', 8: 'Male', 13: 'Male'}), palette={'Male': 'red'})
+
+    plt.title('Reaction times for the female and male talkers, \n irrespective of ferret', fontsize=15)
+    plt.xlabel('reaction time relative to target presentation (s)', fontsize=13)
+    plt.ylabel('Count', fontsize=13)
+    plt.xticks(ticks=[0, 1, 2], labels=labels)
+    plt.legend(title='Gender', title_fontsize=12, fontsize=10)
+    plt.savefig('D:/behavmodelfigs/reaction_times_by_talker_female_male_interandintra.png', dpi=500)
+    plt.show()
+
+
+    print('done')
+
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
+    # plot_reaction_times_interandintra_violin(ferrets)
     # plot_reaction_times_interandintra(ferrets)
 
     # plot_reaction_times_interandintra_swarm(ferrets)
