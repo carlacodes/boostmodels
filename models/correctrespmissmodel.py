@@ -344,7 +344,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     # Convert the text width from points to inches
     text_width_inches = text_width_pt / 72.27
 
-    mosaic = ['A', 'B', 'C'], ['D', 'B', 'E']
+    mosaic = ['A', 'B', 'E'], ['D', 'B', 'C']
     ferret_id_only = ['F1702', 'F1815', 'F1803', 'F2002', 'F2105']
 
     # fig = plt.figure(figsize=(20, 10))
@@ -395,7 +395,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     # # Modifying color bar parameters
     # cb_ax.tick_params(labelsize=15)
     # cb_ax.set_ylabel("precursor = target F0 word", fontsize=15)
-    ax_dict['E'].set_ylabel('SHAP value', fontsize=10)
+    ax_dict['E'].set_ylabel('Impact on p(miss)', fontsize=10)
     # ax_dict['E'].set_title('Talker versus impact on miss probability', fontsize=18)
     cb_ax.set_yticks([1, 2, 3,4, 5])
     cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
@@ -420,7 +420,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
 
     # Modifying color bar parameters
     cb_ax.tick_params(labelsize=15)
-    ax_dict['C'].set_ylabel('SHAP value', fontsize=10)
+    ax_dict['C'].set_ylabel('Impact on p(miss)', fontsize=10)
     # ax_dict['C'].set_xlabel('Ferret ID', fontsize=16)
     ax_dict['C'].set_xlabel('')
     ax_dict['C'].set_xticks([0, 1, 2, 3, 4])
