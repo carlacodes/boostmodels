@@ -330,8 +330,37 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     plt.savefig(fig_dir / 'ferretIDbysideofaudio_violin.png', dpi=500, bbox_inches='tight')
     plt.show()
 
+    ferret_ids = shap_values2[:, "ferret ID"].data
+    talker_values = shap_values2[:, "talker"].data
+    shap_values = shap_values2[:, "ferret ID"].values
 
+    # Create a DataFrame with the necessary data
+    data_df = pd.DataFrame({
+        "ferret ID": ferret_ids,
+        "talker": talker_values,
+        "SHAP value": shap_values
+    })
+    fig, ax = plt.subplots(figsize=(10, 6))
+    sns.violinplot(x="ferret ID", y="SHAP value", hue="talker", data=data_df, split=True, inner="quart",
+                   palette=custom_colors, ax=ax)
 
+    ax.set_xticks([0, 1, 2, 3, 4])
+    ax.set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18, rotation=45)
+    ax.set_xlabel('Ferret ID', fontsize=18)
+    ax.set_ylabel('Impact on p(miss)', fontsize=18)  # Corrected y-label
+
+    # plt.title('Mean SHAP value over ferret ID', fontsize=18)
+
+    # Optionally add a legend
+    ax.legend(title="talker", fontsize=14, title_fontsize=16)
+    # change legend labels
+    handles, labels = ax.get_legend_handles_labels()
+    labels = ['Male', 'Female']
+    ax.legend(handles=handles[0:], labels=labels[0:], title="talker", fontsize=14, title_fontsize=16)
+    ax.set_title('Talker type', fontsize=25)
+
+    plt.savefig(fig_dir / 'ferretIDbytalkertype_violin.png', dpi=500, bbox_inches='tight')
+    plt.show()
 
     # mosaic = ['A', 'B', 'C'], ['D', 'B', 'E']
     # ferret_id_only = ['F1702', 'F1815', 'F1803', 'F2002', 'F2105']
