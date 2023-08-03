@@ -768,13 +768,12 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     ax_dict['C'].set_xlim(0.8, 5.2)
 
     ax_dict['C'].set_xlabel('talker', fontsize=16)
-    ax_dict['C'].set_xticks([0,1])
+    ax_dict['C'].set_xticks([1,2])
+    ax_dict['C'].set_xticklabels['Female', 'Male']
 
     ax_dict['C'].set_ylabel('Impact on p(FA)', fontsize=10)
 
 
-    #remove padding outside the figures
-    font_props = fm.FontProperties(weight='bold', size=27)
 
     # ax_dict['A'].annotate('A', xy=get_axis_limits(ax_dict['A']), xytext=(-0.05, ax_dict['A'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props, zorder=10)
     # ax_dict['B'].annotate('B', xy=get_axis_limits(ax_dict['B']), xytext=(-0.05, ax_dict['B'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
