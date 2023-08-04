@@ -522,6 +522,23 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.show()
 
     fig, ax = plt.subplots(figsize=(5, 5))
+    shap.plots.scatter(shap_values2[:, "time since trial start"], color=shap_values2[:, "F0"], show=False, ax=ax,
+                       cmap=cmapcustom)
+    cax = fig.axes[1]
+    cax.tick_params(labelsize=15)
+    cax.set_ylabel("F0", fontsize=12)
+    cax.set_yticks([ 1, 2, 3, 4, 5])
+    cax.set_yticklabels(['109', '124', '144', '191', '251'], fontsize=18, rotation=45)
+    plt.title('F0', fontsize=18)
+    ax.set_ylabel('Impact on p(FA)', fontsize=18)
+
+    plt.savefig(fig_dir / 'timestartbyF0_supplemental.png', dpi=500, bbox_inches='tight')
+    # plt.xlim(0.8, 5.2)
+    # plt.xticks([1, 2, 3, 4, 5], labels = ["109", "124", "144", "191", "251"])
+    # shap.plots.scatter(shap_values2[:, "time since start of trial"], color=shap_values2[:, "F0"], show= True, ax =ax,  cmap=cmapcustom)
+    plt.show()
+
+    fig, ax = plt.subplots(figsize=(5, 5))
     shap.plots.scatter(shap_values2[:, "F0"], color=shap_values2[:, "trial number"], show=False, ax=ax,
                        cmap=cmapcustom)
     cax = fig.axes[1]
