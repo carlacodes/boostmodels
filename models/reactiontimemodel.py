@@ -380,14 +380,14 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     ax.set_xlabel('Ferret ID', fontsize=18)
     ax.set_ylabel('Impact on reaction time', fontsize=18)  # Corrected y-label
     handles, labels = ax.get_legend_handles_labels()
-    labels = ['false', 'true']
-    ax.legend(handles=handles[0:], labels=labels[0:], title="precursor = target F0", fontsize=14, title_fontsize=16)
+    labels_new = ['false', 'true']
+    ax.legend(handles=handles[0:], labels=labels_new, title="precursor = target F0", fontsize=14, title_fontsize=16)
 
 
     # plt.title('Mean SHAP value over ferret ID', fontsize=18)
 
     # Optionally add a legend
-    ax.legend(title="precursor = target F0", fontsize=14, title_fontsize=16)
+    # ax.legend(title="precursor = target F0", fontsize=14, title_fontsize=16)
     ax.set_title('Precursor = target F0',  fontsize = 25)
 
     plt.savefig(fig_savedir / 'ferretIDbyprecurequaltargF0_violin.png', dpi=500, bbox_inches='tight')
