@@ -432,7 +432,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     ax.set_yticklabels(np.flip(feature_labels), fontsize=17, rotation = 45)
     legend_handles, legend_labels = ax.get_legend_handles_labels()
     #reinsert the legend_hanldes and labels
-    ax.legend(legend_handles, ['Correct Rejection', 'False Alarm'], loc='upper right', fontsize=18)
+    ax.legend(legend_handles, ['Correct Rejection', 'False Alarm'], loc='upper right', fontsize=13)
 
     ax.set_xlabel('Impact on p(FA)')
     fig.tight_layout()
@@ -960,6 +960,9 @@ def runlgbfaornot(dataframe):
 def runfalsealarmpipeline(ferrets, optimization=False, ferret_as_feature=False):
     resultingfa_df = behaviouralhelperscg.get_false_alarm_behavdata(ferrets=ferrets, startdate='04-01-2020',
                                                               finishdate='01-03-2023')
+    #extract female talker
+    resultingfa_df = resultingfa_df[resultingfa_df['talker'] == 1.0]
+
     if len(ferrets) == 1:
         one_ferret = True
     len_of_data_male = {}

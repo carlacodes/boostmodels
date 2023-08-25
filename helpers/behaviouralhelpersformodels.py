@@ -503,7 +503,10 @@ class behaviouralhelperscg():
             talkerlist = newdata['talker']
 
             for i0 in range(0, len(distractors)):
-                talkermat[i0] = int(talkerlist.values[i0]) * np.ones(len(distractors.values[i0]))
+                if talkerlist.values[i0] ==1:
+                    talkermat[i0] = int(4) * np.ones(len(distractors.values[i0]))
+                else:
+                    talkermat[i0] = int(talkerlist.values[i0]) * np.ones(len(distractors.values[i0]))
             talkermat = pd.Series(talkermat, index=talkermat.keys())
 
             pitchshiftmat = newdata['PitchShiftMat']
@@ -548,6 +551,8 @@ class behaviouralhelperscg():
 
                 if isinstance(chosentrial, float) or is_all_zero:
                     chosentrial = talkermat.values[i].astype(int)
+
+
                     intra_trial_roving.append(0)
                 else:
                     intra_trial_roving.append(1)
@@ -603,7 +608,7 @@ class behaviouralhelperscg():
                     if count == len(chosentrial):
                         # print('count is as long as trial')
                         count = count - 1
-                    elif count - len(chosentrial) >=1:
+                    elif count - len(chosentrial) >= 1:
                         count = -1
                     if chosentrial[count] == 8.0:
                         pitchof0oflastword.append(float(3))
