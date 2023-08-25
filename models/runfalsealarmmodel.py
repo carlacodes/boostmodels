@@ -809,7 +809,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     #             fontsize=25, va='bottom', weight = 'bold')
 
     # plt.tight_layout()
-    plt.suptitle('False alarm versus correct rejection', fontsize=18)
+    plt.suptitle('Non-target words: false alarm vs. correct rejection model', fontsize=18)
     plt.subplots_adjust(wspace=0.2, hspace=0.4)
 
     plt.savefig(fig_dir / 'big_summary_plot_2_noannotations.png', dpi=500, bbox_inches="tight")

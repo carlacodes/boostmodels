@@ -1,6 +1,6 @@
 import sklearn.metrics
 import seaborn as sns
-from instruments.io.BehaviourIO import BehaviourDataSet
+# from instruments.io.BehaviourIO import BehaviourDataSet
 from sklearn.inspection import permutation_importance
 from instruments.behaviouralAnalysis import reactionTimeAnalysis  # outputbehaviordf
 from pathlib import Path
@@ -239,8 +239,10 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
 
     fig.set_size_inches(6, 12)
     ax.set_xlabel('Impact on p(miss)', fontsize=18)
-    ax.set_yticks(range(len(feature_labels)))
-    ax.set_yticklabels(feature_labels, fontsize=17, rotation = 45)
+    # ax.set_yticks(range(len(feature_labels)))
+    #for some reason y ticks are set in reverse order
+    ax.set_yticklabels(np.flip(feature_labels), fontsize=17, rotation = 45)
+    # ax.set_yticklabels(np.reverse(feature_labels), fontsize=17, rotation = 45)
     # ax.set_ylabel('Features', fontsize=18)
     #pull legend from figure
     # Pull legend from figure
@@ -476,7 +478,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
 
     # plt.tight_layout()
 
-    plt.suptitle('Miss versus correct hit response', fontsize=18)
+    plt.suptitle('Target words: miss versus hit model', fontsize=18)
     plt.subplots_adjust(wspace=0.2, hspace=0.4)
 
     # plt.tight_layout()
@@ -676,11 +678,6 @@ def run_correct_responsepipeline(ferrets):
         df_miss = df_miss.sample(n=len(df_nomiss), random_state=123)
 
     resultingcr_df = pd.concat([df_nomiss, df_miss], axis=0)
-
-    # #
-    # #shuffle the rows
-    # resultingcr_df = resultingcr_df.sample(frac=1).reset_index(drop=True)
-
 
 
 
