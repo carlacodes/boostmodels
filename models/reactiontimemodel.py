@@ -757,6 +757,35 @@ def extract_release_times_data(ferrets):
                 "realRelReleaseTimes", "ferret", "pastcorrectresp"]]
     labels = ['target F0', 'past trial was catch', 'trial number', 'talker', 'side of audio', 'precursor = target F0', 'time to target', 'realRelReleaseTimes', 'ferret ID', 'past trial was correct']
     dfuse = dfuse.rename(columns=dict(zip(dfuse.columns, labels)))
+    #plot the proportion of trials that have target F0 = precursor F0 for each subset of target F0
+    targ_1 = dfuse[dfuse['target F0'] == 1]
+    targ_1_precur_and_targ_same = targ_1[targ_1['precursor = target F0'] == 1]
+    targ_1_precur_and_targ_diff = targ_1[targ_1['precursor = target F0'] == 0]
+    targ_2 = dfuse[dfuse['target F0'] == 2]
+    targ_2_precur_and_targ_same = targ_2[targ_2['precursor = target F0'] == 1]
+    targ_2_precur_and_targ_diff = targ_2[targ_2['precursor = target F0'] == 0]
+
+    targ_3 = dfuse[dfuse['target F0'] == 3]
+    targ_3_precur_and_targ_same = targ_3[targ_3['precursor = target F0'] == 1]
+    targ_3_precur_and_targ_diff = targ_3[targ_3['precursor = target F0'] == 0]
+
+    targ_4 = dfuse[dfuse['target F0'] == 4]
+    targ_4_precur_and_targ_same = targ_4[targ_4['precursor = target F0'] == 1]
+    targ_4_precur_and_targ_diff = targ_4[targ_4['precursor = target F0'] == 0]
+    targ_5 = dfuse[dfuse['target F0'] == 5]
+    targ_5_precur_and_targ_same = targ_5[targ_5['precursor = target F0'] == 1]
+    targ_5_precur_and_targ_diff = targ_5[targ_5['precursor = target F0'] == 0]
+
+    #plot the proportion of trials that have target F0 = precursor F0 for each subset of target F0
+    fig, ax = plt.subplots()
+    sns.barplot(x='target F0', y='precursor = target F0', data=dfuse, palette='Set2')
+    plt.title('Proportion of trials with precursor = target F0 \n for each target F0', fontsize=18)
+    plt.show()
+
+    #plot whether the precursor = target F0 over the target F0
+    fig,ax = plt.subplots()
+    sns.scatterplot(data=dfuse, x='target F0', y='precursor = target F0', hue='ferret ID', palette='Set2')
+    plt.show()
     return dfuse
 
 
@@ -802,20 +831,20 @@ def run_correctrxntime_model_for_a_ferret(ferrets, optimization = False, ferret_
         col2 = 'ferret ID'
         dfx = dfx.loc[:, dfx.columns != col2]
         if optimization == False:
-            best_params = np.load('D:\mixedeffectmodelsbehavioural\optuna_results/best_paramsreleastimemodel_'+ ferrets[0]+ '.npy', allow_pickle=True).item()
+            best_params = np.load('D:\mixedeffectmodelsbehavioural\optuna_results/best_paramsreleastimemodel2308_'+ ferrets[0]+ '.npy', allow_pickle=True).item()
         else:
             best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
             best_params = best_study_results.best_params
-            np.save('D:\mixedeffectmodelsbehavioural\optuna_results/best_paramsreleastimemodel_'+ ferrets[0]+ '.npy', best_params)
+            np.save('D:\mixedeffectmodelsbehavioural\optuna_results/best_paramsreleastimemodel2308_'+ ferrets[0]+ '.npy', best_params)
     else:
         dfx = dfx
         if optimization == False:
-            best_params = np.load('D:\mixedeffectmodelsbehavioural\optuna_results/best_paramsreleastimemodel_ferretasfeature_'+ '.npy', allow_pickle=True).item()
+            best_params = np.load('D:\mixedeffectmodelsbehavioural\optuna_results/best_paramsreleastimemodel_ferretasfeature2308_'+ '.npy', allow_pickle=True).item()
         else:
             best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
             best_params = best_study_results.best_params
 
-            np.save('D:\mixedeffectmodelsbehavioural\optuna_results/best_paramsreleastimemodel_ferretasfeature_'+ '.npy', best_params)
+            np.save('D:\mixedeffectmodelsbehavioural\optuna_results/best_paramsreleastimemodel_ferretasfeature2308_'+ '.npy', best_params)
     xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx, df_use[col], paramsinput=best_params, ferret_as_feature=ferret_as_feature, one_ferret=True, ferrets=ferrets[0])
 
 

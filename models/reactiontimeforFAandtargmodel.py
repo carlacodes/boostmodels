@@ -941,13 +941,13 @@ def predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feat
         dfx = dfx
         if optimization == False:
             best_params = np.load(
-                'D:\mixedeffectmodelsbehavioural/optuna_results/best_paramsreleastimemodel_dist_ferretasfeature_2805' + 'talker' + str(
+                'D:\mixedeffectmodelsbehavioural/optuna_results/best_paramsreleastimemodel_dist_ferretasfeature_2308' + 'talker' + str(
                     talker) + '2007.npy', allow_pickle=True).item()
         else:
             best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
             best_params = best_study_results.best_params
             np.save(
-                'D:\mixedeffectmodelsbehavioural/optuna_results/best_paramsreleastimemodel_dist_ferretasfeature_2805' + 'talker' + str(
+                'D:\mixedeffectmodelsbehavioural/optuna_results/best_paramsreleastimemodel_dist_ferretasfeature_2308' + 'talker' + str(
                     talker) + '2007.npy', best_params)
     if len(ferrets) == 1:
         one_ferret = True
@@ -997,13 +997,15 @@ def predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feat
 
 
 def main():
-    ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']  # , 'F2105_Clove']
+    ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
+    ferrets = ['F1815_Cruella']# , 'F2105_Clove']
+    ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
 
     predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=True, talker=2)
 
-    # for ferret in ferrets:
-    #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)
-    #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 2)
+    for ferret in ferrets:
+        predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)
+        predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 2)
 
 
 if __name__ == '__main__':
