@@ -503,7 +503,7 @@ class behaviouralhelperscg():
             talkerlist = newdata['talker']
 
             for i0 in range(0, len(distractors)):
-                if talkerlist.values[i0] ==1:
+                if talkerlist.values[i0] == 1:
                     talkermat[i0] = int(4) * np.ones(len(distractors.values[i0]))
                 else:
                     talkermat[i0] = int(talkerlist.values[i0]) * np.ones(len(distractors.values[i0]))
@@ -623,10 +623,24 @@ class behaviouralhelperscg():
 
 
                 else:
-                    try:
-                        pitchof0oflastword.append(chosentrial[-1])
+                    try: #false alarm
+                        if chosentrial[-1] == 8.0:
+                            pitchof0oflastword.append(float(3))
+                        elif chosentrial[-1] == 13.0:
+                            pitchof0oflastword.append(float(1))
+                        elif chosentrial[-1] == 1.0:
+                            pitchof0oflastword.append(float(4))
+                        else:
+                            pitchof0oflastword.append(float(chosentrial[-1]))
                     except:
-                        pitchof0oflastword.append(chosentrial)
+                        if chosentrial == 8.0:
+                            pitchof0oflastword.append(float(3))
+                        elif chosentrial == 13.0:
+                            pitchof0oflastword.append(float(1))
+                        elif chosentrial == 1.0:
+                            pitchof0oflastword.append(float(4))
+                        else:
+                            pitchof0oflastword.append(float(chosentrial))
                     time_elapsed.append(np.sum(distractordurationoftrial[:]) / fs)
 
 
@@ -755,7 +769,7 @@ class behaviouralhelperscg():
             newdata = newdata[(newdata.currAtten == 0)]
             listtodrop = []
             for i3 in range (0, len(newdata)):
-                if np.any(newdata['PitchShiftMat'].values[i3] == 14) or np.any(newdata['PitchShiftMat'].values[i3] == 10)  or np.any(newdata['PitchShiftMat'].values[i3] == 6):
+                if np.any(newdata['PitchShiftMat'].values[i3] == 14) or np.any(newdata['PitchShiftMat'].values[i3] == 10) or np.any(newdata['PitchShiftMat'].values[i3] == 6):
                     listtodrop.append(True)
                 else:
                     listtodrop.append(False)

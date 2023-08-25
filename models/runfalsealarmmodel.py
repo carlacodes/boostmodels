@@ -962,6 +962,10 @@ def runfalsealarmpipeline(ferrets, optimization=False, ferret_as_feature=False):
                                                               finishdate='01-03-2023')
     #extract female talker
     resultingfa_df = resultingfa_df[resultingfa_df['talker'] == 1.0]
+    #get the min of thepitchof0oflastword and find which rows have that value
+    minpitch = np.min(resultingfa_df['pitchof0oflastword'].values)
+    minpitchrows = resultingfa_df[resultingfa_df['pitchof0oflastword'] == minpitch]
+    np.min(resultingfa_df['pitchof0oflastword'].values)
 
     if len(ferrets) == 1:
         one_ferret = True
