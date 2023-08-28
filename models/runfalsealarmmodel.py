@@ -2,10 +2,8 @@ from pathlib import Path
 import lightgbm as lgb
 import matplotlib
 import matplotlib.colors as mcolors
-import matplotlib.pyplot as plt
 import numpy as np
 import optuna
-import seaborn as sns
 import shap
 import matplotlib.image as mpimg
 import sklearn
@@ -22,6 +20,11 @@ from helpers.behaviouralhelpersformodels import *
 from instruments.behaviouralAnalysis import reactionTimeAnalysis  # outputbehaviordf
 from instruments.io.BehaviourIO import BehaviourDataSet
 import matplotlib.font_manager as fm
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+
+
 
 
 def get_axis_limits(ax, scale=1):
@@ -1610,8 +1613,6 @@ def plot_reaction_times_interandintra_swarm(ferrets):
 
     return df_by_ferret
 
-import seaborn as sns
-import matplotlib.pyplot as plt
 
 def plot_reaction_times_interandintra_violin(ferrets):
     # plot the reaction times by animal
@@ -1675,13 +1676,7 @@ def plot_reaction_times_interandintra_violin(ferrets):
     plt.show()
     print('done')
 
-import seaborn as sns
-import matplotlib.pyplot as plt
 
-import seaborn as sns
-import matplotlib.pyplot as plt
-import seaborn as sns
-import matplotlib.pyplot as plt
 
 def plot_reaction_times_interandintra_swarm(ferrets):
     # plot the reaction times by animal
@@ -1730,7 +1725,7 @@ def plot_reaction_times_interandintra_swarm(ferrets):
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    # plot_reaction_times_interandintra_violin(ferrets)
+    plot_reaction_times_interandintra_violin(ferrets)
     # plot_reaction_times_interandintra(ferrets)
 
     # plot_reaction_times_interandintra_swarm(ferrets)
