@@ -665,7 +665,7 @@ def plot_stats_by_pitch(stats_dict_all_combined, stats_dict_combined, stats_dict
     ax2.legend( loc='upper left')
     ax2.set_ylabel('P(FA) by F0 of \n  target word')
     ax2.set_title('False alarms')
-    ax2.set_xlabel('F0 of audio stream')
+    ax2.set_xlabel('F0 (Hz)')
     ax2.set_xticks([0, 0.25, 0.5, 0.75, 1.0, 1.5, 1.75], ['109 Hz', '124 Hz', '144 Hz', '191 Hz', '251 Hz', 'intra - female', 'intra - male '], rotation=45)
 
 
