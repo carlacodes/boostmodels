@@ -608,7 +608,7 @@ def plot_stats_by_pitch(stats_dict_all_combined, stats_dict_combined, stats_dict
 
     ax1.set_ylim(0, 1)
     ax1.set_ylabel('P(hit) by F0 \n  of target word')
-    ax1.set_title('Proportion of hits over target F0')
+    ax1.set_title('Hits')
 
     width = 0.25  # the width of the bars
     multiplier = 0
@@ -664,7 +664,7 @@ def plot_stats_by_pitch(stats_dict_all_combined, stats_dict_combined, stats_dict
     ax2.set_ylim(0, 1)
     ax2.legend( loc='upper left')
     ax2.set_ylabel('P(FA) by F0 of \n  target word')
-    ax2.set_title('Proportion of false alarms over F0')
+    ax2.set_title('False alarms')
     ax2.set_xlabel('F0 of audio stream')
     ax2.set_xticks([0, 0.25, 0.5, 0.75, 1.0, 1.5, 1.75], ['109 Hz', '124 Hz', '144 Hz', '191 Hz', '251 Hz', 'intra - female', 'intra - male '], rotation=45)
 
@@ -720,7 +720,7 @@ def run_barplot_pipeline():
 
 if __name__ == '__main__':
     stats_dict_empty = {}
-    run_barplot_pipeline()
+    # run_barplot_pipeline()
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
     df = behaviouralhelperscg.get_stats_df(ferrets=ferrets, startdate='04-01-2016', finishdate='01-03-2023')
     stats_dict_all_inter, stats_dict_inter = run_stats_calc_by_pitch(df, ferrets, stats_dict_empty, pitch_param='inter_trial_roving')

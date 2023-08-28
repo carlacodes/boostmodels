@@ -1662,7 +1662,7 @@ def plot_reaction_times_interandintra_violin(ferrets):
     ax.set_xticks([0, 1, 2])
     ax.set_xticklabels(['control', 'inter', 'intra'], fontsize=18, rotation=45)
     ax.set_xlabel('Ferret ID', fontsize=18)
-    ax.set_ylabel('Release time relative to target', fontsize=18)  # Corrected y-label
+    ax.set_ylabel('Release time (s)', fontsize=18)  # Corrected y-label
 
 
     # Optionally add a legend
@@ -1670,7 +1670,7 @@ def plot_reaction_times_interandintra_violin(ferrets):
     handles, labels = ax.get_legend_handles_labels()
     labels = ['Male', 'Female']
     ax.legend(handles=handles[0:], labels=labels[0:], title="talker", fontsize=14, title_fontsize=16)
-    ax.set_title('Talker type', fontsize=25)
+    # ax.set_title('Talker type', fontsize=25)
     plt.savefig( 'D:/behavmodelfigs/rovingtypebytalker_violin.png', dpi=500, bbox_inches='tight')
     plt.show()
     print('done')
