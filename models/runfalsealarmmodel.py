@@ -961,11 +961,11 @@ def runfalsealarmpipeline(ferrets, optimization=False, ferret_as_feature=False):
     resultingfa_df = behaviouralhelperscg.get_false_alarm_behavdata(ferrets=ferrets, startdate='04-01-2020',
                                                               finishdate='01-03-2023')
     #extract female talker
-    resultingfa_df = resultingfa_df[resultingfa_df['talker'] == 1.0]
+    # resultingfa_df = resultingfa_df[resultingfa_df['talker'] == 1.0]
     #get the min of thepitchof0oflastword and find which rows have that value
-    minpitch = np.min(resultingfa_df['pitchof0oflastword'].values)
-    minpitchrows = resultingfa_df[resultingfa_df['pitchof0oflastword'] == minpitch]
-    np.min(resultingfa_df['pitchof0oflastword'].values)
+    # minpitch = np.min(resultingfa_df['pitchof0oflastword'].values)
+    # minpitchrows = resultingfa_df[resultingfa_df['pitchof0oflastword'] == minpitch]
+    # np.min(resultingfa_df['pitchof0oflastword'].values)
 
     if len(ferrets) == 1:
         one_ferret = True
@@ -1057,13 +1057,13 @@ def runfalsealarmpipeline(ferrets, optimization=False, ferret_as_feature=False):
 
     if optimization == False:
         # load the saved params
-        params = np.load('../optuna_results/falsealarm_optunaparams_1406_9.npy', allow_pickle=True).item()
+        params = np.load('../optuna_results/falsealarm_optunaparams_2808_1.npy', allow_pickle=True).item()
     else:
         study = run_optuna_study_falsealarm(resultingfa_df, resultingfa_df['falsealarm'].to_numpy(),
                                             ferret_as_feature=ferret_as_feature)
         print(study.best_params)
         params = study.best_params
-        np.save('../optuna_results/falsealarm_optunaparams_1406_9.npy', study.best_params)
+        np.save('../optuna_results/falsealarm_optunaparams_2808_1.npy', study.best_params)
 
     resultingfa_df.to_csv(filepath)
 
@@ -1735,7 +1735,7 @@ if __name__ == '__main__':
 
     # plot_reaction_times_interandintra_swarm(ferrets)
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(
-        ferrets, optimization=False, ferret_as_feature=True)
+        ferrets, optimization=True, ferret_as_feature=True)
     # ferrets = ['F2105_Clove']# 'F2105_Clove'
     # df_by_ferretdict = plot_reaction_times(ferrets)
     # #
