@@ -111,7 +111,7 @@ def runlgbreleasetimes_for_a_ferret(data, paramsinput=None, ferret=1, ferret_nam
     mse_test = cross_val_score(xg_reg, X_test, y_test, scoring='neg_mean_squared_error', cv=kfold)
 
     print("MSE on test: %.4f" % (mse_test) + ferret_name)
-    print("negative MSE training: %.2f%%" % (np.mean(mse_train) * 100.0))
+    print("negative MSE training: %.4f" % (np.mean(mse_train)))
     print(mse_train)
     shap_values = shap.TreeExplainer(xg_reg).shap_values(dfx)
 
