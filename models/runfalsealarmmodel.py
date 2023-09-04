@@ -899,9 +899,9 @@ def runlgbfaornot(dataframe):
     results_training = cross_val_score(xg_reg, X_train, y_train, scoring='balanced_accuracy', cv=kfold)
     results = cross_val_score(xg_reg, X_test, y_test, scoring='accuracy', cv=kfold)
     bal_accuracy = cross_val_score(xg_reg, X_test, y_test, scoring='balanced_accuracy', cv=kfold)
-    print("Accuracy: %.2f%%" % (np.mean(results) * 100.0))
+    print("Accuracy on test set: %.2f%%" % (np.mean(results) * 100.0))
     print(results)
-    print('Balanced Accuracy: %.2f%%' % (np.mean(bal_accuracy) * 100.0))
+    print('Balanced Accuracy on test set: %.2f%%' % (np.mean(bal_accuracy) * 100.0))
 
     shap_values1 = shap.TreeExplainer(xg_reg).shap_values(dfx)
     explainer = shap.Explainer(xg_reg, dfx)
@@ -1048,19 +1048,19 @@ def runfalsealarmpipeline(ferrets, optimization=False, ferret_as_feature=False):
 
 
 
-    if len(df_nofa_intra) > len(df_fa_intra):
+    if len(df_nofa_intra) > len(df_fa_intra) * 1.2:
         df_nofa_intra = df_nofa_intra.sample(n=len(df_fa_intra), random_state=123)
-    elif len(df_fa_intra) > len(df_nofa_intra):
+    elif len(df_fa_intra) > len(df_nofa_intra) * 1.2:
         df_fa_intra = df_fa_intra.sample(n=len(df_nofa_intra), random_state=123)
 
-    if len(df_nofa_inter) > len(df_fa_inter) :
+    if len(df_nofa_inter) > len(df_fa_inter) * 1.2:
         df_nofa_inter = df_nofa_inter.sample(n=len(df_fa_inter), random_state=123)
-    elif len(df_fa_inter) > len(df_nofa_inter) :
+    elif len(df_fa_inter) > len(df_nofa_inter) * 1.2:
         df_fa_inter = df_fa_inter.sample(n=len(df_nofa_inter), random_state=123)
 
-    if len(df_nofa_control) > len(df_fa_control):
+    if len(df_nofa_control) > len(df_fa_control) * 1.2:
         df_nofa_control = df_nofa_control.sample(n=len(df_fa_control), random_state=123)
-    elif len(df_fa_control) > len(df_nofa_control):
+    elif len(df_fa_control) > len(df_nofa_control) * 1.2:
         df_fa_control = df_fa_control.sample(n=len(df_nofa_control), random_state=123)
 
 
@@ -1099,13 +1099,13 @@ def runfalsealarmpipeline(ferrets, optimization=False, ferret_as_feature=False):
 
     if optimization == False:
         # load the saved params
-        params = np.load('../optuna_results/falsealarm_optunaparams_2808_4.npy', allow_pickle=True).item()
+        params = np.load('../optuna_results/falsealarm_optunaparams_2808_2.npy', allow_pickle=True).item()
     else:
         study = run_optuna_study_falsealarm(resultingfa_df, resultingfa_df['falsealarm'].to_numpy(),
                                             ferret_as_feature=ferret_as_feature)
         print(study.best_params)
         params = study.best_params
-        np.save('../optuna_results/falsealarm_optunaparams_2808_4.npy', study.best_params)
+        np.save('../optuna_results/falsealarm_optunaparams_2808_2.npy', study.best_params)
 
     resultingfa_df.to_csv(filepath)
 
@@ -1769,7 +1769,7 @@ if __name__ == '__main__':
 
     # plot_reaction_times_interandintra_swarm(ferrets)
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(
-        ferrets, optimization=True, ferret_as_feature=True)
+        ferrets, optimization=False, ferret_as_feature=True)
     # ferrets = ['F2105_Clove']# 'F2105_Clove'
     # df_by_ferretdict = plot_reaction_times(ferrets)
     # #
