@@ -839,7 +839,13 @@ def run_correctrxntime_model_for_a_ferret(ferrets, optimization = False, ferret_
     else:
         dfx = dfx
         if optimization == False:
-            best_params = np.load('D:\mixedeffectmodelsbehavioural\optuna_results/best_paramsreleastimemodel_ferretasfeature2308_'+ '.npy', allow_pickle=True).item()
+            # best_params = np.load('D:\mixedeffectmodelsbehavioural\optuna_results/best_paramsreleastimemodel_ferretasfeature2308_'+ '.npy', allow_pickle=True).item()
+            best_params = {'colsample_bytree': 0.9984483617911889, 'alpha': 10.545892165925359, 'n_estimators': 120,
+                       'learning_rate': 0.2585298848712121, 'max_depth': 20, 'bagging_fraction': 1.0,
+                       'bagging_freq': 23, 'lambda': 0.19538105338084405, 'subsample': 0.8958044434304789,
+                       'min_child_samples': 20, 'min_child_weight': 9.474782393947127, 'gamma': 0.1571174215092159,
+                       'subsample_for_bin': 6200}
+
         else:
             best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
             best_params = best_study_results.best_params
@@ -851,7 +857,7 @@ def run_correctrxntime_model_for_a_ferret(ferrets, optimization = False, ferret_
 def main():
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']  # , 'F2105_Clove']
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature=True)
+    run_correctrxntime_model(ferrets, optimization = True, ferret_as_feature=True)
     #
     # for ferret in ferrets:
     #     run_correctrxntime_model_for_a_ferret([ferret], optimization=False, ferret_as_feature=False)
