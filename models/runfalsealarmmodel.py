@@ -383,7 +383,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.ylabel('Cumulative Feature Importance')
     plt.title('Elbow Plot of Cumulative Feature Importance for False Alarm Model')
     plt.xticks(rotation=45, ha='right')  # rotate x-axis labels for better readability
-    plt.savefig(fig_dir / 'elbowplot.png', dpi=500, bbox_inches='tight')
+    plt.savefig(fig_dir / 'elbowplot14091409.png', dpi=500, bbox_inches='tight')
     plt.show()
 
 
@@ -399,7 +399,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     ax.set_xlabel('Ferret ID', fontsize=18)
     ax.set_ylabel('Impact on p(FA)', fontsize=18)
     plt.title('Time since trial start', fontsize=18)
-    plt.savefig(fig_dir /'ferretIDby_timesincestartoftrial.png', dpi=500, bbox_inches='tight')
+    plt.savefig(fig_dir /'ferretIDby_timesincestartoftrial1409.png', dpi=500, bbox_inches='tight')
     plt.show()
 
 
@@ -414,7 +414,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     ax.set_xlabel('Ferret ID', fontsize=18)
     ax.set_ylabel('Impact on p(FA)', fontsize=18)
     # plt.title('Mean SHAP value over ferret ID', fontsize=18)
-    plt.savefig(fig_dir /'ferretIDbysideofaudio.png', dpi=500, bbox_inches='tight')
+    plt.savefig(fig_dir /'ferretIDbysideofaudio1409.png', dpi=500, bbox_inches='tight')
     plt.show()
     #time since start of trial
 
@@ -439,7 +439,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
 
     ax.set_xlabel('Impact on p(FA)')
     fig.tight_layout()
-    plt.savefig(fig_dir / 'ranked_features.png', dpi=1000, bbox_inches="tight")
+    plt.savefig(fig_dir / 'ranked_features1409.png', dpi=1000, bbox_inches="tight")
     plt.show()
 
     # calculate permutation importance
@@ -450,7 +450,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     ax.barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, color='slategray')
     ax.set_title("Permutation importance for the false alarm model")
     fig.tight_layout()
-    plt.savefig(fig_dir / 'permutation_importance.png', dpi=500)
+    plt.savefig(fig_dir / 'permutation_importance1409.png', dpi=500)
     plt.show()
 
 
@@ -504,7 +504,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     ax.legend(handles=handles[0:], labels=labels[0:], title="side of audio", fontsize=14, title_fontsize=16)
     ax.set_title('Side of audio presentation', fontsize=25)
 
-    plt.savefig(fig_dir / 'ferretIDbysideofaudio_violin.png', dpi=500, bbox_inches='tight')
+    plt.savefig(fig_dir / 'ferretIDbysideofaudio_violin1409.png', dpi=500, bbox_inches='tight')
     plt.show()
 
 
@@ -518,7 +518,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     ax.set_ylabel('Impact on p(FA)', fontsize=18)
     ax.set_xticks([1, 2, 3, 4, 5])
     ax.set_xticklabels(['109', '124', '144', '191', '251'], fontsize=18, rotation=45)
-    plt.savefig(fig_dir / 'F0bytimestart_supplemental.png', dpi=500, bbox_inches='tight')
+    plt.savefig(fig_dir / 'F0bytimestart_supplemental1409.png', dpi=500, bbox_inches='tight')
     # plt.xlim(0.8, 5.2)
     # plt.xticks([1, 2, 3, 4, 5], labels = ["109", "124", "144", "191", "251"])
     # shap.plots.scatter(shap_values2[:, "time since start of trial"], color=shap_values2[:, "F0"], show= True, ax =ax,  cmap=cmapcustom)
@@ -534,8 +534,9 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     cax.set_yticklabels(['109', '124', '144', '191', '251'], fontsize=18, rotation=45)
     plt.title('F0', fontsize=18)
     ax.set_ylabel('Impact on p(FA)', fontsize=18)
+    ax.set_xticks([1, 2, 3, 4, 5])
 
-    plt.savefig(fig_dir / 'timestartbyF0_supplemental.png', dpi=500, bbox_inches='tight')
+    plt.savefig(fig_dir / 'timestartbyF0_supplemental1409.png', dpi=500, bbox_inches='tight')
     # plt.xlim(0.8, 5.2)
     # plt.xticks([1, 2, 3, 4, 5], labels = ["109", "124", "144", "191", "251"])
     # shap.plots.scatter(shap_values2[:, "time since start of trial"], color=shap_values2[:, "F0"], show= True, ax =ax,  cmap=cmapcustom)
@@ -554,7 +555,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
 
     ax.set_xticks([1, 2, 3, 4, 5])
     ax.set_xticklabels(['109', '124', '144', '191', '251'], fontsize=18, rotation=45)
-    plt.savefig(fig_dir / 'F0bytrialnum_supplemental.png', dpi=500, bbox_inches='tight')
+    plt.savefig(fig_dir / 'F0bytrialnum_supplemental1409.png', dpi=500, bbox_inches='tight')
     # plt.xlim(0.8, 5.2)
     # plt.xticks([1, 2, 3, 4, 5], labels = ["109", "124", "144", "191", "251"])
     # shap.plots.scatter(shap_values2[:, "time since start of trial"], color=shap_values2[:, "F0"], show= True, ax =ax,  cmap=cmapcustom)
@@ -574,7 +575,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     ax.set_xticks([0,1,2,3,4])
     ax.set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18, rotation=45)
     ax.set_xlabel('Ferret ID', fontsize=18)
-    plt.savefig(fig_dir / 'FERRETIDbytrialnum_supplemental.png', dpi=500, bbox_inches='tight')
+    plt.savefig(fig_dir / 'FERRETIDbytrialnum_supplemental1409.png', dpi=500, bbox_inches='tight')
     # plt.xlim(0.8, 5.2)
     # plt.xticks([1, 2, 3, 4, 5], labels = ["109", "124", "144", "191", "251"])
     # shap.plots.scatter(shap_values2[:, "time since start of trial"], color=shap_values2[:, "F0"], show= True, ax =ax,  cmap=cmapcustom)
@@ -593,7 +594,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     ax.set_ylabel('Impact on p(FA)', fontsize=18)
 
     ax.set_xticklabels(['109', '124', '144', '191', '251'], fontsize=18, rotation=45)
-    plt.savefig(fig_dir / 'F0byferretID_supplemental.png', dpi=500, bbox_inches='tight')
+    plt.savefig(fig_dir / 'F0byferretID_supplemental1409.png', dpi=500, bbox_inches='tight')
     # plt.xlim(0.8, 5.2)
     # plt.xticks([1, 2, 3, 4, 5], labels = ["109", "124", "144", "191", "251"])
     # shap.plots.scatter(shap_values2[:, "time since start of trial"], color=shap_values2[:, "F0"], show= True, ax =ax,  cmap=cmapcustom)
@@ -628,7 +629,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     ax.legend(handles=handles[0:], labels=labels[0:], title="talker", fontsize=14, title_fontsize=16)
     ax.set_title('Talker type', fontsize=25)
 
-    plt.savefig(fig_dir / 'F0byutalker_violin.png', dpi=500, bbox_inches='tight')
+    plt.savefig(fig_dir / 'F0byutalker_violin1409.png', dpi=500, bbox_inches='tight')
     plt.show()
 
     ferret_ids = shap_values2[:, "ferret ID"].data
@@ -657,7 +658,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     ax.legend(handles=handles[0:], labels=labels[0:], title="talker", fontsize=14, title_fontsize=16)
     ax.set_title('Talker type', fontsize=25)
 
-    plt.savefig(fig_dir / 'ferretIDbyTALKER_violin.png', dpi=500, bbox_inches='tight')
+    plt.savefig(fig_dir / 'ferretIDbyTALKER_violin1409.png', dpi=500, bbox_inches='tight')
     plt.show()
 
     fig, ax = plt.subplots(figsize=(5, 5))
@@ -705,7 +706,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.xticks([1, 2, 3, 4, 5], labels=['109 Hz', '124 Hz', '144 Hz', '191 Hz', '251 Hz'], fontsize=15)
     plt.ylabel('SHAP value', fontsize=16)
     plt.xlabel('precursor F0 word', fontsize=16)
-    plt.savefig(fig_dir / 'precursor F0intratrialrove.png', dpi=500)
+    plt.savefig(fig_dir / 'precursor F0intratrialrove1409.png', dpi=500)
     plt.show()
     shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "intra-trial F0 roving"], show=True, cmap=cmapcustom)
     shap.plots.scatter(shap_values2[:, "intra-trial F0 roving"], color=shap_values2[:, "F0"], show=True, cmap=cmapcustom)
@@ -722,7 +723,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.title('Target presentation time \n versus impact in false alarm probability', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
     plt.xlabel('Target presentation time', fontsize=16)
-    plt.savefig(fig_dir / 'time_elapsedcolouredbytrialnumber.png', dpi=1000)
+    plt.savefig(fig_dir / 'time_elapsedcolouredbytrialnumber1409.png', dpi=1000)
     plt.show()
 
 
@@ -738,7 +739,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.ylabel('SHAP value', fontsize=16)
     plt.xlabel('Ferret ID', fontsize=16)
     plt.xticks([0, 1, 2, 3, 4], labels=['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=15)
-    plt.savefig(fig_dir / 'ferretIDcolouredbytrialnumber.png', dpi=500)
+    plt.savefig(fig_dir / 'ferretIDcolouredbytrialnumber1409.png', dpi=500)
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "time since trial start"], color=shap_values2[:, "F0"], show=False,
@@ -751,11 +752,12 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     cb_ax.set_yticks([1, 2, 3, 4, 5])
     cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
     cb_ax.set_ylabel("F0", fontsize=12)
+    ax.set_xticks([0.5, 1, 1.5, 2, 2.5, 3,3.5, 4, 4.5, 5, 5.5, 6])
     plt.ylabel('SHAP value', fontsize=10)
     plt.title('Target presentation versus \n impact on false alarm probability', fontsize=18)
     plt.ylabel('SHAP value', fontsize=16)
     plt.xlabel('Target presentation time', fontsize=16)
-    plt.savefig(fig_dir / 'trialtime_colouredbyprecur.png', dpi=1000)
+    plt.savefig(fig_dir / 'trialtime_colouredbyprecur1409.png', dpi=1000)
     plt.show()
     text_width_pt = 419.67816  # Replace with your value
 
@@ -778,7 +780,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     ax_dict['A'].tick_params(axis='x', which='major', labelsize=12)
 
     # rotate x-axis labels for better readability
-    summary_img = mpimg.imread(fig_dir / 'ranked_features.png')
+    summary_img = mpimg.imread(fig_dir / 'ranked_features1409.png')
     ax_dict['B'].imshow(summary_img, aspect='auto', )
     ax_dict['B'].axis('off')  # Turn off axis ticks and labels
     # ax_dict['B'].set_title('Ranked list of features over their \n impact on false alarm probability', fontsize=13)
@@ -850,7 +852,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     #             fontsize=25, va='bottom', weight = 'bold')
 
     # plt.tight_layout()
-    plt.suptitle('Non-target words: false alarm vs. correct rejection model', fontsize=18)
+    plt.suptitle('Non-target words: false alarm vs. no false alarm model', fontsize=18)
     plt.subplots_adjust(wspace=0.2, hspace=0.4)
 
     plt.savefig(fig_dir / 'big_summary_plot_2_noannotations.png', dpi=500, bbox_inches="tight")
@@ -927,7 +929,7 @@ def runlgbfaornot(dataframe):
     ax.set_yticklabels(labels)
     fig.tight_layout()
 
-    plt.savefig('D:/behavmodelfigs/fa_or_not_model/ranked_features.png', dpi=1000, bbox_inches="tight")
+    plt.savefig('D:/behavmodelfigs/fa_or_not_model/ranked_features14091409.png', dpi=1000, bbox_inches="tight")
     plt.show()
 
     shap.dependence_plot("F0", shap_values1[0], dfx)  #
@@ -940,7 +942,7 @@ def runlgbfaornot(dataframe):
     ax.barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T)
     ax.set_title("Permutation Importances (test set)")
     fig.tight_layout()
-    plt.savefig('D:/behavmodelfigs/permutation_importance.png', dpi=500)
+    plt.savefig('D:/behavmodelfigs/permutation_importance14091409.png', dpi=500)
     plt.show()
 
     fig, ax = plt.subplots(figsize=(15, 15))
@@ -969,30 +971,30 @@ def runlgbfaornot(dataframe):
     shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "intra-trial F0 roving"], show=False)
     plt.title('False alarm model - SHAP values as a function of cosine similarity \n, coloured by intra trial roving')
     fig.tight_layout()
-    plt.savefig('D:/behavmodelfigs/cosinesimdepenencyplot.png', dpi=500)
+    plt.savefig('D:/behavmodelfigs/cosinesimdepenencyplot14091409.png', dpi=500)
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "intra-trial F0 roving"], color=shap_values2[:, "cosinesim"], show=False)
-    plt.savefig('D:/behavmodelfigs/intratrialrovingcosinecolor.png', dpi=500)
+    plt.savefig('D:/behavmodelfigs/intratrialrovingcosinecolor14091409.png', dpi=500)
 
     plt.show()
     fig, ax = plt.subplots(figsize=(15, 15))
     shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "pitchoftarg"], show=False)
     plt.title('False alarm model - trial number as a function of SHAP values, coloured by pitch of target')
     fig.tight_layout()
-    plt.savefig('D:/behavmodelfigs/trialnumcosinecolor.png', dpi=500)
+    plt.savefig('D:/behavmodelfigs/trialnumcosinecolor14091409.png', dpi=500)
     plt.show()
 
     fig, ax = plt.subplots(figsize=(18, 15))
     shap.plots.scatter(shap_values2[:, "time_elapsed"], color=shap_values2[:, "cosinesim"], show=False)
     plt.title('shap values for FA model as a function of time since start of trial, coloured by cosine similarity')
     fig.tight_layout()
-    plt.savefig('D:/behavmodelfigs/time_elapsedcosinecolor.png', dpi=500)
+    plt.savefig('D:/behavmodelfigs/time_elapsedcosinecolor14091409.png', dpi=500)
     plt.show()
 
     shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "time_elapsed"], show=False)
     plt.title('Cosine Similarity as a function of SHAP values, coloured by time_elapsed')
-    plt.savefig('D:/behavmodelfigs/cosinesimtime_elapsed.png', dpi=500)
+    plt.savefig('D:/behavmodelfigs/cosinesimtime_elapsed14091409.png', dpi=500)
     plt.show()
 
     return xg_reg, ypred, y_test, results, shap_values1, X_train, y_train, bal_accuracy, shap_values2
@@ -1099,13 +1101,13 @@ def runfalsealarmpipeline(ferrets, optimization=False, ferret_as_feature=False):
 
     if optimization == False:
         # load the saved params
-        params = np.load('../optuna_results/falsealarm_optunaparams_1309_3.npy', allow_pickle=True).item()
+        params = np.load('../optuna_results/falsealarm_optunaparams_1309_4.npy', allow_pickle=True).item()
     else:
         study = run_optuna_study_falsealarm(resultingfa_df, resultingfa_df['falsealarm'].to_numpy(),
                                             ferret_as_feature=ferret_as_feature)
         print(study.best_params)
         params = study.best_params
-        np.save('../optuna_results/falsealarm_optunaparams_1309_3.npy', study.best_params)
+        np.save('../optuna_results/falsealarm_optunaparams_1309_4.npy', study.best_params)
 
     resultingfa_df.to_csv(filepath)
 
@@ -1180,7 +1182,7 @@ def run_reaction_time_fa_pipleine_female(ferrets):
     shap.summary_plot(shap_values1, X_train, show=False)
     plt.title('Ranked list of features over their \n impact in predicting reaction time, female talker', fontsize=18)
     fig.tight_layout()
-    plt.savefig('D:/behavmodelfigs/ranked_features_rxntimealarmhitmodel.png', dpi=500)
+    plt.savefig('D:/behavmodelfigs/ranked_features_rxntimealarmhitmodel14091409.png', dpi=500)
     plt.show()
 
     return resultingdf
@@ -1238,7 +1240,7 @@ def run_reaction_time_fa_pipleine_male(ferrets):
     shap.summary_plot(shap_values1, X_train, show=False)
     plt.title('Ranked list of features over their \n impact in predicting reaction time, male talker', fontsize=18)
     fig.tight_layout()
-    plt.savefig('D:/behavmodelfigs/ranked_features_rxntimealarmhitmodel_male.png', dpi=500)
+    plt.savefig('D:/behavmodelfigs/ranked_features_rxntimealarmhitmodel_male14091409.png', dpi=500)
     plt.show()
 
     return resultingdf
@@ -1259,7 +1261,7 @@ def plot_correct_response_byside(ferrets):
     plt.ylabel('proportion of correct responses')
     plt.xlabel('side of the auditory stimulus')
     plt.ylim(0, 1)
-    plt.savefig('D:/behavmodelfigs/proportion_correct_responses_by_side.png', dpi=500)
+    plt.savefig('D:/behavmodelfigs/proportion_correct_responses_by_side14091409.png', dpi=500)
 
     plt.show()
     df_left_by_ferret = {}
@@ -1289,7 +1291,7 @@ def plot_correct_response_byside(ferrets):
     plt.ylim(0, 1)
 
     plt.ylabel('proportion of correct responses', fontsize=13)
-    plt.savefig('D:/behavmodelfigs/proportion_correct_responses_by_side_by_ferret.png', dpi=1000)
+    plt.savefig('D:/behavmodelfigs/proportion_correct_responses_by_side_by_ferret14091409.png', dpi=1000)
     plt.show()
     return df_left, df_right
 
@@ -1324,7 +1326,7 @@ def plot_reaction_times_intra(ferrets):
     plt.title('Reaction times for the female talker, \n irrespective of ferret', fontsize=15)
     plt.legend(fontsize=10)
     plt.xlabel('reaction time relative to target presentation (s)', fontsize=13)
-    plt.savefig('D:/behavmodelfigs/reaction_times_by_talker_female.png', dpi=500)
+    plt.savefig('D:/behavmodelfigs/reaction_times_by_talker_female14091409.png', dpi=500)
     plt.show()
 
     sns.distplot(df_male_control['realRelReleaseTimes'], color='green', label='control F0')
@@ -1332,7 +1334,7 @@ def plot_reaction_times_intra(ferrets):
     plt.title('Reaction times for the male talker, \n irrespective of ferret', fontsize=15)
     plt.legend(fontsize=10)
     plt.xlabel('reaction time relative to target presentation (s)', fontsize=13)
-    plt.savefig('D:/behavmodelfigs/reaction_times_by_talker_male.png', dpi=500)
+    plt.savefig('D:/behavmodelfigs/reaction_times_by_talker_male14091409.png', dpi=500)
     plt.show()
 
     df_by_ferret = {}
@@ -1359,7 +1361,7 @@ def plot_reaction_times_intra(ferrets):
         plt.title('Reaction times for ferret ID ' + str(ferret_labels[ferret]), fontsize=15)
         plt.legend(fontsize=10)
         plt.xlabel('reaction time relative to target presentation (s)', fontsize=13)
-        plt.savefig('D:/behavmodelfigs/reaction_times_by_ferret_' + str(ferret_labels[ferret]) + '.png', dpi=1000)
+        plt.savefig('D:/behavmodelfigs/reaction_times_by_ferret_' + str(ferret_labels[ferret]) + '14091409.png', dpi=1000)
         plt.show()
 
     return df_by_ferret
@@ -1401,7 +1403,7 @@ def plot_reaction_times_interandintra(ferrets):
     plt.title('Reaction times for the female talker, \n irrespective of ferret', fontsize=15)
     plt.legend(fontsize=10)
     plt.xlabel('reaction time relative to target presentation (s)', fontsize=13)
-    plt.savefig('D:/behavmodelfigs/reaction_times_by_talker_female_interandintra.png', dpi=500)
+    plt.savefig('D:/behavmodelfigs/reaction_times_by_talker_female_interandintra14091409.png', dpi=500)
 
     plt.show()
 
@@ -1412,7 +1414,7 @@ def plot_reaction_times_interandintra(ferrets):
     plt.title('Reaction times for the male talker, \n irrespective of ferret', fontsize=15)
     plt.legend(fontsize=10)
     plt.xlabel('reaction time relative to target presentation (s)', fontsize=13)
-    plt.savefig('D:/behavmodelfigs/reaction_times_by_talker_male_interandintra.png', dpi=500)
+    plt.savefig('D:/behavmodelfigs/reaction_times_by_talker_male_interandintra14091409.png', dpi=500)
     plt.show()
 
     df_by_ferret = {}
@@ -1462,7 +1464,7 @@ def plot_reaction_times_interandintra(ferrets):
     ax_dict['4'].annotate('e)', xy=get_axis_limits(ax_dict['4']), xytext=(-0.1, ax_dict['4'].title.get_position()[1]+0.01), textcoords='axes fraction', fontproperties = font_props,zorder=1)
 
 
-    # plt.savefig('D:/behavmodelfigs/reaction_times_by_ferret_interbigmosaic_2806.png', dpi=500)
+    # plt.savefig('D:/behavmodelfigs/reaction_times_by_ferret_interbigmosaic_280614091409.png', dpi=500)
     # plt.savefig('D:/behavmodelfigs/reaction_times_by_ferret_interbigmosaic_2806.pdf', dpi=500)
 
     plt.show()
@@ -1505,7 +1507,7 @@ def plot_reaction_times_interandintra_swarm(ferrets):
     plt.title('Reaction times for the female talker, \n irrespective of ferret', fontsize=15)
     plt.legend(fontsize=10)
     plt.xlabel('reaction time relative to target presentation (s)', fontsize=13)
-    plt.savefig('D:/behavmodelfigs/reaction_times_by_talker_female_interandintra.png', dpi=500)
+    plt.savefig('D:/behavmodelfigs/reaction_times_by_talker_female_interandintra14091409.png', dpi=500)
 
     plt.show()
 
@@ -1516,7 +1518,7 @@ def plot_reaction_times_interandintra_swarm(ferrets):
     plt.title('Reaction times for the male talker, \n irrespective of ferret', fontsize=15)
     plt.legend(fontsize=10)
     plt.xlabel('reaction time relative to target presentation (s)', fontsize=13)
-    plt.savefig('D:/behavmodelfigs/reaction_times_by_talker_male_interandintra.png', dpi=500)
+    plt.savefig('D:/behavmodelfigs/reaction_times_by_talker_male_interandintra14091409.png', dpi=500)
     plt.show()
 
     df_by_ferret = {}
@@ -1615,7 +1617,7 @@ def plot_reaction_times_interandintra_swarm(ferrets):
 
 
 
-    plt.savefig('D:/behavmodelfigs/reaction_times_by_ferret_swarm_byF0_bigmosaic_noannotation.png', dpi=500)
+    plt.savefig('D:/behavmodelfigs/reaction_times_by_ferret_swarm_byF0_bigmosaic_noannotation14091409.png', dpi=500)
     plt.savefig('D:/behavmodelfigs/reaction_times_by_ferret_swarm_byF0_bigmosaic_noannotation.pdf', dpi=500)
     plt.show()
 
@@ -1647,7 +1649,7 @@ def plot_reaction_times_interandintra_swarm(ferrets):
     # ax_dict['4'].annotate('e)', xy=get_axis_limits(ax_dict['4']), xytext=(-0.1, ax_dict['4'].title.get_position()[1]+0.01), textcoords='axes fraction', fontproperties = font_props,zorder=1)
     #
     #
-    # plt.savefig('D:/behavmodelfigs/reaction_times_by_ferret_swarm_interbigmosaic.png', dpi=500)
+    # plt.savefig('D:/behavmodelfigs/reaction_times_by_ferret_swarm_interbigmosaic14091409.png', dpi=500)
     # plt.show()
 
     return df_by_ferret
@@ -1711,7 +1713,7 @@ def plot_reaction_times_interandintra_violin(ferrets):
     labels = ['Male', 'Female']
     ax.legend(handles=handles[0:], labels=labels[0:], title="talker", fontsize=14, title_fontsize=16)
     # ax.set_title('Talker type', fontsize=25)
-    plt.savefig( 'D:/behavmodelfigs/rovingtypebytalker_violin.png', dpi=500, bbox_inches='tight')
+    plt.savefig( 'D:/behavmodelfigs/rovingtypebytalker_violin14091409.png', dpi=500, bbox_inches='tight')
     plt.show()
     print('done')
 
@@ -1756,7 +1758,7 @@ def plot_reaction_times_interandintra_swarm(ferrets):
     plt.ylabel('Count', fontsize=13)
     plt.xticks(ticks=[0, 1, 2], labels=labels)
     plt.legend(title='Gender', title_fontsize=12, fontsize=10)
-    plt.savefig('D:/behavmodelfigs/reaction_times_by_talker_female_male_interandintra.png', dpi=500)
+    plt.savefig('D:/behavmodelfigs/reaction_times_by_talker_female_male_interandintra14091409.png', dpi=500)
     plt.show()
 
 
@@ -1769,7 +1771,7 @@ if __name__ == '__main__':
 
     # plot_reaction_times_interandintra_swarm(ferrets)
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(
-        ferrets, optimization=True, ferret_as_feature=True)
+        ferrets, optimization=False, ferret_as_feature=True)
     # ferrets = ['F2105_Clove']# 'F2105_Clove'
     # df_by_ferretdict = plot_reaction_times(ferrets)
     # #

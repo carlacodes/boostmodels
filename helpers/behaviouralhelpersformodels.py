@@ -749,7 +749,8 @@ class behaviouralhelperscg():
             #added below to only look at catch trials:
             # newdata = newdata[newdata['catchTrial'] == 1]
             #remove all release times less than 0.5 seconds
-            newdata = newdata[newdata['centreRelease'] - newdata['absentTime'] > 0.5]
+            newdata = newdata[(newdata['centreRelease'] - newdata['absentTime']) > 0.5]
+            print(np.min(newdata['centreRelease']))
             # newdata = newdata[
             #     (newdata.pitchofprecur == 1) | (newdata.pitchofprecur == 2) | (newdata.pitchofprecur == 3) | (
             #             newdata.pitchofprecur == 4) | (newdata.pitchofprecur == 5)]
