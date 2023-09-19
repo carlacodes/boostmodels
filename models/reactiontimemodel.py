@@ -292,6 +292,8 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     import matplotlib.image as mpimg
     fig.set_size_inches(9, 15)
     ax.set_xlabel('SHAP Value (impact on model output)', fontsize=18)
+    #increase the y tick label size
+    ax.tick_params(axis='y', which='major', labelsize=18)
     ax.set_ylabel('Features', fontsize=18)
     plt.savefig(fig_savedir / 'shapsummaryplot_allanimals2.png', dpi=300, bbox_inches='tight')
 
@@ -808,6 +810,15 @@ def run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature = 
         dfx = dfx
         if optimization == False:
             best_params = np.load('../optuna_results/best_paramsreleastimemodel_allferrets_ferretasfeature.npy', allow_pickle=True).item()
+            best_params = {
+                "colsample_bytree": 0.46168728494506456,
+                "alpha": 8.758272905706946,
+                "n_estimators": 82,
+                "learning_rate": 0.2165288044507529,
+                "max_depth": 18,
+                "bagging_fraction": 0.7000000000000001,
+                "bagging_freq": 0
+            }
         else:
             best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
             best_params = best_study_results.best_params
@@ -857,7 +868,7 @@ def run_correctrxntime_model_for_a_ferret(ferrets, optimization = False, ferret_
 def main():
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']  # , 'F2105_Clove']
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    run_correctrxntime_model(ferrets, optimization = True, ferret_as_feature=True)
+    run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature=True)
     #
     # for ferret in ferrets:
     #     run_correctrxntime_model_for_a_ferret([ferret], optimization=False, ferret_as_feature=False)

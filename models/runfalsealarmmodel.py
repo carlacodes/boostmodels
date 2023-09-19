@@ -507,6 +507,40 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.savefig(fig_dir / 'ferretIDbysideofaudio_violin1409.png', dpi=500, bbox_inches='tight')
     plt.show()
 
+    intra_values = shap_values2[:, "intra-trial F0 roving"].data
+    ferret_ids = shap_values2[:, "ferret ID"].data
+    shap_values = shap_values2[:, "ferret ID"].values
+
+    data_df = pd.DataFrame({
+        "ferret ID": ferret_ids,
+        "intra-trial roving": intra_values,
+        "SHAP value": shap_values
+    })
+    fig, ax = plt.subplots(figsize=(10, 6))
+    sns.violinplot(x="ferret ID", y="SHAP value", hue="intra-trial roving", data=data_df, split=True, inner="quart",
+                   palette=custom_colors, ax=ax)
+
+    ax.set_xticks([0, 1, 2, 3, 4])
+    ax.set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18, rotation=45)
+    ax.set_xlabel('Ferret ID', fontsize=18)
+    ax.set_ylabel('Impact on p(FA)', fontsize=18)  # Corrected y-label
+
+    # plt.title('Mean SHAP value over ferret ID', fontsize=18)
+
+    # Optionally add a legend
+    ax.legend(title="side of audio", fontsize=14, title_fontsize=16)
+    # change legend labels
+    handles, labels = ax.get_legend_handles_labels()
+    labels = ['False', 'True']
+    ax.legend(handles=handles[0:], labels=labels[0:], title="intra-trial F0 roving", fontsize=14, title_fontsize=16)
+    ax.set_title('Intra trial F0 roving', fontsize=25)
+
+    plt.savefig(fig_dir / 'ferretIDbyINTRA_violin1409.png', dpi=500, bbox_inches='tight')
+    plt.show()
+
+
+
+
 
     fig, ax = plt.subplots(figsize=(5, 5))
     shap.plots.scatter(shap_values2[:, "F0"], color=shap_values2[:, "time since trial start"], show=False, ax=ax,
