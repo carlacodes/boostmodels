@@ -779,7 +779,7 @@ class behaviouralhelperscg():
             newdata = newdata[~np.array(listtodrop)]
 
             # | (allData.response == 7)
-            # newdata = newdata[(newdata.catchTrial == 0)]  # | (allData.response == 7)
+            # newdata = newdata[(newdata.catchTrial == 1) | (newdata.response == 5) ]
 
             bigdata = bigdata.append(newdata)
         return bigdata

@@ -616,6 +616,29 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.show()
 
     fig, ax = plt.subplots(figsize=(5, 5))
+
+    shap.plots.scatter(shap_values2[:, "intra-trial F0 roving"], color=shap_values2[:, "ferret ID"], ax=ax,
+                       cmap=cmapcustom, show=False)
+
+    fig, ax = plt.gcf(), plt.gca()
+    cb_ax = fig.axes[1]
+    # Modifying color bar parameters
+    cb_ax.tick_params(labelsize=15)
+    cb_ax.set_ylabel("Ferret ID", fontsize=12)
+    cb_ax.set_yticks([0,1,2,3,4])
+    cb_ax.set_yticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'])
+
+    ax.set_ylabel('Impact on p(FA)', fontsize=18)
+    # ax_dict['E'].set_title('Intra-trial roving versus impact on false alarm probability', fontsize=13)
+    ax.set_xticks([0,1])
+
+    ax.set_xticklabels(['False', 'True'],  fontsize = 16, rotation=45, ha='right')
+    ax.set_xlabel('')
+    plt.title('Intra trial roving', fontsize=16)
+    plt.savefig(fig_dir / 'intratrialrovingbyferretID_supplemental1409.png', dpi=500, bbox_inches='tight')
+
+
+    fig, ax = plt.subplots(figsize=(5, 5))
     shap.plots.scatter(shap_values2[:, "F0"], color=shap_values2[:, "ferret ID"], show=False, ax=ax,
                        cmap=cmapcustom)
     cax = fig.axes[1]
@@ -824,27 +847,48 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     # ax_dict['D'].set_title("Permutation importances on false alarm probability")
     # ax_dict['D'].set_xlabel("Permutation importance")
 
+    #
+    # shap.plots.scatter(shap_values2[:, "intra-trial F0 roving"], color=shap_values2[:, "ferret ID"], ax=ax_dict['E'],
+    #                    cmap=cmapcustom, show=False)
+    #
+    # fig, ax = plt.gcf(), plt.gca()
+    # cb_ax = fig.axes[5]
+    # # Modifying color bar parameters
+    # cb_ax.tick_params(labelsize=15)
+    # cb_ax.set_ylabel("Ferret ID", fontsize=12)
+    # cb_ax.set_yticks([0,1,2,3,4])
+    # cb_ax.set_yticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'])
+    #
+    #
+    #
+    #
+    # ax_dict['E'].set_ylabel('Impact on p(FA)', fontsize=10)
+    # # ax_dict['E'].set_title('Intra-trial roving versus impact on false alarm probability', fontsize=13)
+    # ax_dict['E'].set_xticks([0,1])
+    # ferret_id_only = ['F1702', 'F1815', 'F1803', 'F2002', 'F2105']
+    # ax_dict['E'].set_xticklabels(['False', 'True'],  rotation=45, ha='right')
+    # ax_dict['E'].set_xlabel('Intra trial roving', fontsize=16)
+    data_df = pd.DataFrame({
+        "ferret ID": ferret_ids,
+        "intra-trial roving": intra_values,
+        "SHAP value": shap_values
+    })
+    sns.violinplot(x="ferret ID", y="SHAP value", hue="intra-trial roving", data=data_df, split=True, inner="quart",
+                   palette=custom_colors, ax=ax_dict['E'])
 
-    shap.plots.scatter(shap_values2[:, "intra-trial F0 roving"], color=shap_values2[:, "ferret ID"], ax=ax_dict['E'],
-                       cmap=cmapcustom, show=False)
+    ax_dict['E'].set_xticks([0, 1, 2, 3, 4])
+    ax_dict['E'].set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], rotation=45)
+    ax_dict['E'].set_xlabel('Ferret ID', fontsize=18)
+    ax_dict['E'].set_ylabel('Impact on p(FA)', fontsize=10)  # Corrected y-label
 
-    fig, ax = plt.gcf(), plt.gca()
-    cb_ax = fig.axes[5]
-    # Modifying color bar parameters
-    cb_ax.tick_params(labelsize=15)
-    cb_ax.set_ylabel("Ferret ID", fontsize=12)
-    cb_ax.set_yticks([0,1,2,3,4])
-    cb_ax.set_yticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'])
+    # plt.title('Mean SHAP value over ferret ID', fontsize=18)
 
-
-
-
-    ax_dict['E'].set_ylabel('Impact on p(FA)', fontsize=10)
-    # ax_dict['E'].set_title('Intra-trial roving versus impact on false alarm probability', fontsize=13)
-    ax_dict['E'].set_xticks([0,1])
-    ferret_id_only = ['F1702', 'F1815', 'F1803', 'F2002', 'F2105']
-    ax_dict['E'].set_xticklabels(['False', 'True'],  rotation=45, ha='right')
-    ax_dict['E'].set_xlabel('Intra trial roving', fontsize=16)
+    # Optionally add a legend
+    # change legend labels
+    handles, labels =  ax_dict['E'].get_legend_handles_labels()
+    labels = ['False', 'True']
+    ax_dict['E'].legend(handles=handles[0:], labels=labels[0:], title="", fontsize=12, title_fontsize=12)
+    ax_dict['E'].set_xlabel('Intra trial F0 roving', fontsize=16)
 
     # shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "F0"], ax=ax_dict['C'],
     #                    cmap =cmapcustom, show=False)
@@ -858,7 +902,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "F0"], show= False, ax =ax_dict['C'],  cmap=cmapcustom)
 
     fig, ax = plt.gcf(), plt.gca()
-    cax = fig.axes[7]
+    cax = fig.axes[5]
     cax.tick_params(labelsize=15)
     cax.set_yticks([1, 2, 3, 4, 5])
     cax.set_yticklabels(['109', '124', '144', '191', '251'])
@@ -886,7 +930,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     #             fontsize=25, va='bottom', weight = 'bold')
 
     # plt.tight_layout()
-    plt.suptitle('Non-target words: false alarm vs. no false alarm model', fontsize=18)
+    plt.suptitle('Non-target and target words: false alarm vs. no false alarm model', fontsize=18)
     plt.subplots_adjust(wspace=0.2, hspace=0.4)
 
     plt.savefig(fig_dir / 'big_summary_plot_2_noannotations.png', dpi=500, bbox_inches="tight")

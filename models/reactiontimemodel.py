@@ -293,7 +293,9 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     fig.set_size_inches(9, 15)
     ax.set_xlabel('SHAP Value (impact on model output)', fontsize=18)
     #increase the y tick label size
-    ax.tick_params(axis='y', which='major', labelsize=18)
+    ax.tick_params(axis='y', which='major', labelsize=17, rotation = 45)
+    # ax.set_yticklabels(np.flip(feature_labels), fontsize=17, rotation = 45)
+
     ax.set_ylabel('Features', fontsize=18)
     plt.savefig(fig_savedir / 'shapsummaryplot_allanimals2.png', dpi=300, bbox_inches='tight')
 
@@ -793,6 +795,8 @@ def extract_release_times_data(ferrets):
 
 def run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature = False ):
     df_use = extract_release_times_data(ferrets)
+    #export to csv
+    df_use.to_csv('D:\dfformixedmodels\correctrxntime_data.csv')
     col = 'realRelReleaseTimes'
     dfx = df_use.loc[:, df_use.columns != col]
 
