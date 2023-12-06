@@ -718,7 +718,35 @@ def run_barplot_pipeline():
 
     plot_stats(stats_dict_all_combined, stats_dict_combined)
 
+def run_simulated_releasetimes():
+    min_time = 0
+    max_time = 6
+
+    # Number of response times to simulate
+    num_samples = 1000
+
+    # Simulate response times using a uniform distribution
+    simulated_response_times = np.random.uniform(min_time, max_time, num_samples)
+
+    # Calculate the mean of the simulated response times
+    mean_response_time = np.mean(simulated_response_times)
+    #plot the distribution
+    fig, ax = plt.subplots()
+    ax.hist(simulated_response_times, bins=100)
+    ax.set_xlabel('Response time (s)')
+    ax.set_ylabel('Count')
+    ax.set_title('Simulated Response Times')
+    plt.show()
+
+    # Calculate the actual mean squared error (MSE)
+    actual_mean = (max_time + min_time) / 2  # Actual mean of the uniform distribution
+    mse = np.mean((simulated_response_times - actual_mean) ** 2)
+
+    print(f"Simulated Mean Response Time: {mean_response_time:.4f} seconds")
+    print(f"Actual Mean Squared Error (MSE): {mse:.4f}")
+
 if __name__ == '__main__':
+    run_simulated_releasetimes()
     stats_dict_empty = {}
     # run_barplot_pipeline()
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
