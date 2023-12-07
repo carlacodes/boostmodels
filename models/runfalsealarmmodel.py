@@ -1266,6 +1266,7 @@ def run_reaction_time_fa_pipleine_female(ferrets):
     return resultingdf
 
 
+
 def run_reaction_time_fa_pipleine_male(ferrets):
     resultingdf = behaviouralhelperscg.get_reactiontime_data(ferrets=ferrets, startdate='04-01-2020',
                                                              finishdate='01-10-2023')

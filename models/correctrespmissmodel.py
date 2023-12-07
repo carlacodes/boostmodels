@@ -5,6 +5,8 @@ from sklearn.inspection import permutation_importance
 from instruments.behaviouralAnalysis import reactionTimeAnalysis  # outputbehaviordf
 from pathlib import Path
 from sklearn.model_selection import cross_val_score
+import statsmodels.formula.api as smf
+
 import shap
 import matplotlib
 import lightgbm as lgb
@@ -117,12 +119,70 @@ def run_optuna_study_correctresp(X, y):
     for key, value in study.best_params.items():
         print(f"\t\t{key}: {value}")
     return study
+
+def run_mixed_effects_model_correctresp(df):
+    equation = 'misslist ~ talker + side + precur_and_targ_same + targTimes + pastcorrectresp + pastcatchtrial + pitchoftarg*precur_and_targ_same+ pitchoftarg+ ferret'
+    #split the data into training and test set
+
+    len(df['ferret'])
+    #drop the rows with missing values
+    df = df.dropna()
+    train, test = train_test_split(df, test_size=0.2, random_state=123)
+    #use five-fold cross validation
+
+    model = smf.mixedlm(equation, train, groups=train["ferret"])
+    result = model.fit()
+    print(result.summary())
+    var_resid = result.scale
+    var_random_effect = float(result.cov_re.iloc[0])
+    var_fixed_effect = result.predict(df).var()
+
+    total_var = var_fixed_effect + var_random_effect + var_resid
+    marginal_r2 = var_fixed_effect / total_var
+    conditional_r2 = (var_fixed_effect + var_random_effect) / total_var
+    #generate a confusion matrix
+    #calculate the train accuracy
+    y_pred_train = result.predict(train)
+    y_pred_train[y_pred_train > 0.5] = 1
+    y_pred_train[y_pred_train <= 0.5] = 0
+    y_pred_train = y_pred_train.astype(int)
+    y_true_train = train['misslist'].to_numpy()
+    confusion_matrix_train = sklearn.metrics.confusion_matrix(y_true_train, y_pred_train)
+    print(confusion_matrix_train)
+    #calculate the balanced accuracy
+    balanced_accuracy_train = sklearn.metrics.balanced_accuracy_score(y_true_train, y_pred_train)
+    print(balanced_accuracy_train)
+    #export the confusion matrix
+    np.savetxt("mixedeffects_csvs/correctresp_confusionmatrix_train.csv", confusion_matrix_train, delimiter=",")
+    #export the balanced accuracy
+    np.savetxt("mixedeffects_csvs/correctresp_balac_train.csv", [balanced_accuracy_train], delimiter=",")
+
+
+    y_pred = result.predict(test)
+    y_pred[y_pred > 0.5] = 1
+    y_pred[y_pred <= 0.5] = 0
+    y_pred = y_pred.astype(int)
+    y_true = test['misslist'].to_numpy()
+    confusion_matrix = sklearn.metrics.confusion_matrix(y_true, y_pred)
+    print(confusion_matrix)
+    #calculate the balanced accuracy
+    balanced_accuracy = sklearn.metrics.balanced_accuracy_score(y_true, y_pred)
+    print(balanced_accuracy)
+    #export the confusion matrix
+    np.savetxt("mixedeffects_csvs/correctresp_confusionmatrix.csv", confusion_matrix, delimiter=",")
+    #export the balanced accuracy
+    np.savetxt("mixedeffects_csvs/correctresp_balac.csv", [balanced_accuracy], delimiter=",")
+
+    return result
+
 def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization = False, ferret_as_feature=False, one_ferret = False, ferrets = None):
     if ferret_as_feature == True:
         df_to_use = dataframe[["trialNum", "misslist", "talker", "side", "precur_and_targ_same",
                                "targTimes", "pastcorrectresp",
                                "pastcatchtrial", "pitchoftarg", "ferret"]]
         labels = ['trial number','misslist', 'talker', 'audio side', 'precursor = target F0','target presentation time', 'past response was correct', 'past trial was catch',"target F0", 'ferret ID']
+
+        run_mixed_effects_model_correctresp(df_to_use)
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
 
         fig_dir = Path('D:/behavmodelfigs/correctresp_or_miss/ferret_as_feature')
