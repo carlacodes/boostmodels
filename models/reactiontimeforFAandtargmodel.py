@@ -28,6 +28,9 @@ import matplotlib.font_manager as fm
 import matplotlib.image as mpimg
 import librosa
 import librosa.display
+import statsmodels.formula.api as smf
+from sklearn.model_selection import KFold
+from sklearn.metrics import confusion_matrix, balanced_accuracy_score, median_absolute_error
 
 
 def get_axis_limits(ax, scale=1):
@@ -1039,9 +1042,106 @@ def run_correctrxntime_model(ferrets, optimization=False, ferret_as_feature=Fals
     xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx, df_use[col], paramsinput=best_params,
                                                         ferret_as_feature=ferret_as_feature)
 
+def run_mixed_effects_model_absrxntime(df, talker =1):
+    #split the data into training and test set
+    #relabel the labels by addding underscore for each label
+    female_word_labels = ['release_time', 'instruments', 'when a', 'sailor', 'in a small', 'craft', 'faces', 'of the might',
+                          'of the vast', 'atlantic', 'ocean', 'today', 'he takes', 'the same', 'risks',
+                          'that generations', 'took', 'before', 'him', 'but', 'in contrast', 'them', 'he can meet',
+                          'any', 'emergency', 'that comes', 'his way', 'confidence', 'that stems', 'profound', 'trust',
+                          'advance', 'of science', 'boats', 'stronger', 'more stable', 'protecting', 'against',
+                          'and du', 'exposure', 'tools and', 'more ah', 'accurate', 'the more', 'reliable',
+                          'helping in', 'normal weather', 'and conditions', 'food', 'and drink', 'of better',
+                          'researched', 'than easier', 'to cook', 'than ever', 'before']
+    male_word_labels = ['release_time', 'instruments', 'when a', 'sailor', 'in a', 'small', 'craft', 'faces', 'the might', 'of the',
+                        'vast', 'atlantic', 'ocean', 'today', 'he', 'takes', 'the same', 'risks', 'that generations',
+                        'took', 'before him', 'but', 'in contrast', 'to them', 'he', 'can meet', 'any', 'emergency',
+                        'that comes', 'his way', 'with a', 'confidence', 'that stems', 'from', 'profound', 'trust',
+                        'in the', 'advances', 'of science', 'boats', 'as stronger', 'and more', 'stable', 'protecting',
+                        'against', 'undue', 'exposure', 'tools', 'and', 'accurate', 'and more', 'reliable', 'helping',
+                        'in all', 'weather', 'and']
 
+
+    for i, col in enumerate(df.columns):
+        if talker == 1:
+            df.rename(columns={col: female_word_labels[i]}, inplace=True)
+        else:
+            df.rename(columns={col: male_word_labels[i]}, inplace=True)
+
+        df.rename(columns={col: col.replace(" ", "_")}, inplace=True)
+
+    #now define the equation
+    if talker == 1:
+        equation = 'release_time ~instruments + when_a + sailor + in_a_small + craft + faces + of_the_might + of_the_vast + atlantic + ocean + today + he_takes + the_same + risks + that_generations + took + before + him + but + in_contrast + them + he_can_meet + any + emergency + that_comes + his_way + confidence + that_stems + profound + trust + advance + of_science + boats + stronger + more_stable + protecting + against + and_du + exposure + tools_and + more_ah + accurate + the_more + reliable + helping_in + normal_weather + and_conditions + food + and_drink + of_better + researched + than_easier + to_cook + than_ever + before'
+    else:
+        equation = 'release_time ~instruments + when_a + sailor + in_a + small + craft + faces + the_might + of_the + vast + atlantic + ocean + today + he + takes + the_same + risks + that_generations + took + before_him + but + in_contrast + to_them + he + can_meet + any + emergency + that_comes + his_way + with_a + confidence + that_stems + from + profound + trust + in_the + advances + of_science + boats + as_stronger + and_more + stable + protecting + against + undue + exposure + tools + and + accurate + and_more + reliable + helping + in_all + weather + and'
+
+    #not perfect but for mixed effects model, need to fill the missing rows with 0
+    df = df.fillna(0)
+
+
+    #drop the rows with missing values
+    kf = KFold(n_splits=5, shuffle=True, random_state=123)
+    fold_index = 1
+    train_mse = []
+    test_mse = []
+    train_mae = []
+    test_mae = []
+    for train_index, test_index in kf.split(df):
+        train, test = df.iloc[train_index], df.iloc[test_index]
+
+        model = smf.mixedlm(equation, train, groups=train["ferret_ID"])
+        result = model.fit()
+        print(result.summary())
+
+        var_resid = result.scale
+        var_random_effect = float(result.cov_re.iloc[0])
+        var_fixed_effect = result.predict(df).var()
+
+        total_var = var_fixed_effect + var_random_effect + var_resid
+        marginal_r2 = var_fixed_effect / total_var
+        conditional_r2 = (var_fixed_effect + var_random_effect) / total_var
+
+        print("marginal R2: {:.3f}".format(marginal_r2))
+        print("conditional R2: {:.3f}".format(conditional_r2))
+        #calculate the mean squared error
+
+        ypred_train = result.predict(train)
+        y_train = train['centreRelease']
+        mse_train = mean_squared_error(y_train, ypred_train)
+        mae_train = median_absolute_error(y_train, ypred_train)
+        train_mse.append(mse_train)
+        train_mae.append(mae_train)
+        print(mse_train)
+
+
+        ypred = result.predict(test)
+        y_test = test['centreRelease']
+        mse = mean_squared_error(y_test, ypred)
+        test_mse.append(mse)
+        #calculate the median absolute error
+        mae = median_absolute_error(y_test, ypred)
+
+        test_mae.append(mae)
+        print(mae)
+
+        print(mse)
+
+
+    #calculate the mean accuracy
+    print(np.mean(train_mse))
+    print(np.mean(test_mse))
+    print(np.mean(train_mae))
+    print(np.mean(test_mae))
+    #export
+    np.savetxt(f"mixedeffects_csvs/absrxntimemodel_mse_train_mean.csv", [np.mean(train_mse)], delimiter=",")
+    np.savetxt(f"mixedeffects_csvs/absrxntimemodel_mse_test_mean.csv", [np.mean(test_mse)], delimiter=",")
+    np.savetxt(f"mixedeffects_csvs/absrxntimemodel_mae_train_mean.csv", [np.mean(train_mae)], delimiter=",")
+    np.savetxt(f"mixedeffects_csvs/absrxntimemodel_mae_test_mean.csv", [np.mean(test_mae)], delimiter=",")
+    return result
 def predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=False, talker=2):
     df_use = extract_releasedata_withdist(ferrets, talker=talker)
+    run_mixed_effects_model_absrxntime(df_use, talker = talker)
     col = 'centreRelease'
     dfx = df_use.loc[:, df_use.columns != col]
     if ferret_as_feature == False:
@@ -1134,8 +1234,8 @@ def predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feat
 
 def main():
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    ferrets = ['F1815_Cruella']# , 'F2105_Clove']
-    ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
+    # ferrets = ['F1815_Cruella']# , 'F2105_Clove']
+    # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
 
     predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=True, talker=1)
 
