@@ -6,6 +6,12 @@ from instruments.behaviouralAnalysis import reactionTimeAnalysis  # outputbehavi
 from pathlib import Path
 from sklearn.model_selection import cross_val_score
 import statsmodels.formula.api as smf
+import pandas as pd
+import numpy as np
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+from sklearn.model_selection import KFold
+from sklearn.metrics import confusion_matrix, balanced_accuracy_score
 
 import shap
 import matplotlib
@@ -127,52 +133,68 @@ def run_mixed_effects_model_correctresp(df):
     len(df['ferret'])
     #drop the rows with missing values
     df = df.dropna()
-    train, test = train_test_split(df, test_size=0.2, random_state=123)
-    #use five-fold cross validation
+    kf = KFold(n_splits=5, shuffle=True, random_state=123)
+    fold_index = 1
+    train_acc = []
+    test_acc = []
+    for train_index, test_index in kf.split(df):
+        train, test = df.iloc[train_index], df.iloc[test_index]
 
-    model = smf.mixedlm(equation, train, groups=train["ferret"])
-    result = model.fit()
-    print(result.summary())
-    var_resid = result.scale
-    var_random_effect = float(result.cov_re.iloc[0])
-    var_fixed_effect = result.predict(df).var()
+        model = smf.mixedlm(equation, train, groups=train["ferret"])
+        result = model.fit()
+        print(result.summary())
 
-    total_var = var_fixed_effect + var_random_effect + var_resid
-    marginal_r2 = var_fixed_effect / total_var
-    conditional_r2 = (var_fixed_effect + var_random_effect) / total_var
-    #generate a confusion matrix
-    #calculate the train accuracy
-    y_pred_train = result.predict(train)
-    y_pred_train[y_pred_train > 0.5] = 1
-    y_pred_train[y_pred_train <= 0.5] = 0
-    y_pred_train = y_pred_train.astype(int)
-    y_true_train = train['misslist'].to_numpy()
-    confusion_matrix_train = sklearn.metrics.confusion_matrix(y_true_train, y_pred_train)
-    print(confusion_matrix_train)
-    #calculate the balanced accuracy
-    balanced_accuracy_train = sklearn.metrics.balanced_accuracy_score(y_true_train, y_pred_train)
-    print(balanced_accuracy_train)
-    #export the confusion matrix
-    np.savetxt("mixedeffects_csvs/correctresp_confusionmatrix_train.csv", confusion_matrix_train, delimiter=",")
-    #export the balanced accuracy
-    np.savetxt("mixedeffects_csvs/correctresp_balac_train.csv", [balanced_accuracy_train], delimiter=",")
+        var_resid = result.scale
+        var_random_effect = float(result.cov_re.iloc[0])
+        var_fixed_effect = result.predict(df).var()
 
+        total_var = var_fixed_effect + var_random_effect + var_resid
+        marginal_r2 = var_fixed_effect / total_var
+        conditional_r2 = (var_fixed_effect + var_random_effect) / total_var
 
-    y_pred = result.predict(test)
-    y_pred[y_pred > 0.5] = 1
-    y_pred[y_pred <= 0.5] = 0
-    y_pred = y_pred.astype(int)
-    y_true = test['misslist'].to_numpy()
-    confusion_matrix = sklearn.metrics.confusion_matrix(y_true, y_pred)
-    print(confusion_matrix)
-    #calculate the balanced accuracy
-    balanced_accuracy = sklearn.metrics.balanced_accuracy_score(y_true, y_pred)
-    print(balanced_accuracy)
-    #export the confusion matrix
-    np.savetxt("mixedeffects_csvs/correctresp_confusionmatrix.csv", confusion_matrix, delimiter=",")
-    #export the balanced accuracy
-    np.savetxt("mixedeffects_csvs/correctresp_balac.csv", [balanced_accuracy], delimiter=",")
+        # Generate confusion matrix for train set
+        y_pred_train = result.predict(train)
+        y_pred_train = (y_pred_train > 0.5).astype(int)
+        y_true_train = train['misslist'].to_numpy()
+        confusion_matrix_train = confusion_matrix(y_true_train, y_pred_train)
+        print(confusion_matrix_train)
 
+        # Calculate balanced accuracy for train set
+        balanced_accuracy_train = balanced_accuracy_score(y_true_train, y_pred_train)
+        print(balanced_accuracy_train)
+        train_acc.append(balanced_accuracy_train)
+
+        # Export confusion matrix and balanced accuracy for train set
+        np.savetxt(f"mixedeffects_csvs/correctresp_confusionmatrix_train_fold{fold_index}.csv", confusion_matrix_train,
+                   delimiter=",")
+        np.savetxt(f"mixedeffects_csvs/correctresp_balac_train_fold{fold_index}.csv", [balanced_accuracy_train],
+                   delimiter=",")
+
+        # Generate confusion matrix for test set
+        y_pred = result.predict(test)
+        y_pred = (y_pred > 0.5).astype(int)
+        y_true = test['misslist'].to_numpy()
+        confusion_matrix_test = confusion_matrix(y_true, y_pred)
+        print(confusion_matrix_test)
+
+        # Calculate balanced accuracy for test set
+        balanced_accuracy_test = balanced_accuracy_score(y_true, y_pred)
+        print(balanced_accuracy_test)
+        test_acc.append(balanced_accuracy_test)
+
+        # Export confusion matrix and balanced accuracy for test set
+        np.savetxt(f"mixedeffects_csvs/correctresp_confusionmatrix_test_fold{fold_index}.csv", confusion_matrix_test,
+                   delimiter=",")
+        np.savetxt(f"mixedeffects_csvs/correctresp_balac_test_fold{fold_index}.csv", [balanced_accuracy_test],
+                   delimiter=",")
+
+        fold_index += 1  # Increment fold index
+    #calculate the mean accuracy
+    print(np.mean(train_acc))
+    print(np.mean(test_acc))
+    #export
+    np.savetxt(f"mixedeffects_csvs/correctresp_balac_train_mean.csv", [np.mean(train_acc)], delimiter=",")
+    np.savetxt(f"mixedeffects_csvs/correctresp_balac_test_mean.csv", [np.mean(test_acc)], delimiter=",")
     return result
 
 def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization = False, ferret_as_feature=False, one_ferret = False, ferrets = None):
