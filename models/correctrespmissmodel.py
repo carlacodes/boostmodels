@@ -127,10 +127,8 @@ def run_optuna_study_correctresp(X, y):
     return study
 
 def run_mixed_effects_model_correctresp(df):
-    equation = 'misslist ~ talker + side + precur_and_targ_same + targTimes + pastcorrectresp + pastcatchtrial + pitchoftarg*precur_and_targ_same+ pitchoftarg+ ferret'
+    equation = 'misslist ~ talker + side + precur_and_targ_same + targTimes + pastcorrectresp + pastcatchtrial + pitchoftarg*precur_and_targ_same+ pitchoftarg'
     #split the data into training and test set
-
-    len(df['ferret'])
     #drop the rows with missing values
     df = df.dropna()
     kf = KFold(n_splits=5, shuffle=True, random_state=123)
