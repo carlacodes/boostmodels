@@ -368,7 +368,8 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput, ferret_as_feature=False, one
                   "intra-trial F0 roving", "past response correct", "past trial was catch", "falsealarm", "F0"]
         labels_mixed_effects = ["time_since_trial_start", "ferret_ID", "trial_number", "talker", "audio_side",
                   "intra_trial_F0_roving", "past_response_correct", "past_trial_was_catch", "falsealarm", "F0"]
-        df_to_use_mixed_effects = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels_mixed_effects)))
+        df_to_use2 = df_to_use.copy()
+        df_to_use_mixed_effects = df_to_use2.rename(columns=dict(zip(df_to_use.columns, labels_mixed_effects)))
 
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
         run_mixed_effects_model_falsealarm(df_to_use_mixed_effects)

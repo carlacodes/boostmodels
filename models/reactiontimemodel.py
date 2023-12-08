@@ -244,15 +244,18 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
 
     kfold = KFold(n_splits=10)
     results = cross_val_score(xg_reg, X_train, y_train, scoring='neg_mean_squared_error', cv=kfold)
-    mse_train = mean_squared_error(ypred, y_test)
-    mablog = median_absolute_error(y_test, ypred)
+    results_mae = cross_val_score(xg_reg, X_train, y_train, scoring='neg_median_absolute_error', cv=kfold)
+    # mse_train = mean_squared_error(ypred, y_test)
 
-    mse = mean_squared_error(ypred, y_test)
-    print("MSE on test: %.4f" % (mse))
+    mse_test = cross_val_score(xg_reg, X_test, y_test, scoring='neg_mean_squared_error', cv=kfold)
+    mae_test  = cross_val_score(xg_reg, X_test, y_test, scoring='neg_median_absolute_error', cv=kfold)
 
-
-    print('med. absolute error on test: %.4f' % (mablog))
+    print("MSE on test: %.4f" % (np.mean(mse_test)))
     print("negative MSE training: %.2f%%" % (np.mean(results) * 100.0))
+    mae = median_absolute_error(ypred, y_test)
+    print("MAE on test: %.4f" % (np.mean(mae_test)))
+    print("negative MAE training: %.2f%%" % (np.mean(results_mae) * 100.0))
+
     print(results)
     shap_values = shap.TreeExplainer(xg_reg).shap_values(X)
     fig, ax = plt.subplots(figsize=(15, 15))
@@ -797,6 +800,7 @@ def extract_release_times_data(ferrets):
 def run_mixed_effects_model_correctrxntime(df):
     #split the data into training and test set
     #relabel the labels by addding underscore for each label
+
     for col in df.columns:
         if col == 'precursor = target F0':
             #rename this column to make it easier to work with
@@ -810,7 +814,7 @@ def run_mixed_effects_model_correctrxntime(df):
 
     #drop the rows with missing values
     df = df.dropna()
-    kf = KFold(n_splits=5, shuffle=True, random_state=123)
+    kf = KFold(n_splits=10, shuffle=True, random_state=123)
     fold_index = 1
     train_mse = []
     test_mse = []
@@ -872,7 +876,8 @@ def run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature = 
     df_use = extract_release_times_data(ferrets)
     #export to csv
     df_use.to_csv('D:\dfformixedmodels\correctrxntime_data.csv')
-    run_mixed_effects_model_correctrxntime(df_use)
+    df_use2 = df_use.copy()
+    run_mixed_effects_model_correctrxntime(df_use2)
     col = 'realRelReleaseTimes'
     dfx = df_use.loc[:, df_use.columns != col]
 

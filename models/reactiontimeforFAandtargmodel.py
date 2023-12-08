@@ -107,13 +107,16 @@ def runlgbreleasetimes_for_a_ferret(data, paramsinput=None, ferret=1, ferret_nam
 
     kfold = KFold(n_splits=10)
     mse_train = cross_val_score(xg_reg, X_train, y_train, scoring='neg_mean_squared_error', cv=kfold)
+    mae_train = cross_val_score(xg_reg, X_train, y_train, scoring='neg_median_absolute_error', cv=kfold)
 
     mse_test = mean_squared_error(ypred, y_test)
     mse_test = cross_val_score(xg_reg, X_test, y_test, scoring='neg_mean_squared_error', cv=kfold)
     print("MSE on test: %.4f" % (mse_test) + ferret_name)
     print("negative MSE training: %.4f" % (mse_train) + ferret_name)
 
-    print(mse_train)
+    print('MAE on test: %.4f' % (mae_train) + ferret_name)
+    print('MAE on test: %.4f' % (mae_train) + ferret_name)
+
     shap_values = shap.TreeExplainer(xg_reg).shap_values(dfx)
 
     # Calculate the combined cumulative sum of feature importances
@@ -232,11 +235,18 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
 
     kfold = KFold(n_splits=10)
     results = cross_val_score(xg_reg, X_train, y_train, scoring='neg_mean_squared_error', cv=kfold)
-    mse_train = mean_squared_error(ypred, y_test)
+    results_mae = cross_val_score(xg_reg, X_train, y_train, scoring='neg_median_absolute_error', cv=kfold)
+    # mse_train = mean_squared_error(ypred, y_test)
 
-    mse = mean_squared_error(ypred, y_test)
-    print("MSE on test: %.4f" % (mse))
+    mse_test = cross_val_score(xg_reg, X_test, y_test, scoring='neg_mean_squared_error', cv=kfold)
+    mae_test  = cross_val_score(xg_reg, X_test, y_test, scoring='neg_median_absolute_error', cv=kfold)
+
+    print("MSE on test: %.4f" % (np.mean(mse_test)))
     print("negative MSE training: %.2f%%" % (np.mean(results) * 100.0))
+    mae = median_absolute_error(ypred, y_test)
+    print("MAE on test: %.4f" % (np.mean(mae_test)))
+    print("negative MAE training: %.2f%%" % (np.mean(results_mae) * 100.0))
+
     print(results)
     shap_values = shap.TreeExplainer(xg_reg).shap_values(X)
     fig, ax = plt.subplots(figsize=(15, 15))
@@ -1059,7 +1069,7 @@ def run_mixed_effects_model_absrxntime(df, talker =1):
                         'that comes', 'his way', 'with a', 'confidence', 'that stems', 'from', 'profound', 'trust',
                         'in the', 'advances', 'of science', 'boats', 'as stronger', 'and more', 'stable', 'protecting',
                         'against', 'undue', 'exposure', 'tools', 'and', 'accurate', 'and more', 'reliable', 'helping',
-                        'in all', 'weather', 'and']
+                        'in all', 'weather', '_and']
 
 
     for i, col in enumerate(df.columns):
@@ -1068,20 +1078,21 @@ def run_mixed_effects_model_absrxntime(df, talker =1):
         else:
             df.rename(columns={col: male_word_labels[i]}, inplace=True)
 
+    for col in df.columns:
         df.rename(columns={col: col.replace(" ", "_")}, inplace=True)
 
     #now define the equation
     if talker == 1:
         equation = 'release_time ~instruments + when_a + sailor + in_a_small + craft + faces + of_the_might + of_the_vast + atlantic + ocean + today + he_takes + the_same + risks + that_generations + took + before + him + but + in_contrast + them + he_can_meet + any + emergency + that_comes + his_way + confidence + that_stems + profound + trust + advance + of_science + boats + stronger + more_stable + protecting + against + and_du + exposure + tools_and + more_ah + accurate + the_more + reliable + helping_in + normal_weather + and_conditions + food + and_drink + of_better + researched + than_easier + to_cook + than_ever + before'
     else:
-        equation = 'release_time ~instruments + when_a + sailor + in_a + small + craft + faces + the_might + of_the + vast + atlantic + ocean + today + he + takes + the_same + risks + that_generations + took + before_him + but + in_contrast + to_them + he + can_meet + any + emergency + that_comes + his_way + with_a + confidence + that_stems + from + profound + trust + in_the + advances + of_science + boats + as_stronger + and_more + stable + protecting + against + undue + exposure + tools + and + accurate + and_more + reliable + helping + in_all + weather + and'
+        equation = 'release_time ~instruments + when_a + sailor + in_a + small + craft + faces + the_might + of_the + vast + atlantic + ocean + today + he + takes + the_same + risks + that_generations + took + before_him + but + in_contrast + to_them + he + can_meet + any + emergency + that_comes + his_way + with_a + confidence + that_stems + _from + profound + trust + in_the + advances + of_science + boats + as_stronger + and_more + stable + protecting + against + undue + exposure + tools + and + accurate + and_more + reliable + helping + in_all + weather + _and_'
 
     #not perfect but for mixed effects model, need to fill the missing rows with 0
     df = df.fillna(0)
 
 
     #drop the rows with missing values
-    kf = KFold(n_splits=5, shuffle=True, random_state=123)
+    kf = KFold(n_splits=10, shuffle=True, random_state=123)
     fold_index = 1
     train_mse = []
     test_mse = []
@@ -1090,24 +1101,17 @@ def run_mixed_effects_model_absrxntime(df, talker =1):
     for train_index, test_index in kf.split(df):
         train, test = df.iloc[train_index], df.iloc[test_index]
 
-        model = smf.mixedlm(equation, train, groups=train["ferret_ID"])
+        # model = smf.mixedlm(equation, train)
+        #make a linear m model without random effects
+        model = smf.ols(equation, train)
         result = model.fit()
         print(result.summary())
 
-        var_resid = result.scale
-        var_random_effect = float(result.cov_re.iloc[0])
-        var_fixed_effect = result.predict(df).var()
 
-        total_var = var_fixed_effect + var_random_effect + var_resid
-        marginal_r2 = var_fixed_effect / total_var
-        conditional_r2 = (var_fixed_effect + var_random_effect) / total_var
-
-        print("marginal R2: {:.3f}".format(marginal_r2))
-        print("conditional R2: {:.3f}".format(conditional_r2))
         #calculate the mean squared error
 
         ypred_train = result.predict(train)
-        y_train = train['centreRelease']
+        y_train = train['release_time']
         mse_train = mean_squared_error(y_train, ypred_train)
         mae_train = median_absolute_error(y_train, ypred_train)
         train_mse.append(mse_train)
@@ -1116,7 +1120,7 @@ def run_mixed_effects_model_absrxntime(df, talker =1):
 
 
         ypred = result.predict(test)
-        y_test = test['centreRelease']
+        y_test = test['release_time']
         mse = mean_squared_error(y_test, ypred)
         test_mse.append(mse)
         #calculate the median absolute error
@@ -1134,14 +1138,15 @@ def run_mixed_effects_model_absrxntime(df, talker =1):
     print(np.mean(train_mae))
     print(np.mean(test_mae))
     #export
-    np.savetxt(f"mixedeffects_csvs/absrxntimemodel_mse_train_mean.csv", [np.mean(train_mse)], delimiter=",")
-    np.savetxt(f"mixedeffects_csvs/absrxntimemodel_mse_test_mean.csv", [np.mean(test_mse)], delimiter=",")
-    np.savetxt(f"mixedeffects_csvs/absrxntimemodel_mae_train_mean.csv", [np.mean(train_mae)], delimiter=",")
-    np.savetxt(f"mixedeffects_csvs/absrxntimemodel_mae_test_mean.csv", [np.mean(test_mae)], delimiter=",")
+    np.savetxt(f"mixedeffects_csvs/absrxntimemodel_talker_{talker}_mse_train_mean.csv", [np.mean(train_mse)], delimiter=",")
+    np.savetxt(f"mixedeffects_csvs/absrxntimemodel_talker_{talker}_mse_test_mean.csv", [np.mean(test_mse)], delimiter=",")
+    np.savetxt(f"mixedeffects_csvs/absrxntimemodel_talker_{talker}_mae_train_mean.csv", [np.mean(train_mae)], delimiter=",")
+    np.savetxt(f"mixedeffects_csvs/absrxntimemodel_talker_{talker}_mae_test_mean.csv", [np.mean(test_mae)], delimiter=",")
     return result
 def predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=False, talker=2):
     df_use = extract_releasedata_withdist(ferrets, talker=talker)
-    run_mixed_effects_model_absrxntime(df_use, talker = talker)
+    df_use2 = df_use.copy()
+    run_mixed_effects_model_absrxntime(df_use2, talker = talker)
     col = 'centreRelease'
     dfx = df_use.loc[:, df_use.columns != col]
     if ferret_as_feature == False:
@@ -1237,7 +1242,7 @@ def main():
     # ferrets = ['F1815_Cruella']# , 'F2105_Clove']
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
 
-    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=True, talker=1)
+    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=True, talker=2)
 
     # for ferret in ferrets:
     #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)
