@@ -6,7 +6,9 @@ from sklearn.model_selection import KFold
 from sklearn.model_selection import cross_val_score
 from sklearn.inspection import permutation_importance
 import matplotlib.font_manager as fm
-
+import statsmodels.formula.api as smf
+from sklearn.model_selection import KFold
+from sklearn.metrics import confusion_matrix, balanced_accuracy_score
 import shap
 import matplotlib
 import lightgbm as lgb
@@ -792,11 +794,90 @@ def extract_release_times_data(ferrets):
     plt.show()
     return dfuse
 
+def run_mixed_effects_model_correctrxntime(df):
+    #split the data into training and test set
+    #relabel the labels by addding underscore for each label
+    for col in df.columns:
+        if col == 'precursor = target F0':
+            #rename this column to make it easier to work with
+            df.rename(columns={col: 'precursor_equals_target_F0'}, inplace=True)
+        else:
 
+            df.rename(columns={col: col.replace(" ", "_")}, inplace=True)
+
+    equation = 'realRelReleaseTimes ~target_F0 + past_trial_was_catch + trial_number + talker + side_of_audio + precursor_=_target_F0 + time_to_target + past_trial_was_correct'
+
+
+    #drop the rows with missing values
+    df = df.dropna()
+    kf = KFold(n_splits=5, shuffle=True, random_state=123)
+    fold_index = 1
+    train_acc = []
+    test_acc = []
+    for train_index, test_index in kf.split(df):
+        train, test = df.iloc[train_index], df.iloc[test_index]
+
+        model = smf.mixedlm(equation, train, groups=train["ferret_ID"])
+        result = model.fit()
+        print(result.summary())
+
+        var_resid = result.scale
+        var_random_effect = float(result.cov_re.iloc[0])
+        var_fixed_effect = result.predict(df).var()
+
+        total_var = var_fixed_effect + var_random_effect + var_resid
+        marginal_r2 = var_fixed_effect / total_var
+        conditional_r2 = (var_fixed_effect + var_random_effect) / total_var
+
+        # Generate confusion matrix for train set
+        y_pred_train = result.predict(train)
+        y_pred_train = (y_pred_train > 0.5).astype(int)
+        y_true_train = train['realRelReleaseTimes'].to_numpy()
+        confusion_matrix_train = confusion_matrix(y_true_train, y_pred_train)
+        print(confusion_matrix_train)
+
+        # Calculate balanced accuracy for train set
+        balanced_accuracy_train = balanced_accuracy_score(y_true_train, y_pred_train)
+        print(balanced_accuracy_train)
+        train_acc.append(balanced_accuracy_train)
+
+        # Export confusion matrix and balanced accuracy for train set
+        np.savetxt(f"mixedeffects_csvs/correctrxntimemodel_confusionmatrix_train_fold{fold_index}.csv", confusion_matrix_train,
+                   delimiter=",")
+        np.savetxt(f"mixedeffects_csvs/correctrxntimemodel_balac_train_fold{fold_index}.csv", [balanced_accuracy_train],
+                   delimiter=",")
+
+        # Generate confusion matrix for test set
+        y_pred = result.predict(test)
+        y_pred = (y_pred > 0.5).astype(int)
+        y_true = test['realRelReleaseTimes'].to_numpy()
+        confusion_matrix_test = confusion_matrix(y_true, y_pred)
+        print(confusion_matrix_test)
+
+        # Calculate balanced accuracy for test set
+        balanced_accuracy_test = balanced_accuracy_score(y_true, y_pred)
+        print(balanced_accuracy_test)
+        test_acc.append(balanced_accuracy_test)
+
+        # Export confusion matrix and balanced accuracy for test set
+        np.savetxt(f"mixedeffects_csvs/correctrxntimemodel_confusionmatrix_test_fold{fold_index}.csv", confusion_matrix_test,
+                   delimiter=",")
+        np.savetxt(f"mixedeffects_csvs/correctrxntimemodel_balac_test_fold{fold_index}.csv", [balanced_accuracy_test],
+                   delimiter=",")
+
+        fold_index += 1  # Increment fold index
+    #calculate the mean accuracy
+    print(np.mean(train_acc))
+    print(np.mean(test_acc))
+    #export
+    np.savetxt(f"mixedeffects_csvs/correctrxntimemodel_balac_train_mean.csv", [np.mean(train_acc)], delimiter=",")
+    np.savetxt(f"mixedeffects_csvs/correctrxntimemodel_balac_test_mean.csv", [np.mean(test_acc)], delimiter=",")
+    return result
 def run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature = False ):
     df_use = extract_release_times_data(ferrets)
     #export to csv
     df_use.to_csv('D:\dfformixedmodels\correctrxntime_data.csv')
+    run_mixed_effects_model_correctrxntime(df_use)
     col = 'realRelReleaseTimes'
     dfx = df_use.loc[:, df_use.columns != col]
 

@@ -282,11 +282,13 @@ def run_optuna_study_correctresponse(dataframe, y):
         print(f"\t\t{key}: {value}")
     return study
 def run_mixed_effects_model_falsealarm(df):
-    equation = 'falsealarm ~ talker +time since trial start+ trial number + audio side + intra-trial F0 roving + past response correct + past trial was catch + F0'
+    equation = 'falsealarm ~ talker +time_since_trial_start+ trial_number + audio_side + intra_trial_F0_roving + past_response_correct + past_trial_was_catch + F0'
+
     #split the data into training and test set
     #drop the rows with missing values
-    labels = ["time since trial start", "ferret ID", "trial number", "talker", "audio side",
-              "intra-trial F0 roving", "past response correct", "past trial was catch", "falsealarm", "F0"]
+    labels_mixed_effects = ["time_since_trial_start", "ferret_ID", "trial_number", "talker", "audio_side",
+                            "intra_trial_F0_roving", "past_response_correct", "past_trial_was_catch", "falsealarm",
+                            "F0"]
     df = df.dropna()
     kf = KFold(n_splits=5, shuffle=True, random_state=123)
     fold_index = 1
@@ -295,7 +297,7 @@ def run_mixed_effects_model_falsealarm(df):
     for train_index, test_index in kf.split(df):
         train, test = df.iloc[train_index], df.iloc[test_index]
 
-        model = smf.mixedlm(equation, train, groups=train["ferret"])
+        model = smf.mixedlm(equation, train, groups=train["ferret_ID"])
         result = model.fit()
         print(result.summary())
 
@@ -310,7 +312,7 @@ def run_mixed_effects_model_falsealarm(df):
         # Generate confusion matrix for train set
         y_pred_train = result.predict(train)
         y_pred_train = (y_pred_train > 0.5).astype(int)
-        y_true_train = train['misslist'].to_numpy()
+        y_true_train = train['falsealarm'].to_numpy()
         confusion_matrix_train = confusion_matrix(y_true_train, y_pred_train)
         print(confusion_matrix_train)
 
@@ -328,7 +330,7 @@ def run_mixed_effects_model_falsealarm(df):
         # Generate confusion matrix for test set
         y_pred = result.predict(test)
         y_pred = (y_pred > 0.5).astype(int)
-        y_true = test['misslist'].to_numpy()
+        y_true = test['falsealarm'].to_numpy()
         confusion_matrix_test = confusion_matrix(y_true, y_pred)
         print(confusion_matrix_test)
 
@@ -364,8 +366,12 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput, ferret_as_feature=False, one
         #             "realRelReleaseTimes", "ferret", "pastcorrectresp"]]
         labels = ["time since trial start", "ferret ID", "trial number", "talker", "audio side",
                   "intra-trial F0 roving", "past response correct", "past trial was catch", "falsealarm", "F0"]
+        labels_mixed_effects = ["time_since_trial_start", "ferret_ID", "trial_number", "talker", "audio_side",
+                  "intra_trial_F0_roving", "past_response_correct", "past_trial_was_catch", "falsealarm", "F0"]
+        df_to_use_mixed_effects = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels_mixed_effects)))
+
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
-        run_mixed_effects_model_falsealarm(df_to_use)
+        run_mixed_effects_model_falsealarm(df_to_use_mixed_effects)
 
     else:
         df_to_use = dataframe[
