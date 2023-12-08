@@ -294,6 +294,7 @@ def run_mixed_effects_model_falsealarm(df):
     fold_index = 1
     train_acc = []
     test_acc = []
+    coefficients = []
     for train_index, test_index in kf.split(df):
         train, test = df.iloc[train_index], df.iloc[test_index]
 
@@ -308,6 +309,7 @@ def run_mixed_effects_model_falsealarm(df):
         total_var = var_fixed_effect + var_random_effect + var_resid
         marginal_r2 = var_fixed_effect / total_var
         conditional_r2 = (var_fixed_effect + var_random_effect) / total_var
+        coefficients.append(result.params)
 
         # Generate confusion matrix for train set
         y_pred_train = result.predict(train)
@@ -349,7 +351,8 @@ def run_mixed_effects_model_falsealarm(df):
     #calculate the mean accuracy
     print(np.mean(train_acc))
     print(np.mean(test_acc))
-    #export
+    mean_coefficients = pd.DataFrame(coefficients).mean()
+    print(mean_coefficients)    #export
     np.savetxt(f"mixedeffects_csvs/falsealarm_balac_train_mean.csv", [np.mean(train_acc)], delimiter=",")
     np.savetxt(f"mixedeffects_csvs/falsealarmbalac_test_mean.csv", [np.mean(test_acc)], delimiter=",")
     return result

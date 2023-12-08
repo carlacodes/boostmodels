@@ -144,7 +144,7 @@ def runlgbreleasetimes_for_a_ferret(data, paramsinput=None, ferret=1, ferret_nam
     }
     # savedictionary to csv
     trainandtestaccuracy = pd.DataFrame(trainandtestaccuracy)
-    np.savetxt(f'D:\mixedeffectmodelsbehavioural\metrics/absolute_rxn_model_resultsummary_talker_{talker}.csv', trainandtestaccuracy, delimiter=',', fmt='%s')
+    # np.savetxt(f'D:\mixedeffectmodelsbehavioural\metrics/absolute_rxn_model_resultsummary_talker_{talker}.csv', trainandtestaccuracy, delimiter=',', fmt='%s')
 
 
     print("MSE on test: %.4f" % (mse_test) + ferret_name)
@@ -270,18 +270,53 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
                         'in all', 'weather', 'and']
 
     kfold = KFold(n_splits=5)
+    # results = cross_val_score(xg_reg, X_train, y_train, scoring='neg_mean_squared_error', cv=kfold)
+    # results_mae = cross_val_score(xg_reg, X_train, y_train, scoring='neg_median_absolute_error', cv=kfold)
+    # # mse_train = mean_squared_error(ypred, y_test)
+    #
+    # mse_test = cross_val_score(xg_reg, X_test, y_test, scoring='neg_mean_squared_error', cv=kfold)
+    # mae_test  = cross_val_score(xg_reg, X_test, y_test, scoring='neg_median_absolute_error', cv=kfold)
+    #
+    # print("MSE on test: %.4f" % (np.mean(mse_test)))
+    # print("negative MSE training: %.2f%%" % (np.mean(results) * 100.0))
+    # print("MAE on test: %.4f" % (np.mean(mae_test)))
+    # print("negative MAE training: %.2f%%" % (np.mean(results_mae) * 100.0))
+
     results = cross_val_score(xg_reg, X_train, y_train, scoring='neg_mean_squared_error', cv=kfold)
     results_mae = cross_val_score(xg_reg, X_train, y_train, scoring='neg_median_absolute_error', cv=kfold)
-    # mse_train = mean_squared_error(ypred, y_test)
+    results_r2 = cross_val_score(xg_reg, X_train, y_train, scoring='r2', cv=kfold)
 
     mse_test = cross_val_score(xg_reg, X_test, y_test, scoring='neg_mean_squared_error', cv=kfold)
-    mae_test  = cross_val_score(xg_reg, X_test, y_test, scoring='neg_median_absolute_error', cv=kfold)
-
+    mae_test = cross_val_score(xg_reg, X_test, y_test, scoring='neg_median_absolute_error', cv=kfold)
+    r2_test = cross_val_score(xg_reg, X_test, y_test, scoring='r2', cv=kfold)
     print("MSE on test: %.4f" % (np.mean(mse_test)))
     print("negative MSE training: %.2f%%" % (np.mean(results) * 100.0))
+    print('r2 on test: %.4f' % (np.mean(r2_test)))
+    print('r2 on training: %.4f' % (np.mean(results_r2)))
     mae = median_absolute_error(ypred, y_test)
     print("MAE on test: %.4f" % (np.mean(mae_test)))
     print("negative MAE training: %.2f%%" % (np.mean(results_mae) * 100.0))
+
+    # export all scoring results
+    trainandtestaccuracy = {
+        'mse_test': mse_test,
+        'mse_train': results,
+        'mean_mse_train': np.mean(results),
+        'mean_mse_test': np.mean(mse_test),
+        'mae_test': mae_test,
+        'mae_train': results_mae,
+        'mean_mae_train': np.mean(results_mae),
+        'mean_mae_test': np.mean(mae_test),
+        'r2_test': r2_test,
+        'r2_train': results_r2,
+        'mean_r2_train': np.mean(results_r2),
+        'mean_r2_test': np.mean(r2_test),
+    }
+
+
+    # savedictionary to csv
+    trainandtestaccuracy = pd.DataFrame(trainandtestaccuracy)
+    trainandtestaccuracy.to_csv(f'D:\mixedeffectmodelsbehavioural\metrics/absolute_rxn_time_modelmetrics_talker_{talker}.csv')
 
     print(results)
     shap_values = shap.TreeExplainer(xg_reg).shap_values(X)
@@ -1136,6 +1171,7 @@ def run_mixed_effects_model_absrxntime(df, talker =1):
     test_mae = []
     train_r2 = []
     test_r2 = []
+    coefficients = []
     for train_index, test_index in kf.split(df):
         train, test = df.iloc[train_index], df.iloc[test_index]
 
@@ -1144,6 +1180,7 @@ def run_mixed_effects_model_absrxntime(df, talker =1):
         model = smf.ols(equation, train)
         result = model.fit()
         print(result.summary())
+        coefficients.append(result.params)
 
 
         #calculate the mean squared error
@@ -1180,13 +1217,16 @@ def run_mixed_effects_model_absrxntime(df, talker =1):
     print(np.mean(test_mse))
     print(np.mean(train_mae))
     print(np.mean(test_mae))
+    mean_coefficients = pd.DataFrame(coefficients).mean()
+    print(mean_coefficients)
+    mean_coefficients.to_csv(f"mixedeffects_csvs/absrxntimemodel_talker_{talker}_mean_coefficients.csv")
     #export
-    np.savetxt(f"mixedeffects_csvs/absrxntimemodel_talker_{talker}_mse_train_mean.csv", [np.mean(train_mse)], delimiter=",")
-    np.savetxt(f"mixedeffects_csvs/absrxntimemodel_talker_{talker}_mse_test_mean.csv", [np.mean(test_mse)], delimiter=",")
-    np.savetxt(f"mixedeffects_csvs/absrxntimemodel_talker_{talker}_mae_train_mean.csv", [np.mean(train_mae)], delimiter=",")
-    np.savetxt(f"mixedeffects_csvs/absrxntimemodel_talker_{talker}_mae_test_mean.csv", [np.mean(test_mae)], delimiter=",")
-    np.savetxt(f"mixedeffects_csvs/absrxntimemodel_talker_{talker}_r2_train_mean.csv", [np.mean(train_r2)], delimiter=",")
-    np.savetxt(f"mixedeffects_csvs/absrxntimemodel_talker_{talker}_r2_test_mean.csv", [np.mean(test_r2)], delimiter=",")
+    # np.savetxt(f"mixedeffects_csvs/absrxntimemodel_talker_{talker}_mse_train_mean.csv", [np.mean(train_mse)], delimiter=",")
+    # np.savetxt(f"mixedeffects_csvs/absrxntimemodel_talker_{talker}_mse_test_mean.csv", [np.mean(test_mse)], delimiter=",")
+    # np.savetxt(f"mixedeffects_csvs/absrxntimemodel_talker_{talker}_mae_train_mean.csv", [np.mean(train_mae)], delimiter=",")
+    # np.savetxt(f"mixedeffects_csvs/absrxntimemodel_talker_{talker}_mae_test_mean.csv", [np.mean(test_mae)], delimiter=",")
+    # np.savetxt(f"mixedeffects_csvs/absrxntimemodel_talker_{talker}_r2_train_mean.csv", [np.mean(train_r2)], delimiter=",")
+    # np.savetxt(f"mixedeffects_csvs/absrxntimemodel_talker_{talker}_r2_test_mean.csv", [np.mean(test_r2)], delimiter=",")
     #make dictionary
     results = {'train_mse': train_mse, 'test_mse': test_mse, 'train_mae': train_mae, 'test_mae': test_mae, 'train_r2': train_r2, 'test_r2': test_r2,
                'mean_train_mse': np.mean(train_mse), 'mean_test_mse': np.mean(test_mse), 'mean_train_mae': np.mean(train_mae), 'mean_test_mae': np.mean(test_mae),'mean_train_r2': np.mean(train_r2), 'mean_test_r2': np.mean(test_r2)}
@@ -1225,6 +1265,36 @@ def predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feat
             best_params = np.load(
                 'D:/mixedeffectmodelsbehavioural/optuna_results/best_paramsreleastime_dist_model_' + ferrets[
                     0] + str(talker) + '.npy', allow_pickle=True).item()
+
+            if talker == 1:
+                best_params = {
+                    'colsample_bytree': 0.9984483617911889,
+                    'alpha': 10.545892165925359,
+                    'n_estimators': 120,
+                    'learning_rate': 0.2585298848712121,
+                    'max_depth': 20,
+                    'bagging_fraction': 1.0,
+                    'bagging_freq': 23,
+                    'lambda': 0.19538105338084405,
+                    'subsample': 0.8958044434304789,
+                    'min_child_samples': 20,
+                    'min_child_weight': 9.474782393947127,
+                    'gamma': 0.1571174215092159,
+                    'subsample_for_bin': 6200
+                }
+
+            elif talker == 2:
+                best_params = {
+                    'colsample_bytree': 0.5870762820095368,
+                    'alpha': 10.840482953967314,
+                    'n_estimators': 70,
+                    'learning_rate': 0.18038495501541654,
+                    'max_depth': 20,
+                    'bagging_fraction': 0.9,
+                    'bagging_freq': 30
+                }
+
+
         else:
             best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
             best_params = best_study_results.best_params
@@ -1295,7 +1365,7 @@ def main():
     # ferrets = ['F1815_Cruella']# , 'F2105_Clove']
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
 
-    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=True, talker=2)
+    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=False, talker=2)
 
     # for ferret in ferrets:
     #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)

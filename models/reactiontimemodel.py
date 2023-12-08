@@ -19,6 +19,7 @@ from sklearn.model_selection import StratifiedKFold
 # scaler = MinMaxScaler()
 import os
 import xgboost as xgb
+import pandas as pd
 import matplotlib.pyplot as plt
 # import rpy2.robjects.numpy2ri
 import matplotlib.colors as mcolors
@@ -277,7 +278,8 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     }
     #savedictionary to csv
     trainandtestaccuracy = pd.DataFrame(trainandtestaccuracy)
-    np.savetxt('D:\mixedeffectmodelsbehavioural\metrics/correct_rxn_time_modelmse.csv', trainandtestaccuracy, delimiter=',', fmt='%s')
+    trainandtestaccuracy.to_csv('D:\mixedeffectmodelsbehavioural/metrics/correct_rxn_time_modelmse.csv')
+    # np.savetxt('D:\mixedeffectmodelsbehavioural\metrics/correct_rxn_time_modelmse.csv', trainandtestaccuracy, delimiter=',', fmt='%s')
     print(results)
     shap_values = shap.TreeExplainer(xg_reg).shap_values(X)
     fig, ax = plt.subplots(figsize=(15, 15))
@@ -385,7 +387,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     plt.savefig(fig_savedir /'ferretIDbytimetotarget.png', dpi=500, bbox_inches='tight')
     plt.show()
     import seaborn as sns
-    import pandas as pd
+    # import pandas as pd
     import seaborn as sns
 
     ferret_ids = shap_values2[:, "ferret ID"].data
@@ -844,13 +846,14 @@ def run_mixed_effects_model_correctrxntime(df):
     test_mae = []
     test_r2 = []
     train_r2 = []
+    coefficients = []
     for train_index, test_index in kf.split(df):
         train, test = df.iloc[train_index], df.iloc[test_index]
 
         model = smf.mixedlm(equation, train, groups=train["ferret_ID"])
         result = model.fit()
         print(result.summary())
-
+        coefficients.append(result.params)
         var_resid = result.scale
         var_random_effect = float(result.cov_re.iloc[0])
         var_fixed_effect = result.predict(df).var()
@@ -900,6 +903,10 @@ def run_mixed_effects_model_correctrxntime(df):
     print(np.mean(test_mae))
     print(np.mean(train_r2))
     print(np.mean(test_r2))
+    mean_coefficients = pd.DataFrame(coefficients).mean()
+    print(mean_coefficients)
+    mean_coefficients.to_csv('D:\mixedeffectmodelsbehavioural\models/mixedeffects_csvs/correctrxntimemodel_coefficients.csv')
+
 
     #export
     # np.savetxt(f"mixedeffects_csvs/correctrxntimemodel_mse_train_mean.csv", [np.mean(train_mse)], delimiter=",")
@@ -912,8 +919,9 @@ def run_mixed_effects_model_correctrxntime(df):
     #make a results dictionary
     results = {'train_mse': train_mse, 'test_mse': test_mse, 'train_mae': train_mae, 'test_mae': test_mae, 'train_r2': train_r2, 'test_r2': test_r2,
                   'mean_train_mse': np.mean(train_mse), 'mean_test_mse': np.mean(test_mse), 'mean_train_mae': np.mean(train_mae), 'mean_test_mae': np.mean(test_mae), 'mean_train_r2': np.mean(train_r2), 'mean_test_r2': np.mean(test_r2)}
-    results = pd.DataFrame.from_dict(results, orient='index')
-    results.to_csv(f"models/mixedeffects_csvs/correctrxntimemodel_mixed_effect_results.csv")
+    #make results into a dataframe
+    result = pd.DataFrame.from_dict(results)
+    result.to_csv(f"D:\mixedeffectmodelsbehavioural\models/mixedeffects_csvs/correctrxntimemodel_m ixed_effect_results.csv")
     return result
 def run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature = False ):
     df_use = extract_release_times_data(ferrets)

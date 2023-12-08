@@ -127,7 +127,7 @@ def run_optuna_study_correctresp(X, y):
     return study
 
 def run_mixed_effects_model_correctresp(df):
-    equation = 'misslist ~ talker + side + precur_and_targ_same + targTimes + pastcorrectresp + pastcatchtrial + pitchoftarg*precur_and_targ_same+ pitchoftarg'
+    equation = 'misslist ~ talker + side + precur_and_targ_same + targTimes + pastcorrectresp + pastcatchtrial + pitchoftarg'
     #split the data into training and test set
     #drop the rows with missing values
     df = df.dropna()
@@ -135,16 +135,21 @@ def run_mixed_effects_model_correctresp(df):
     fold_index = 1
     train_acc = []
     test_acc = []
+    coefficients = []
     for train_index, test_index in kf.split(df):
         train, test = df.iloc[train_index], df.iloc[test_index]
 
         model = smf.mixedlm(equation, train, groups=train["ferret"])
         result = model.fit()
         print(result.summary())
+        #store the coefficients in a dictionary
+
+        #
 
         var_resid = result.scale
         var_random_effect = float(result.cov_re.iloc[0])
         var_fixed_effect = result.predict(df).var()
+        coefficients.append(result.params)
 
         total_var = var_fixed_effect + var_random_effect + var_resid
         marginal_r2 = var_fixed_effect / total_var
@@ -190,9 +195,12 @@ def run_mixed_effects_model_correctresp(df):
     #calculate the mean accuracy
     print(np.mean(train_acc))
     print(np.mean(test_acc))
-    #export
-    np.savetxt(f"mixedeffects_csvs/correctresp_balac_train_mean.csv", [np.mean(train_acc)], delimiter=",")
-    np.savetxt(f"mixedeffects_csvs/correctresp_balac_test_mean.csv", [np.mean(test_acc)], delimiter=",")
+    mean_coefficients = pd.DataFrame(coefficients).mean()
+    print(mean_coefficients)
+    mean_coefficients.to_csv('mixedeffects_csvs/correctresp_mean_coefficients.csv')
+    #export to dataframe
+    # np.savetxt(f"mixedeffects_csvs/correctresp_balac_train_mean.csv", [np.mean(train_acc)], delimiter=",")
+    # np.savetxt(f"mixedeffects_csvs/correctresp_balac_test_mean.csv", [np.mean(test_acc)], delimiter=",")
     return result
 
 def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization = False, ferret_as_feature=False, one_ferret = False, ferrets = None):
