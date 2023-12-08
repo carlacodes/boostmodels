@@ -3,12 +3,13 @@ import sklearn.metrics
 import seaborn as sns
 from sklearn.metrics import mean_squared_error, median_absolute_error, r2_score, mean_absolute_error
 from sklearn.model_selection import KFold
+import pandas as pd
 from sklearn.model_selection import cross_val_score
 from sklearn.inspection import permutation_importance
 import matplotlib.font_manager as fm
 import statsmodels.formula.api as smf
 from sklearn.model_selection import KFold
-from sklearn.metrics import confusion_matrix, balanced_accuracy_score
+from sklearn.metrics import confusion_matrix, balanced_accuracy_score, r2_score
 import shap
 import matplotlib
 import lightgbm as lgb
@@ -106,12 +107,12 @@ def runlgbreleasetimes_for_a_ferret(data, paramsinput=None, ferret=1, ferret_nam
     plt.title('feature importances for the LGBM Correct Release Times model for ferret ' + ferret_name)
     plt.show()
 
-    kfold = KFold(n_splits=10)
+    kfold = KFold(n_splits=5)
     mse_train = cross_val_score(xg_reg, X_train, y_train, scoring='neg_mean_squared_error', cv=kfold)
 
     mse_test = mean_squared_error(ypred, y_test)
     mse_test = cross_val_score(xg_reg, X_test, y_test, scoring='neg_mean_squared_error', cv=kfold)
-
+    r2_test = cross_val_score(xg_reg, X_test, y_test, scoring='r2', cv=kfold)
     print("MSE on test: %.4f" % (mse_test) + ferret_name)
     print("negative MSE training: %.4f" % (np.mean(mse_train)))
     print(mse_train)
@@ -242,20 +243,41 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         plt.title('feature importances for the LGBM Correct Release Times model')
     plt.show()
 
-    kfold = KFold(n_splits=10)
+    kfold = KFold(n_splits=5)
     results = cross_val_score(xg_reg, X_train, y_train, scoring='neg_mean_squared_error', cv=kfold)
     results_mae = cross_val_score(xg_reg, X_train, y_train, scoring='neg_median_absolute_error', cv=kfold)
+    results_r2 = cross_val_score(xg_reg, X_train, y_train, scoring='r2', cv=kfold)
     # mse_train = mean_squared_error(ypred, y_test)
 
     mse_test = cross_val_score(xg_reg, X_test, y_test, scoring='neg_mean_squared_error', cv=kfold)
     mae_test  = cross_val_score(xg_reg, X_test, y_test, scoring='neg_median_absolute_error', cv=kfold)
-
+    r2_test = cross_val_score(xg_reg, X_test, y_test, scoring='r2', cv=kfold)
     print("MSE on test: %.4f" % (np.mean(mse_test)))
     print("negative MSE training: %.2f%%" % (np.mean(results) * 100.0))
+    print('r2 on test: %.4f' % (np.mean(r2_test)))
+    print('r2 on training: %.4f' % (np.mean(results_r2)))
     mae = median_absolute_error(ypred, y_test)
     print("MAE on test: %.4f" % (np.mean(mae_test)))
     print("negative MAE training: %.2f%%" % (np.mean(results_mae) * 100.0))
 
+    #export all scoring results
+    trainandtestaccuracy ={
+        'mse_test': mse_test,
+        'mse_train': results,
+        'mean_mse_train': np.mean(results),
+        'mean_mse_test': np.mean(mse_test),
+        'mae_test': mae_test,
+        'mae_train': results_mae,
+        'mean_mae_train': np.mean(results_mae),
+        'mean_mae_test': np.mean(mae_test),
+        'r2_test': r2_test,
+        'r2_train': results_r2,
+        'mean_r2_train': np.mean(results_r2),
+        'mean_r2_test': np.mean(r2_test),
+    }
+    #savedictionary to csv
+    trainandtestaccuracy = pd.DataFrame(trainandtestaccuracy)
+    np.savetxt('D:\mixedeffectmodelsbehavioural\metrics/correct_rxn_time_modelmse.csv', trainandtestaccuracy, delimiter=',', fmt='%s')
     print(results)
     shap_values = shap.TreeExplainer(xg_reg).shap_values(X)
     fig, ax = plt.subplots(figsize=(15, 15))
@@ -814,12 +836,14 @@ def run_mixed_effects_model_correctrxntime(df):
 
     #drop the rows with missing values
     df = df.dropna()
-    kf = KFold(n_splits=10, shuffle=True, random_state=123)
+    kf = KFold(n_splits=5, shuffle=True, random_state=123)
     fold_index = 1
     train_mse = []
     test_mse = []
     train_mae = []
     test_mae = []
+    test_r2 = []
+    train_r2 = []
     for train_index, test_index in kf.split(df):
         train, test = df.iloc[train_index], df.iloc[test_index]
 
@@ -835,6 +859,8 @@ def run_mixed_effects_model_correctrxntime(df):
         marginal_r2 = var_fixed_effect / total_var
         conditional_r2 = (var_fixed_effect + var_random_effect) / total_var
 
+
+
         print("marginal R2: {:.3f}".format(marginal_r2))
         print("conditional R2: {:.3f}".format(conditional_r2))
         #calculate the mean squared error
@@ -843,14 +869,20 @@ def run_mixed_effects_model_correctrxntime(df):
         y_train = train['realRelReleaseTimes']
         mse_train = mean_squared_error(y_train, ypred_train)
         mae_train = median_absolute_error(y_train, ypred_train)
+        r2_train = r2_score(y_train, ypred_train)
+        train_r2.append(r2_train)
         train_mse.append(mse_train)
         train_mae.append(mae_train)
         print(mse_train)
+
+        #calculate the r2
 
 
         ypred = result.predict(test)
         y_test = test['realRelReleaseTimes']
         mse = mean_squared_error(y_test, ypred)
+        r2 = r2_score(y_test, ypred)
+        test_r2.append(r2)
         test_mse.append(mse)
         #calculate the median absolute error
         mae = median_absolute_error(y_test, ypred)
@@ -866,11 +898,22 @@ def run_mixed_effects_model_correctrxntime(df):
     print(np.mean(test_mse))
     print(np.mean(train_mae))
     print(np.mean(test_mae))
+    print(np.mean(train_r2))
+    print(np.mean(test_r2))
+
     #export
-    np.savetxt(f"mixedeffects_csvs/correctrxntimemodel_mse_train_mean.csv", [np.mean(train_mse)], delimiter=",")
-    np.savetxt(f"mixedeffects_csvs/correctrxntimemodel_mse_test_mean.csv", [np.mean(test_mse)], delimiter=",")
-    np.savetxt(f"mixedeffects_csvs/correctrxntimemodel_mae_train_mean.csv", [np.mean(train_mae)], delimiter=",")
-    np.savetxt(f"mixedeffects_csvs/correctrxntimemodel_mae_test_mean.csv", [np.mean(test_mae)], delimiter=",")
+    # np.savetxt(f"mixedeffects_csvs/correctrxntimemodel_mse_train_mean.csv", [np.mean(train_mse)], delimiter=",")
+    #
+    # np.savetxt(f"mixedeffects_csvs/correctrxntimemodel_mse_test_mean.csv", [np.mean(test_mse)], delimiter=",")
+    # np.savetxt(f"mixedeffects_csvs/correctrxntimemodel_mae_train_mean.csv", [np.mean(train_mae)], delimiter=",")
+    # np.savetxt(f"mixedeffects_csvs/correctrxntimemodel_mae_test_mean.csv", [np.mean(test_mae)], delimiter=",")
+    # np.savetxt(f"mixedeffects_csvs/correctrxntimemodel_r2_train_mean.csv", [np.mean(train_r2)], delimiter=",")
+    # np.savetxt(f"mixedeffects_csvs/correctrxntimemodel_r2_test_mean.csv", [np.mean(test_r2)], delimiter=",")
+    #make a results dictionary
+    results = {'train_mse': train_mse, 'test_mse': test_mse, 'train_mae': train_mae, 'test_mae': test_mae, 'train_r2': train_r2, 'test_r2': test_r2,
+                  'mean_train_mse': np.mean(train_mse), 'mean_test_mse': np.mean(test_mse), 'mean_train_mae': np.mean(train_mae), 'mean_test_mae': np.mean(test_mae), 'mean_train_r2': np.mean(train_r2), 'mean_test_r2': np.mean(test_r2)}
+    results = pd.DataFrame.from_dict(results, orient='index')
+    results.to_csv(f"models/mixedeffects_csvs/correctrxntimemodel_mixed_effect_results.csv")
     return result
 def run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature = False ):
     df_use = extract_release_times_data(ferrets)
