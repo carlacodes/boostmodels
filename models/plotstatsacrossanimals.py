@@ -14,6 +14,7 @@ from optuna.integration import LightGBMPruningCallback
 from sklearn.model_selection import StratifiedKFold
 # scaler = MinMaxScaler()
 import os
+import scipy.stats as stats
 import xgboost as xgb
 import matplotlib.pyplot as plt
 # import rpy2.robjects.numpy2ri
@@ -24,8 +25,56 @@ from helpers.behaviouralhelpersformodels import *
 from helpers.calculate_stats import *
 
 
+# def kw_test(df):
+#     df_noncatchnoncorrection_intra = df[(df['catchTrial'] == 0) & (df['correctionTrial'] == 0) & (df['intra_trial_roving'] == 1)]
+#     df_catchnoncorrection_intra = df[(df['catchTrial'] == 1) & (df['correctionTrial'] == 0) & (df['intra_trial_roving'] == 1)]
+#     df_noncorrection_intra = df[(df['correctionTrial'] == 0) & (df['intra_trial_roving'] == 1)]
+#
+#     df_noncatchnoncorrection_inter = df[(df['catchTrial'] == 0) & (df['correctionTrial'] == 0) & (df['inter_trial_roving'] == 1)]
+#     df_catchnoncorrection_inter = df[(df['catchTrial'] == 1) & (df['correctionTrial'] == 0) & (df['inter_trial_roving'] == 1)]
+#     df_noncorrection_inter = df[(df['correctionTrial'] == 0) & (df['inter_trial_roving'] == 1)]
+#
+#     df_noncatchnoncorrection_control = df[(df['catchTrial'] == 0) & (df['correctionTrial'] == 0) & (df['control_trial'] == 1)]
+#     df_catchnoncorrection_control = df[(df['catchTrial'] == 1) & (df['correctionTrial'] == 0) & (df['control_trial'] == 1)]
+#     df_noncorrection_control = df[(df['correctionTrial'] == 0) & (df['control_trial'] == 1)]
+#
+#     #run kw test on each talker comparing between the three conditions inter control and intra
+#     talkers = [1,2]
+#     kw_dict = {}
+#     kw_dict['hits'] = {}
+#     kw_dict['false_alarms'] = {}
+#     kw_dict['correct_response'] = {}
+#     kw_dict['dprime'] = {}
+#     kw_dict['bias'] = {}
+#     for talker in talkers:
+#         kw_dict['hits'][talker] = stats.kruskal(df_noncatchnoncorrection[df_noncatchnoncorrection['talker'] == talker]['hit'], df_noncorrection[df_noncorrection['talker'] == talker]['falsealarm'], df_catchnoncorrection[df_catchnoncorrection['talker'] == talker]['response'] == 3)
+#         kw_dict['false_alarms'][talker] = stats.kruskal(df_noncorrection[df_noncorrection['talker'] == talker]['falsealarm'], df_catchnoncorrection[df_catchnoncorrection['talker'] == talker]['response'] == 3)
+#         kw_dict['correct_response'][talker] = stats.kruskal(df_catchnoncorrection[df_catchnoncorrection['talker'] == talker]['response'] == 3)
+#         kw_dict['dprime'][talker] = stats.kruskal(df_noncatchnoncorrection[df_noncatchnoncorrection['talker'] == talker]['hit'], df_noncorrection[df_noncorrection['talker'] == talker]['falsealarm'])
+#         kw_dict['bias'][talker] = stats.kruskal(df_noncatchnoncorrection[df_noncatchnoncorrection['talker'] == talker]['hit'], df_noncorrection[df_noncorrection['talker'] == talker]['falsealarm'])
+#
+def kw_test(df):
+    conditions = ['inter_trial_roving', 'intra_trial_roving', 'control_trial']
 
+    # run kw test on each talker comparing between the three conditions
+    talkers = df['talker'].unique()
+    kw_dict = {}
 
+    for condition in conditions:
+        kw_dict[condition] = {}
+        for talker in talkers:
+            data = df[df['talker'] == talker]
+            group_values = []
+
+            # Get data for the current condition and talker
+            for condition_val in conditions:
+                group_values.append(data[data[condition_val] == 1]['hit'])  # Change 'hit' to your column name
+
+            # Perform Kruskal-Wallis test for the current condition and talker
+            kw_stat, kw_p_value = stats.kruskal(*group_values)
+            kw_dict[condition][talker] = {'kw_stat': kw_stat, 'p_value': kw_p_value}
+
+    return kw_dict
 def run_stats_calc(df, ferrets, pitch_param = 'control_trial'):
 
     df_noncatchnoncorrection = df[(df['catchTrial'] == 0) & (df['correctionTrial'] == 0) & (df[pitch_param] == 1)]
@@ -350,7 +399,7 @@ def run_stats_calc_by_pitch_mf(df, ferrets, stats_dict, pitch_param = 'inter_tri
         stats_dict_all[i+1]['bias'] = CalculateStats.bias(hits, false_alarms)
 
     return stats_dict_all, stats_dict
-def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'inter_trial_roving'):
+def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'inter_trial_roving', kw_test = True):
     if pitch_param == None:
         df_noncatchnoncorrection = df[(df['catchTrial'] == 0) & (df['correctionTrial'] == 0)]
         df_catchnoncorrection = df[(df['catchTrial'] == 1) & (df['correctionTrial'] == 0)]
@@ -436,6 +485,12 @@ def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'inter_trial_
     stats_dict_all[3]= {}
     stats_dict_all[4]= {}
     stats_dict_all[5]= {}
+    kw_dict_all = {}
+    kw_dict_all[1] = {}
+    kw_dict_all[2] = {}
+    kw_dict_all[3] = {}
+    kw_dict_all[4] = {}
+    kw_dict_all[5] = {}
 
 
     for pitch in pitch_list:
@@ -455,11 +510,33 @@ def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'inter_trial_
         hits = np.mean(list(stats_dict[pitch]['hits'].values()))
         false_alarms = np.mean(list(stats_dict[pitch]['false_alarms'].values()))
 
+        if kw_test == True:
+            kw_dict_all[pitch]['hits'] = list(stats_dict[pitch]['hits'].values())
+            kw_dict_all[pitch]['false_alarms'] = list(stats_dict[pitch]['false_alarms'].values())
+            kw_dict_all[pitch]['correct_response'] = list(stats_dict[pitch]['correct_response'].values())
+            kw_dict_all[pitch]['dprime'] = list(stats_dict[pitch]['dprime'].values())
+            kw_dict_all[pitch]['bias'] = list(stats_dict[pitch]['bias'].values())
+
         stats_dict_all[pitch]['hits'] = hits
         stats_dict_all[pitch]['false_alarms'] = false_alarms
         stats_dict_all[pitch]['correct_response'] = correct_response
         stats_dict_all[pitch]['dprime'] = CalculateStats.dprime(hits, false_alarms)
         stats_dict_all[pitch]['bias'] = CalculateStats.bias(hits, false_alarms)
+
+        if kw_test == True:
+            kw_dict = {}
+            kw_dict['hits'] = {}
+            kw_dict['false_alarms'] = {}
+            kw_dict['correct_response'] = {}
+            kw_dict['dprime'] = {}
+            kw_dict['bias'] = {}
+            for key, value in kw_dict_all.items():
+                kw_dict['hits'][key] = stats.kruskal(value['hits'], value['false_alarms'], value['correct_response'], value['dprime'], value['bias'])
+                kw_dict['false_alarms'][key] = stats.kruskal(value['false_alarms'], value['correct_response'], value['dprime'], value['bias'])
+                kw_dict['correct_response'][key] = stats.kruskal(value['correct_response'], value['dprime'], value['bias'])
+                kw_dict['dprime'][key] = stats.kruskal(value['dprime'], value['bias'])
+                kw_dict['bias'][key] = stats.kruskal(value['bias'])
+            return stats_dict_all, stats_dict, kw_dict
 
     return stats_dict_all, stats_dict
 
@@ -1112,22 +1189,28 @@ def run_simulated_releasetimes():
     print(f"Simulated Mean Response Time: {mean_response_time:.4f} seconds")
     print(f"Actual Mean Squared Error (MSE): {mse:.4f}")
 
+
+
 if __name__ == '__main__':
     run_simulated_releasetimes()
     stats_dict_empty = {}
     # run_barplot_pipeline()
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
     df = behaviouralhelperscg.get_stats_df(ferrets=ferrets, startdate='04-01-2016', finishdate='01-03-2023')
-    stats_dict_all_inter, stats_dict_inter = run_stats_calc_by_pitch_mf(df, ferrets, stats_dict_empty, pitch_param='inter_trial_roving')
+    kw_dict =  kw_test(df)
+    # stats_dict_all_inter, stats_dict_inter = run_stats_calc_by_pitch_mf(df, ferrets, stats_dict_empty, pitch_param='inter_trial_roving')
+    #
+    # stats_dict_all_bypitch, stats_dict_bypitch = run_stats_calc_by_pitch_mf(df, ferrets, stats_dict_empty, pitch_param=None)
+    # stats_dict_all_intra, stats_dict_intra = run_stats_calc(df, ferrets, pitch_param='intra_trial_roving')
+    # plot_stats_by_pitch_lineplot(stats_dict_all_bypitch, stats_dict_bypitch, stats_dict_all_inter, stats_dict_inter, stats_dict_all_intra, stats_dict_intra)
 
-    stats_dict_all_bypitch, stats_dict_bypitch = run_stats_calc_by_pitch_mf(df, ferrets, stats_dict_empty, pitch_param=None)
+    #
+    stats_dict_all_bypitch, stats_dict_bypitch, kw_dict_bypitch = run_stats_calc_by_pitch(df, ferrets, stats_dict_empty, pitch_param=None)
     stats_dict_all_intra, stats_dict_intra = run_stats_calc(df, ferrets, pitch_param='intra_trial_roving')
 
-    # stats_dict_all_inter, stats_dict_inter = run_stats_calc_by_pitch(df, ferrets, stats_dict_empty, pitch_param='inter_trial_roving')
-    #
-    # stats_dict_all_bypitch, stats_dict_bypitch = run_stats_calc_by_pitch(df, ferrets, stats_dict_empty, pitch_param=None)
-    # stats_dict_all_intra, stats_dict_intra = run_stats_calc(df, ferrets, pitch_param='intra_trial_roving')
+
+
+
     # plot_stats_by_pitch(stats_dict_all_bypitch, stats_dict_bypitch, stats_dict_all_inter, stats_dict_inter, stats_dict_all_intra, stats_dict_intra)
-    plot_stats_by_pitch_lineplot(stats_dict_all_bypitch, stats_dict_bypitch, stats_dict_all_inter, stats_dict_inter, stats_dict_all_intra, stats_dict_intra)
 
 
