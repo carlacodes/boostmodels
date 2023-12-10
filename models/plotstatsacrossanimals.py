@@ -1384,19 +1384,41 @@ def run_repeated_anova(stats_dict_inter, stats_dict_intra, stats_dict_control):
     #make a dataframe with the data
     #make a dataframe with the data
     #flatten the dictionary
-    stats_dict_inter = {k: v for d in stats_dict_inter.values() for k, v in d.items()}
-    stats_dict_intra = {k: v for d in stats_dict_intra.values() for k, v in d.items()}
-    stats_dict_control = {k: v for d in stats_dict_control.values() for k, v in d.items()}
-    stats_dict_inter = pd.DataFrame.from_dict(stats_dict_inter)
-    stats_dict_intra = pd.DataFrame.from_dict(stats_dict_intra)
-    stats_dict_control = pd.DataFrame.from_dict(stats_dict_control)
+    # stats_dict_inter = {k: v for d in stats_dict_inter.values() for k, v in d.items()}
+    # stats_dict_intra = {k: v for d in stats_dict_intra.values() for k, v in d.items()}
+    # stats_dict_control = {k: v for d in stats_dict_control.values() for k, v in d.items()}
+    stat_dict_inter2 = {}
+    stat_dict_intra2 = {}
+    stat_dict_control2 = {}
+    for key in stats_dict_inter.keys():
+        list = []
+        for ferretkey in stats_dict_inter[key].keys():
+            list.append(stats_dict_inter[key][ferretkey])
+        stat_dict_inter2[key] = list
+    for key in stats_dict_intra.keys():
+        list = []
+        for ferretkey in stats_dict_intra[key].keys():
+            list.append(stats_dict_intra[key][ferretkey])
+        stat_dict_intra2[key] = list
+    for key in stats_dict_control.keys():
+        list = []
+        for ferretkey in stats_dict_control[key].keys():
+            list.append(stats_dict_control[key][ferretkey])
+        stat_dict_control2[key] = list
+
+
+    # stats_dict_inter = pd.DataFrame.from_dict(stats_dict_inter)
+
+    stats_dict_inter2 = pd.DataFrame.from_dict(stat_dict_inter2)
+    stats_dict_intra2 = pd.DataFrame.from_dict(stat_dict_intra2)
+    stats_dict_control2 = pd.DataFrame.from_dict(stat_dict_control2)
     #concatrenate the dataframes
     #add a roving type column
-    stats_dict_inter['roving_type'] = 'inter'
-    stats_dict_intra['roving_type'] = 'intra'
-    stats_dict_control['roving_type'] = 'control'
+    stats_dict_inter2['roving_type'] = 'inter'
+    stats_dict_intra2['roving_type'] = 'intra'
+    stats_dict_control2['roving_type'] = 'control'
     #concatenate the dataframes
-    stats_dict_all = pd.concat([stats_dict_inter, stats_dict_intra, stats_dict_control])
+    stats_dict_all = pd.concat([stats_dict_inter2, stats_dict_intra2, stats_dict_control2])
     #make a dataframe with the data
     stats_dict_all = stats_dict_all.reset_index()
     #rename the index column
