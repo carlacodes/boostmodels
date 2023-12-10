@@ -6,7 +6,9 @@ from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import KFold
 from sklearn.model_selection import cross_val_score
 from sklearn.inspection import permutation_importance
+import scikit_posthocs as sp
 from statsmodels.stats.multicomp import MultiComparison
+from statsmodels.stats.multicomp import pairwise_tukeyhsd
 
 import shap
 import matplotlib
@@ -96,10 +98,17 @@ def kw_test(df):
 
                 # Perform Kruskal-Wallis test for the current column and conditions
                 kw_stat, kw_p_value = stats.kruskal(*groups)
-                #calculate tukeyhsd
-                tukey = stats.multicomp.pairwise_tukeyhsd(endog=data_talker_whole[column], groups=data_talker_whole[conditions], alpha=0.05)
+                dunn_results = None
+                if kw_p_value < 0.05:  # Assuming a significance level of 0.05
+                    # Perform post hoc test (Dunn's test)
+                    dunn_results = sp.posthoc_dunn(groups,
+                                                   p_adjust='holm')  # You can choose a different p-adjust method
 
-                # Calculate effect size using Pingouin
+                    # Print Dunn's test results
+                    print("Dunn's test results:")
+                    print(dunn_results)
+
+
                 data_total = np.concatenate(groups)
 
                 k = len(groups)
@@ -110,7 +119,7 @@ def kw_test(df):
                 kw_dict[talker][column][ferret]['kw_stat'] = kw_stat
                 kw_dict[talker][column][ferret]['p_value'] = kw_p_value
                 kw_dict[talker][column][ferret]['effect_size'] = eta_squared
-                kw_dict[talker][column][ferret]['tukey'] = tukey
+                kw_dict[talker][column][ferret]['dunn_result'] = dunn_results
     # #export kw_dict to csv
     # kw_dict_df = pd.DataFrame.from_dict({(i,j,k): kw_dict[i][j][k]
     #                         for i in kw_dict.keys()
@@ -704,9 +713,15 @@ def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'inter_trial_
                     # Perform Kruskal-Wallis test for the current column, condition, and talker
                 kw_stat, kw_p_value = stats.kruskal(*group_values)
                 data_total = np.concatenate(group_values)
-                #run tukey
-                mc = MultiComparison(data_total, data['pitchoftarg'])
-                result_tukey = mc.tukeyhsd()
+                dunn_results = None
+                if kw_p_value < 0.05:  # Assuming a significance level of 0.05
+                    # Perform post hoc test (Dunn's test)
+                    dunn_results = sp.posthoc_dunn(group_values,
+                                                   p_adjust='holm')  # You can choose a different p-adjust method
+
+                    # Print Dunn's test results
+                    print("Dunn's test results:")
+                    print(dunn_results)
                 # Print Kruskal-Wallis test results
 
 
@@ -721,7 +736,7 @@ def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'inter_trial_
                 # compute the effect size
 
                 kw_dict_rxntime[column][ferret] = {'kw_stat': kw_stat, 'p_value': kw_p_value,
-                                   'effect_size': eta_squared, 'tukey': result_tukey}
+                                   'effect_size': eta_squared, 'dunn_result': dunn_results}
         # for key, value in kw_dict_all.items():
         #     kw_dict['hits'][key] = stats.kruskal(value['hits'], value['false_alarms'], value['correct_response'], value['dprime'], value['bias'])
         #     kw_dict['false_alarms'][key] = stats.kruskal(value['false_alarms'], value['correct_response'], value['dprime'], value['bias'])
@@ -1484,7 +1499,10 @@ def run_repeated_anova(stats_dict_inter, stats_dict_intra, stats_dict_control):
             posthocresults = posthoc.tukeyhsd()
             print(posthocresults)
             #export to csv
-            posthocresults.to_csv(f'D:\mixedeffectmodelsbehavioural\metrics/posthocresults_by_rovingtype_{value}.csv')
+            tukey_df = pd.DataFrame(data=posthocresults._results_table.data[1:],
+                                    columns=posthocresults._results_table.data[0])
+
+            tukey_df.to_csv(f'D:\mixedeffectmodelsbehavioural\metrics/posthocresults_by_rovingtype_{value}.csv')
             anovaresults.anova_table.to_csv(f'D:\mixedeffectmodelsbehavioural\metrics/anova_results_by_rovingtype_{value}.csv')
 
             print(anovaresults)
