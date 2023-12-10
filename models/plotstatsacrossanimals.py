@@ -1,3 +1,4 @@
+import pandas as pd
 import sklearn.metrics
 # from rpy2.robjects import pandas2ri
 import seaborn as sns
@@ -10,6 +11,8 @@ import shap
 import matplotlib
 import lightgbm as lgb
 import optuna
+from statsmodels.stats.anova import AnovaRM
+
 from optuna.integration import LightGBMPruningCallback
 from sklearn.model_selection import StratifiedKFold
 import statsmodels.api as sm
@@ -58,7 +61,7 @@ from helpers.calculate_stats import *
 
 def kw_test(df):
     conditions = ['inter_trial_roving', 'intra_trial_roving', 'control_trial']
-    columns_to_compare = ['hit', 'falsealarm', 'realRelReleaseTimes']
+    columns_to_compare = ['realRelReleaseTimes']
 
     # Create an empty dictionary to store results
     kw_dict = {}
@@ -68,7 +71,7 @@ def kw_test(df):
         kw_dict[talker] = {}
 
         # Get data for the current talker
-        data_talker = df[df['talker'] == talker]
+        data_talker_whole = df[df['talker'] == talker]
 
         # Perform Kruskal-Wallis test for each column and conditions
         for column in columns_to_compare:
@@ -77,7 +80,7 @@ def kw_test(df):
                 kw_dict[talker][column][ferret] = {}
                 groups = []
 
-                data_talker = data_talker[data_talker['ferret'] == ferret]
+                data_talker = data_talker_whole[data_talker_whole['ferret'] == ferret]
 
                 for condition in conditions:
                     if column == 'hit' or column == 'realRelReleaseTimes':
@@ -104,7 +107,14 @@ def kw_test(df):
                 kw_dict[talker][column][ferret]['kw_stat'] = kw_stat
                 kw_dict[talker][column][ferret]['p_value'] = kw_p_value
                 kw_dict[talker][column][ferret]['effect_size'] = eta_squared
-    #calculate repeated measures anova
+    # #export kw_dict to csv
+    # kw_dict_df = pd.DataFrame.from_dict({(i,j,k): kw_dict[i][j][k]
+    #                         for i in kw_dict.keys()
+    #                         for j in kw_dict[i].keys()
+    #                         for k in kw_dict[i][j].keys()},
+    #                       orient='index')
+    # kw_dict_df.to_csv('D:\mixedeffectmodelsbehavioural\metrics/kw_dict_by_roving_type.csv')
+
 
 
     return kw_dict
@@ -576,6 +586,8 @@ def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'inter_trial_
     kw_dict_all[3] = {}
     kw_dict_all[4] = {}
     kw_dict_all[5] = {}
+
+    rm_anova_dataframe = pd.DataFrame(columns=['pitch', 'ferret', 'hits', 'false_alarms', 'correct_response'])
     for ferret in ferrets:
 
         selected_ferret = df_noncatchnoncorrection[df_noncatchnoncorrection['ferret'] == count]
@@ -594,11 +606,25 @@ def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'inter_trial_
             stats_dict[pitch]['hits'][ferret] = np.mean(selected_ferret_talker_hitrate['hit'])
             # kw_dict_all[pitch]['hits'] = list(selected_ferret_talker_hitrate['hit'])
             stats_dict[pitch]['false_alarms'][ferret] = np.mean(selected_ferret_all_talker['falsealarm'])
+
             stats_dict[pitch]['dprime'][ferret] = CalculateStats.dprime(np.mean(selected_ferret_talker_hitrate['hit']), np.mean(selected_ferret_all_talker['falsealarm']))
             stats_dict[pitch]['bias'][ferret] = CalculateStats.bias(np.mean(selected_ferret_talker_hitrate['hit']), np.mean(selected_ferret_all_talker['falsealarm']))
             #%Correct(hit + CR / hits + misses + CR + FA)
             stats_dict[pitch]['correct_response'][ferret] = (len(selected_ferret_talker[selected_ferret_talker['hit']==True]) + len(selected_ferret_catch_talker[selected_ferret_catch_talker['response'] == 3]))/ (len(selected_ferret_talker) + len(selected_ferret_catch_talker))
+
+            rm_anova_dataframe = rm_anova_dataframe.append({'pitch': pitch, 'ferret': ferret, 'hits':  np.mean(selected_ferret_talker_hitrate['hit']), 'false_alarms': np.mean(selected_ferret_all_talker['falsealarm']), 'correct_response': stats_dict[pitch]['correct_response'][ferret]}, ignore_index=True
+                                      )
         count += 1
+    anovaresults = {}
+    for value in ['hits', 'false_alarms', 'correct_response']:
+        rm = AnovaRM(rm_anova_dataframe, value, 'ferret', within=['pitch'])
+        res = rm.fit()
+        #store res in a dictionary
+        anovaresults[value] = res
+        print(res)
+        #export to csv
+        res.anova_table.to_csv(f'D:\mixedeffectmodelsbehavioural\metrics/anova_results_{value}.csv')
+
     stats_dict_all = {}
 
     stats_dict_all[1]= {}
@@ -641,17 +667,22 @@ def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'inter_trial_
         stats_dict_all[pitch]['bias'] = CalculateStats.bias(hits, false_alarms)
     conditions = ['hits', 'false_alarms', 'correct_response', 'dprime', 'bias']
 
-
+    stats_dict2 = {}
     if repeated_anova == True:
         #make a dataframe from the stats_dict_all
-        df_stats = pd.DataFrame.from_dict(stats_dict)
-        df_stats = df_stats.reset_index()
-        df_stats = df_stats.rename(columns={'index': 'pitch'})
-        df_stats = df_stats.melt(id_vars=['pitch'], value_vars=['hits', 'false_alarms', 'correct_response', 'dprime', 'bias'])
-        #run the repeated measures anova
-        rm = statsmodels.stats.anova.AnovaRM(df_stats, 'value', 'pitch', within=['variable'], aggregate_func='mean')
-        res = rm.fit()
-        print(res)
+        for key in stats_dict.keys():
+            stats_dict2[key] = {}
+            for stat in stats_dict[key].keys():
+                list2 = []
+                for ferretkey in stats_dict[key][stat].keys():
+                    list2.append(stats_dict[key][stat][ferretkey])
+                stats_dict2[key][stat] = list2
+
+        df_stats = pd.DataFrame.from_dict(stats_dict2)
+        #run repeated measures anova
+        rm = AnovaRM(df_stats, 'hits', 'ferret', within=['pitch'])
+
+
 
 
     if kw_test == True:
@@ -1390,46 +1421,58 @@ def run_repeated_anova(stats_dict_inter, stats_dict_intra, stats_dict_control):
     stat_dict_inter2 = {}
     stat_dict_intra2 = {}
     stat_dict_control2 = {}
-    for key in stats_dict_inter.keys():
-        list = []
-        for ferretkey in stats_dict_inter[key].keys():
-            list.append(stats_dict_inter[key][ferretkey])
-        stat_dict_inter2[key] = list
-    for key in stats_dict_intra.keys():
-        list = []
-        for ferretkey in stats_dict_intra[key].keys():
-            list.append(stats_dict_intra[key][ferretkey])
-        stat_dict_intra2[key] = list
-    for key in stats_dict_control.keys():
-        list = []
-        for ferretkey in stats_dict_control[key].keys():
-            list.append(stats_dict_control[key][ferretkey])
-        stat_dict_control2[key] = list
 
+    for key in stats_dict_control.keys():
+        stat_dict_control2[key] = {}
+        for trialkey in stats_dict_control[key].keys():
+            for statkey in stats_dict_control[key][trialkey].keys():
+                list = []
+
+                for ferretkey in stats_dict_control[key][trialkey][statkey].keys():
+                    list.append(stats_dict_control[key][trialkey][statkey][ferretkey])
+                stat_dict_control2[key][statkey] = list
+    for key in stats_dict_inter.keys():
+        stat_dict_inter2[key] = {}
+        for statkey in stats_dict_inter[key].keys():
+            list = []
+            for ferretkey in stats_dict_inter[key][statkey].keys():
+                list.append(stats_dict_inter[key][statkey][ferretkey])
+            stat_dict_inter2[key][statkey] = list
+    for key in stats_dict_intra.keys():
+        stat_dict_intra2[key] = {}
+        for trialkey in stats_dict_intra[key].keys():
+            for statkey in stats_dict_intra[key][trialkey].keys():
+                list = []
+
+                for ferretkey in stats_dict_intra[key][trialkey][statkey].keys():
+                    list.append(stats_dict_intra[key][trialkey][statkey][ferretkey])
+                stat_dict_intra2[key][statkey] = list
 
     # stats_dict_inter = pd.DataFrame.from_dict(stats_dict_inter)
+    for talker in [1,2]:
+        stats_dict_inter2 = pd.DataFrame.from_dict(stat_dict_inter2[1])
+        stats_dict_intra2 = pd.DataFrame.from_dict(stat_dict_intra2[1])
+        stats_dict_control2 = pd.DataFrame.from_dict(stat_dict_control2[1])
+        #concatrenate the dataframes
+        #add a roving type column
+        stats_dict_inter2['roving_type'] = 'inter'
+        stats_dict_intra2['roving_type'] = 'intra'
+        stats_dict_control2['roving_type'] = 'control'
+        #concatenate the dataframes
+        stats_dict_all = pd.concat([stats_dict_inter2, stats_dict_intra2, stats_dict_control2])
+        #make a dataframe with the data
+        stats_dict_all = stats_dict_all.reset_index()
+        #rename the index column
+        stats_dict_all = stats_dict_all.rename(columns = {'index': 'ferret'})
 
-    stats_dict_inter2 = pd.DataFrame.from_dict(stat_dict_inter2)
-    stats_dict_intra2 = pd.DataFrame.from_dict(stat_dict_intra2)
-    stats_dict_control2 = pd.DataFrame.from_dict(stat_dict_control2)
-    #concatrenate the dataframes
-    #add a roving type column
-    stats_dict_inter2['roving_type'] = 'inter'
-    stats_dict_intra2['roving_type'] = 'intra'
-    stats_dict_control2['roving_type'] = 'control'
-    #concatenate the dataframes
-    stats_dict_all = pd.concat([stats_dict_inter2, stats_dict_intra2, stats_dict_control2])
-    #make a dataframe with the data
-    stats_dict_all = stats_dict_all.reset_index()
-    #rename the index column
-    stats_dict_all = stats_dict_all.rename(columns = {'index': 'ferret'})
-    from statsmodels.stats.anova import AnovaRM
+        for value in ['hits', 'false_alarms', 'correct_response', 'dprime', 'bias']:
+            anovaresults = AnovaRM(stats_dict_all, value, 'ferret', within=['roving_type']).fit()
+            #export to csv.
+            # anovaresults.export_to_csv('anovaresults_' + str(talker) + '_' + value + '.csv')
+            anovaresults.anova_table.to_csv(f'D:\mixedeffectmodelsbehavioural\metrics/anova_results_by_rovingtype_{value}.csv')
 
-    for value in ['hits', 'false_alarms', 'correct_response', 'dprime', 'bias']:
-        anovaresults = AnovaRM(stats_dict_all, value, 'ferret', within=['roving_type']).fit()
-
-
-        print(anovaresults)
+            print(anovaresults)
+    return
 
 
     #run the repeated measures ANOVA
