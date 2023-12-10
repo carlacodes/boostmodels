@@ -618,10 +618,9 @@ def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'inter_trial_
         false_alarms = np.mean(list(stats_dict[pitch]['false_alarms'].values()))
 
         if kw_test == True:
-            data_for_hits = data_dict[pitch]['hit'] & data_dict[pitch]['catchTrial'] == 0
-            data_for_false_alarms = data_dict[pitch]['falsealarm'] & data_dict[pitch]['catchTrial'] == 1
-            kw_dict_all[pitch]['hits'] = list(data_for_hits)
-            kw_dict_all[pitch]['false_alarms'] = list(data_for_false_alarms)
+
+            kw_dict_all[pitch]['hits'] = list(data_dict[pitch]['hit'])
+            kw_dict_all[pitch]['false_alarms'] = list(data_dict[pitch]['falsealarm'])
             #remove all na values from the data
 
             kw_dict_all[pitch]['reaction_time'] = list(data_dict[pitch]['realRelReleaseTimes'].dropna())
