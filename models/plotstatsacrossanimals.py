@@ -74,7 +74,14 @@ def kw_test(df):
             groups = []
 
             for condition in conditions:
-                data_condition = data_talker[data_talker[condition] == 1][column]
+                if column == 'hit' or column == 'realRelReleaseTimes':
+                    data_condition = data_talker[(data_talker[condition] == 1) & (data_talker['catchTrial'] != 1)][column]
+                elif column == 'falsealarm':
+                    data_condition = data_talker[(data_talker[condition] == 1) & (data_talker['catchTrial'] != 0)][column]
+                else:
+                    data_condition = data_talker[data_talker[condition] == 1][column]
+                if column == 'hit' or column == 'realRelReleaseTimes':
+                    data_condition = data_condition.dropna()
                 groups.append(data_condition)
 
             # Perform Kruskal-Wallis test for the current column and conditions
@@ -93,7 +100,7 @@ def kw_test(df):
             kw_dict[talker][column]['effect_size'] = eta_squared
 
     return kw_dict
-#
+
 # def kw_test(df):
 #     conditions = ['inter_trial_roving', 'intra_trial_roving', 'control_trial']
 #     columns_to_compare = ['hit', 'falsealarm', 'realRelReleaseTimes']
@@ -132,6 +139,37 @@ def kw_test(df):
 #
 #                 kw_dict[column][condition][talker] = {'kw_stat': kw_stat, 'p_value': kw_p_value, 'effect_size': eta_squared}
 #                 #calculate
+#
+#     return kw_dict
+
+# def kw_test2(df):
+#     conditions = ['inter_trial_roving', 'intra_trial_roving', 'control_trial']
+#     columns_to_compare = ['hit', 'falsealarm', 'realRelReleaseTimes']
+#
+#     talkers = df['talker'].unique()
+#     kw_dict = {}
+#
+#     for column in columns_to_compare:
+#         kw_dict[column] = {}
+#         for condition in conditions:
+#             kw_dict[column][condition] = {}
+#             for talker in talkers:
+#                 data = df[df['talker'] == talker]
+#                 if column in ['hit', 'realRelReleaseTimes']:
+#                     data = data[data['catchTrial'] != 1]
+#                     data = data.dropna(subset=[column])
+#
+#                 group_values = [data[(data[cond] == 1) & (data['talker'] == talker)][column] for cond in conditions]
+#                 kw_stat, kw_p_value = stats.kruskal(*group_values)
+#                 data_total = np.concatenate(group_values)
+#
+#                 k = len(group_values)
+#                 n = len(data_total)
+#
+#                 eta_squared = (kw_stat - k + 1) / (n - k)
+#
+#                 kw_dict[column][condition][talker] = {'kw_stat': kw_stat, 'p_value': kw_p_value,
+#                                                       'effect_size': eta_squared}
 #
 #     return kw_dict
 
@@ -580,8 +618,10 @@ def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'inter_trial_
         false_alarms = np.mean(list(stats_dict[pitch]['false_alarms'].values()))
 
         if kw_test == True:
-            kw_dict_all[pitch]['hits'] = list(data_dict[pitch]['hit'])
-            kw_dict_all[pitch]['false_alarms'] = list(data_dict[pitch]['falsealarm'])
+            data_for_hits = data_dict[pitch]['hit'] & data_dict[pitch]['catchTrial'] == 0
+            data_for_false_alarms = data_dict[pitch]['falsealarm'] & data_dict[pitch]['catchTrial'] == 1
+            kw_dict_all[pitch]['hits'] = list(data_for_hits)
+            kw_dict_all[pitch]['false_alarms'] = list(data_for_false_alarms)
             #remove all na values from the data
 
             kw_dict_all[pitch]['reaction_time'] = list(data_dict[pitch]['realRelReleaseTimes'].dropna())
