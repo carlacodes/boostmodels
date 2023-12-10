@@ -12,6 +12,8 @@ import lightgbm as lgb
 import optuna
 from optuna.integration import LightGBMPruningCallback
 from sklearn.model_selection import StratifiedKFold
+import statsmodels.api as sm
+import pingouin as pg
 # scaler = MinMaxScaler()
 import os
 import scipy.stats as stats
@@ -71,33 +73,39 @@ def kw_test(df):
         # Perform Kruskal-Wallis test for each column and conditions
         for column in columns_to_compare:
             kw_dict[talker][column] = {}
-            groups = []
+            for ferret in df['ferret'].unique():
+                kw_dict[talker][column][ferret] = {}
+                groups = []
 
-            for condition in conditions:
-                if column == 'hit' or column == 'realRelReleaseTimes':
-                    data_condition = data_talker[(data_talker[condition] == 1) & (data_talker['catchTrial'] != 1)][column]
-                elif column == 'falsealarm':
-                    data_condition = data_talker[(data_talker[condition] == 1) & (data_talker['catchTrial'] != 0)][column]
-                else:
-                    data_condition = data_talker[data_talker[condition] == 1][column]
-                if column == 'hit' or column == 'realRelReleaseTimes':
-                    data_condition = data_condition.dropna()
-                groups.append(data_condition)
+                data_talker = data_talker[data_talker['ferret'] == ferret]
 
-            # Perform Kruskal-Wallis test for the current column and conditions
-            kw_stat, kw_p_value = stats.kruskal(*groups)
+                for condition in conditions:
+                    if column == 'hit' or column == 'realRelReleaseTimes':
+                        data_condition = data_talker[(data_talker[condition] == 1) & (data_talker['catchTrial'] != 1)][column]
+                    elif column == 'falsealarm':
+                        data_condition = data_talker[(data_talker[condition] == 1) & (data_talker['catchTrial'] != 0)][column]
+                    else:
+                        data_condition = data_talker[data_talker[condition] == 1][column]
+                    if column == 'hit' or column == 'realRelReleaseTimes':
+                        data_condition = data_condition.dropna()
+                    groups.append(data_condition)
 
-            # Calculate effect size using Pingouin
-            data_total = np.concatenate(groups)
+                # Perform Kruskal-Wallis test for the current column and conditions
+                kw_stat, kw_p_value = stats.kruskal(*groups)
 
-            k = len(groups)
-            n = len(data_total)
+                # Calculate effect size using Pingouin
+                data_total = np.concatenate(groups)
 
-            # Calculate Eta-squared effect size
-            eta_squared = (kw_stat - k + 1) / (n - k)
-            kw_dict[talker][column]['kw_stat'] = kw_stat
-            kw_dict[talker][column]['p_value'] = kw_p_value
-            kw_dict[talker][column]['effect_size'] = eta_squared
+                k = len(groups)
+                n = len(data_total)
+
+                # Calculate Eta-squared effect size
+                eta_squared = (kw_stat - k + 1) / (n - k)
+                kw_dict[talker][column][ferret]['kw_stat'] = kw_stat
+                kw_dict[talker][column][ferret]['p_value'] = kw_p_value
+                kw_dict[talker][column][ferret]['effect_size'] = eta_squared
+    #calculate repeated measures anova
+
 
     return kw_dict
 
@@ -498,7 +506,7 @@ def run_stats_calc_by_pitch_mf(df, ferrets, stats_dict, pitch_param = 'inter_tri
         stats_dict_all[i+1]['bias'] = CalculateStats.bias(hits, false_alarms)
 
     return stats_dict_all, stats_dict
-def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'inter_trial_roving', kw_test = True):
+def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'inter_trial_roving', kw_test = True, repeated_anova = True ):
     if pitch_param == None:
         df_noncatchnoncorrection = df[(df['catchTrial'] == 0) & (df['correctionTrial'] == 0)]
         df_catchnoncorrection = df[(df['catchTrial'] == 1) & (df['correctionTrial'] == 0)]
@@ -562,7 +570,12 @@ def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'inter_trial_
     for i in pitch_list:
         data_dict[i] = {}
         data_dict[i] = df_noncorrection[df_noncorrection['f0'] == i]
-
+    kw_dict_all = {}
+    kw_dict_all[1] = {}
+    kw_dict_all[2] = {}
+    kw_dict_all[3] = {}
+    kw_dict_all[4] = {}
+    kw_dict_all[5] = {}
     for ferret in ferrets:
 
         selected_ferret = df_noncatchnoncorrection[df_noncatchnoncorrection['ferret'] == count]
@@ -579,6 +592,7 @@ def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'inter_trial_
 
             selected_ferret_catch_talker = selected_ferret_catch[selected_ferret_catch['pitchoftarg'] == pitch]
             stats_dict[pitch]['hits'][ferret] = np.mean(selected_ferret_talker_hitrate['hit'])
+            # kw_dict_all[pitch]['hits'] = list(selected_ferret_talker_hitrate['hit'])
             stats_dict[pitch]['false_alarms'][ferret] = np.mean(selected_ferret_all_talker['falsealarm'])
             stats_dict[pitch]['dprime'][ferret] = CalculateStats.dprime(np.mean(selected_ferret_talker_hitrate['hit']), np.mean(selected_ferret_all_talker['falsealarm']))
             stats_dict[pitch]['bias'][ferret] = CalculateStats.bias(np.mean(selected_ferret_talker_hitrate['hit']), np.mean(selected_ferret_all_talker['falsealarm']))
@@ -592,12 +606,7 @@ def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'inter_trial_
     stats_dict_all[3]= {}
     stats_dict_all[4]= {}
     stats_dict_all[5]= {}
-    kw_dict_all = {}
-    kw_dict_all[1] = {}
-    kw_dict_all[2] = {}
-    kw_dict_all[3] = {}
-    kw_dict_all[4] = {}
-    kw_dict_all[5] = {}
+
 
 
     for pitch in pitch_list:
@@ -631,95 +640,50 @@ def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'inter_trial_
         stats_dict_all[pitch]['dprime'] = CalculateStats.dprime(hits, false_alarms)
         stats_dict_all[pitch]['bias'] = CalculateStats.bias(hits, false_alarms)
     conditions = ['hits', 'false_alarms', 'correct_response', 'dprime', 'bias']
+
+
+    if repeated_anova == True:
+        #make a dataframe from the stats_dict_all
+        df_stats = pd.DataFrame.from_dict(stats_dict)
+        df_stats = df_stats.reset_index()
+        df_stats = df_stats.rename(columns={'index': 'pitch'})
+        df_stats = df_stats.melt(id_vars=['pitch'], value_vars=['hits', 'false_alarms', 'correct_response', 'dprime', 'bias'])
+        #run the repeated measures anova
+        rm = statsmodels.stats.anova.AnovaRM(df_stats, 'value', 'pitch', within=['variable'], aggregate_func='mean')
+        res = rm.fit()
+        print(res)
+
+
     if kw_test == True:
-        kw_dict = {}
-        kw_dict['hits'] = {}
-        kw_dict['false_alarms'] = {}
-        kw_dict['realRelReleaseTimes'] = {}
-        # kw_dict['dprime'] = {}
-        # kw_dict['bias'] = {}
-        columns_to_compare = ['hits', 'false_alarms', 'realRelReleaseTimes']  # Update with your columns
 
-        # for condition in conditions:
-        #     kw_dict[condition] = {}
-        #     for pitch in pitch_list:
-        #         data = kw_dict_all[kw_dict_all[pitch]]
-        #         group_values = []
-        #
-        #         # Get data for the current condition and talker
-        #         for condition_val in conditions:
-        #             group_values.append(data[data[condition_val] == 1])  # Change 'hit' to your column name
-        #
-        #         # Perform Kruskal-Wallis test for the current condition and talker
-        #         kw_stat, kw_p_value = stats.kruskal(*group_values)
-        #         kw_dict[condition] = {'kw_stat': kw_stat, 'p_value': kw_p_value}
-
-        # for column in columns_to_compare:
-        #     kw_dict[column] = {}
-        #     for pitch in pitch_list:
-        #         kw_dict[column][pitch] = {}
-        #         for talker in talkers:
-        #             data = kw_dict_all[pitch]
-        #             if column == 'hit':
-        #                 data = data[data['catchTrial'] != 1]
-        #             group_values = []
-        #
-        #             # Get data for the current column, condition, and talker
-        #             for cond in pitch_list:
-        #                 group_values.append(data[cond])
-        #
-        #             # Perform Kruskal-Wallis test for the current column, condition, and talker
-        #             kw_stat, kw_p_value = stats.kruskal(*group_values)
-        #             data_total = np.concatenate(group_values)
-        #
-        #             k = len(group_values)
-        #             n = len(data_total)
-        #
-        #             # Calculate Eta-squared effect size
-        #             eta_squared = (kw_stat - k + 1) / (n - k)
-        #
-        #             kw_dict[column][pitch] = {'kw_stat': kw_stat, 'p_value': kw_p_value, 'eta_squared': eta_squared}
-        conditions = ['inter_trial_roving', 'intra_trial_roving', 'control_trial']
-        columns_to_compare = ['hits', 'false_alarms', 'reaction_time']  # Update with your columns
-
-        # run kw test on each talker comparing between the three conditions
-        talkers = df['talker'].unique()
-        kw_dict = {}
-
+        kw_dict_rxntime = {}
+        columns_to_compare = ['reaction_time']
         for column in columns_to_compare:
-            kw_dict[column] = {}
-            group_values = []
-            for condition in pitch_list:
-                kw_dict[column][condition] = {}
-                data = kw_dict_all[condition]
-                # if column == 'reaction_time':
-                #     #remove all na values from the data
+            for ferret in ferrets:
+                kw_dict_rxntime[column][ferret] = {}
+                group_values = []
+                for condition in pitch_list:
+                    kw_dict_rxntime[column][ferret][condition] = {}
+                    data = kw_dict_all[condition]
+                    data = data[data['ferret'] == ferret]
+                    # if column == 'reaction_time':
 
+                    group_values.append(data[column].values())
 
-                # if column == 'hit' or column == 'realRelReleaseTimes':
-                #     # data = data[data['catchTrial'] != 1]
-                #     # drop na values
-                #     data = data.dropna(subset=[column])
-                # group_values = []
-                #
-                # # Get data for the current column, condition, and talker
-                # for cond in conditions:
-                group_values.append(data[column])
+                    # Perform Kruskal-Wallis test for the current column, condition, and talker
+                kw_stat, kw_p_value = stats.kruskal(*group_values)
+                data_total = np.concatenate(group_values)
 
-                # Perform Kruskal-Wallis test for the current column, condition, and talker
-            kw_stat, kw_p_value = stats.kruskal(*group_values)
-            data_total = np.concatenate(group_values)
+                k = len(group_values)
+                n = len(data_total)
 
-            k = len(group_values)
-            n = len(data_total)
+                # Calculate Eta-squared effect size
+                eta_squared = (kw_stat - k + 1) / (n - k)
 
-            # Calculate Eta-squared effect size
-            eta_squared = (kw_stat - k + 1) / (n - k)
+                # compute the effect size
 
-            # compute the effect size
-
-            kw_dict[column]= {'kw_stat': kw_stat, 'p_value': kw_p_value,
-                                                  'effect_size': eta_squared}
+                kw_dict_rxntime[column] = {'kw_stat': kw_stat, 'p_value': kw_p_value,
+                                   'effect_size': eta_squared}
         # for key, value in kw_dict_all.items():
         #     kw_dict['hits'][key] = stats.kruskal(value['hits'], value['false_alarms'], value['correct_response'], value['dprime'], value['bias'])
         #     kw_dict['false_alarms'][key] = stats.kruskal(value['false_alarms'], value['correct_response'], value['dprime'], value['bias'])
@@ -814,7 +778,7 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
                 offset_jitter = offset + np.random.uniform(-0.05, 0.05)
                 ax2.scatter(offset_jitter, ferret_data, 25, color=color, marker=marker_list[count],label=label_text, edgecolors='black')
                 count += 1
-
+            # if multiplier !=2:
             multiplier += 1
 
     ax2.set_ylim(0, 1)
@@ -891,8 +855,6 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
     ax4.set_ylabel('d\'')
     ax4.set_title('d\'')
 
-    def get_axis_limits(ax, scale=1):
-        return ax.get_xlim()[0] * scale, (ax.get_ylim()[1] * scale)
 
     import matplotlib.font_manager as fm
 
@@ -1118,6 +1080,8 @@ def plot_stats_by_pitch_lineplot(stats_dict_all_combined, stats_dict_combined, s
     for attribute, measurement in stats_dict_all_combined.items():
 
             offset = width * multiplier
+            if multiplier >= 3:
+                offset = width * (multiplier-1)
     # Add gap offset for the second series
 
             color = color_map(attribute)  # Assign color based on label
@@ -1151,6 +1115,8 @@ def plot_stats_by_pitch_lineplot(stats_dict_all_combined, stats_dict_combined, s
     for attribute, measurement in stats_dict_all_inter.items():
 
             offset = width * multiplier
+            if multiplier >= 3:
+                offset = width * (multiplier-1)
             # Add gap offset for the second series
             offsets2.append(offset)
             false_alarms.append(measurement['false_alarms'])
@@ -1176,33 +1142,49 @@ def plot_stats_by_pitch_lineplot(stats_dict_all_combined, stats_dict_combined, s
 
             multiplier += 1
 
-    ax1.plot(offsets1, hits, color=color, linestyle='--', marker='o', label='_nolegend_', markersize=12, alpha=0.5)
+    # ax1.plot(offsets1, hits, color=color, linestyle='--', marker='o', label='_nolegend_', markersize=12, alpha=0.5)
+    #
+    # # Plot lines for the second subplot (ax2)
+    # ax2.plot(offsets2, false_alarms, color=color, linestyle='--', marker='o', label='_nolegend_', markersize=12,
+    #          alpha=0.5)
+
+    offsets1_f = offsets1[len(offsets1)//2:]
+    hits_f = hits[len(hits)//2:]
+    offsets1_m = offsets1[:len(offsets1)//2]
+    hits_m = hits[:len(hits)//2]
+
+    ax1.plot(offsets1_f, hits_f, color='grey', linestyle='--', marker='o', label='Female Talker', markersize=12, alpha=0.5)
+    ax1.plot(offsets1_m, hits_m, color='blue', linestyle='--', marker='o', label='Male Talker', markersize=12, alpha=0.5)
+
+
 
     # Plot lines for the second subplot (ax2)
-    ax2.plot(offsets2, false_alarms, color=color, linestyle='--', marker='o', label='_nolegend_', markersize=12,
-             alpha=0.5)
+    # ax2.plot(offsets2, false_alarms, color=color, linestyle='--', marker='o', label='_nolegend_', markersize=12,
+    #          alpha=0.5)
+
+    offsets2_f = offsets2[len(offsets2)//2:]
+    false_alarms_f = false_alarms[len(false_alarms)//2:]
+    offsets2_m = offsets2[:len(offsets2)//2]
+    false_alarms_m = false_alarms[:len(false_alarms)//2]
+
+    ax2.plot(offsets2_f, false_alarms_f,  color='grey', linestyle='--', marker='o', label='Female Talker', markersize=12, alpha=0.5)
+    ax2.plot(offsets2_m, false_alarms_m,  color='blue', linestyle='--', marker='o', label='Male Talker', markersize=12, alpha=0.5)
+
     ax2.set_ylim(0, 1)
-    ax2.legend( loc='upper left')
+    ax2.legend( loc='upper left', fontsize = 8)
     ax2.set_ylabel('P(FA) by target word F0', fontsize = 12)
     ax2.set_title('False alarms')
     ax2.set_xlabel('F0 of target (Hz)')
-    ax1.set_xticks([0, 0.25, 0.5, 0.75, 1.0, 1.25], ['109', '124', '144 - M','144 - F', '191', '251 '])
+    ax1.set_xticks([0, 0.25, 0.5, 0.75, 1.0], ['109', '124', '144', '191', '251 '])
     ax1.set_xlabel('F0 (Hz)')
-    ax2.set_xticks([0, 0.25, 0.5, 0.75, 1.0, 1.25], ['109', '124', '144 - M','144 - F', '191', '251 '])
+    ax2.set_xticks([0, 0.25, 0.5, 0.75, 1.0], ['109', '124', '144', '191', '251 '])
 
 
     def get_axis_limits(ax, scale=1):
         return ax.get_xlim()[0] * scale, (ax.get_ylim()[1] * scale)
 
     import matplotlib.font_manager as fm
-    #
-    # ax1.annotate('a)', xy=get_axis_limits(ax1))
-    # ax2.annotate('b)', xy=get_axis_limits(ax2))
-    # # ax3.annotate('c)', xy=get_axis_limits(ax3))
-    # # ax4.annotate('d)', xy=get_axis_limits(ax4))
-    # title_y = ax1.title.get_position()[1]  # Get the y-coordinate of the title
-    # font_props = fm.FontProperties(weight='bold')
-    font_props = fm.FontProperties(weight='bold', size=9)
+
 
     # ax1.annotate('A', xy=get_axis_limits(ax1), xytext=(-0.1, ax1.title.get_position()[1]+0.05), textcoords='axes fraction', fontproperties = font_props, zorder=10)
     # ax2.annotate('B', xy=get_axis_limits(ax2), xytext=(-0.1, ax2.title.get_position()[1]+0.05), textcoords='axes fraction', fontproperties = font_props,zorder=10)
@@ -1213,6 +1195,8 @@ def plot_stats_by_pitch_lineplot(stats_dict_all_combined, stats_dict_combined, s
     plt.subplots_adjust(wspace=0.0, hspace=0.38)
 
     plt.savefig('figs/proportionofhits_FA_byF0_noaxisannotation.pdf', dpi = 500, bbox_inches='tight')
+    plt.savefig('figs/proportionofhits_FA_byF0_noaxisannotation.png', dpi = 500, bbox_inches='tight')
+
     plt.show()
 
     ##no do dprime and correct response
@@ -1232,6 +1216,8 @@ def plot_stats_by_pitch_lineplot(stats_dict_all_combined, stats_dict_combined, s
     for attribute, measurement in stats_dict_all_combined.items():
 
             offset = width * multiplier
+            if multiplier >= 3:
+                offset = width * (multiplier-1)
     # Add gap offset for the second series
 
             color = color_map(attribute)  # Assign color based on label
@@ -1257,7 +1243,6 @@ def plot_stats_by_pitch_lineplot(stats_dict_all_combined, stats_dict_combined, s
 
     width = 0.25  # the width of the bars
     multiplier = 0
-    gap_width = 0.2
 
 
 
@@ -1265,6 +1250,8 @@ def plot_stats_by_pitch_lineplot(stats_dict_all_combined, stats_dict_combined, s
     for attribute, measurement in stats_dict_all_inter.items():
 
             offset = width * multiplier
+            if multiplier >= 3:
+                offset = width * (multiplier-1)
             # Add gap offset for the second series
             offsets2.append(offset)
             false_alarms.append(measurement['correct_response'])
@@ -1285,35 +1272,44 @@ def plot_stats_by_pitch_lineplot(stats_dict_all_combined, stats_dict_combined, s
                 count += 1
 
             multiplier += 1
+    # ax1.plot(offsets1, hits, color=color, linestyle='--', marker='o', label='_nolegend_', markersize=12, alpha=0.5)
+    #split offset1s into half for the second plot
+    offsets1_f = offsets1[len(offsets1)//2:]
+    hits_f = hits[len(hits)//2:]
+    offsets1_m = offsets1[:len(offsets1)//2]
+    hits_m = hits[:len(hits)//2]
 
-    ax1.plot(offsets1, hits, color=color, linestyle='--', marker='o', label='_nolegend_', markersize=12, alpha=0.5)
+    ax1.plot(offsets1_f, hits_f, color='grey', linestyle='--', marker='o', label='Female Talker', markersize=12, alpha=0.5)
+    ax1.plot(offsets1_m, hits_m, color='blue', linestyle='--', marker='o', label='Male Talker', markersize=12, alpha=0.5)
+
+
 
     # Plot lines for the second subplot (ax2)
-    ax2.plot(offsets2, false_alarms, color=color, linestyle='--', marker='o', label='_nolegend_', markersize=12,
-             alpha=0.5)
+    # ax2.plot(offsets2, false_alarms, color=color, linestyle='--', marker='o', label='_nolegend_', markersize=12,
+    #          alpha=0.5)
+
+    offsets2_f = offsets2[len(offsets2)//2:]
+    false_alarms_f = false_alarms[len(false_alarms)//2:]
+    offsets2_m = offsets2[:len(offsets2)//2]
+    false_alarms_m = false_alarms[:len(false_alarms)//2]
+
+    ax2.plot(offsets2_f, false_alarms_f,  color='grey', linestyle='--', marker='o', label='Female Talker', markersize=12, alpha=0.5)
+    ax2.plot(offsets2_m, false_alarms_m,  color='blue', linestyle='--', marker='o', label='Male Talker', markersize=12, alpha=0.5)
+
+
+
     ax2.set_ylim(0, 1)
-    ax2.legend( loc='upper left')
+    # ax2.legend( loc='upper left')
     ax2.set_ylabel('P(Correct Response) by F0', fontsize = 12)
     ax2.set_title('P(Correct Response)')
     ax2.set_xlabel('F0 of target (Hz)')
-    ax1.set_xticks([0, 0.25, 0.5, 0.75, 1.0, 1.25], ['109', '124', '144 - M','144 - F', '191', '251 '])
+    ax1.set_xticks([0, 0.25, 0.5, 0.75, 1.0,], ['109', '124', '144', '191', '251 '])
     ax1.set_xlabel('F0 (Hz)')
-    ax2.set_xticks([0, 0.25, 0.5, 0.75, 1.0, 1.25], ['109', '124', '144 - M','144 - F', '191', '251 '])
+    ax2.set_xticks([0, 0.25, 0.5, 0.75, 1.0], ['109', '124', '144', '191', '251 '])
     # ax2.legend(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=6, loc='upper right')
 
-
-    def get_axis_limits(ax, scale=1):
-        return ax.get_xlim()[0] * scale, (ax.get_ylim()[1] * scale)
-
     import matplotlib.font_manager as fm
-    #
-    # ax1.annotate('a)', xy=get_axis_limits(ax1))
-    # ax2.annotate('b)', xy=get_axis_limits(ax2))
-    # # ax3.annotate('c)', xy=get_axis_limits(ax3))
-    # # ax4.annotate('d)', xy=get_axis_limits(ax4))
-    # title_y = ax1.title.get_position()[1]  # Get the y-coordinate of the title
-    # font_props = fm.FontProperties(weight='bold')
-    font_props = fm.FontProperties(weight='bold', size=9)
+
 
     # ax1.annotate('A', xy=get_axis_limits(ax1), xytext=(-0.1, ax1.title.get_position()[1]+0.05), textcoords='axes fraction', fontproperties = font_props, zorder=10)
     # ax2.annotate('B', xy=get_axis_limits(ax2), xytext=(-0.1, ax2.title.get_position()[1]+0.05), textcoords='axes fraction', fontproperties = font_props,zorder=10)
@@ -1324,6 +1320,8 @@ def plot_stats_by_pitch_lineplot(stats_dict_all_combined, stats_dict_combined, s
     plt.subplots_adjust(wspace=0.0, hspace=0.38)
 
     plt.savefig('figs/proportionofhits_dprimecorrect_response_byF0_noaxisannotation.pdf', dpi = 500, bbox_inches='tight')
+    plt.savefig('figs/proportionofhits_dprimecorrect_response_byF0_noaxisannotation.png', dpi = 500, bbox_inches='tight')
+
     plt.show()
     return
 
@@ -1380,6 +1378,43 @@ def run_simulated_releasetimes():
     print(f"Actual Mean Squared Error (MSE): {mse:.4f}")
 
 
+def run_repeated_anova(stats_dict_inter, stats_dict_intra, stats_dict_control):
+    #run repeated measures ANOVA
+    #get the data into a dataframe
+    #make a dataframe with the data
+    #make a dataframe with the data
+    #flatten the dictionary
+    stats_dict_inter = {k: v for d in stats_dict_inter.values() for k, v in d.items()}
+    stats_dict_intra = {k: v for d in stats_dict_intra.values() for k, v in d.items()}
+    stats_dict_control = {k: v for d in stats_dict_control.values() for k, v in d.items()}
+    stats_dict_inter = pd.DataFrame.from_dict(stats_dict_inter)
+    stats_dict_intra = pd.DataFrame.from_dict(stats_dict_intra)
+    stats_dict_control = pd.DataFrame.from_dict(stats_dict_control)
+    #concatrenate the dataframes
+    #add a roving type column
+    stats_dict_inter['roving_type'] = 'inter'
+    stats_dict_intra['roving_type'] = 'intra'
+    stats_dict_control['roving_type'] = 'control'
+    #concatenate the dataframes
+    stats_dict_all = pd.concat([stats_dict_inter, stats_dict_intra, stats_dict_control])
+    #make a dataframe with the data
+    stats_dict_all = stats_dict_all.reset_index()
+    #rename the index column
+    stats_dict_all = stats_dict_all.rename(columns = {'index': 'ferret'})
+    from statsmodels.stats.anova import AnovaRM
+
+    for value in ['hits', 'false_alarms', 'correct_response', 'dprime', 'bias']:
+        anovaresults = AnovaRM(stats_dict_all, value, 'ferret', within=['roving_type']).fit()
+
+
+        print(anovaresults)
+
+
+    #run the repeated measures ANOVA
+    #ANOVA
+    #stats_dict_all = stats_dict_all.dropna()
+
+
 
 if __name__ == '__main__':
     run_simulated_releasetimes()
@@ -1388,13 +1423,17 @@ if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
     df = behaviouralhelperscg.get_stats_df(ferrets=ferrets, startdate='04-01-2016', finishdate='01-03-2023')
     kw_dict =  kw_test(df)
-    # stats_dict_all_inter, stats_dict_inter = run_stats_calc_by_pitch_mf(df, ferrets, stats_dict_empty, pitch_param='inter_trial_roving')
-    #
+    stats_dict_all_inter, stats_dict_inter = run_stats_calc_by_pitch_mf(df, ferrets, stats_dict_empty, pitch_param='inter_trial_roving')
+    stats_dict_all_intra, stats_dict_intra = run_stats_calc(df, ferrets, pitch_param='intra_trial_roving')
+    stats_dict_all_control, stats_dict_control = run_stats_calc(df, ferrets, pitch_param='control_trial')
+
+    run_repeated_anova(stats_dict_inter, stats_dict_intra, stats_dict_control)
+
     # stats_dict_all_bypitch, stats_dict_bypitch = run_stats_calc_by_pitch_mf(df, ferrets, stats_dict_empty, pitch_param=None)
     # stats_dict_all_intra, stats_dict_intra = run_stats_calc(df, ferrets, pitch_param='intra_trial_roving')
     # plot_stats_by_pitch_lineplot(stats_dict_all_bypitch, stats_dict_bypitch, stats_dict_all_inter, stats_dict_inter, stats_dict_all_intra, stats_dict_intra)
-
     #
+    # #
     stats_dict_all_bypitch, stats_dict_bypitch, kw_dict_bypitch = run_stats_calc_by_pitch(df, ferrets, stats_dict_empty, pitch_param=None)
     stats_dict_all_intra, stats_dict_intra = run_stats_calc(df, ferrets, pitch_param='intra_trial_roving')
 
