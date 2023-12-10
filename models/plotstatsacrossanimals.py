@@ -102,7 +102,7 @@ def kw_test(df):
                 if kw_p_value < 0.05:  # Assuming a significance level of 0.05
                     # Perform post hoc test (Dunn's test)
                     dunn_results = sp.posthoc_dunn(groups,
-                                                   p_adjust='holm')  # You can choose a different p-adjust method
+                                                   p_adjust='bonferroni')  # You can choose a different p-adjust method
 
                     # Print Dunn's test results
                     print("Dunn's test results:")
@@ -717,7 +717,7 @@ def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'inter_trial_
                 if kw_p_value < 0.05:  # Assuming a significance level of 0.05
                     # Perform post hoc test (Dunn's test)
                     dunn_results = sp.posthoc_dunn(group_values,
-                                                   p_adjust='holm')  # You can choose a different p-adjust method
+                                                   p_adjust='bonferroni')  # You can choose a different p-adjust method
 
                     # Print Dunn's test results
                     print("Dunn's test results:")
