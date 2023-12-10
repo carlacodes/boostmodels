@@ -216,6 +216,140 @@ def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'control_tria
 
     return stats_dict_all, stats_dict
 
+def run_stats_calc_by_pitch_mf(df, ferrets, stats_dict, pitch_param = 'inter_trial_roving'):
+    if pitch_param == None:
+        df_noncatchnoncorrection = df[(df['catchTrial'] == 0) & (df['correctionTrial'] == 0)]
+        df_catchnoncorrection = df[(df['catchTrial'] == 1) & (df['correctionTrial'] == 0)]
+        df_noncorrection = df[(df['correctionTrial'] == 0)]
+
+    else:
+
+        df_noncatchnoncorrection = df[(df['catchTrial'] == 0) & (df['correctionTrial'] == 0) & ((df[pitch_param] == 1) |(df['control_trial'] == 1))]
+        df_catchnoncorrection = df[(df['catchTrial'] == 1) & (df['correctionTrial'] == 0) & ((df[pitch_param] == 1) |(df['control_trial'] == 1))]
+        df_noncorrection = df[(df['correctionTrial'] == 0) & ((df[pitch_param] == 1) | (df['control_trial'] == 1))]
+    count = int(0)
+
+
+    talkers = [1,2]
+    stats_dict[1] = {}
+    stats_dict[2] = {}
+    stats_dict[3] = {}
+    stats_dict[4] = {}
+    stats_dict[5] = {}
+    stats_dict[6] = {}
+
+
+
+    stats_dict[1]['hits'] = {}
+    stats_dict[1]['false_alarms']= {}
+    stats_dict[1]['correct_response']= {}
+    stats_dict[1]['dprime']= {}
+    stats_dict[1]['bias']= {}
+
+
+    stats_dict[2]['hits'] ={}
+    stats_dict[2]['false_alarms'] = {}
+    stats_dict[2]['correct_response'] = {}
+    stats_dict[2]['dprime']= {}
+    stats_dict[2]['bias'] = {}
+
+    stats_dict[3]['hits'] ={}
+
+    stats_dict[3]['false_alarms'] = {}
+    stats_dict[3]['correct_response'] = {}
+    stats_dict[3]['dprime']= {}
+    stats_dict[3]['bias'] = {}
+
+    stats_dict[4]['hits'] ={}
+    stats_dict[4]['false_alarms'] = {}
+    stats_dict[4]['correct_response'] = {}
+    stats_dict[4]['dprime']= {}
+    stats_dict[4]['bias'] = {}
+
+    stats_dict[5]['hits'] ={}
+    stats_dict[5]['false_alarms'] = {}
+    stats_dict[5]['correct_response'] = {}
+    stats_dict[5]['dprime']= {}
+    stats_dict[5]['bias'] = {}
+    stats_dict[6]['hits'] ={}
+    stats_dict[6]['false_alarms'] = {}
+    stats_dict[6]['correct_response'] = {}
+    stats_dict[6]['dprime']= {}
+    stats_dict[6]['bias'] = {}
+
+    count = 0
+    pitch_list = [1,2,3,3,4,5]
+    for ferret in ferrets:
+
+        selected_ferret = df_noncatchnoncorrection[df_noncatchnoncorrection['ferret'] == count]
+        selected_ferret_catch = df_catchnoncorrection[df_catchnoncorrection['ferret'] == count]
+        selected_ferret_all = df_noncorrection[df_noncorrection['ferret'] == count]
+
+        for i, pitch in enumerate(pitch_list):
+            if i ==2:
+                selected_ferret_talker = selected_ferret[selected_ferret['pitchoftarg'] == pitch]
+                selected_ferret_talker = selected_ferret_talker[selected_ferret_talker['talker'] == 2]
+
+
+                selected_ferret_all_talker = selected_ferret_all[selected_ferret_all['f0'] == 3]
+                selected_ferret_all_talker = selected_ferret_all_talker[selected_ferret_all_talker['talker'] == 2]
+            elif i == 3:
+                selected_ferret_talker = selected_ferret[selected_ferret['pitchoftarg'] == 3]
+                selected_ferret_talker = selected_ferret_talker[selected_ferret_talker['talker'] == 1]
+
+
+                selected_ferret_all_talker = selected_ferret_all[selected_ferret_all['f0'] == 3]
+                selected_ferret_all_talker = selected_ferret_all_talker[selected_ferret_all_talker['talker'] == 1]
+            else:
+                selected_ferret_talker = selected_ferret[selected_ferret['f0'] == pitch]
+
+                selected_ferret_all_talker = selected_ferret_all[selected_ferret_all['f0'] == pitch]
+
+            selected_ferret_talker_hitrate = selected_ferret_talker[selected_ferret_talker['response'] != 5]
+
+            selected_ferret_catch_talker = selected_ferret_catch[selected_ferret_catch['pitchoftarg'] == pitch]
+
+            stats_dict[i+1]['hits'][ferret] = np.mean(selected_ferret_talker_hitrate['hit'])
+            stats_dict[i+1]['false_alarms'][ferret] = np.mean(selected_ferret_all_talker['falsealarm'])
+            stats_dict[i+1]['dprime'][ferret] = CalculateStats.dprime(np.mean(selected_ferret_talker_hitrate['hit']), np.mean(selected_ferret_all_talker['falsealarm']))
+            stats_dict[i+1]['bias'][ferret] = CalculateStats.bias(np.mean(selected_ferret_talker_hitrate['hit']), np.mean(selected_ferret_all_talker['falsealarm']))
+            #%Correct(hit + CR / hits + misses + CR + FA)
+            stats_dict[i+1]['correct_response'][ferret] = (len(selected_ferret_talker[selected_ferret_talker['hit']==True]) + len(selected_ferret_catch_talker[selected_ferret_catch_talker['response'] == 3]))/ (len(selected_ferret_talker) + len(selected_ferret_catch_talker))
+        count += 1
+    stats_dict_all = {}
+
+    stats_dict_all[1]= {}
+    stats_dict_all[2]= {}
+    stats_dict_all[3]= {}
+    stats_dict_all[4]= {}
+    stats_dict_all[5]= {}
+    stats_dict_all[6] = {}
+
+
+    for i, pitch in enumerate(pitch_list):
+        # df_noncatchnoncorrection_talker = df_noncatchnoncorrection[df_noncatchnoncorrection['pitchoftarg'] == pitch]
+        # df_noncorrection_talker = df_noncorrection[df_noncorrection['pitchoftarg'] == pitch]
+        # df_noncatchnoncorrection_talker_hitrate = df_noncatchnoncorrection_talker[df_noncatchnoncorrection_talker['response'] != 5]
+        #
+        # df_catchnoncorrection_talker = df_catchnoncorrection[df_catchnoncorrection['pitchoftarg'] == pitch]
+        # hits = np.mean(df_noncatchnoncorrection_talker_hitrate['hit'])
+        # false_alarms = np.mean(df_noncorrection_talker['falsealarm'])
+        # correct_rejections = np.mean(df_catchnoncorrection_talker['response'] == 3)
+        # correct_response =  (len(df_noncatchnoncorrection_talker[df_noncatchnoncorrection_talker['hit']==True]) + len(df_catchnoncorrection_talker[df_catchnoncorrection_talker['response'] == 3]))/ (len(df_noncorrection_talker))
+        #take mean of all the values in the dictionary
+
+
+        correct_response = np.mean(list(stats_dict[i+1]['correct_response'].values()))
+        hits = np.mean(list(stats_dict[i+1]['hits'].values()))
+        false_alarms = np.mean(list(stats_dict[i+1]['false_alarms'].values()))
+
+        stats_dict_all[i+1]['hits'] = hits
+        stats_dict_all[i+1]['false_alarms'] = false_alarms
+        stats_dict_all[i+1]['correct_response'] = correct_response
+        stats_dict_all[i+1]['dprime'] = CalculateStats.dprime(hits, false_alarms)
+        stats_dict_all[i+1]['bias'] = CalculateStats.bias(hits, false_alarms)
+
+    return stats_dict_all, stats_dict
 def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'inter_trial_roving'):
     if pitch_param == None:
         df_noncatchnoncorrection = df[(df['catchTrial'] == 0) & (df['correctionTrial'] == 0)]
@@ -567,7 +701,6 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
     #get proportion of hits and false alarms for the dataframe
     fig, ax = plt.subplots()
 
-
 def plot_stats_by_pitch(stats_dict_all_combined, stats_dict_combined, stats_dict_all_inter, stats_dict_inter, stats_dict_all_intra, stats_dict_intra):
 
     #generate bar plots
@@ -694,6 +827,240 @@ def plot_stats_by_pitch(stats_dict_all_combined, stats_dict_combined, stats_dict
     plt.show()
 
 
+def plot_stats_by_pitch_lineplot(stats_dict_all_combined, stats_dict_combined, stats_dict_all_inter, stats_dict_inter, stats_dict_all_intra, stats_dict_intra):
+
+    #generate bar plots
+    stats = pd.DataFrame.from_dict(stats_dict_all_combined)
+    x = np.arange(len(stats_dict_all_combined))  # the label locations
+    width = 0.25  # the width of the bars
+    multiplier = 0
+    gap_width = 0.2  # Width of the gap between series
+    ferret_ids = ['F1702', 'F1815', 'F1803', 'F2002', 'F2105']
+    text_width_pt = 419.67816  # Replace with your value
+
+    # Convert the text width from points to inches
+    text_width_inches = text_width_pt / 72.27
+    fig, ((ax1, ax2)) = plt.subplots(2,1, layout='constrained',figsize=(0.8*text_width_inches,0.9*text_width_inches))
+    #make a panel for the subplots to go into
+
+    color_map = plt.cm.get_cmap('tab10')  # Choose a colormap
+    offsets1 = []
+    hits = []
+    offsets2 = []
+    false_alarms = []
+    for attribute, measurement in stats_dict_all_combined.items():
+
+            offset = width * multiplier
+    # Add gap offset for the second series
+
+            color = color_map(attribute)  # Assign color based on label
+            # rects = ax1.bar(offset, measurement['hits'], width, label='_nolegend_', color=color)
+            hits.append(measurement['hits'])
+            offsets1.append(offset)
+            #scatter plot the corresponding individual ferret data, each ferret is a different marker shape
+            marker_list = ['o', 's', '<', 'd', "*"]
+            count = 0
+            for ferret, ferret_data in stats_dict_combined[attribute]['hits'].items():
+                #add jitter to offset
+                print('ferret', ferret)
+                print('ferret data', ferret_data)
+                offset_jitter = offset + np.random.uniform(-0.05, 0.05)
+                ax1.scatter(offset_jitter, ferret_data, 25, color=color, marker=marker_list[count],label='_nolegend_', edgecolors='black')
+                count += 1
+
+            multiplier += 1
+
+    ax1.set_ylim(0, 1)
+    ax1.set_ylabel('P(hit) by target word F0', fontsize = 12)
+    ax1.set_title('Hits')
+
+    width = 0.25  # the width of the bars
+    multiplier = 0
+    gap_width = 0.2
+
+
+
+
+    for attribute, measurement in stats_dict_all_inter.items():
+
+            offset = width * multiplier
+            # Add gap offset for the second series
+            offsets2.append(offset)
+            false_alarms.append(measurement['false_alarms'])
+            color = color_map(attribute)  # Assign color based on label
+            # rects = ax2.bar(offset, measurement['false_alarms'], width, label='_nolegend_', color=color)
+            #do a line plot
+            ax2.plot(offset, measurement['false_alarms'], color=color, linestyle = '--', marker = 'o', label='_nolegend_', markersize = 12, alpha = 0.5)
+
+            #scatter plot the corresponding individual ferret data, each ferret is a different marker shape
+            marker_list = ['p', 's', '<', 'd', "*"]
+            count = 0
+            for ferret, ferret_data in stats_dict_inter[attribute]['false_alarms'].items():
+                #add jitter to offset
+                print('ferret', ferret)
+                print('ferret data', ferret_data)
+                offset_jitter = offset + np.random.uniform(-0.05, 0.05)
+                if multiplier < 1:
+                    label_text = ferret_ids[count]
+                else:
+                    label_text = '_nolegend_'
+                ax2.scatter(offset_jitter, ferret_data, 25, color=color, marker=marker_list[count],label=label_text, edgecolors='black')
+                count += 1
+
+            multiplier += 1
+
+    ax1.plot(offsets1, hits, color=color, linestyle='--', marker='o', label='_nolegend_', markersize=12, alpha=0.5)
+
+    # Plot lines for the second subplot (ax2)
+    ax2.plot(offsets2, false_alarms, color=color, linestyle='--', marker='o', label='_nolegend_', markersize=12,
+             alpha=0.5)
+    ax2.set_ylim(0, 1)
+    ax2.legend( loc='upper left')
+    ax2.set_ylabel('P(FA) by target word F0', fontsize = 12)
+    ax2.set_title('False alarms')
+    ax2.set_xlabel('F0 of target (Hz)')
+    ax1.set_xticks([0, 0.25, 0.5, 0.75, 1.0, 1.25], ['109', '124', '144 - M','144 - F', '191', '251 '])
+    ax1.set_xlabel('F0 (Hz)')
+    ax2.set_xticks([0, 0.25, 0.5, 0.75, 1.0, 1.25], ['109', '124', '144 - M','144 - F', '191', '251 '])
+
+
+    def get_axis_limits(ax, scale=1):
+        return ax.get_xlim()[0] * scale, (ax.get_ylim()[1] * scale)
+
+    import matplotlib.font_manager as fm
+    #
+    # ax1.annotate('a)', xy=get_axis_limits(ax1))
+    # ax2.annotate('b)', xy=get_axis_limits(ax2))
+    # # ax3.annotate('c)', xy=get_axis_limits(ax3))
+    # # ax4.annotate('d)', xy=get_axis_limits(ax4))
+    # title_y = ax1.title.get_position()[1]  # Get the y-coordinate of the title
+    # font_props = fm.FontProperties(weight='bold')
+    font_props = fm.FontProperties(weight='bold', size=9)
+
+    # ax1.annotate('A', xy=get_axis_limits(ax1), xytext=(-0.1, ax1.title.get_position()[1]+0.05), textcoords='axes fraction', fontproperties = font_props, zorder=10)
+    # ax2.annotate('B', xy=get_axis_limits(ax2), xytext=(-0.1, ax2.title.get_position()[1]+0.05), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+    # ax3.annotate('c)', xy=get_axis_limits(ax3), xytext=(-0.1, ax3.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+    # ax4.annotate('d)', xy=get_axis_limits(ax4), xytext=(-0.1, ax4.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+    #
+    # plt.suptitle('Proportion of hits, false alarms,\n correct responses and d\' by talker')
+    plt.subplots_adjust(wspace=0.0, hspace=0.38)
+
+    plt.savefig('figs/proportionofhits_FA_byF0_noaxisannotation.pdf', dpi = 500, bbox_inches='tight')
+    plt.show()
+
+    ##no do dprime and correct response
+    multiplier = 0
+    text_width_pt = 419.67816  # Replace with your value
+
+    # Convert the text width from points to inches
+    text_width_inches = text_width_pt / 72.27
+    fig, ((ax1, ax2)) = plt.subplots(2,1, layout='constrained',figsize=(0.8*text_width_inches,0.9*text_width_inches))
+    #make a panel for the subplots to go into
+
+    color_map = plt.cm.get_cmap('tab10')  # Choose a colormap
+    offsets1 = []
+    hits = []
+    offsets2 = []
+    false_alarms = []
+    for attribute, measurement in stats_dict_all_combined.items():
+
+            offset = width * multiplier
+    # Add gap offset for the second series
+
+            color = color_map(attribute)  # Assign color based on label
+            # rects = ax1.bar(offset, measurement['hits'], width, label='_nolegend_', color=color)
+            hits.append(measurement['dprime'])
+            offsets1.append(offset)
+            #scatter plot the corresponding individual ferret data, each ferret is a different marker shape
+            marker_list = ['o', 's', '<', 'd', "*"]
+            count = 0
+            for ferret, ferret_data in stats_dict_combined[attribute]['dprime'].items():
+                #add jitter to offset
+                print('ferret', ferret)
+                print('ferret data', ferret_data)
+                offset_jitter = offset + np.random.uniform(-0.05, 0.05)
+                ax1.scatter(offset_jitter, ferret_data, 25, color=color, marker=marker_list[count],label='_nolegend_', edgecolors='black')
+                count += 1
+
+            multiplier += 1
+
+    # ax1.set_ylim(0, 1)
+    ax1.set_ylabel("d'", fontsize = 12)
+    ax1.set_title("d'")
+
+    width = 0.25  # the width of the bars
+    multiplier = 0
+    gap_width = 0.2
+
+
+
+
+    for attribute, measurement in stats_dict_all_inter.items():
+
+            offset = width * multiplier
+            # Add gap offset for the second series
+            offsets2.append(offset)
+            false_alarms.append(measurement['correct_response'])
+            color = color_map(attribute)  # Assign color based on label
+            # rects = ax2.bar(offset, measurement['false_alarms'], width, label='_nolegend_', color=color)
+            #do a line plot
+            # ax2.plot(offset, measurement['correct_response'], color=color, linestyle = '--', marker = 'o', label='_nolegend_', markersize = 12, alpha = 0.5)
+
+            #scatter plot the corresponding individual ferret data, each ferret is a different marker shape
+            marker_list = ['p', 's', '<', 'd', "*"]
+            count = 0
+            for ferret, ferret_data in stats_dict_inter[attribute]['correct_response'].items():
+                #add jitter to offset
+                print('ferret', ferret)
+                print('ferret data', ferret_data)
+                offset_jitter = offset + np.random.uniform(-0.05, 0.05)
+                ax2.scatter(offset_jitter, ferret_data, 25, color=color, marker=marker_list[count],label='_nolegend_', edgecolors='black')
+                count += 1
+
+            multiplier += 1
+
+    ax1.plot(offsets1, hits, color=color, linestyle='--', marker='o', label='_nolegend_', markersize=12, alpha=0.5)
+
+    # Plot lines for the second subplot (ax2)
+    ax2.plot(offsets2, false_alarms, color=color, linestyle='--', marker='o', label='_nolegend_', markersize=12,
+             alpha=0.5)
+    ax2.set_ylim(0, 1)
+    ax2.legend( loc='upper left')
+    ax2.set_ylabel('P(Correct Response) by F0', fontsize = 12)
+    ax2.set_title('P(Correct Response)')
+    ax2.set_xlabel('F0 of target (Hz)')
+    ax1.set_xticks([0, 0.25, 0.5, 0.75, 1.0, 1.25], ['109', '124', '144 - M','144 - F', '191', '251 '])
+    ax1.set_xlabel('F0 (Hz)')
+    ax2.set_xticks([0, 0.25, 0.5, 0.75, 1.0, 1.25], ['109', '124', '144 - M','144 - F', '191', '251 '])
+    # ax2.legend(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=6, loc='upper right')
+
+
+    def get_axis_limits(ax, scale=1):
+        return ax.get_xlim()[0] * scale, (ax.get_ylim()[1] * scale)
+
+    import matplotlib.font_manager as fm
+    #
+    # ax1.annotate('a)', xy=get_axis_limits(ax1))
+    # ax2.annotate('b)', xy=get_axis_limits(ax2))
+    # # ax3.annotate('c)', xy=get_axis_limits(ax3))
+    # # ax4.annotate('d)', xy=get_axis_limits(ax4))
+    # title_y = ax1.title.get_position()[1]  # Get the y-coordinate of the title
+    # font_props = fm.FontProperties(weight='bold')
+    font_props = fm.FontProperties(weight='bold', size=9)
+
+    # ax1.annotate('A', xy=get_axis_limits(ax1), xytext=(-0.1, ax1.title.get_position()[1]+0.05), textcoords='axes fraction', fontproperties = font_props, zorder=10)
+    # ax2.annotate('B', xy=get_axis_limits(ax2), xytext=(-0.1, ax2.title.get_position()[1]+0.05), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+    # ax3.annotate('c)', xy=get_axis_limits(ax3), xytext=(-0.1, ax3.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+    # ax4.annotate('d)', xy=get_axis_limits(ax4), xytext=(-0.1, ax4.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
+    #
+    # plt.suptitle('Proportion of hits, false alarms,\n correct responses and d\' by talker')
+    plt.subplots_adjust(wspace=0.0, hspace=0.38)
+
+    plt.savefig('figs/proportionofhits_dprimecorrect_response_byF0_noaxisannotation.pdf', dpi = 500, bbox_inches='tight')
+    plt.show()
+    return
+
+
 def run_barplot_pipeline():
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
     df = behaviouralhelperscg.get_stats_df(ferrets=ferrets, startdate='04-01-2016', finishdate='01-03-2023')
@@ -751,11 +1118,16 @@ if __name__ == '__main__':
     # run_barplot_pipeline()
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
     df = behaviouralhelperscg.get_stats_df(ferrets=ferrets, startdate='04-01-2016', finishdate='01-03-2023')
-    stats_dict_all_inter, stats_dict_inter = run_stats_calc_by_pitch(df, ferrets, stats_dict_empty, pitch_param='inter_trial_roving')
+    stats_dict_all_inter, stats_dict_inter = run_stats_calc_by_pitch_mf(df, ferrets, stats_dict_empty, pitch_param='inter_trial_roving')
 
-    stats_dict_all_bypitch, stats_dict_bypitch = run_stats_calc_by_pitch(df, ferrets, stats_dict_empty, pitch_param=None)
+    stats_dict_all_bypitch, stats_dict_bypitch = run_stats_calc_by_pitch_mf(df, ferrets, stats_dict_empty, pitch_param=None)
     stats_dict_all_intra, stats_dict_intra = run_stats_calc(df, ferrets, pitch_param='intra_trial_roving')
-    plot_stats_by_pitch(stats_dict_all_bypitch, stats_dict_bypitch, stats_dict_all_inter, stats_dict_inter, stats_dict_all_intra, stats_dict_intra)
 
+    # stats_dict_all_inter, stats_dict_inter = run_stats_calc_by_pitch(df, ferrets, stats_dict_empty, pitch_param='inter_trial_roving')
+    #
+    # stats_dict_all_bypitch, stats_dict_bypitch = run_stats_calc_by_pitch(df, ferrets, stats_dict_empty, pitch_param=None)
+    # stats_dict_all_intra, stats_dict_intra = run_stats_calc(df, ferrets, pitch_param='intra_trial_roving')
+    # plot_stats_by_pitch(stats_dict_all_bypitch, stats_dict_bypitch, stats_dict_all_inter, stats_dict_inter, stats_dict_all_intra, stats_dict_intra)
+    plot_stats_by_pitch_lineplot(stats_dict_all_bypitch, stats_dict_bypitch, stats_dict_all_inter, stats_dict_inter, stats_dict_all_intra, stats_dict_intra)
 
 
