@@ -6,6 +6,7 @@ from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import KFold
 from sklearn.model_selection import cross_val_score
 from sklearn.inspection import permutation_importance
+from statsmodels.stats.multicomp import MultiComparison
 
 import shap
 import matplotlib
@@ -95,6 +96,8 @@ def kw_test(df):
 
                 # Perform Kruskal-Wallis test for the current column and conditions
                 kw_stat, kw_p_value = stats.kruskal(*groups)
+                #calculate tukeyhsd
+                tukey = stats.multicomp.pairwise_tukeyhsd(endog=data_talker_whole[column], groups=data_talker_whole[conditions], alpha=0.05)
 
                 # Calculate effect size using Pingouin
                 data_total = np.concatenate(groups)
@@ -107,6 +110,7 @@ def kw_test(df):
                 kw_dict[talker][column][ferret]['kw_stat'] = kw_stat
                 kw_dict[talker][column][ferret]['p_value'] = kw_p_value
                 kw_dict[talker][column][ferret]['effect_size'] = eta_squared
+                kw_dict[talker][column][ferret]['tukey'] = tukey
     # #export kw_dict to csv
     # kw_dict_df = pd.DataFrame.from_dict({(i,j,k): kw_dict[i][j][k]
     #                         for i in kw_dict.keys()
@@ -115,7 +119,8 @@ def kw_test(df):
     #                       orient='index')
     # kw_dict_df.to_csv('D:\mixedeffectmodelsbehavioural\metrics/kw_dict_by_roving_type.csv')
 
-
+    kw_dict_all_df = pd.DataFrame.from_dict(kw_dict)
+    kw_dict_all_df.to_csv(f'D:\mixedeffectmodelsbehavioural\metrics/kw_dict_byrovetype.csv')
 
     return kw_dict
 
@@ -621,9 +626,19 @@ def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'inter_trial_
         res = rm.fit()
         #store res in a dictionary
         anovaresults[value] = res
+        #run tukey post hoc test
         print(res)
         #export to csv
-        res.anova_table.to_csv(f'D:\mixedeffectmodelsbehavioural\metrics/anova_results_{value}.csv')
+        res.anova_table.to_csv(f'D:\mixedeffectmodelsbehavioural\metrics/anova_results_bypitch_{value}.csv')
+        mc = MultiComparison(rm_anova_dataframe[value], rm_anova_dataframe['pitch'])
+        result = mc.tukeyhsd()
+
+        # Print post hoc test results
+        print(result)
+
+        # Export post hoc test results to CSV
+        posthoc_df = pd.DataFrame(result._results_table.data[1:], columns=result._results_table.data[0])
+        posthoc_df.to_csv(f'D:/mixedeffectmodelsbehavioural/metrics/posthoc_results_{value}.csv')
 
     stats_dict_all = {}
 
@@ -665,45 +680,37 @@ def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'inter_trial_
         stats_dict_all[pitch]['correct_response'] = correct_response
         stats_dict_all[pitch]['dprime'] = CalculateStats.dprime(hits, false_alarms)
         stats_dict_all[pitch]['bias'] = CalculateStats.bias(hits, false_alarms)
-    conditions = ['hits', 'false_alarms', 'correct_response', 'dprime', 'bias']
-
-    stats_dict2 = {}
-    if repeated_anova == True:
-        #make a dataframe from the stats_dict_all
-        for key in stats_dict.keys():
-            stats_dict2[key] = {}
-            for stat in stats_dict[key].keys():
-                list2 = []
-                for ferretkey in stats_dict[key][stat].keys():
-                    list2.append(stats_dict[key][stat][ferretkey])
-                stats_dict2[key][stat] = list2
-
-        df_stats = pd.DataFrame.from_dict(stats_dict2)
-        #run repeated measures anova
-        rm = AnovaRM(df_stats, 'hits', 'ferret', within=['pitch'])
 
 
 
 
     if kw_test == True:
-
         kw_dict_rxntime = {}
-        columns_to_compare = ['reaction_time']
+        columns_to_compare = ['realRelReleaseTimes']
         for column in columns_to_compare:
+            kw_dict_rxntime[column] = {}
             for ferret in ferrets:
                 kw_dict_rxntime[column][ferret] = {}
                 group_values = []
                 for condition in pitch_list:
                     kw_dict_rxntime[column][ferret][condition] = {}
-                    data = kw_dict_all[condition]
-                    data = data[data['ferret'] == ferret]
-                    # if column == 'reaction_time':
+                    data = data_dict[condition]
+                    data = data[data['ferretname'] == ferret]
 
-                    group_values.append(data[column].values())
+                    # if column == 'reaction_time':
+                    values_to_append = data[column].dropna()
+                    group_values.append(values_to_append)
 
                     # Perform Kruskal-Wallis test for the current column, condition, and talker
                 kw_stat, kw_p_value = stats.kruskal(*group_values)
                 data_total = np.concatenate(group_values)
+                #run tukey
+                mc = MultiComparison(data_total, data['pitchoftarg'])
+                result_tukey = mc.tukeyhsd()
+                # Print Kruskal-Wallis test results
+
+
+
 
                 k = len(group_values)
                 n = len(data_total)
@@ -713,14 +720,17 @@ def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'inter_trial_
 
                 # compute the effect size
 
-                kw_dict_rxntime[column] = {'kw_stat': kw_stat, 'p_value': kw_p_value,
-                                   'effect_size': eta_squared}
+                kw_dict_rxntime[column][ferret] = {'kw_stat': kw_stat, 'p_value': kw_p_value,
+                                   'effect_size': eta_squared, 'tukey': result_tukey}
         # for key, value in kw_dict_all.items():
         #     kw_dict['hits'][key] = stats.kruskal(value['hits'], value['false_alarms'], value['correct_response'], value['dprime'], value['bias'])
         #     kw_dict['false_alarms'][key] = stats.kruskal(value['false_alarms'], value['correct_response'], value['dprime'], value['bias'])
         #     kw_dict['correct_response'][key] = stats.kruskal(value['correct_response'], value['dprime'], value['bias'])
         #     kw_dict['dprime'][key] = stats.kruskal(value['dprime'], value['bias'])
         #     kw_dict['bias'][key] = stats.kruskal(value['bias'])
+        #export kw_dict to csv
+        kw_dict_all_df = pd.DataFrame.from_dict(kw_dict_rxntime)
+        kw_dict_all_df.to_csv(f'D:\mixedeffectmodelsbehavioural\metrics/kw_dict_bypitch.csv')
         return stats_dict_all, stats_dict, kw_dict
 
     return stats_dict_all, stats_dict
@@ -1469,6 +1479,12 @@ def run_repeated_anova(stats_dict_inter, stats_dict_intra, stats_dict_control):
             anovaresults = AnovaRM(stats_dict_all, value, 'ferret', within=['roving_type']).fit()
             #export to csv.
             # anovaresults.export_to_csv('anovaresults_' + str(talker) + '_' + value + '.csv')
+            #run tukey post hoc test
+            posthoc = MultiComparison(stats_dict_all[value], stats_dict_all['roving_type'])
+            posthocresults = posthoc.tukeyhsd()
+            print(posthocresults)
+            #export to csv
+            posthocresults.to_csv(f'D:\mixedeffectmodelsbehavioural\metrics/posthocresults_by_rovingtype_{value}.csv')
             anovaresults.anova_table.to_csv(f'D:\mixedeffectmodelsbehavioural\metrics/anova_results_by_rovingtype_{value}.csv')
 
             print(anovaresults)

@@ -1648,21 +1648,21 @@ def plot_reaction_times_interandintra(ferrets):
 
     font_props = fm.FontProperties(weight='bold', size=17)
 
-    ax_dict['0'].annotate('A', xy=get_axis_limits(ax_dict['0']),
-                          xytext=(-0.1, ax_dict['0'].title.get_position()[1] + 0.01), textcoords='axes fraction',
-                          fontproperties=font_props, zorder=1)
-    ax_dict['1'].annotate('B', xy=get_axis_limits(ax_dict['1']),
-                          xytext=(-0.1, ax_dict['1'].title.get_position()[1] + 0.01), textcoords='axes fraction',
-                          fontproperties=font_props, zorder=1)
-    ax_dict['2'].annotate('C', xy=get_axis_limits(ax_dict['2']),
-                          xytext=(-0.1, ax_dict['2'].title.get_position()[1] + 0.01), textcoords='axes fraction',
-                          fontproperties=font_props, zorder=1)
-    ax_dict['3'].annotate('D', xy=get_axis_limits(ax_dict['3']),
-                          xytext=(-0.1, ax_dict['3'].title.get_position()[1] + 0.01), textcoords='axes fraction',
-                          fontproperties=font_props, zorder=1)
-    ax_dict['4'].annotate('E', xy=get_axis_limits(ax_dict['4']),
-                          xytext=(-0.1, ax_dict['4'].title.get_position()[1] + 0.01), textcoords='axes fraction',
-                          fontproperties=font_props, zorder=1)
+    # ax_dict['0'].annotate('A', xy=get_axis_limits(ax_dict['0']),
+    #                       xytext=(-0.1, ax_dict['0'].title.get_position()[1] + 0.01), textcoords='axes fraction',
+    #                       fontproperties=font_props, zorder=1)
+    # ax_dict['1'].annotate('B', xy=get_axis_limits(ax_dict['1']),
+    #                       xytext=(-0.1, ax_dict['1'].title.get_position()[1] + 0.01), textcoords='axes fraction',
+    #                       fontproperties=font_props, zorder=1)
+    # ax_dict['2'].annotate('C', xy=get_axis_limits(ax_dict['2']),
+    #                       xytext=(-0.1, ax_dict['2'].title.get_position()[1] + 0.01), textcoords='axes fraction',
+    #                       fontproperties=font_props, zorder=1)
+    # ax_dict['3'].annotate('D', xy=get_axis_limits(ax_dict['3']),
+    #                       xytext=(-0.1, ax_dict['3'].title.get_position()[1] + 0.01), textcoords='axes fraction',
+    #                       fontproperties=font_props, zorder=1)
+    # ax_dict['4'].annotate('E', xy=get_axis_limits(ax_dict['4']),
+    #                       xytext=(-0.1, ax_dict['4'].title.get_position()[1] + 0.01), textcoords='axes fraction',
+    #                       fontproperties=font_props, zorder=1)
 
     plt.savefig('D:/behavmodelfigs/reaction_times_by_ferret_panel.png', dpi=500)
     plt.savefig('D:/behavmodelfigs/reaction_times_by_ferret_panel.png', dpi=500)
