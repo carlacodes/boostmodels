@@ -638,9 +638,19 @@ def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'inter_trial_
         #run tukey post hoc test
         print(res)
         #export to csv
+
+        numerator = res.anova_table['F Value'][0] * res.anova_table['Num DF'][0]
+        denominator = numerator + res.anova_table['Den DF'][0]
+        partial_eta_squared = numerator / denominator
+
         res.anova_table.to_csv(f'D:\mixedeffectmodelsbehavioural\metrics/anova_results_bypitch_{value}.csv')
+        #export eta_squared to csv
+        eta_squared_df = pd.DataFrame({'partial_eta_squared': [partial_eta_squared]})
+        eta_squared_df.to_csv(f'D:\mixedeffectmodelsbehavioural\metrics/eta_squared_bypitch_{value}.csv')
         mc = MultiComparison(rm_anova_dataframe[value], rm_anova_dataframe['pitch'])
         result = mc.tukeyhsd()
+        #get the eta squared value
+
 
         # Print post hoc test results
         print(result)
@@ -1498,6 +1508,13 @@ def run_repeated_anova(stats_dict_inter, stats_dict_intra, stats_dict_control):
             posthoc = MultiComparison(stats_dict_all[value], stats_dict_all['roving_type'])
             posthocresults = posthoc.tukeyhsd()
             print(posthocresults)
+            numerator = anovaresults.anova_table['F Value'][0] * anovaresults.anova_table['Num DF'][0]
+            denominator = numerator + anovaresults.anova_table['Den DF'][0]
+            partial_eta_squared = numerator / denominator
+
+
+            eta_squared_df = pd.DataFrame({'partial_eta_squared': [partial_eta_squared]})
+            eta_squared_df.to_csv(f'D:\mixedeffectmodelsbehavioural\metrics/eta_squared_rovingtype_{value}.csv')
             #export to csv
             tukey_df = pd.DataFrame(data=posthocresults._results_table.data[1:],
                                     columns=posthocresults._results_table.data[0])
