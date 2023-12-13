@@ -1215,20 +1215,29 @@ def run_mixed_effects_model_absrxntime(df, talker =1):
     coefficients_df = pd.DataFrame(coefficients).mean()
     p_values_df = pd.DataFrame(p_values).mean()
     # combine into one dataframe
+    if talker == 1:
+        color_text = 'purple'
+        talker_text = 'Female Talker'
+    else:
+        color_text = 'darkorange'
+        talker_text = 'Male Talker'
     result_coefficients = pd.concat([coefficients_df, p_values_df], axis=1, keys=['coefficients', 'p_values'])
-    fig, ax = plt.subplots()
+    #replace GroupVar with text Ferret
+    fig, ax = plt.subplots(figsize = (20,5))
     # sort the coefficients by their mean value
     result_coefficients = result_coefficients.sort_values(by='coefficients', ascending=False)
-    ax.bar(result_coefficients.index, result_coefficients['coefficients'], color='purple')
+
+    ax.bar(result_coefficients.index, result_coefficients['coefficients'], color=color_text)
     # ax.set_xticklabels(result_coefficients['features'], rotation=45, ha='right')
     # if the mean p value is less than 0.05, then add a star to the bar plot
     for i in range(len(result_coefficients)):
         if result_coefficients['p_values'][i] < 0.05:
             ax.text(i, 0.00, '*', fontsize=20)
     ax.set_xlabel('Features')
-    ax.set_ylabel('Mean Coefficient')
+    plt.yticks(fontsize=15)
+    ax.set_ylabel('Mean Coefficient', fontsize = 20)
     plt.xticks(rotation=45, ha='right')
-    ax.set_title('Mean Coefficient for Each Feature, Absolute Reaction Time Model')
+    ax.set_title(f'Mean Coefficient for Each Feature, Absolute Reaction Time Model, {talker_text}', fontsize = 20)
     plt.savefig(f'mixedeffects_csvs/mean_coefficients_absolute_rxn_time_talker_{talker}.png', dpi=500, bbox_inches='tight')
     plt.show()
 
@@ -1385,7 +1394,7 @@ def main():
     # ferrets = ['F1815_Cruella']# , 'F2105_Clove']
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
 
-    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=False, talker=2)
+    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=False, talker=1)
 
     # for ferret in ferrets:
     #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)

@@ -903,7 +903,10 @@ def run_mixed_effects_model_correctrxntime(df):
     result_coefficients = pd.concat([coefficients_df, p_values_df], axis=1, keys=['coefficients', 'p_values'])
     fig, ax = plt.subplots()
     # sort the coefficients by their mean value
+    result_coefficients.index = result_coefficients.index.str.replace('Group Var', 'Ferret')
+
     result_coefficients = result_coefficients.sort_values(by='coefficients', ascending=False)
+
     ax.bar(result_coefficients.index, result_coefficients['coefficients'], color = 'cyan')
     # ax.set_xticklabels(result_coefficients['features'], rotation=45, ha='right')
     # if the mean p value is less than 0.05, then add a star to the bar plot
@@ -914,7 +917,7 @@ def run_mixed_effects_model_correctrxntime(df):
     ax.set_ylabel('Mean Coefficient')
     plt.xticks(rotation=45, ha='right')
     ax.set_title('Mean Coefficient for Each Feature, Correct Reaction Time Model')
-    plt.savefig('figs/correctrxntimemodel/mean_coefficients.png', dpi=500, bbox_inches='tight')
+    plt.savefig('D:\mixedeffectmodelsbehavioural\models/mixedeffects_csvs/correctrxntimemodel_mean_coefficients.png', dpi=500, bbox_inches='tight')
     plt.show()
 
     #calculate the mean accuracy

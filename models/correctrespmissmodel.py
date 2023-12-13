@@ -142,6 +142,9 @@ def run_mixed_effects_model_correctresp(df):
 
         model = smf.mixedlm(equation, train, groups=train["ferret"])
         result = model.fit()
+        #get the reference group
+        #
+
         print(result.summary())
         #store the coefficients in a dictionary
 
@@ -201,6 +204,19 @@ def run_mixed_effects_model_correctresp(df):
     result_coefficients = pd.concat([coefficients_df, p_values_df], axis=1, keys=['coefficients', 'p_values'])
     fig, ax = plt.subplots()
     # sort the coefficients by their mean value
+    result_coefficients.index = result_coefficients.index.str.replace('Group Var', 'ferret ID')
+    result_coefficients.index = result_coefficients.index.str.replace('targTimes', 'target presentation time')
+    result_coefficients.index = result_coefficients.index.str.replace('side', 'audio side')
+    result_coefficients.index = result_coefficients.index.str.replace('pitchoftarg', 'target pitch')
+    result_coefficients.index = result_coefficients.index.str.replace('pastcatchtrial', 'past trial was catch')
+
+    result_coefficients.index = result_coefficients.index.str.replace('pastcorrectresp', 'past response correct')
+    result_coefficients.index = result_coefficients.index.str.replace('precur_and_targ_same', 'precursor = target F0')
+
+
+
+
+
     result_coefficients = result_coefficients.sort_values(by='coefficients', ascending=False)
     ax.bar(result_coefficients.index, result_coefficients['coefficients'], color = 'peru')
     # ax.set_xticklabels(result_coefficients['features'], rotation=45, ha='right')
@@ -211,7 +227,7 @@ def run_mixed_effects_model_correctresp(df):
     ax.set_xlabel('Features')
     ax.set_ylabel('Mean Coefficient')
     plt.xticks(rotation=45, ha='right')
-    ax.set_title('Mean Coefficient for Each Feature, Correct Response / Miss Model')
+    ax.set_title('Mean Coefficient for Each Feature, Miss Model')
 
     plt.savefig('mixedeffects_csvs/mean_coefficients_correct_response.png', dpi=500, bbox_inches='tight')
     plt.show()

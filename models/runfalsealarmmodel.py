@@ -290,6 +290,7 @@ def run_mixed_effects_model_falsealarm(df):
                             "intra_trial_F0_roving", "past_response_correct", "past_trial_was_catch", "falsealarm",
                             "F0"]
     df = df.dropna()
+    df['talker'] = df['talker'].replace({1: 2, 2: 1})
     kf = KFold(n_splits=5, shuffle=True, random_state=123)
     fold_index = 1
     train_acc = []
@@ -360,6 +361,8 @@ def run_mixed_effects_model_falsealarm(df):
     result_coefficients = pd.concat([coefficients_df, p_values_df], axis=1, keys=['coefficients', 'p_values'])
     fig, ax = plt.subplots()
     #sort the coefficients by their mean value
+    result_coefficients.index = result_coefficients.index.str.replace('Group Var', 'Ferret')
+
     result_coefficients = result_coefficients.sort_values(by='coefficients', ascending=False)
     ax.bar(result_coefficients.index, result_coefficients['coefficients'])
     # ax.set_xticklabels(result_coefficients['features'], rotation=45, ha='right')
@@ -371,7 +374,7 @@ def run_mixed_effects_model_falsealarm(df):
     ax.set_ylabel('Mean Coefficient')
     plt.xticks(rotation=45, ha='right')
     ax.set_title('Mean Coefficient for Each Feature, False Alarm Model')
-    plt.savefig('D:/behavmodelfigs/fa_or_not_model/mean_coefficients.png', dpi=500, bbox_inches='tight')
+    plt.savefig('mixedeffects_csvs//fa_or_not_model_mean_coefficients.png', dpi=500, bbox_inches='tight')
     plt.show()
 
     #plot the mean coefficients as a bar plot
