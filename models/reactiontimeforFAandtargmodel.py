@@ -1172,6 +1172,7 @@ def run_mixed_effects_model_absrxntime(df, talker =1):
     train_r2 = []
     test_r2 = []
     coefficients = []
+    p_values = []
     for train_index, test_index in kf.split(df):
         train, test = df.iloc[train_index], df.iloc[test_index]
 
@@ -1205,12 +1206,31 @@ def run_mixed_effects_model_absrxntime(df, talker =1):
         test_r2.append(r2_test)
         #calculate the median absolute error
         mae = median_absolute_error(y_test, ypred)
-
+        p_values.append(result.pvalues)
         test_mae.append(mae)
         print(mae)
 
         print(mse)
 
+    coefficients_df = pd.DataFrame(coefficients).mean()
+    p_values_df = pd.DataFrame(p_values).mean()
+    # combine into one dataframe
+    result_coefficients = pd.concat([coefficients_df, p_values_df], axis=1, keys=['coefficients', 'p_values'])
+    fig, ax = plt.subplots()
+    # sort the coefficients by their mean value
+    result_coefficients = result_coefficients.sort_values(by='coefficients', ascending=False)
+    ax.bar(result_coefficients.index, result_coefficients['coefficients'], color='purple')
+    # ax.set_xticklabels(result_coefficients['features'], rotation=45, ha='right')
+    # if the mean p value is less than 0.05, then add a star to the bar plot
+    for i in range(len(result_coefficients)):
+        if result_coefficients['p_values'][i] < 0.05:
+            ax.text(i, 0.00, '*', fontsize=20)
+    ax.set_xlabel('Features')
+    ax.set_ylabel('Mean Coefficient')
+    plt.xticks(rotation=45, ha='right')
+    ax.set_title('Mean Coefficient for Each Feature, Absolute Reaction Time Model')
+    plt.savefig(f'mixedeffects_csvs/mean_coefficients_absolute_rxn_time_talker_{talker}.png', dpi=500, bbox_inches='tight')
+    plt.show()
 
     #calculate the mean accuracy
     print(np.mean(train_mse))

@@ -136,6 +136,7 @@ def run_mixed_effects_model_correctresp(df):
     train_acc = []
     test_acc = []
     coefficients = []
+    p_values = []
     for train_index, test_index in kf.split(df):
         train, test = df.iloc[train_index], df.iloc[test_index]
 
@@ -150,6 +151,7 @@ def run_mixed_effects_model_correctresp(df):
         var_random_effect = float(result.cov_re.iloc[0])
         var_fixed_effect = result.predict(df).var()
         coefficients.append(result.params)
+        p_values.append(result.pvalues)
 
         total_var = var_fixed_effect + var_random_effect + var_resid
         marginal_r2 = var_fixed_effect / total_var
@@ -193,6 +195,27 @@ def run_mixed_effects_model_correctresp(df):
 
         fold_index += 1  # Increment fold index
     #calculate the mean accuracy
+    coefficients_df = pd.DataFrame(coefficients).mean()
+    p_values_df = pd.DataFrame(p_values).mean()
+    # combine into one dataframe
+    result_coefficients = pd.concat([coefficients_df, p_values_df], axis=1, keys=['coefficients', 'p_values'])
+    fig, ax = plt.subplots()
+    # sort the coefficients by their mean value
+    result_coefficients = result_coefficients.sort_values(by='coefficients', ascending=False)
+    ax.bar(result_coefficients.index, result_coefficients['coefficients'], color = 'peru')
+    # ax.set_xticklabels(result_coefficients['features'], rotation=45, ha='right')
+    # if the mean p value is less than 0.05, then add a star to the bar plot
+    for i in range(len(result_coefficients)):
+        if result_coefficients['p_values'][i] < 0.05:
+            ax.text(i, 0.00, '*', fontsize=20)
+    ax.set_xlabel('Features')
+    ax.set_ylabel('Mean Coefficient')
+    plt.xticks(rotation=45, ha='right')
+    ax.set_title('Mean Coefficient for Each Feature, Correct Response / Miss Model')
+
+    plt.savefig('mixedeffects_csvs/mean_coefficients_correct_response.png', dpi=500, bbox_inches='tight')
+    plt.show()
+
     print(np.mean(train_acc))
     print(np.mean(test_acc))
     mean_coefficients = pd.DataFrame(coefficients).mean()

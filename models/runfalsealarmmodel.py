@@ -295,6 +295,7 @@ def run_mixed_effects_model_falsealarm(df):
     train_acc = []
     test_acc = []
     coefficients = []
+    p_values   = []
     for train_index, test_index in kf.split(df):
         train, test = df.iloc[train_index], df.iloc[test_index]
 
@@ -310,6 +311,7 @@ def run_mixed_effects_model_falsealarm(df):
         marginal_r2 = var_fixed_effect / total_var
         conditional_r2 = (var_fixed_effect + var_random_effect) / total_var
         coefficients.append(result.params)
+        p_values.append(result.pvalues)
 
         # Generate confusion matrix for train set
         y_pred_train = result.predict(train)
@@ -349,6 +351,45 @@ def run_mixed_effects_model_falsealarm(df):
 
         fold_index += 1  # Increment fold index
     #calculate the mean accuracy
+    #plot the mean coefficients as a bar plot
+    #make a dataframe of the coefficients, p-values, and features
+    coefficients_df = pd.DataFrame(coefficients).mean()
+    p_values_df = pd.DataFrame(p_values).mean()
+    labels_mixed_effects_df = pd.DataFrame(labels_mixed_effects)
+    #combine into one dataframe
+    result_coefficients = pd.concat([coefficients_df, p_values_df], axis=1, keys=['coefficients', 'p_values'])
+    fig, ax = plt.subplots()
+    #sort the coefficients by their mean value
+    result_coefficients = result_coefficients.sort_values(by='coefficients', ascending=False)
+    ax.bar(result_coefficients.index, result_coefficients['coefficients'])
+    # ax.set_xticklabels(result_coefficients['features'], rotation=45, ha='right')
+    #if the mean p value is less than 0.05, then add a star to the bar plot
+    for i in range(len(result_coefficients)):
+        if result_coefficients['p_values'][i] < 0.05:
+            ax.text(i, 0.00, '*', fontsize=20)
+    ax.set_xlabel('Features')
+    ax.set_ylabel('Mean Coefficient')
+    plt.xticks(rotation=45, ha='right')
+    ax.set_title('Mean Coefficient for Each Feature, False Alarm Model')
+    plt.savefig('D:/behavmodelfigs/fa_or_not_model/mean_coefficients.png', dpi=500, bbox_inches='tight')
+    plt.show()
+
+    #plot the mean coefficients as a bar plot
+
+    fig, ax = plt.subplots()
+    #sort the coefficients by their mean value
+
+    ax.bar(labels_mixed_effects, pd.DataFrame(coefficients).mean())
+    ax.set_xticklabels(labels_mixed_effects, rotation=45, ha='right')
+    #if the mean p value is less than 0.05, then add a star to the bar plot
+    for i in range(len(p_values)):
+        if p_values[i].mean() < 0.05:
+            ax.text(i, 0.05, '*', fontsize=20)
+    ax.set_xlabel('Features')
+    ax.set_ylabel('Mean Coefficient')
+    ax.set_title('Mean Coefficient for each Feature')
+    plt.savefig('D:/behavmodelfigs/fa_or_not_model/mean_coefficients.png', dpi=500, bbox_inches='tight')
+    plt.show()
     print(np.mean(train_acc))
     print(np.mean(test_acc))
     mean_coefficients = pd.DataFrame(coefficients).mean()
@@ -1967,7 +2008,7 @@ def plot_reaction_times_interandintra_swarm(ferrets):
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
     # plot_reaction_times_interandintra_violin(ferrets)
-    plot_reaction_times_interandintra(ferrets)
+    # plot_reaction_times_interandintra(ferrets)
 
     # plot_reaction_times_interandintra_swarm(ferrets)
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(
