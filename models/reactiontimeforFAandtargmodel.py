@@ -1268,7 +1268,7 @@ def run_mixed_effects_model_absrxntime(df, talker =1):
 def predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=False, talker=2):
     df_use = extract_releasedata_withdist(ferrets, talker=talker)
     df_use2 = df_use.copy()
-    run_mixed_effects_model_absrxntime(df_use2, talker = talker)
+    # run_mixed_effects_model_absrxntime(df_use2, talker = talker)
     col = 'centreRelease'
     dfx = df_use.loc[:, df_use.columns != col]
     if ferret_as_feature == False:
