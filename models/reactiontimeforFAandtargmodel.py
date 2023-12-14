@@ -347,44 +347,44 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
 
     cumulative_importances = np.cumsum(feature_importances)
 
-    talkerlist = ['female', 'male'
-                  ]
-    # Plot the elbow plot
-    plt.figure(figsize=(10, 6))
-    plt.plot(feature_labels_words, cumulative_importances, marker='o', color='cyan')
-    plt.xlabel('Features')
-    plt.ylabel('Cumulative Feature Importance')
-    if one_ferret:
-        plt.title(
-            'Elbow Plot of Cumulative Feature Importance for Correct Reaction Time Model for' + ferrets + ' talker' +
-            talkerlist[talker - 1], fontsize=15)
-    else:
-        plt.title('Elbow Plot of Cumulative Feature Importance for Correct Reaction Time Model', fontsize=20)
-    plt.xticks(rotation=45, ha='right')  # rotate x-axis labels for better readability
-    plt.savefig(fig_savedir / 'elbowplot.png', dpi=500, bbox_inches='tight')
-    plt.show()
-
-    shap.summary_plot(shap_values, X, show=False, cmap=cmap_color)
-
-    fig, ax = plt.gcf(), plt.gca()
-    fig.set_size_inches(25, 9)
-    # get the labels
-    labels = ax.get_yticklabels()
-    labels = [item.get_text() for item in ax.get_yticklabels()]
-    # set the labels
-    ax.set_yticklabels(np.flip(feature_labels_words[0:20]))
-    # change fontsize of xticks
-    plt.xticks(rotation=45, ha='right', fontsize=18)  # rotate x-axis labels for better readability
-
-    if one_ferret:
-        plt.title('Ranked list of features over their impact in predicting reaction time for' + ferrets + ' talker' +
-                  talkerlist[talker - 1])
-
-    plt.xlabel('SHAP value (impact on model output) on reaction time', fontsize=25)
-
-    # ax.set_yticklabels(labels)
-    plt.savefig(fig_savedir / 'shapsummaryplot_allanimals2.png', dpi=400, bbox_inches='tight')
-    plt.show()
+    # talkerlist = ['female', 'male'
+    #               ]
+    # # Plot the elbow plot
+    # plt.figure(figsize=(10, 6))
+    # plt.plot(feature_labels_words, cumulative_importances, marker='o', color='cyan')
+    # plt.xlabel('Features')
+    # plt.ylabel('Cumulative Feature Importance')
+    # if one_ferret:
+    #     plt.title(
+    #         'Elbow Plot of Cumulative Feature Importance for Correct Reaction Time Model for' + ferrets + ' talker' +
+    #         talkerlist[talker - 1], fontsize=15)
+    # else:
+    #     plt.title('Elbow Plot of Cumulative Feature Importance for Correct Reaction Time Model', fontsize=20)
+    # plt.xticks(rotation=45, ha='right')  # rotate x-axis labels for better readability
+    # plt.savefig(fig_savedir / 'elbowplot.png', dpi=500, bbox_inches='tight')
+    # plt.show()
+    #
+    # shap.summary_plot(shap_values, X, show=False, cmap=cmap_color)
+    #
+    # fig, ax = plt.gcf(), plt.gca()
+    # fig.set_size_inches(25, 9)
+    # # get the labels
+    # labels = ax.get_yticklabels()
+    # labels = [item.get_text() for item in ax.get_yticklabels()]
+    # # set the labels
+    # ax.set_yticklabels(np.flip(feature_labels_words[0:20]))
+    # # change fontsize of xticks
+    # plt.xticks(rotation=45, ha='right', fontsize=18)  # rotate x-axis labels for better readability
+    #
+    # if one_ferret:
+    #     plt.title('Ranked list of features over their impact in predicting reaction time for' + ferrets + ' talker' +
+    #               talkerlist[talker - 1])
+    #
+    # plt.xlabel('SHAP value (impact on model output) on reaction time', fontsize=25)
+    #
+    # # ax.set_yticklabels(labels)
+    # plt.savefig(fig_savedir / 'shapsummaryplot_allanimals2.png', dpi=400, bbox_inches='tight')
+    # plt.show()
 
     result = permutation_importance(xg_reg, X_test, y_test, n_repeats=100,
                                     random_state=123, n_jobs=2)
