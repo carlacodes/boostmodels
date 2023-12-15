@@ -347,8 +347,8 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
 
     cumulative_importances = np.cumsum(feature_importances)
 
-    # talkerlist = ['female', 'male'
-    #               ]
+    talkerlist = ['female', 'male'
+                  ]
     # # Plot the elbow plot
     # plt.figure(figsize=(10, 6))
     # plt.plot(feature_labels_words, cumulative_importances, marker='o', color='cyan')
@@ -810,6 +810,56 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
         # Display the chart
         plt.savefig(os.path.join((fig_savedir), str(talker) + '_permutationimportance_plot_2906_noannotation.png'), dpi=500, bbox_inches='tight')
         plt.show()
+        words_to_plot = [
+        "he takes",
+        "today",
+        "of science",
+        "but",
+        "sailor",
+        "any",
+        "accurate",
+        "in contrast",
+        "researched",
+        "boats",
+        "took",
+        "when a",
+        "craft"
+    ]
+        words_to_plot = words_to_plot[::-1]
+        feature_labels_words = feature_labels_words[::-1]
+
+        fig, ax = plt.subplots(figsize=(15, 5))
+        # do the same plot as above but with the words to plot
+        # get the indices of the words to plot
+        indices = []
+        # need to reverse the feature labels words to match the permutation importance values
+
+        for word in words_to_plot:
+            index = np.where(feature_labels_words == word)[0][0]
+            indices.append(index)
+        indices = np.array(indices)
+        indices = indices.flatten()
+
+        # get the values of the words to plot
+        values = data_perm_importance[indices]
+        # get the labels of the words to plot
+        labels = feature_labels_words[indices]
+        data_for_plot = pd.DataFrame({'labels': labels, 'values': values})
+        # data_for_plot = data_for_plot.sort_values(by='values', ascending=True)
+        labels = data_for_plot['labels']
+        values = data_for_plot['values']
+        plt.xticks(fontsize = 15)
+        plt.yticks(fontsize = 15)
+
+        # plot the values
+        ax.barh(labels, values, color=talker_color)
+        ax.set_xlabel('Permutation importance', fontsize=20)
+        ax.set_title('Permutation importance of words in absolute reaction time model, ' + talker_word + ' talker',
+                        fontsize=20)
+        plt.savefig(os.path.join((fig_savedir), str(talker) + 'permutationimportance_plot_frombehaviouralmodel_2906_noannotation.png'), dpi=500, bbox_inches='tight')
+        plt.show()
+
+
 
     return xg_reg, ypred, y_test, results
 
