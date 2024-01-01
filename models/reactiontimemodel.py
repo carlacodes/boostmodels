@@ -337,9 +337,9 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     fig, ax = plt.subplots()
     ax.barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, color = 'cyan')
     if one_ferret:
-        ax.set_title('Permutation Importances of the \n Reaction Time Model for ' + ferrets, fontsize = 13)
+        ax.set_title('Permutation Importances of the \n Reaction Time Model for ' + ferrets, fontsize = 20)
     else:
-        ax.set_title('Permutation Importances of the \n Reaction Time Model', fontsize = 13)
+        ax.set_title('Permutation Importances of the \n Reaction Time Model', fontsize = 20)
     plt.xlabel('Permutation Importance')
     fig.tight_layout()
     plt.savefig(fig_savedir / 'permutation_importance.png', dpi=300, bbox_inches='tight')
@@ -353,7 +353,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "precursor = target F0"], show=False, cmap = matplotlib.colormaps[cmapname])
     plt.xticks([1,2], labels = ['male', 'female'])
     if one_ferret:
-        plt.title('Talker versus impact \n on reaction time for ' + ferrets, fontsize=18)
+        plt.title('Talker versus impact \n on reaction time for ' + ferrets, fontsize=20)
     plt.savefig(fig_savedir / 'talker_vs_precursorequaltargF0.png', dpi=300, bbox_inches='tight')
 
     fig, ax = plt.subplots()
@@ -365,10 +365,10 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     colorbar_scatter.set_yticks([0,1])
     colorbar_scatter.set_yticklabels(['False', 'True'], fontsize=18)
     ax.set_xticks([0,1,2,3,4])
-    ax.set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18, rotation=45)
+    ax.set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=20, rotation=45)
     ax.set_xlabel('Ferret ID', fontsize=18)
     ax.set_ylabel('Influence on reaction time', fontsize=18)
-    plt.title('Mean SHAP value over ferret ID', fontsize=18)
+    plt.title('Mean SHAP value over ferret ID', fontsize=20)
     plt.savefig(fig_savedir /'ferretIDbyprecurequaltargF0.png', dpi=500, bbox_inches='tight')
     plt.show()
 
@@ -411,7 +411,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     ax.set_xticks([0, 1, 2, 3, 4])
     ax.set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18, rotation=45)
     ax.set_xlabel('Ferret ID', fontsize=18)
-    ax.set_ylabel('Impact on reaction time', fontsize=18)  # Corrected y-label
+    ax.set_ylabel('Impact on reaction time', fontsize=20)  # Corrected y-label
     handles, labels = ax.get_legend_handles_labels()
     labels_new = ['false', 'true']
     ax.legend(handles=handles[0:], labels=labels_new, title="precursor = target F0", fontsize=14, title_fontsize=16)
@@ -421,7 +421,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
 
     # Optionally add a legend
     # ax.legend(title="precursor = target F0", fontsize=14, title_fontsize=16)
-    ax.set_title('Precursor = target F0',  fontsize = 25)
+    ax.set_title('Precursor = target F0',  fontsize = 20)
 
     plt.savefig(fig_savedir / 'ferretIDbyprecurequaltargF0_violin.png', dpi=500, bbox_inches='tight')
     plt.show()
@@ -452,7 +452,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     handles, labels = ax.get_legend_handles_labels()
     labels = ['male', 'female']
     ax.legend(handles=handles[0:], labels=labels[0:], title="talker", fontsize=14, title_fontsize=16)
-    ax.set_title('Talker', fontsize = 25)
+    ax.set_title('Talker', fontsize = 20)
 
     plt.savefig(fig_savedir / 'ferretIDbytalker_violin.png', dpi=500, bbox_inches='tight')
     plt.show()
@@ -484,29 +484,19 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     handles, labels = ax.get_legend_handles_labels()
     labels = ['left', 'right']
     ax.legend(handles=handles[0:], labels=labels[0:], title="side of audio", fontsize=14, title_fontsize=16)
-    ax.set_title('Side of audio presentation', fontsize = 25)
+    ax.set_title('Side of audio presentation', fontsize = 20)
 
 
     plt.savefig(fig_savedir / 'ferretIDbysideofaudio_violin.png', dpi=500, bbox_inches='tight')
     plt.show()
-    # - talker
-    #
-    # - precursor = target
-    #
-    # - side
-    # of
-    # audio
-    #
-    # - time
-    # to
-    # target
+
 
     fig, ax = plt.subplots(figsize=(10, 10))
     shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "target F0"], show=False,
                        cmap=matplotlib.colormaps[cmapname])
     plt.xticks([1, 2], labels=['male', 'female'])
     if one_ferret:
-        plt.title('Talker versus impact \n on reaction time for ' + ferrets, fontsize=18)
+        plt.title('Talker versus impact \n on reaction time for ' + ferrets, fontsize=20)
     plt.savefig(fig_savedir / 'talker_vs_targetF0.png', dpi=300, bbox_inches='tight')
 
 
@@ -517,11 +507,11 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     # Modifying color bar parameters
     cb_ax.tick_params(labelsize=15)
     cb_ax.set_ylabel("Trial number", fontsize=12)
-    plt.ylabel('SHAP value', fontsize=10)
+    plt.ylabel('SHAP value', fontsize=18)
     if one_ferret:
-        plt.title('Target presentation time  versus impact \n on reacton time for ' + ferrets, fontsize=18)
+        plt.title('Target presentation time  versus impact \n on reacton time for ' + ferrets, fontsize=20)
     else:
-        plt.title('Target presentation time versus impact on reacton time', fontsize=18)
+        plt.title('Target presentation time versus impact on reacton time', fontsize=20)
     plt.ylabel('SHAP value', fontsize=16)
     plt.xlabel('Target presentation time', fontsize=16)
     plt.savefig(fig_savedir /'targtimescolouredbytrialnumber.png', dpi=300)
@@ -534,11 +524,11 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     # Modifying color bar parameters
     cb_ax.tick_params(labelsize=15)
     cb_ax.set_ylabel("talker", fontsize=12)
-    plt.ylabel('SHAP value', fontsize=10)
+    plt.ylabel('SHAP value', fontsize=18)
     if one_ferret:
-        plt.title('Precursor = target F0 \n over reacton time impact for ' + ferrets, fontsize=18)
+        plt.title('Precursor = target F0 \n over reacton time impact for ' + ferrets, fontsize=20)
     else:
-        plt.title('Precursor = target F0 over reaction time impact', fontsize=18)
+        plt.title('Precursor = target F0 over reaction time impact', fontsize=20)
     plt.ylabel('SHAP value', fontsize=16)
     plt.xlabel('Precursor = target F0', fontsize=16)
     plt.savefig(fig_savedir /'pitchofprecur_equals_target_colouredbytalker.png', dpi=500)
@@ -553,13 +543,13 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     # cb_ax.set_yticks([1, 2, 3,4, 5])
     # cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
     cb_ax.set_ylabel("Pitch of precursor = target", fontsize=12)
-    plt.ylabel('SHAP value', fontsize=10)
+    plt.ylabel('SHAP value', fontsize=18)
     if one_ferret:
-        plt.title('target F0 versus impact \n in predicted reacton time for ' + ferrets, fontsize=18)
+        plt.title('target F0 versus impact \n in predicted reacton time for ' + ferrets, fontsize=20)
     else:
-        plt.title('target F0 versus impact \n in predicted reacton time', fontsize=18)
-    plt.ylabel('SHAP value', fontsize=16)
-    plt.xlabel('target F0', fontsize=16)
+        plt.title('target F0 versus impact \n in predicted reacton time', fontsize=20)
+    plt.ylabel('SHAP value', fontsize=18)
+    plt.xlabel('target F0', fontsize=18)
     plt.xticks([1,2,3,4,5], labels=['109', '124', '144 ', '191', '251'], fontsize=15)
     plt.savefig( fig_savedir /'pitchoftargcolouredbyprecur.png', dpi=1000)
     plt.show()
@@ -574,13 +564,13 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         cb_ax.set_yticks([1, 2, 3,4, 5])
         # cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
         cb_ax.set_ylabel("Target presentation time ", fontsize=12)
-        plt.ylabel('SHAP value', fontsize=10)
+        plt.ylabel('SHAP value', fontsize=18)
         if one_ferret:
             plt.title('Ferret \n versus impact in predicted reacton time for' + ferrets[0], fontsize=18)
         else:
             plt.title('Ferret versus impact on reaction time', fontsize=18)
-        plt.ylabel('SHAP value', fontsize=16)
-        plt.xlabel('Ferret', fontsize=16)
+        plt.ylabel('SHAP value', fontsize=18)
+        plt.xlabel('Ferret', fontsize=18)
         # plt.xticks([1,2,3,4,5], labels=['109', '124', '144 ', '191', '251'], fontsize=15)
         plt.xticks([0,1,2,3,4], labels=['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'], fontsize=15)
         #rotate xtick labels:
@@ -598,13 +588,13 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
             cb_ax.tick_params(labelsize=15)
             cb_ax.set_yticks([0,1])
             # cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
-            plt.ylabel('SHAP value', fontsize=10)
+            plt.ylabel('SHAP value', fontsize=18)
             if one_ferret:
                 plt.title('Ferret versus impact \n in predicted reaction time for ' + ferrets, fontsize=18)
             else:
                 plt.title('Ferret versus impact in predicted reaction time', fontsize=18)
-            plt.ylabel('SHAP value', fontsize=16)
-            plt.xlabel('Ferret', fontsize=16)
+            plt.ylabel('SHAP value', fontsize=18)
+            plt.xlabel('Ferret', fontsize=18)
             # plt.xticks([1,2,3,4,5], labels=['109', '124', '144 ', '191', '251'], fontsize=15)
             plt.xticks([0, 1, 2, 3, 4], labels=['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'],
                        fontsize=15)
@@ -623,13 +613,13 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
             cb_ax.set_yticks([0, 1])
             cb_ax.set_yticklabels(['Left', 'Right'])
             # cb_ax.set_ylabel("Target presentation time ", fontsize=12)
-            plt.ylabel('SHAP value', fontsize=10)
+            plt.ylabel('SHAP value', fontsize=18)
             if one_ferret:
                 plt.title('Ferret \n versus impact in predicted reacton time for' + ferrets[0], fontsize=18)
             else:
                 plt.title('Ferret versus impact on reaction time', fontsize=18)
-            plt.ylabel('SHAP value', fontsize=16)
-            plt.xlabel('Ferret', fontsize=16)
+            plt.ylabel('SHAP value', fontsize=18)
+            plt.xlabel('Ferret', fontsize=18)
             # plt.xticks([1,2,3,4,5], labels=['109', '124', '144 ', '191', '251'], fontsize=15)
             plt.xticks([0, 1, 2, 3, 4],
                        labels=['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'],
@@ -651,12 +641,12 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         cb_ax.set_ylabel("ferret ", fontsize=12)
         # plt.xticks([0, 1, 2, 3, 4], labels=['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'],
         #            fontsize=15)
-        plt.ylabel('SHAP value', fontsize=10)
+        plt.ylabel('SHAP value', fontsize=18)
 
         plt.title('Side of audio versus impact on reaction time', fontsize=18)
 
-        # plt.ylabel('SHAP value', fontsize=16)
-        plt.xlabel('side', fontsize=16)
+        # plt.ylabel('SHAP value', fontsize=18)
+        plt.xlabel('side', fontsize=18)
         plt.xticks([0,1], labels=['left', 'right'], fontsize=15)
 
         # rotate xtick labels:
@@ -707,9 +697,9 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         cb_ax.set_yticks([1,2,3,4,5])
         cb_ax.set_yticklabels(['109', '124', '144 ', '191', '251'])
         cb_ax.set_yticklabels(['109', '124', '144 ', '191', '251'])
-        ax_dict['E'].set_ylabel('Impact on reaction time', fontsize=10)
+        ax_dict['E'].set_ylabel('Impact on reaction time', fontsize=18)
         # ax_dict['E'].set_title('Talker versus impact on reaction time', fontsize=13)
-        ax_dict['E'].set_xlabel('Talker', fontsize=16)
+        ax_dict['E'].set_xlabel('Talker', fontsize=18)
         ax_dict['E'].set_xticks([1,2])
         ax_dict['E'].set_xticklabels(['Male', 'Female'], rotation=45, ha='right')
 
@@ -720,12 +710,12 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         cb_ax.set_yticks([1, 2, 3,4, 5])
         cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
         cb_ax.tick_params(labelsize=15)
-        cb_ax.set_ylabel("target F0 (Hz)", fontsize=10)
+        cb_ax.set_ylabel("target F0 (Hz)", fontsize=18)
 
         # Modifying color bar parameters
         cb_ax.tick_params(labelsize=15)
-        ax_dict['C'].set_ylabel('Impact on reaction time', fontsize=10)
-        ax_dict['C'].set_xlabel('Ferret ID', fontsize=16)
+        ax_dict['C'].set_ylabel('Impact on reaction time', fontsize=18)
+        ax_dict['C'].set_xlabel('Ferret ID', fontsize=18)
         ax_dict['C'].set_xticks([0, 1, 2, 3, 4])
         # ax_dict['C'].set_title('Ferret ID versus impact on reaction time', fontsize=13)
 
