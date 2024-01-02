@@ -510,7 +510,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
             bottom += values
         ax.set_ylabel('Permutation importance', fontsize=15)
         ax.set_title('Top 5 features for predicting absolute release time, ' + talkerlist[talker - 1] + ' talker',
-                               fontsize=15)
+                               fontsize=30)
         ax.set_xticks(np.arange(len(all_labels)))
         ax.set_xticklabels(all_labels, rotation=70, fontsize=10)
         ax.legend()
@@ -805,7 +805,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
         kwargs = dict(transform=ax1.transAxes, color='k', clip_on=False)
         ax1.plot((1 - d, 1 + d), (-d, +d), **kwargs)
         ax1.plot((1 - d, 1 + d), (1 - d, 1 + d), **kwargs)
-        fig.text(0.5, 0.00, 'Permutation Importance', ha='center', va='center', fontsize = 12)  # Add a common x-axis label
+        fig.text(0.5, 0.00, 'Permutation Importance', ha='center', va='center', fontsize = 30)  # Add a common x-axis label
 
         # Display the chart
         plt.savefig(os.path.join((fig_savedir), str(talker) + '_permutationimportance_plot_2906_noannotation.png'), dpi=500, bbox_inches='tight')

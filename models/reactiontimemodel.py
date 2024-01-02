@@ -320,12 +320,17 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
 
     import matplotlib.image as mpimg
     fig.set_size_inches(9, 15)
-    ax.set_xlabel('SHAP Value (impact on model output)', fontsize=18)
+    ax.set_xlabel('SHAP Value (impact \n on model output)', fontsize=36)
+    #get the color bar
+    colorbar = fig.axes[1]
+    #change the font size of the color bar
+    colorbar.tick_params(labelsize=30)
     #increase the y tick label size
-    ax.tick_params(axis='y', which='major', labelsize=17, rotation = 45)
+    ax.tick_params(axis='y', which='major', labelsize=25, rotation = 45)
+    ax.tick_params(axis='x', which='major', labelsize=25)
     # ax.set_yticklabels(np.flip(feature_labels), fontsize=17, rotation = 45)
 
-    ax.set_ylabel('Features', fontsize=18)
+    # ax.set_ylabel('Features', fontsize=18)
     plt.savefig(fig_savedir / 'shapsummaryplot_allanimals2.png', dpi=300, bbox_inches='tight')
 
     plt.show()
@@ -670,8 +675,8 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
 
         # Plot the elbow plot
         ax_dict['A'].plot(feature_labels, cumulative_importances, marker='o', color='cyan')
-        ax_dict['A'].set_xlabel('Features')
-        ax_dict['A'].set_ylabel('Cumulative Feature Importance')
+        ax_dict['A'].set_xlabel('Features', fontsize=18)
+        ax_dict['A'].set_ylabel('Cumulative Feature Importance', fontsize=18)
         # ax_dict['A'].set_title('Elbow Plot of Cumulative Feature Importance for Rxn Time Prediction')
         ax_dict['A'].set_xticklabels(feature_labels, rotation=20, ha='right')  # rotate x-axis labels for better readability
 
@@ -684,7 +689,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
 
         ax_dict['D'].barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, color='cyan')
         # ax_dict['D'].set_title("Permutation importances on reaction time")
-        ax_dict['D'].set_xlabel("Permutation importance")
+        ax_dict['D'].set_xlabel("Permutation importance", fontsize = 18)
 
 
         shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "target F0"], ax=ax_dict['E'],
@@ -722,7 +727,6 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         ax_dict['C'].set_xticklabels(ferret_id_only, rotation=45, ha='right')
         # ax_dict['C'].set_title('Ferret ID and precursor = target F0 versus SHAP value on miss probability', fontsize=18)
         #remove padding outside the figures
-        font_props = fm.FontProperties(weight='bold', size=17)
         #
         # ax_dict['A'].annotate('a)', xy=get_axis_limits(ax_dict['A']), xytext=(-0.1, ax_dict['A'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props, zorder=10)
         # ax_dict['B'].annotate('b)', xy=get_axis_limits(ax_dict['B']), xytext=(-0.1, ax_dict['B'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
@@ -738,7 +742,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         #             fontsize=25, va='bottom', weight='bold')
 
         # plt.tight_layout()
-        plt.suptitle('Correct hit response reaction times', fontsize=18)
+        plt.suptitle('Correct hit response reaction times', fontsize=25)
 
         plt.subplots_adjust(wspace=0.2, hspace=0.4)
 

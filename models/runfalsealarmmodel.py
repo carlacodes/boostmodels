@@ -560,12 +560,12 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     fig.set_size_inches(7, 12)
     ax.set_xlabel('Mean SHAP value', fontsize=18)
     ax.set_yticks(range(len(feature_labels)))
-    ax.set_yticklabels(np.flip(feature_labels), fontsize=17, rotation = 45)
+    ax.set_yticklabels(np.flip(feature_labels), fontsize=18, rotation = 45)
     legend_handles, legend_labels = ax.get_legend_handles_labels()
     #reinsert the legend_hanldes and labels
     ax.legend(legend_handles, ['Correct Rejection', 'False Alarm'], loc='upper right', fontsize=13)
 
-    ax.set_xlabel('Impact on p(FA)')
+    ax.set_xlabel('Impact on p(FA)', fontsize=36)
     fig.tight_layout()
     plt.savefig(fig_dir / 'ranked_features1409.png', dpi=1000, bbox_inches="tight")
     plt.show()
@@ -957,8 +957,8 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
 
     # Plot the elbow plot
     ax_dict['A'].plot(feature_labels, cumulative_importances, marker='o', color='slategray')
-    ax_dict['A'].set_xlabel('Features')
-    ax_dict['A'].set_ylabel('Cumulative \n feature importance')
+    # ax_dict['A'].set_xlabel('Features', fontsize=18)
+    ax_dict['A'].set_ylabel('Cumulative \n feature importance', fontsize=18)
     # ax_dict['A'].set_title('Elbow plot of cumulative feature importance for false alarm model', fontsize=13)
     #decrease fontsize of xtick labels
     ax_dict['A'].set_xticklabels(feature_labels, rotation=20, ha='right')  # rotate x-axis labels for better readability
@@ -973,7 +973,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
 
     ax_dict['D'].barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, color='slategray')
     # ax_dict['D'].set_title("Permutation importances on false alarm probability")
-    # ax_dict['D'].set_xlabel("Permutation importance")
+    ax_dict['D'].set_xlabel("Permutation importance", fontsize=18)
 
     #
     # shap.plots.scatter(shap_values2[:, "intra-trial F0 roving"], color=shap_values2[:, "ferret ID"], ax=ax_dict['E'],
@@ -1007,7 +1007,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     ax_dict['E'].set_xticks([0, 1, 2, 3, 4])
     ax_dict['E'].set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], rotation=45)
     ax_dict['E'].set_xlabel('Ferret ID', fontsize=18)
-    ax_dict['E'].set_ylabel('Impact on p(FA)', fontsize=10)  # Corrected y-label
+    ax_dict['E'].set_ylabel('Impact on p(FA)', fontsize=18)  # Corrected y-label
 
     # plt.title('Mean SHAP value over ferret ID', fontsize=18)
 
@@ -1016,7 +1016,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     handles, labels =  ax_dict['E'].get_legend_handles_labels()
     labels = ['False', 'True']
     ax_dict['E'].legend(handles=handles[0:], labels=labels[0:], title="", fontsize=12, title_fontsize=12)
-    ax_dict['E'].set_xlabel('Intra trial F0 roving', fontsize=16)
+    ax_dict['E'].set_xlabel('Intra trial F0 roving', fontsize=18)
 
     # shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "F0"], ax=ax_dict['C'],
     #                    cmap =cmapcustom, show=False)
@@ -1034,14 +1034,14 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     cax.tick_params(labelsize=15)
     cax.set_yticks([1, 2, 3, 4, 5])
     cax.set_yticklabels(['109', '124', '144', '191', '251'])
-    cax.set_ylabel("F0 (Hz)", fontsize=12)
+    cax.set_ylabel("F0 (Hz)", fontsize=18)
     # ax_dict['C'].set_xlim(0.8, 5.2)
 
-    ax_dict['C'].set_xlabel('talker', fontsize=16)
+    ax_dict['C'].set_xlabel('talker', fontsize=18)
     ax_dict['C'].set_xticks([1,2])
     ax_dict['C'].set_xticklabels(['Female', 'Male'])
 
-    ax_dict['C'].set_ylabel('Impact on p(FA)', fontsize=10)
+    ax_dict['C'].set_ylabel('Impact on p(FA)', fontsize=18)
 
 
 
@@ -1058,7 +1058,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     #             fontsize=25, va='bottom', weight = 'bold')
 
     # plt.tight_layout()
-    plt.suptitle('Non-target and target words: false alarm vs. no false alarm model', fontsize=18)
+    plt.suptitle('Non-target and target words: false alarm vs. no false alarm model', fontsize=25)
     plt.subplots_adjust(wspace=0.2, hspace=0.4)
 
     plt.savefig(fig_dir / 'big_summary_plot_2_noannotations.png', dpi=500, bbox_inches="tight")

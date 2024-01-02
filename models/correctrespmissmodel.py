@@ -365,7 +365,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     fig, ax = plt.gcf(), plt.gca()
 
     fig.set_size_inches(6, 12)
-    ax.set_xlabel('Impact on p(miss)', fontsize=18)
+    ax.set_xlabel('Impact on p(miss)', fontsize=36)
     # ax.set_yticks(range(len(feature_labels)))
     #for some reason y ticks are set in reverse order
     ax.set_yticklabels(np.flip(feature_labels), fontsize=17, rotation = 45)
@@ -515,7 +515,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     # Plot the elbow plot
     ax_dict['A'].plot(feature_labels, cumulative_importances, marker='o', color='gold')
     # ax_dict['A'].set_xlabel('Features')
-    ax_dict['A'].set_ylabel('Cumulative Feature Importance')
+    ax_dict['A'].set_ylabel('Cumulative Feature Importance', fontsize = 18)
     # ax_dict['A'].set_title('Elbow plot for miss vs hit', fontsize=13)
     ax_dict['A'].set_xticklabels(feature_labels, rotation=20, ha='right')  # rotate x-axis labels for better readability
 
@@ -528,7 +528,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
 
     ax_dict['D'].barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, color='peru')
     # ax_dict['D'].set_title("Permutation importances on predicting a miss")
-    ax_dict['D'].set_xlabel("Permutation importance")
+    ax_dict['D'].set_xlabel("Permutation importance", fontsize=18)
 
 
     # shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "precursor = target F0"], ax=ax_dict['E'],
@@ -553,11 +553,11 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     # # Modifying color bar parameters
     # cb_ax.tick_params(labelsize=15)
     # cb_ax.set_ylabel("precursor = target F0 word", fontsize=15)
-    ax_dict['E'].set_ylabel('Impact on p(miss)', fontsize=10)
+    ax_dict['E'].set_ylabel('Impact on p(miss)', fontsize=18)
     # ax_dict['E'].set_title('Talker versus impact on miss probability', fontsize=18)
     cb_ax.set_yticks([1, 2, 3,4, 5])
     cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
-    cb_ax.set_ylabel("target F0 (Hz)", fontsize=15)
+    cb_ax.set_ylabel("target F0 (Hz)", fontsize=18)
     cb_ax.tick_params(labelsize=15)
     # ax_dict['E'].set_xlabel('Talker', fontsize=16)
     ax_dict['E'].set_xlabel('')
@@ -574,21 +574,20 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     cb_ax.set_yticks([1, 2, 3,4, 5])
     cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
     cb_ax.tick_params(labelsize=15)
-    cb_ax.set_ylabel("target F0 (Hz)", fontsize=15)
+    cb_ax.set_ylabel("target F0 (Hz)", fontsize=18)
 
     # Modifying color bar parameters
     cb_ax.tick_params(labelsize=15)
-    ax_dict['C'].set_ylabel('Impact on p(miss)', fontsize=10)
+    ax_dict['C'].set_ylabel('Impact on p(miss)', fontsize=18)
     # ax_dict['C'].set_xlabel('Ferret ID', fontsize=16)
     ax_dict['C'].set_xlabel('')
     ax_dict['C'].set_xticks([0, 1, 2, 3, 4])
-    ax_dict['C'].set_xticklabels(ferret_id_only, fontsize=12, rotation = 45, ha='right')
+    ax_dict['C'].set_xticklabels(ferret_id_only, fontsize=18, rotation = 45, ha='right')
 
     # ax_dict['C'].set_xticklabels(ferrets, fontsize=16)
 
     # ax_dict['C'].set_title('Ferret ID and precursor = target F0 versus SHAP value on miss probability', fontsize=18)
     #remove padding outside the figures
-    font_props = fm.FontProperties(weight='bold', size=17)
     #
     # ax_dict['A'].annotate('a)', xy=get_axis_limits(ax_dict['A']), xytext=(-0.1, ax_dict['A'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props, zorder=10)
     # ax_dict['B'].annotate('b)', xy=get_axis_limits(ax_dict['B']), xytext=(-0.1, ax_dict['B'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
@@ -605,7 +604,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
 
     # plt.tight_layout()
 
-    plt.suptitle('Target words: miss versus hit model', fontsize=18)
+    plt.suptitle('Target words: miss versus hit model', fontsize=25)
     plt.subplots_adjust(wspace=0.2, hspace=0.4)
 
     # plt.tight_layout()
