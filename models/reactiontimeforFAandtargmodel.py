@@ -806,8 +806,8 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
         ax1.plot((1 - d, 1 + d), (-d, +d), **kwargs)
         ax1.plot((1 - d, 1 + d), (1 - d, 1 + d), **kwargs)
         #increase the x ticks font size
-        ax1.tick_params(axis='x', labelsize=15)
-        ax2.tick_params(axis='x', labelsize=15)
+        ax1.tick_params(axis='x', labelsize=12)
+        ax2.tick_params(axis='x', labelsize=12)
 
         fig.text(0.5, 0.00, 'Permutation Importance', ha='center', va='center', fontsize = 30)  # Add a common x-axis label
 

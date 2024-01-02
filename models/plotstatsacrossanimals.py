@@ -1012,7 +1012,12 @@ def plot_stats_by_pitch(stats_dict_all_combined, stats_dict_combined, stats_dict
     fig, ((ax1, ax2)) = plt.subplots(2,1, layout='constrained',figsize=(0.8*text_width_inches,0.9*text_width_inches))
     #make a panel for the subplots to go into
 
-    color_map = plt.cm.get_cmap('tab10')  # Choose a colormap
+    color_map = plt.cm.get_cmap('tab20')  # Choose a colormap
+    #remove orange and green from the color map
+    color_map = color_map(np.delete(np.arange(20), [0,1,2,3,4,5]))
+
+    #remove orange and green from the color map, make a custom colour map
+
 
     for attribute, measurement in stats_dict_all_combined.items():
 
@@ -1120,6 +1125,7 @@ def plot_stats_by_pitch(stats_dict_all_combined, stats_dict_combined, stats_dict
 
     plt.savefig('figs/proportionofhitsbyF0_noaxisannotation.pdf', dpi = 500, bbox_inches='tight')
     plt.show()
+    return
 
 
 def plot_stats_by_pitch_lineplot(stats_dict_all_combined, stats_dict_combined, stats_dict_all_inter, stats_dict_inter, stats_dict_all_intra, stats_dict_intra):
@@ -1545,9 +1551,10 @@ if __name__ == '__main__':
 
     run_repeated_anova(stats_dict_inter, stats_dict_intra, stats_dict_control)
 
-    # stats_dict_all_bypitch, stats_dict_bypitch = run_stats_calc_by_pitch_mf(df, ferrets, stats_dict_empty, pitch_param=None)
+    stats_dict_all_bypitch, stats_dict_bypitch = run_stats_calc_by_pitch_mf(df, ferrets, stats_dict_empty, pitch_param=None)
     # stats_dict_all_intra, stats_dict_intra = run_stats_calc(df, ferrets, pitch_param='intra_trial_roving')
-    # plot_stats_by_pitch_lineplot(stats_dict_all_bypitch, stats_dict_bypitch, stats_dict_all_inter, stats_dict_inter, stats_dict_all_intra, stats_dict_intra)
+    plot_stats_by_pitch(stats_dict_all_bypitch, stats_dict_bypitch, stats_dict_all_inter, stats_dict_inter, stats_dict_all_intra, stats_dict_intra)
+    plot_stats_by_pitch_lineplot(stats_dict_all_bypitch, stats_dict_bypitch, stats_dict_all_inter, stats_dict_inter, stats_dict_all_intra, stats_dict_intra)
     #
     # #
     stats_dict_all_bypitch, stats_dict_bypitch, kw_dict_bypitch = run_stats_calc_by_pitch(df, ferrets, stats_dict_empty, pitch_param=None)
