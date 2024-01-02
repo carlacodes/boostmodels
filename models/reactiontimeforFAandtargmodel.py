@@ -508,7 +508,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
                     values[j] = permutation_importance_dict[ferret][index]
             ax.bar(positions, values, width, bottom=bottom, label=ferret, color=color_list_bar[i])
             bottom += values
-        ax.set_ylabel('Permutation importance', fontsize=25)
+        ax.set_ylabel('Permutation importance', fontsize=20)
         ax.set_title('Top 5 features for predicting absolute release time, ' + talkerlist[talker - 1] + ' talker',
                                fontsize=30)
         ax.set_xticks(np.arange(len(all_labels)))
@@ -806,8 +806,8 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
         ax1.plot((1 - d, 1 + d), (-d, +d), **kwargs)
         ax1.plot((1 - d, 1 + d), (1 - d, 1 + d), **kwargs)
         #increase the x ticks font size
-        ax1.tick_params(axis='x', labelsize=20)
-        ax2.tick_params(axis='x', labelsize=20)
+        ax1.tick_params(axis='x', labelsize=15)
+        ax2.tick_params(axis='x', labelsize=15)
 
         fig.text(0.5, 0.00, 'Permutation Importance', ha='center', va='center', fontsize = 30)  # Add a common x-axis label
 
