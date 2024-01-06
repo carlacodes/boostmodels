@@ -40,14 +40,14 @@ def get_training_metadata(ferrets):
         #sort the list of dictionaries by date
         list_of_dicts_for_ferret.sort(key=lambda x: x['date'])
         #get the first and last date
-        first_date = list_of_dicts_for_ferret[0]['date']
+        first_date = list_of_dicts_for_ferret[1]['date'] #take the second date because the first date likely could be an error
         last_date = list_of_dicts_for_ferret[-1]['date']
         #get the number of days between the first and last date
         num_days = (last_date - first_date).days
         #get the number of sessions
         #get the first three weeks of sessions
         #filter out the first three weeks of sessions
-        list_of_dicts_for_ferret2 = [x for x in list_of_dicts_for_ferret if (x['date'] - first_date).days >= 21]
+        list_of_dicts_for_ferret2 = [x for x in list_of_dicts_for_ferret if (x['date'] - first_date).days <= 21]
         #move each file in list_of_dicts_for_ferret2 to a different directory
         for file in list_of_dicts_for_ferret2:
             #get the name of the file
