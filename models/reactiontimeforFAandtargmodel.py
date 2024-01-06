@@ -809,7 +809,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
         ax1.tick_params(axis='x', labelsize=12)
         ax2.tick_params(axis='x', labelsize=12)
 
-        fig.text(0.5, 0.00, 'Permutation Importance', ha='center', va='center', fontsize = 30)  # Add a common x-axis label
+        fig.text(0.5, 0.00, 'Permutation Importance', ha='center', va='center', fontsize = 25)  # Add a common x-axis label
 
         # Display the chart
         plt.savefig(os.path.join((fig_savedir), str(talker) + '_permutationimportance_plot_2906_noannotation.png'), dpi=500, bbox_inches='tight')
@@ -1448,7 +1448,7 @@ def main():
     # ferrets = ['F1815_Cruella']# , 'F2105_Clove']
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
 
-    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=False, talker=1)
+    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=False, talker=2)
 
     # for ferret in ferrets:
     #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)

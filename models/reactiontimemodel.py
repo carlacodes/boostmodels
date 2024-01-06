@@ -325,6 +325,8 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     colorbar = fig.axes[1]
     #change the font size of the color bar
     colorbar.tick_params(labelsize=30)
+    #change the label of the color bar
+    colorbar.set_ylabel(None)
     #increase the y tick label size
     ax.tick_params(axis='y', which='major', labelsize=25, rotation = 45)
     ax.tick_params(axis='x', which='major', labelsize=25)

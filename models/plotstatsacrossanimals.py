@@ -9,6 +9,7 @@ from sklearn.inspection import permutation_importance
 import scikit_posthocs as sp
 from statsmodels.stats.multicomp import MultiComparison
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
+from matplotlib.colors import ListedColormap
 
 import shap
 import matplotlib
@@ -1011,10 +1012,13 @@ def plot_stats_by_pitch(stats_dict_all_combined, stats_dict_combined, stats_dict
     text_width_inches = text_width_pt / 72.27
     fig, ((ax1, ax2)) = plt.subplots(2,1, layout='constrained',figsize=(0.8*text_width_inches,0.9*text_width_inches))
     #make a panel for the subplots to go into
+    color_map = plt.cm.get_cmap('tab20')
 
-    color_map = plt.cm.get_cmap('tab20')  # Choose a colormap
-    #remove orange and green from the color map
-    color_map = color_map(np.delete(np.arange(20), [0,1,2,3,4,5]))
+    colors_to_remove = [0, 1, 2, 3 ,4,5]
+
+    # Create a colormap without the specified colors
+    new_colors = [color_map(i) for i in range(color_map.N) if i not in colors_to_remove]
+    color_map = ListedColormap(new_colors)
 
     #remove orange and green from the color map, make a custom colour map
 
