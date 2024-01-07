@@ -531,7 +531,7 @@ def run_stats_calc_by_pitch_mf(df, ferrets, stats_dict, pitch_param = 'inter_tri
         for key in stats_dict[i+1].keys():
             for key2 in list(stats_dict[i+1][key].keys()):
 
-                if np.isnan(stats_dict[i+1][key][key2]):
+                if np.isnan(stats_dict[i+1][key][key2]) or np.isinf(stats_dict[i+1][key][key2]):
                     del stats_dict[i+1][key][key2]
 
         correct_response = np.mean(list(stats_dict[i+1]['correct_response'].values()))
