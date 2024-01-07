@@ -1,0 +1,4 @@
+,group1,group2,meandiff,p-adj,lower,upper,reject
+0,control,inter,-0.5522,0.0146,-0.9912,-0.1132,True
+1,control,intra,-0.0939,0.8378,-0.5329,0.3451,False
+2,inter,intra,0.4583,0.0407,0.0193,0.8973,True

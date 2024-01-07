@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import sklearn.metrics
 # from rpy2.robjects import pandas2ri
@@ -252,7 +253,10 @@ def run_stats_calc(df, ferrets, pitch_param = 'control_trial'):
             stats_dict[talker][pitch_param]['dprime'][ferret] = CalculateStats.dprime(np.mean(selected_ferret_talker_hitrate['hit']), np.mean(selected_ferret_all_talker['falsealarm']))
             stats_dict[talker][pitch_param]['bias'][ferret] = CalculateStats.bias(np.mean(selected_ferret_talker_hitrate['hit']), np.mean(selected_ferret_all_talker['falsealarm']))
             #%Correct(hit + CR / hits + misses + CR + FA)
-            stats_dict[talker][pitch_param]['correct_response'][ferret] = (len(selected_ferret_talker[selected_ferret_talker['hit']==True]) + len(selected_ferret_catch_talker[selected_ferret_catch_talker['response'] == 3]))/ (len(selected_ferret_talker) + len(selected_ferret_catch_talker))
+            try:
+                stats_dict[talker][pitch_param]['correct_response'][ferret] = (len(selected_ferret_talker[selected_ferret_talker['hit']==True]) + len(selected_ferret_catch_talker[selected_ferret_catch_talker['response'] == 3]))/ (len(selected_ferret_talker) + len(selected_ferret_catch_talker))
+            except:
+                stats_dict[talker][pitch_param]['correct_response'][ferret] = np.nan
         count += 1
     stats_dict_all = {}
     stats_dict_all[1] ={}
@@ -272,6 +276,14 @@ def run_stats_calc(df, ferrets, pitch_param = 'control_trial'):
         # correct_rejections = np.mean(df_catchnoncorrection_talker['response'] == 3)
         # correct_response =  (len(df_noncatchnoncorrection_talker[df_noncatchnoncorrection_talker['hit']==True]) + len(df_catchnoncorrection_talker[df_catchnoncorrection_talker['response'] == 3]))/ (len(df_noncorrection_talker))
         #take mean of all the values in the dictionary
+        #scan through the dictionary and remove all entries that are nan
+        for key in stats_dict[talker][pitch_param].keys():
+            for key2 in list(stats_dict[talker][pitch_param][key].keys()):
+
+                if np.isnan(stats_dict[talker][pitch_param][key][key2]) or np.isinf(stats_dict[talker][pitch_param][key][key2]):
+                    del stats_dict[talker][pitch_param][key][key2]
+
+
 
 
         correct_response = np.mean(list(stats_dict[talker][pitch_param]['correct_response'].values()))
@@ -489,7 +501,10 @@ def run_stats_calc_by_pitch_mf(df, ferrets, stats_dict, pitch_param = 'inter_tri
             stats_dict[i+1]['dprime'][ferret] = CalculateStats.dprime(np.mean(selected_ferret_talker_hitrate['hit']), np.mean(selected_ferret_all_talker['falsealarm']))
             stats_dict[i+1]['bias'][ferret] = CalculateStats.bias(np.mean(selected_ferret_talker_hitrate['hit']), np.mean(selected_ferret_all_talker['falsealarm']))
             #%Correct(hit + CR / hits + misses + CR + FA)
-            stats_dict[i+1]['correct_response'][ferret] = (len(selected_ferret_talker[selected_ferret_talker['hit']==True]) + len(selected_ferret_catch_talker[selected_ferret_catch_talker['response'] == 3]))/ (len(selected_ferret_talker) + len(selected_ferret_catch_talker))
+            try:
+                stats_dict[i+1]['correct_response'][ferret] = (len(selected_ferret_talker[selected_ferret_talker['hit']==True]) + len(selected_ferret_catch_talker[selected_ferret_catch_talker['response'] == 3]))/ (len(selected_ferret_talker) + len(selected_ferret_catch_talker))
+            except:
+                stats_dict[i + 1]['correct_response'][ferret] = np.nan
         count += 1
     stats_dict_all = {}
 
@@ -513,6 +528,11 @@ def run_stats_calc_by_pitch_mf(df, ferrets, stats_dict, pitch_param = 'inter_tri
         # correct_response =  (len(df_noncatchnoncorrection_talker[df_noncatchnoncorrection_talker['hit']==True]) + len(df_catchnoncorrection_talker[df_catchnoncorrection_talker['response'] == 3]))/ (len(df_noncorrection_talker))
         #take mean of all the values in the dictionary
 
+        for key in stats_dict[i+1].keys():
+            for key2 in list(stats_dict[i+1][key].keys()):
+
+                if np.isnan(stats_dict[i+1][key][key2]):
+                    del stats_dict[i+1][key][key2]
 
         correct_response = np.mean(list(stats_dict[i+1]['correct_response'].values()))
         hits = np.mean(list(stats_dict[i+1]['hits'].values()))
@@ -1542,18 +1562,18 @@ if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
     df = behaviouralhelperscg.get_stats_df(ferrets=ferrets, startdate='04-01-2016', finishdate='01-03-2023', path = 'D:/Data/L27and28_training_filtered/')
     kw_dict =  kw_test(df)
+    ferrets_inter = [ 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
     stats_dict_all_inter, stats_dict_inter = run_stats_calc_by_pitch_mf(df, ferrets, stats_dict_empty, pitch_param='inter_trial_roving')
     stats_dict_all_intra, stats_dict_intra = run_stats_calc(df, ferrets, pitch_param='intra_trial_roving')
     stats_dict_all_control, stats_dict_control = run_stats_calc(df, ferrets, pitch_param='control_trial')
 
-    run_repeated_anova(stats_dict_inter, stats_dict_intra, stats_dict_control)
+    # run_repeated_anova(stats_dict_inter, stats_dict_intra, stats_dict_control)
 
     stats_dict_all_bypitch, stats_dict_bypitch = run_stats_calc_by_pitch_mf(df, ferrets, stats_dict_empty, pitch_param=None)
     # stats_dict_all_intra, stats_dict_intra = run_stats_calc(df, ferrets, pitch_param='intra_trial_roving')
     plot_stats_by_pitch(stats_dict_all_bypitch, stats_dict_bypitch, stats_dict_all_inter, stats_dict_inter, stats_dict_all_intra, stats_dict_intra)
     plot_stats_by_pitch_lineplot(stats_dict_all_bypitch, stats_dict_bypitch, stats_dict_all_inter, stats_dict_inter, stats_dict_all_intra, stats_dict_intra)
-    #
-    # #
+
     stats_dict_all_bypitch, stats_dict_bypitch, kw_dict_bypitch = run_stats_calc_by_pitch(df, ferrets, stats_dict_empty, pitch_param=None)
     stats_dict_all_intra, stats_dict_intra = run_stats_calc(df, ferrets, pitch_param='intra_trial_roving')
 
