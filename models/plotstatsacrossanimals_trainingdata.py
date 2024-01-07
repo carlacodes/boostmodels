@@ -1418,7 +1418,7 @@ def plot_stats_by_pitch_lineplot(stats_dict_all_combined, stats_dict_combined, s
 
 def run_barplot_pipeline():
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    df = behaviouralhelperscg.get_stats_df(ferrets=ferrets, startdate='04-01-2016', finishdate='01-03-2023')
+    df = behaviouralhelperscg.get_stats_df(ferrets=ferrets, startdate='04-01-2016', finishdate='01-03-2023', path = 'D:/Data/L27and28_training_filtered/')
     stats_dict = {}
     pitch_type_list = ['control_trial', 'inter_trial_roving', 'intra_trial_roving']
     stats_dict_all_combined = {}
@@ -1558,7 +1558,7 @@ def run_repeated_anova(stats_dict_inter, stats_dict_intra, stats_dict_control):
 if __name__ == '__main__':
     run_simulated_releasetimes()
     stats_dict_empty = {}
-    # run_barplot_pipeline()
+    run_barplot_pipeline()
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
     df = behaviouralhelperscg.get_stats_df(ferrets=ferrets, startdate='04-01-2016', finishdate='01-03-2023', path = 'D:/Data/L27and28_training_filtered/')
     kw_dict =  kw_test(df)
