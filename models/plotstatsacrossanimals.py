@@ -1476,13 +1476,13 @@ def run_repeated_anova(stats_dict_inter, stats_dict_intra, stats_dict_control):
                 for ferretkey in stats_dict_control[key][trialkey][statkey].keys():
                     list.append(stats_dict_control[key][trialkey][statkey][ferretkey])
                 stat_dict_control2[key][statkey] = list
-    for key in stats_dict_inter.keys():
-        stat_dict_inter2[key] = {}
-        for statkey in stats_dict_inter[key].keys():
-            list = []
-            for ferretkey in stats_dict_inter[key][statkey].keys():
-                list.append(stats_dict_inter[key][statkey][ferretkey])
-            stat_dict_inter2[key][statkey] = list
+    # for key in stats_dict_inter.keys():
+    #     stat_dict_inter2[key] = {}
+    #     for statkey in stats_dict_inter[key].keys():
+    #         list = []
+    #         for ferretkey in stats_dict_inter[key][statkey].keys():
+    #             list.append(stats_dict_inter[key][statkey][ferretkey])
+    #         stat_dict_inter2[key][statkey] = list
     for key in stats_dict_intra.keys():
         stat_dict_intra2[key] = {}
         for trialkey in stats_dict_intra[key].keys():
@@ -1492,12 +1492,22 @@ def run_repeated_anova(stats_dict_inter, stats_dict_intra, stats_dict_control):
                 for ferretkey in stats_dict_intra[key][trialkey][statkey].keys():
                     list.append(stats_dict_intra[key][trialkey][statkey][ferretkey])
                 stat_dict_intra2[key][statkey] = list
+    for key in stats_dict_inter.keys():
+        stat_dict_inter2[key] = {}
+        for trialkey in stats_dict_inter[key].keys():
+            for statkey in stats_dict_inter[key][trialkey].keys():
+                list = []
+
+                for ferretkey in stats_dict_inter[key][trialkey][statkey].keys():
+                    list.append(stats_dict_inter[key][trialkey][statkey][ferretkey])
+                stat_dict_inter2[key][statkey] = list
+
 
     # stats_dict_inter = pd.DataFrame.from_dict(stats_dict_inter)
     for talker in [1,2]:
-        stats_dict_inter2 = pd.DataFrame.from_dict(stat_dict_inter2[1])
-        stats_dict_intra2 = pd.DataFrame.from_dict(stat_dict_intra2[1])
-        stats_dict_control2 = pd.DataFrame.from_dict(stat_dict_control2[1])
+        stats_dict_inter2 = pd.DataFrame.from_dict(stat_dict_inter2[talker])
+        stats_dict_intra2 = pd.DataFrame.from_dict(stat_dict_intra2[talker])
+        stats_dict_control2 = pd.DataFrame.from_dict(stat_dict_control2[talker])
         #concatrenate the dataframes
         #add a roving type column
         stats_dict_inter2['roving_type'] = 'inter'
@@ -1524,15 +1534,106 @@ def run_repeated_anova(stats_dict_inter, stats_dict_intra, stats_dict_control):
 
 
             eta_squared_df = pd.DataFrame({'partial_eta_squared': [partial_eta_squared]})
-            eta_squared_df.to_csv(f'D:\mixedeffectmodelsbehavioural\metrics/eta_squared_rovingtype_{value}.csv')
+            eta_squared_df.to_csv(f'D:\mixedeffectmodelsbehavioural\metrics/eta_squared_rovingtype_{value}_talker_{talker}.csv')
             #export to csv
             tukey_df = pd.DataFrame(data=posthocresults._results_table.data[1:],
                                     columns=posthocresults._results_table.data[0])
 
-            tukey_df.to_csv(f'D:\mixedeffectmodelsbehavioural\metrics/posthocresults_by_rovingtype_{value}.csv')
-            anovaresults.anova_table.to_csv(f'D:\mixedeffectmodelsbehavioural\metrics/anova_results_by_rovingtype_{value}.csv')
+            tukey_df.to_csv(f'D:\mixedeffectmodelsbehavioural\metrics/posthocresults_by_rovingtype_{value}_talker_{talker}.csv')
+            anovaresults.anova_table.to_csv(f'D:\mixedeffectmodelsbehavioural\metrics/anova_results_by_rovingtype_{value}_talker_{talker}.csv')
 
             print(anovaresults)
+
+    # stats_dict_inter3 = pd.concat([pd.DataFrame.from_dict(stat_dict_inter2[1]), pd.DataFrame.from_dict(stat_dict_inter2[2])])
+    # stats_dict_intra3 = pd.concat([pd.DataFrame.from_dict(stat_dict_intra2[1]), pd.DataFrame.from_dict(stat_dict_intra2[2])])
+    # stats_dict_control3 = pd.concat([pd.DataFrame.from_dict(stat_dict_control2[1]), pd.DataFrame.from_dict(stat_dict_control2[2])])
+    #
+    # #concatrenate the dataframes
+    # #add a roving type column
+    # stats_dict_inter3['roving_type'] = 'inter'
+    # stats_dict_intra3['roving_type'] = 'intra'
+    # stats_dict_control3['roving_type'] = 'control'
+    # #concatenate the dataframes
+    # stats_dict_all = pd.concat([stats_dict_inter3, stats_dict_intra3, stats_dict_control3])
+    # #make a dataframe with the data
+    # stats_dict_all = stats_dict_all.reset_index()
+    # #rename the index column
+    # stats_dict_all = stats_dict_all.rename(columns = {'index': 'ferret'})
+    #
+    #
+    # for value in ['hits', 'false_alarms', 'correct_response', 'dprime', 'bias']:
+    #     anovaresults = AnovaRM(stats_dict_all, value, 'ferret', within=['roving_type']).fit()
+    #     #export to csv.
+    #     # anovaresults.export_to_csv('anovaresults_' + str(talker) + '_' + value + '.csv')
+    #     #run tukey post hoc test
+    #     posthoc = MultiComparison(stats_dict_all[value], stats_dict_all['roving_type'])
+    #     posthocresults = posthoc.tukeyhsd()
+    #     print(posthocresults)
+    #     numerator = anovaresults.anova_table['F Value'][0] * anovaresults.anova_table['Num DF'][0]
+    #     denominator = numerator + anovaresults.anova_table['Den DF'][0]
+    #     partial_eta_squared = numerator / denominator
+    #
+    #
+    #     eta_squared_df = pd.DataFrame({'partial_eta_squared': [partial_eta_squared]})
+    #     eta_squared_df.to_csv(f'D:\mixedeffectmodelsbehavioural\metrics/eta_squared_rovingtype_{value}_acrosstalkers.csv')
+    #     #export to csv
+    #     tukey_df = pd.DataFrame(data=posthocresults._results_table.data[1:],
+    #                             columns=posthocresults._results_table.data[0])
+    #
+    #     tukey_df.to_csv(f'D:\mixedeffectmodelsbehavioural\metrics/posthocresults_by_rovingtype_{value}_acrosstalkers.csv')
+    #     anovaresults.anova_table.to_csv(f'D:\mixedeffectmodelsbehavioural\metrics/anova_results_by_rovingtype_{value}_acrosstalkers.csv')
+    #
+    #     print(anovaresults)
+
+
+    # stats_dict_female = pd.concat([pd.DataFrame.from_dict(stat_dict_inter2[1]), pd.DataFrame.from_dict(stat_dict_intra2[1]), pd.DataFrame.from_dict(stat_dict_control2[1])])
+    # stats_dict_male = pd.concat([pd.DataFrame.from_dict(stat_dict_inter2[2]), pd.DataFrame.from_dict(stat_dict_intra2[2]), pd.DataFrame.from_dict(stat_dict_control2[2])])
+    stats_dict_all = pd.DataFrame()
+    for talker in [1,2]:
+        stat_dict_inter3 = pd.DataFrame.from_dict( stat_dict_inter2[talker])
+        stat_dict_intra3 = pd.DataFrame.from_dict(stat_dict_intra2[talker])
+        stat_dict_control3 = pd.DataFrame.from_dict(stat_dict_control2[talker])
+        stat_dict_inter3['talker'] = talker
+        stat_dict_intra3['talker'] = talker
+        stat_dict_control3['talker'] = talker
+        stat_dict_inter3['roving_type'] = 'inter'
+        stat_dict_intra3['roving_type'] = 'intra'
+        stat_dict_control3['roving_type'] = 'control'
+        #append to the dataframe
+        stats_dict_all = stats_dict_all.append(stat_dict_intra3)
+        stats_dict_all = stats_dict_all.append(stat_dict_inter3)
+        stats_dict_all = stats_dict_all.append(stat_dict_control3)
+
+    #make a dataframe with the data
+    stats_dict_all = stats_dict_all.reset_index()
+    #rename the index column
+    stats_dict_all = stats_dict_all.rename(columns = {'index': 'ferret'})
+
+
+    for value in ['hits', 'false_alarms', 'correct_response', 'dprime', 'bias']:
+        anovaresults = pg.rm_anova(data=stats_dict_all, dv=value, within=['roving_type', 'talker'], subject='ferret')
+        #run posthoc tests
+        posthoc = pg.pairwise_ttests(data=stats_dict_all, dv=value, within=['roving_type'], subject='ferret', padjust='bonf')
+
+        posthocresults = posthoc
+        print(posthocresults)
+        numerator = anovaresults.anova_table['F Value'][0] * anovaresults.anova_table['Num DF'][0]
+        denominator = numerator + anovaresults.anova_table['Den DF'][0]
+        partial_eta_squared = numerator / denominator
+
+        eta_squared_df = pd.DataFrame({'partial_eta_squared': [partial_eta_squared]})
+        eta_squared_df.to_csv(
+            f'D:\mixedeffectmodelsbehavioural\metrics/eta_squared_rovingtype_{value}_acrosstalkers.csv')
+        # export to csv
+        tukey_df = pd.DataFrame(data=posthocresults._results_table.data[1:],
+                                columns=posthocresults._results_table.data[0])
+
+        tukey_df.to_csv(
+            f'D:\mixedeffectmodelsbehavioural\metrics/posthocresults_by_rovingtype_{value}_acrosstalkers.csv')
+        anovaresults.anova_table.to_csv(
+            f'D:\mixedeffectmodelsbehavioural\metrics/anova_results_by_rovingtype_{value}_acrosstalkers.csv')
+
+        print(anovaresults)
     return
 
 
@@ -1550,10 +1651,11 @@ if __name__ == '__main__':
     df = behaviouralhelperscg.get_stats_df(ferrets=ferrets, startdate='04-01-2016', finishdate='01-03-2023')
     kw_dict =  kw_test(df)
     stats_dict_all_inter, stats_dict_inter = run_stats_calc_by_pitch_mf(df, ferrets, stats_dict_empty, pitch_param='inter_trial_roving')
+    stats_dict_all_intermf, stats_dict_intermf = run_stats_calc(df, ferrets, pitch_param='inter_trial_roving')
     stats_dict_all_intra, stats_dict_intra = run_stats_calc(df, ferrets, pitch_param='intra_trial_roving')
     stats_dict_all_control, stats_dict_control = run_stats_calc(df, ferrets, pitch_param='control_trial')
 
-    run_repeated_anova(stats_dict_inter, stats_dict_intra, stats_dict_control)
+    run_repeated_anova(stats_dict_intermf, stats_dict_intra, stats_dict_control)
 
     stats_dict_all_bypitch, stats_dict_bypitch = run_stats_calc_by_pitch_mf(df, ferrets, stats_dict_empty, pitch_param=None)
     # stats_dict_all_intra, stats_dict_intra = run_stats_calc(df, ferrets, pitch_param='intra_trial_roving')

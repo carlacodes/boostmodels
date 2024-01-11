@@ -1490,13 +1490,13 @@ def run_repeated_anova(stats_dict_inter, stats_dict_intra, stats_dict_control):
                 for ferretkey in stats_dict_control[key][trialkey][statkey].keys():
                     list.append(stats_dict_control[key][trialkey][statkey][ferretkey])
                 stat_dict_control2[key][statkey] = list
-    for key in stats_dict_inter.keys():
-        stat_dict_inter2[key] = {}
-        for statkey in stats_dict_inter[key].keys():
-            list = []
-            for ferretkey in stats_dict_inter[key][statkey].keys():
-                list.append(stats_dict_inter[key][statkey][ferretkey])
-            stat_dict_inter2[key][statkey] = list
+    # for key in stats_dict_inter.keys():
+    #     stat_dict_inter2[key] = {}
+    #     for statkey in stats_dict_inter[key].keys():
+    #         list = []
+    #         for ferretkey in stats_dict_inter[key][statkey].keys():
+    #             list.append(stats_dict_inter[key][statkey][ferretkey])
+    #         stat_dict_inter2[key][statkey] = list
     for key in stats_dict_intra.keys():
         stat_dict_intra2[key] = {}
         for trialkey in stats_dict_intra[key].keys():
@@ -1506,12 +1506,22 @@ def run_repeated_anova(stats_dict_inter, stats_dict_intra, stats_dict_control):
                 for ferretkey in stats_dict_intra[key][trialkey][statkey].keys():
                     list.append(stats_dict_intra[key][trialkey][statkey][ferretkey])
                 stat_dict_intra2[key][statkey] = list
+    for key in stats_dict_inter.keys():
+        stat_dict_inter2[key] = {}
+        for trialkey in stats_dict_inter[key].keys():
+            for statkey in stats_dict_inter[key][trialkey].keys():
+                list = []
+
+                for ferretkey in stats_dict_inter[key][trialkey][statkey].keys():
+                    list.append(stats_dict_inter[key][trialkey][statkey][ferretkey])
+                stat_dict_inter2[key][statkey] = list
 
     # stats_dict_inter = pd.DataFrame.from_dict(stats_dict_inter)
+    #running anova results for each talker separately
     for talker in [1,2]:
-        stats_dict_inter2 = pd.DataFrame.from_dict(stat_dict_inter2[1])
-        stats_dict_intra2 = pd.DataFrame.from_dict(stat_dict_intra2[1])
-        stats_dict_control2 = pd.DataFrame.from_dict(stat_dict_control2[1])
+        stats_dict_inter2 = pd.DataFrame.from_dict(stat_dict_inter2[talker])
+        stats_dict_intra2 = pd.DataFrame.from_dict(stat_dict_intra2[talker])
+        stats_dict_control2 = pd.DataFrame.from_dict(stat_dict_control2[talker])
         #concatrenate the dataframes
         #add a roving type column
         stats_dict_inter2['roving_type'] = 'inter'
@@ -1564,10 +1574,11 @@ if __name__ == '__main__':
     kw_dict =  kw_test(df)
     ferrets_inter = [ 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
     stats_dict_all_inter, stats_dict_inter = run_stats_calc_by_pitch_mf(df, ferrets, stats_dict_empty, pitch_param='inter_trial_roving')
+    stats_dict_all_intermf, stats_dict_intermf = run_stats_calc(df, ferrets, pitch_param='inter_trial_roving')
     stats_dict_all_intra, stats_dict_intra = run_stats_calc(df, ferrets, pitch_param='intra_trial_roving')
     stats_dict_all_control, stats_dict_control = run_stats_calc(df, ferrets, pitch_param='control_trial')
 
-    # run_repeated_anova(stats_dict_inter, stats_dict_intra, stats_dict_control)
+    run_repeated_anova(stats_dict_intermf, stats_dict_intra, stats_dict_control)
 
     stats_dict_all_bypitch, stats_dict_bypitch = run_stats_calc_by_pitch_mf(df, ferrets, stats_dict_empty, pitch_param=None)
     # stats_dict_all_intra, stats_dict_intra = run_stats_calc(df, ferrets, pitch_param='intra_trial_roving')
