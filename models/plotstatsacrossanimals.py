@@ -1613,25 +1613,18 @@ def run_repeated_anova(stats_dict_inter, stats_dict_intra, stats_dict_control):
     for value in ['hits', 'false_alarms', 'correct_response', 'dprime', 'bias']:
         anovaresults = pg.rm_anova(data=stats_dict_all, dv=value, within=['roving_type', 'talker'], subject='ferret')
         #run posthoc tests
-        posthoc = pg.pairwise_ttests(data=stats_dict_all, dv=value, within=['roving_type'], subject='ferret', padjust='bonf')
+        posthoc = pg.pairwise_ttests(data=stats_dict_all, dv=value, within=['roving_type', 'talker'], subject='ferret', padjust='bonf')
 
         posthocresults = posthoc
         print(posthocresults)
-        numerator = anovaresults.anova_table['F Value'][0] * anovaresults.anova_table['Num DF'][0]
-        denominator = numerator + anovaresults.anova_table['Den DF'][0]
+        numerator = anovaresults['F'][0] * anovaresults['ddof1'][0]
+        denominator = numerator + anovaresults['ddof2'][0]
         partial_eta_squared = numerator / denominator
 
         eta_squared_df = pd.DataFrame({'partial_eta_squared': [partial_eta_squared]})
-        eta_squared_df.to_csv(
-            f'D:\mixedeffectmodelsbehavioural\metrics/eta_squared_rovingtype_{value}_acrosstalkers.csv')
-        # export to csv
-        tukey_df = pd.DataFrame(data=posthocresults._results_table.data[1:],
-                                columns=posthocresults._results_table.data[0])
 
-        tukey_df.to_csv(
-            f'D:\mixedeffectmodelsbehavioural\metrics/posthocresults_by_rovingtype_{value}_acrosstalkers.csv')
-        anovaresults.anova_table.to_csv(
-            f'D:\mixedeffectmodelsbehavioural\metrics/anova_results_by_rovingtype_{value}_acrosstalkers.csv')
+        anovaresults.to_csv(
+            f'D:\mixedeffectmodelsbehavioural\metrics/rmanova_twolayer_{value}_acrosstalkers.csv')
 
         print(anovaresults)
     return
