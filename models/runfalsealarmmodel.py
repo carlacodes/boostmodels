@@ -2,13 +2,13 @@ from pathlib import Path
 import lightgbm as lgb
 import matplotlib
 import matplotlib.colors as mcolors
-import numpy as np
 import optuna
 import shap
 import matplotlib.image as mpimg
 import sklearn
 import sklearn.metrics
 import xgboost as xgb
+import pickle
 from optuna.integration import LightGBMPruningCallback
 from sklearn.inspection import permutation_importance
 from sklearn.metrics import mean_squared_error
@@ -555,7 +555,9 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
 
 
 
-    shap.summary_plot(shap_values1, dfx, show=False, color=cmapsummary)
+    # shap.summary_plot(shap_values1, dfx, show=False, color=cmapsummary)
+    shap.plots.beeswarm(shap_values2, show=False,  color=cmapcustom)
+    # shap.plots.bees(shap_values1, dfx, show=False, color=cmapsummary)
     fig, ax = plt.gcf(), plt.gca()
     # plt.title('Ranked list of features over their \n impact in predicting a false alarm', fontsize=18)
     # Get the plot's Patch objects
@@ -1118,8 +1120,16 @@ def runlgbfaornot(dataframe):
     shap_values1 = shap.TreeExplainer(xg_reg).shap_values(dfx)
     explainer = shap.Explainer(xg_reg, dfx)
     shap_values2 = explainer(X_train)
+    # shap.summary_plot(shap_values1, dfx, show=True, plot_type='dot')
+    shap.plots.beeswarm(shap_values2)
+
+    #export shap_values2 to pickle
+    with open('D:/behavmodelfigs/fa_or_not_model/shap_values2.pkl', 'wb') as f:
+        pickle.dump(shap_values2, f)
+
     plt.subplots(figsize=(25, 25))
-    shap.summary_plot(shap_values1, dfx, show=False)
+    # shap.summary_plot(shap_values1, dfx, show=False)
+    shap.plots.bar(shap_values2, show=False)
     fig, ax = plt.gcf(), plt.gca()
     plt.title('Ranked list of features over their \n impact in predicting a false alarm', fontsize=18)
     labels = [item.get_text() for item in ax.get_yticklabels()]

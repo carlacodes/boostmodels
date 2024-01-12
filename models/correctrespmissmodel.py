@@ -361,7 +361,8 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     # Create a single figure
     import matplotlib.image as mpimg
     summary_plot_file = 'summary_plot.png'
-    shap.summary_plot(shap_values1, X_train, show=False, color=cmapsummary)
+    # shap.summary_plot(shap_values1, X_train, show=False, color=cmapsummary)
+    shap.plots.beeswarm(shap_values2,  show=False, color=cmapcustom)
     fig, ax = plt.gcf(), plt.gca()
 
     fig.set_size_inches(6, 12)
