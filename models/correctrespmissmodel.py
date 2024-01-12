@@ -365,7 +365,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     fig, ax = plt.gcf(), plt.gca()
 
     fig.set_size_inches(6, 12)
-    ax.set_xlabel('Impact on p(miss)', fontsize=36)
+    ax.set_xlabel('Log(odds) miss', fontsize=36)
     # ax.set_yticks(range(len(feature_labels)))
     #for some reason y ticks are set in reverse order
     ax.set_yticklabels(np.flip(feature_labels), fontsize=17, rotation = 45)
@@ -406,7 +406,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     colorbar_scatter.set_yticklabels(['Left', 'Right'], fontsize=18)
     ax.set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18, rotation = 45)
     ax.set_xlabel('Ferret ID', fontsize=18)
-    ax.set_ylabel('Impact on p(miss)', fontsize=18)
+    ax.set_ylabel('Log(odds) miss', fontsize=18)
     # plt.title('Mean SHAP value over ferret ID', fontsize=18)
     plt.savefig(fig_dir /'ferretID_vs_audioSide.png', dpi=500, bbox_inches='tight')
     plt.show()
@@ -422,7 +422,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     # colorbar_scatter.set_yticklabels(['Left', 'Right'], fontsize=18)
     ax.set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18, rotation=45)
     ax.set_xlabel('Ferret ID', fontsize=18)
-    ax.set_ylabel('Impact on p(miss)', fontsize=18)
+    ax.set_ylabel('Log(odds) miss', fontsize=18)
     plt.title('Time to target presentation', fontsize=18)
     plt.savefig(fig_dir /'ferretidbytargettime.png', dpi=500, bbox_inches='tight')
     plt.show()
@@ -444,7 +444,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     ax.set_xticks([0, 1, 2, 3, 4])
     ax.set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18, rotation=45)
     ax.set_xlabel('Ferret ID', fontsize=18)
-    ax.set_ylabel('Impact on p(miss)', fontsize=18)  # Corrected y-label
+    ax.set_ylabel('Log(odds) miss', fontsize=18)  # Corrected y-label
 
     # plt.title('Mean SHAP value over ferret ID', fontsize=18)
 
@@ -476,7 +476,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     ax.set_xticks([0, 1, 2, 3, 4])
     ax.set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18, rotation=45)
     ax.set_xlabel('Ferret ID', fontsize=18)
-    ax.set_ylabel('Impact on p(miss)', fontsize=18)  # Corrected y-label
+    ax.set_ylabel('Log(odds) miss', fontsize=18)  # Corrected y-label
 
     # plt.title('Mean SHAP value over ferret ID', fontsize=18)
 
@@ -553,7 +553,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     # # Modifying color bar parameters
     # cb_ax.tick_params(labelsize=15)
     # cb_ax.set_ylabel("precursor = target F0 word", fontsize=15)
-    ax_dict['E'].set_ylabel('Impact on p(miss)', fontsize=18)
+    ax_dict['E'].set_ylabel('Log(odds) miss', fontsize=18)
     # ax_dict['E'].set_title('Talker versus impact on miss probability', fontsize=18)
     cb_ax.set_yticks([1, 2, 3,4, 5])
     cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
@@ -578,7 +578,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
 
     # Modifying color bar parameters
     cb_ax.tick_params(labelsize=15)
-    ax_dict['C'].set_ylabel('Impact on p(miss)', fontsize=18)
+    ax_dict['C'].set_ylabel('Log(odds) miss', fontsize=18)
     # ax_dict['C'].set_xlabel('Ferret ID', fontsize=16)
     ax_dict['C'].set_xlabel('')
     ax_dict['C'].set_xticks([0, 1, 2, 3, 4])
@@ -623,7 +623,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     cb_ax.set_yticklabels(['True', 'False'])
     plt.title('Trial number', fontsize=18)
     plt.xlabel('Trial number', fontsize=15)
-    plt.ylabel('Impact on p(miss)', fontsize=15)
+    plt.ylabel('Log(odds) miss', fontsize=15)
     plt.savefig(fig_dir / 'trialnum_vs_precurpitch.png', dpi=1000, bbox_inches="tight")
     plt.show()
 

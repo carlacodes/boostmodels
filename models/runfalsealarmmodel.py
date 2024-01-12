@@ -486,8 +486,12 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
             fig_dir = Path('D:/behavmodelfigs/fa_or_not_model/')
 
     shap_values1 = shap.TreeExplainer(xg_reg).shap_values(dfx)
+    #convert shap values to probability of false alarm
+    # shap_values1 = 1/(1+np.exp(-shap_values1))
     explainer = shap.Explainer(xg_reg, X_train, feature_names=X_train.columns)
     shap_values2 = explainer(X_train)
+    #convert shape values to probability of false alarm
+    # shap_values2 = 1/(1+np.exp(-shap_values2))
 
     custom_colors = ['slategray', 'hotpink', "yellow"]  # Add more colors as needed
     cmapcustom = mcolors.LinearSegmentedColormap.from_list('my_custom_cmap', custom_colors, N=1000)
@@ -525,7 +529,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     ax.set_xticks([0,1,2,3,4])
     ax.set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18, rotation=45)
     ax.set_xlabel('Ferret ID', fontsize=18)
-    ax.set_ylabel('Impact on p(FA)', fontsize=18)
+    ax.set_ylabel('Log(odds) FA', fontsize=18)
     plt.title('Time since trial start', fontsize=18)
     plt.savefig(fig_dir /'ferretIDby_timesincestartoftrial1409.png', dpi=500, bbox_inches='tight')
     plt.show()
@@ -540,7 +544,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     ax.set_xticks([0,1,2,3,4])
     ax.set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18, rotation=45)
     ax.set_xlabel('Ferret ID', fontsize=18)
-    ax.set_ylabel('Impact on p(FA)', fontsize=18)
+    ax.set_ylabel('Log(odds) FA', fontsize=18)
     # plt.title('Mean SHAP value over ferret ID', fontsize=18)
     plt.savefig(fig_dir /'ferretIDbysideofaudio1409.png', dpi=500, bbox_inches='tight')
     plt.show()
@@ -565,7 +569,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     #reinsert the legend_hanldes and labels
     ax.legend(legend_handles, ['Correct Rejection', 'False Alarm'], loc='upper right', fontsize=13)
 
-    ax.set_xlabel('Impact on p(FA)', fontsize=36)
+    ax.set_xlabel('Log(odds) FA', fontsize=36)
     fig.tight_layout()
     plt.savefig(fig_dir / 'ranked_features1409.png', dpi=1000, bbox_inches="tight")
     plt.show()
@@ -620,7 +624,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     ax.set_xticks([0, 1, 2, 3, 4])
     ax.set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18, rotation=45)
     ax.set_xlabel('Ferret ID', fontsize=18)
-    ax.set_ylabel('Impact on p(FA)', fontsize=18)  # Corrected y-label
+    ax.set_ylabel('Log(odds) FA', fontsize=18)  # Corrected y-label
 
     # plt.title('Mean SHAP value over ferret ID', fontsize=18)
 
@@ -651,7 +655,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     ax.set_xticks([0, 1, 2, 3, 4])
     ax.set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18, rotation=45)
     ax.set_xlabel('Ferret ID', fontsize=18)
-    ax.set_ylabel('Impact on p(FA)', fontsize=18)  # Corrected y-label
+    ax.set_ylabel('Log(odds) FA', fontsize=18)  # Corrected y-label
 
     # plt.title('Mean SHAP value over ferret ID', fontsize=18)
 
@@ -677,7 +681,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     cax.tick_params(labelsize=15)
     cax.set_ylabel("Time since start of trial", fontsize=12)
     plt.title('Time since start of trial', fontsize=18)
-    ax.set_ylabel('Impact on p(FA)', fontsize=18)
+    ax.set_ylabel('Log(odds) FA', fontsize=18)
     ax.set_xticks([1, 2, 3, 4, 5])
     ax.set_xticklabels(['109', '124', '144', '191', '251'], fontsize=18, rotation=45)
     plt.savefig(fig_dir / 'F0bytimestart_supplemental1409.png', dpi=500, bbox_inches='tight')
@@ -695,7 +699,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     cax.set_yticks([ 1, 2, 3, 4, 5])
     cax.set_yticklabels(['109', '124', '144', '191', '251'], fontsize=18, rotation=45)
     plt.title('F0', fontsize=18)
-    ax.set_ylabel('Impact on p(FA)', fontsize=18)
+    ax.set_ylabel('Log(odds) FA', fontsize=18)
     ax.set_xticks([1, 2, 3, 4, 5])
 
     plt.savefig(fig_dir / 'timestartbyF0_supplemental1409.png', dpi=500, bbox_inches='tight')
@@ -713,7 +717,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     # cax.set_yticks([0, 1, 2, 3, 4])
     # cax.set_yticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18, rotation=45)
     plt.title('Trial number', fontsize=18)
-    ax.set_ylabel('Impact on p(FA)', fontsize=18)
+    ax.set_ylabel('Log(odds) FA', fontsize=18)
 
     ax.set_xticks([1, 2, 3, 4, 5])
     ax.set_xticklabels(['109', '124', '144', '191', '251'], fontsize=18, rotation=45)
@@ -732,7 +736,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     # cax.set_yticks([0, 1, 2, 3, 4])
     # cax.set_yticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18, rotation=45)
     plt.title('Trial number', fontsize=18)
-    ax.set_ylabel('Impact on p(FA)', fontsize=18)
+    ax.set_ylabel('Log(odds) FA', fontsize=18)
 
     ax.set_xticks([0,1,2,3,4])
     ax.set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18, rotation=45)
@@ -756,7 +760,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     cb_ax.set_yticks([0,1,2,3,4])
     cb_ax.set_yticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'])
 
-    ax.set_ylabel('Impact on p(FA)', fontsize=18)
+    ax.set_ylabel('Log(odds) FA', fontsize=18)
     # ax_dict['E'].set_title('Intra-trial roving versus impact on false alarm probability', fontsize=13)
     ax.set_xticks([0,1])
 
@@ -776,7 +780,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     cax.set_yticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18, rotation=45)
     plt.title('Ferret ID', fontsize=18)
     ax.set_xticks([1, 2, 3, 4, 5])
-    ax.set_ylabel('Impact on p(FA)', fontsize=18)
+    ax.set_ylabel('Log(odds) FA', fontsize=18)
 
     ax.set_xticklabels(['109', '124', '144', '191', '251'], fontsize=18, rotation=45)
     plt.savefig(fig_dir / 'F0byferretID_supplemental1409.png', dpi=500, bbox_inches='tight')
@@ -803,7 +807,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     ax.set_xticks([ 0, 1, 2, 3, 4])
     ax.set_xticklabels(['109', '124', '144', '191', '251'], fontsize=18, rotation=45)
     ax.set_xlabel('F0', fontsize=18)
-    ax.set_ylabel('Impact on p(FA)', fontsize=18)  # Corrected y-label
+    ax.set_ylabel('Log(odds) FA', fontsize=18)  # Corrected y-label
 
 
     # Optionally add a legend
@@ -832,7 +836,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     ax.set_xticks([0, 1, 2, 3, 4])
     ax.set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18, rotation=45)
     ax.set_xlabel('Ferret ID', fontsize=18)
-    ax.set_ylabel('Impact on p(FA)', fontsize=18)  # Corrected y-label
+    ax.set_ylabel('Log(odds) FA', fontsize=18)  # Corrected y-label
 
 
     # Optionally add a legend
@@ -990,7 +994,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     #
     #
     #
-    # ax_dict['E'].set_ylabel('Impact on p(FA)', fontsize=10)
+    # ax_dict['E'].set_ylabel('Log(odds) FA', fontsize=10)
     # # ax_dict['E'].set_title('Intra-trial roving versus impact on false alarm probability', fontsize=13)
     # ax_dict['E'].set_xticks([0,1])
     # ferret_id_only = ['F1702', 'F1815', 'F1803', 'F2002', 'F2105']
@@ -1007,7 +1011,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     ax_dict['E'].set_xticks([0, 1, 2, 3, 4])
     ax_dict['E'].set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], rotation=45)
     ax_dict['E'].set_xlabel('Ferret ID', fontsize=18)
-    ax_dict['E'].set_ylabel('Impact on p(FA)', fontsize=18)  # Corrected y-label
+    ax_dict['E'].set_ylabel('Log(odds) FA', fontsize=18)  # Corrected y-label
 
     # plt.title('Mean SHAP value over ferret ID', fontsize=18)
 
@@ -1041,7 +1045,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     ax_dict['C'].set_xticks([1,2])
     ax_dict['C'].set_xticklabels(['Female', 'Male'])
 
-    ax_dict['C'].set_ylabel('Impact on p(FA)', fontsize=18)
+    ax_dict['C'].set_ylabel('Log(odds) FA', fontsize=18)
 
 
 
