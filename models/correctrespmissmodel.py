@@ -365,8 +365,13 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     shap.plots.beeswarm(shap_values2,  show=False, color=cmapcustom)
     fig, ax = plt.gcf(), plt.gca()
 
-    fig.set_size_inches(6, 12)
+    fig.set_size_inches(4, 12)
     ax.set_xlabel('Log(odds) miss', fontsize=36)
+    colorbar = fig.axes[1]
+    #change the font size of the color bar
+    colorbar.tick_params(labelsize=30)
+    #change the label of the color bar
+    colorbar.set_ylabel(None)
     # ax.set_yticks(range(len(feature_labels)))
     #for some reason y ticks are set in reverse order
     ax.set_yticklabels(np.flip(feature_labels), fontsize=17, rotation = 45)

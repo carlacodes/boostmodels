@@ -570,7 +570,11 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     legend_handles, legend_labels = ax.get_legend_handles_labels()
     #reinsert the legend_hanldes and labels
     ax.legend(legend_handles, ['Correct Rejection', 'False Alarm'], loc='upper right', fontsize=13)
-
+    colorbar = fig.axes[1]
+    #change the font size of the color bar
+    colorbar.tick_params(labelsize=30)
+    #change the label of the color bar
+    colorbar.set_ylabel(None)
     ax.set_xlabel('Log(odds) FA', fontsize=36)
     fig.tight_layout()
     plt.savefig(fig_dir / 'ranked_features1409.png', dpi=1000, bbox_inches="tight")
