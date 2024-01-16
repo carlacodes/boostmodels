@@ -237,16 +237,16 @@ def run_optuna_study_falsealarm(dataframe, y, ferret_as_feature=False):
         # dfuse = df[["pitchoftarg", "pastcatchtrial", "trialNum", "talker", "side", "precur_and_targ_same",
         #             "timeToTarget",
         #             "realRelReleaseTimes", "ferret", "pastcorrectresp"]]
-        labels = ["F0", "time since start of trial", "ferret ID", "trial number", "talker", "audio side",
-                  "intra-trial F0 roving", "past response correct", "past trial was catch", "falsealarm"]
+        labels = ["F0", "time in trial", "ferret ID", "trial no.", "talker", "audio side",
+                  "intra-trial F0 roving", "past resp. correct", "past trial catch", "falsealarm"]
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
     else:
         df_to_use = dataframe[
             ["pitchof0oflastword", "time_elapsed", "trialNum", "talker", "side", "intra_trial_roving", "pastcorrectresp",
              "pastcatchtrial",
              "falsealarm"]]
-        labels = ["F0", "time since start of trial", "trial number", "talker", "audio side", "intra-trial F0 roving",
-                  "past response correct", "past trial was catch", "falsealarm"]
+        labels = ["F0", "time since start of trial", "trial no", "talker", "audio side", "intra-trial F0 roving",
+                  "past resp. correct", "past trial catch", "falsealarm"]
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
 
     col = 'falsealarm'
@@ -302,6 +302,28 @@ def run_mixed_effects_model_falsealarm(df):
 
         model = smf.mixedlm(equation, train, groups=train["ferret_ID"])
         result = model.fit()
+
+        random_effects = result.random_effects
+        #commbine all into one series
+        # random_effects = pd.DataFrame(random_effects)
+        random_effects_2 = pd.DataFrame()
+        for i, ferret in enumerate(ferrets):
+            try:
+                random_effects_2[ferret] = random_effects[i].values
+            except:
+                continue
+        # random_effects = pd.concat(random_effects.values(), axis=1)
+        # #rework the dataframe so each column  is a random effect
+        # random_effects.columns = random_effects.columns.str.replace('Group Var', 'Ferret')
+        # random_effects.columns = random_effects.columns.str.replace('0', 'F1702')
+        # random_effects.columns = random_effects.columns.str.replace('1', 'F1815')
+        # random_effects.columns = random_effects.columns.str.replace('2', 'F1803')
+        # random_effects.columns = random_effects.columns.str.replace('3', 'F2002')
+        # random_effects.columns = random_effects.columns.str.replace('4', 'F2105')
+        #
+        #flatten the random_effects
+        print(random_effects)
+
         print(result.summary())
 
         var_resid = result.scale
@@ -311,7 +333,11 @@ def run_mixed_effects_model_falsealarm(df):
         total_var = var_fixed_effect + var_random_effect + var_resid
         marginal_r2 = var_fixed_effect / total_var
         conditional_r2 = (var_fixed_effect + var_random_effect) / total_var
-        coefficients.append(result.params)
+        params = result.params
+        #combiune params and random effects into one series
+        params = pd.concat([params, random_effects_2.mean(axis=0)], axis=0)
+
+        coefficients.append(params)
         p_values.append(result.pvalues)
 
         # Generate confusion matrix for train set
@@ -355,13 +381,20 @@ def run_mixed_effects_model_falsealarm(df):
     #plot the mean coefficients as a bar plot
     #make a dataframe of the coefficients, p-values, and features
     coefficients_df = pd.DataFrame(coefficients).mean()
+    index = coefficients_df.index
     p_values_df = pd.DataFrame(p_values).mean()
     labels_mixed_effects_df = pd.DataFrame(labels_mixed_effects)
     #combine into one dataframe
+
     result_coefficients = pd.concat([coefficients_df, p_values_df], axis=1, keys=['coefficients', 'p_values'])
     fig, ax = plt.subplots()
-    #sort the coefficients by their mean value
     result_coefficients.index = result_coefficients.index.str.replace('Group Var', 'Ferret')
+
+    #sort the coefficients by their mean value
+
+
+    # ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
+
 
     result_coefficients = result_coefficients.sort_values(by='coefficients', ascending=False)
     ax.bar(result_coefficients.index, result_coefficients['coefficients'])
@@ -379,23 +412,27 @@ def run_mixed_effects_model_falsealarm(df):
 
     #plot the mean coefficients as a bar plot
 
-    fig, ax = plt.subplots()
-    #sort the coefficients by their mean value
+    # fig, ax = plt.subplots()
+    # #sort the coefficients by their mean value
+    # pd.DataFrame(coefficients).index
+    # coefficients.index
+    # ax.bar(labels_mixed_effects, pd.DataFrame(coefficients).mean())
+    # ax.set_xticklabels(labels_mixed_effects, rotation=45, ha='right')
+    # #if the mean p value is less than 0.05, then add a star to the bar plot
+    # for i in range(len(p_values)):
+    #     if p_values[i].mean() < 0.05:
+    #         ax.text(i, 0.05, '*', fontsize=20)
+    # ax.set_xlabel('Features')
+    # ax.set_ylabel('Mean Coefficient')
+    # ax.set_title('Mean Coefficient for each Feature')
+    # plt.savefig('D:/behavmodelfigs/fa_or_not_model/mean_coefficients.png', dpi=500, bbox_inches='tight')
+    # plt.show()
 
-    ax.bar(labels_mixed_effects, pd.DataFrame(coefficients).mean())
-    ax.set_xticklabels(labels_mixed_effects, rotation=45, ha='right')
-    #if the mean p value is less than 0.05, then add a star to the bar plot
-    for i in range(len(p_values)):
-        if p_values[i].mean() < 0.05:
-            ax.text(i, 0.05, '*', fontsize=20)
-    ax.set_xlabel('Features')
-    ax.set_ylabel('Mean Coefficient')
-    ax.set_title('Mean Coefficient for each Feature')
-    plt.savefig('D:/behavmodelfigs/fa_or_not_model/mean_coefficients.png', dpi=500, bbox_inches='tight')
-    plt.show()
     print(np.mean(train_acc))
     print(np.mean(test_acc))
     mean_coefficients = pd.DataFrame(coefficients).mean()
+    mean_coefficients.to_csv('mixedeffects_csvs/falsealarm_mean_coefficients.csv')
+
     print(mean_coefficients)    #export
     np.savetxt(f"mixedeffects_csvs/falsealarm_balac_train_mean.csv", [np.mean(train_acc)], delimiter=",")
     np.savetxt(f"mixedeffects_csvs/falsealarmbalac_test_mean.csv", [np.mean(test_acc)], delimiter=",")
@@ -563,7 +600,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     # Get the plot's Patch objects
     labels = [item.get_text() for item in ax.get_yticklabels()]
     print(labels)
-    fig.set_size_inches(7, 12)
+    fig.set_size_inches(8, 12)
     ax.set_xlabel('Mean SHAP value', fontsize=18)
     ax.set_yticks(range(len(feature_labels)))
     ax.set_yticklabels(np.flip(feature_labels), fontsize=18, rotation = 45)
@@ -575,7 +612,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     colorbar.tick_params(labelsize=30)
     #change the label of the color bar
     colorbar.set_ylabel(None)
-    ax.set_xlabel('Log(odds) FA', fontsize=36)
+    # ax.set_xlabel('Log(odds) FA', fontsize=36)
     fig.tight_layout()
     plt.savefig(fig_dir / 'ranked_features1409.png', dpi=1000, bbox_inches="tight")
     plt.show()
@@ -960,52 +997,38 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     text_width_inches = text_width_pt / 72.27
 
     # Create the figure with the desired figsize
-    mosaic = ['A', 'B', 'C'], ['D', 'B', 'E']
+    mosaic = ['A', 'B'], ['D', 'B'], ['C', 'E']
     # fig = plt.figure(figsize=(20, 10))
-    fig = plt.figure(figsize=(text_width_inches*3, (text_width_inches / 2)*3))
-    ax_dict = fig.subplot_mosaic(mosaic)
+    figsize = ( (text_width_inches / 2) * 3, text_width_inches * 3)
+    figsize = (text_width_inches * 2, text_width_inches * 2)
+    gridspec_kw = {'width_ratios': [1, 1], 'height_ratios': [1, 1, 1]}
 
+    # Create the figure with subplots
+    fig, ax_dict = plt.subplot_mosaic(mosaic, figsize = figsize, gridspec_kw=gridspec_kw)
+
+    # fig, axes = plt.subplots(nrows=2, ncols=3, figsize=(text_width_inches, text_width_inches),
+    #                          gridspec_kw={'width_ratios': [1, 1, 1], 'height_ratios': [1, 1], 'hspace': 0.2})
     # Plot the elbow plot
     ax_dict['A'].plot(feature_labels, cumulative_importances, marker='o', color='slategray')
     # ax_dict['A'].set_xlabel('Features', fontsize=18)
-    ax_dict['A'].set_ylabel('Cumulative \n feature importance', fontsize=18)
+    ax_dict['A'].set_ylabel('Cumulative \n feature importance', fontsize=15)
     # ax_dict['A'].set_title('Elbow plot of cumulative feature importance for false alarm model', fontsize=13)
     #decrease fontsize of xtick labels
-    ax_dict['A'].set_xticklabels(feature_labels, rotation=20, ha='right')  # rotate x-axis labels for better readability
+    ax_dict['A'].set_xticklabels(feature_labels, fontsize = 10, rotation=20, ha='right')  # rotate x-axis labels for better readability
     ax_dict['A'].tick_params(axis='x', which='major', labelsize=12)
 
     # rotate x-axis labels for better readability
     summary_img = mpimg.imread(fig_dir / 'ranked_features1409.png')
     ax_dict['B'].imshow(summary_img, aspect='auto', )
     ax_dict['B'].axis('off')  # Turn off axis ticks and labels
-    # ax_dict['B'].set_title('Ranked list of features over their \n impact on false alarm probability', fontsize=13)
+    ax_dict['B'].set_xlabel('Log(odds) FA', fontsize=18)
 
 
     ax_dict['D'].barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, color='slategray')
-    # ax_dict['D'].set_title("Permutation importances on false alarm probability")
-    ax_dict['D'].set_xlabel("Permutation importance", fontsize=18)
 
-    #
-    # shap.plots.scatter(shap_values2[:, "intra-trial F0 roving"], color=shap_values2[:, "ferret ID"], ax=ax_dict['E'],
-    #                    cmap=cmapcustom, show=False)
-    #
-    # fig, ax = plt.gcf(), plt.gca()
-    # cb_ax = fig.axes[5]
-    # # Modifying color bar parameters
-    # cb_ax.tick_params(labelsize=15)
-    # cb_ax.set_ylabel("Ferret ID", fontsize=12)
-    # cb_ax.set_yticks([0,1,2,3,4])
-    # cb_ax.set_yticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'])
-    #
-    #
-    #
-    #
-    # ax_dict['E'].set_ylabel('Log(odds) FA', fontsize=10)
-    # # ax_dict['E'].set_title('Intra-trial roving versus impact on false alarm probability', fontsize=13)
-    # ax_dict['E'].set_xticks([0,1])
-    # ferret_id_only = ['F1702', 'F1815', 'F1803', 'F2002', 'F2105']
-    # ax_dict['E'].set_xticklabels(['False', 'True'],  rotation=45, ha='right')
-    # ax_dict['E'].set_xlabel('Intra trial roving', fontsize=16)
+    ax_dict['D'].set_xlabel("Permutation importance", fontsize=18)
+    ax_dict['D'].set_yticklabels((X_test.columns[sorted_idx]), fontsize=10, rotation=20, ha='right')
+
     data_df = pd.DataFrame({
         "ferret ID": ferret_ids,
         "intra-trial roving": intra_values,
@@ -1068,8 +1091,14 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     #             fontsize=25, va='bottom', weight = 'bold')
 
     # plt.tight_layout()
-    plt.suptitle('Non-target and target words: false alarm vs. no false alarm model', fontsize=25)
-    plt.subplots_adjust(wspace=0.2, hspace=0.4)
+    # plt.suptitle('Non-target and target words: false alarm vs. no false alarm model', fontsize=25)
+    # plt.tight_layout()
+
+    plt.subplots_adjust(wspace=0.3, hspace=0.6)
+    for ax in ax_dict.values():
+        ax.tick_params(axis='both', which='major', labelsize=18)
+        ax.tick_params(axis='both', which='minor', labelsize=8)
+
 
     plt.savefig(fig_dir / 'big_summary_plot_2_noannotations.png', dpi=500, bbox_inches="tight")
     plt.savefig(fig_dir / 'big_summary_plot_2_noannotations.pdf', dpi=500, bbox_inches="tight")

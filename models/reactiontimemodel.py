@@ -320,7 +320,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
 
     import matplotlib.image as mpimg
     fig.set_size_inches(9, 15)
-    ax.set_xlabel('SHAP Value (impact \n on model output)', fontsize=36)
+    # ax.set_xlabel('SHAP Value (impact \n on model output)', fontsize=36)
     #get the color bar
     colorbar = fig.axes[1]
     #change the font size of the color bar
@@ -330,6 +330,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     #increase the y tick label size
     ax.tick_params(axis='y', which='major', labelsize=25, rotation = 45)
     ax.tick_params(axis='x', which='major', labelsize=25)
+    ax.set_xlabel(None)
     # ax.set_yticklabels(np.flip(feature_labels), fontsize=17, rotation = 45)
 
     # ax.set_ylabel('Features', fontsize=18)
@@ -352,7 +353,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     plt.savefig(fig_savedir / 'permutation_importance.png', dpi=300, bbox_inches='tight')
     plt.show()
 
-    shap.dependence_plot("time to target", shap_values, X)  #
+    shap.dependence_plot("target time", shap_values, X)  #
     explainer = shap.Explainer(xg_reg, X)
     shap_values2 = explainer(X_train)
     # shap.plots.scatter(shap_values2[:, "side of audio"], color=shap_values2[:, "ferret ID"], show=True, cmap = matplotlib.colormaps[cmapname])
@@ -380,7 +381,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     plt.show()
 
     fig, ax = plt.subplots()
-    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "time to target"], show=False, ax=ax, cmap = 'viridis')
+    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "target time"], show=False, ax=ax, cmap = 'viridis')
     colorbar_scatter = fig.axes[1]
     colorbar_scatter.set_ylabel('time to target (s)', fontsize=18)
     # colorbar_scatter.set_yticks([0,1])
@@ -507,7 +508,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     plt.savefig(fig_savedir / 'talker_vs_targetF0.png', dpi=300, bbox_inches='tight')
 
 
-    shap.plots.scatter(shap_values2[:, "time to target"], color=shap_values2[:, "trial number"], show=False, cmap = matplotlib.colormaps[cmapname])
+    shap.plots.scatter(shap_values2[:, "target time"], color=shap_values2[:, "trial no."], show=False, cmap = matplotlib.colormaps[cmapname])
     fig, ax = plt.gcf(), plt.gca()
     # Get colorbar
     cb_ax = fig.axes[1]
@@ -562,7 +563,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     plt.show()
 
     if one_ferret == False:
-        shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "time to target"], show=False, cmap = matplotlib.colormaps[cmapname])
+        shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "target time"], show=False, cmap = matplotlib.colormaps[cmapname])
         fig, ax = plt.gcf(), plt.gca()
         # Get colorbar
         cb_ax = fig.axes[1]
@@ -685,7 +686,38 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         # rotate x-axis labels for better readability
         summary_img = mpimg.imread(fig_savedir / 'shapsummaryplot_allanimals2.png')
         ax_dict['B'].imshow(summary_img, aspect='auto', )
-        ax_dict['B'].axis('off')  # Turn off axis ticks and labels
+        ax_dict['B'].set_xlabel('SHAP Value (impact \n on rxn times)', fontsize=18)
+        #turn off y axis
+        ax_dict['B'].set_yticks([])
+        ax_dict['B'].set_yticklabels([])
+        ax_dict['B'].set_ylabel(None)
+        ax_dict['B'].axis('off')
+        #add text to the plot where the x axis is
+        from matplotlib.font_manager import FontProperties
+        font_props = FontProperties()
+        font_props.set_size(18)
+        ax_dict['B'].annotate(
+            'SHAP Value (impact \n on rxn times)',
+            xy=(0.5, 0.5),  # Center of the subplot
+            xytext=(0.5, 0),  # No offset
+            textcoords='axes fraction',
+            ha='center',  # Horizontal alignment
+            va='center',  # Vertical alignment
+            fontproperties=font_props,
+            zorder=10
+        )
+
+        # ax_dict['B'].annotate(
+        #     'SHAP Value (impact \n on rxn times)',
+        #     xy=(0.5, -0.2),  # Adjust the x-position as needed
+        #     xytext=(0, -0.25),  # Adjust the y-position as needed
+        #     textcoords='axes fraction',
+        #     ha='center',  # Horizontal alignment
+        #     va='center',  # Vertical alignment
+        #     fontproperties=font_props,
+        #     zorder=10
+        # )
+
         # ax_dict['B'].set_title('Ranked list of features over their \n impact on reaction time', fontsize=13)
 
 
@@ -744,7 +776,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         #             fontsize=25, va='bottom', weight='bold')
 
         # plt.tight_layout()
-        plt.suptitle('Correct hit response reaction times', fontsize=25)
+        # plt.suptitle('Correct hit response reaction times', fontsize=25)
 
         plt.subplots_adjust(wspace=0.2, hspace=0.4)
 
@@ -785,7 +817,7 @@ def extract_release_times_data(ferrets):
     dfuse = df[[ "pitchoftarg", "pastcatchtrial", "trialNum", "talker", "side", "precur_and_targ_same",
                 "timeToTarget",
                 "realRelReleaseTimes", "ferret", "pastcorrectresp"]]
-    labels = ['target F0', 'past trial was catch', 'trial number', 'talker', 'side of audio', 'precursor = target F0', 'time to target', 'realRelReleaseTimes', 'ferret ID', 'past trial was correct']
+    labels = ['target F0', 'past trial catch', 'trial no.', 'talker', 'side of audio', 'precursor = target F0', 'target time', 'realRelReleaseTimes', 'ferret ID', 'past resp. correct']
     dfuse = dfuse.rename(columns=dict(zip(dfuse.columns, labels)))
     #plot the proportion of trials that have target F0 = precursor F0 for each subset of target F0
     targ_1 = dfuse[dfuse['target F0'] == 1]
@@ -821,7 +853,7 @@ def extract_release_times_data(ferrets):
 def run_mixed_effects_model_correctrxntime(df):
     #split the data into training and test set
     #relabel the labels by addding underscore for each label
-
+    ferrets = ['F1702', 'F1815', 'F1803', 'F2002', 'F2105']
     for col in df.columns:
         if col == 'precursor = target F0':
             #rename this column to make it easier to work with
@@ -829,8 +861,10 @@ def run_mixed_effects_model_correctrxntime(df):
         else:
 
             df.rename(columns={col: col.replace(" ", "_")}, inplace=True)
+    for col in df.columns:
+            df.rename(columns={col: col.replace(".", "_")}, inplace=True)
 
-    equation = 'realRelReleaseTimes ~target_F0 + past_trial_was_catch + trial_number + talker + side_of_audio + precursor_equals_target_F0 + time_to_target + past_trial_was_correct'
+    equation = 'realRelReleaseTimes ~target_F0 + past_trial_catch + trial_no_ + talker + side_of_audio + precursor_equals_target_F0 + target_time + past_resp__correct'
 
 
     #drop the rows with missing values
@@ -850,8 +884,24 @@ def run_mixed_effects_model_correctrxntime(df):
 
         model = smf.mixedlm(equation, train, groups=train["ferret_ID"])
         result = model.fit()
+
+        random_effects = result.random_effects
+
+        random_effects_2 = pd.DataFrame()
+        for i, ferret in enumerate(ferrets):
+            try:
+                random_effects_2[ferret] = random_effects[i].values
+            except:
+                continue
+
         print(result.summary())
-        coefficients.append(result.params)
+        params = result.params
+        #combiune params and random effects into one series
+        params = pd.concat([params, random_effects_2.mean(axis=0)], axis=0)
+
+        coefficients.append(params)
+
+
         p_values.append(result.pvalues)
         var_resid = result.scale
         var_random_effect = float(result.cov_re.iloc[0])

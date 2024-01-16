@@ -127,6 +127,7 @@ def run_optuna_study_correctresp(X, y):
     return study
 
 def run_mixed_effects_model_correctresp(df):
+    ferrets= ['F1702', 'F1815', 'F1803', 'F2002', 'F2105']
     equation = 'misslist ~ talker + side + precur_and_targ_same + targTimes + pastcorrectresp + pastcatchtrial + pitchoftarg'
     #split the data into training and test set
     #drop the rows with missing values
@@ -153,7 +154,24 @@ def run_mixed_effects_model_correctresp(df):
         var_resid = result.scale
         var_random_effect = float(result.cov_re.iloc[0])
         var_fixed_effect = result.predict(df).var()
-        coefficients.append(result.params)
+        # coefficients.append(result.params)
+
+        random_effects = result.random_effects
+
+        random_effects_2 = pd.DataFrame()
+        for i, ferret in enumerate(ferrets):
+            try:
+                random_effects_2[ferret] = random_effects[i].values
+            except:
+                continue
+
+        print(result.summary())
+        params = result.params
+        #combiune params and random effects into one series
+        params = pd.concat([params, random_effects_2.mean(axis=0)], axis=0)
+
+        coefficients.append(params)
+
         p_values.append(result.pvalues)
 
         total_var = var_fixed_effect + var_random_effect + var_resid
@@ -269,7 +287,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
                            "targTimes","pastcorrectresp",
                            "pastcatchtrial", "pitchoftarg"]]
         #
-        labels = ['trial number','misslist', 'talker', 'audio side', 'precursor = target F0','target presentation time', 'past response was correct', 'past trial was catch', 'target F0']
+        labels = ['trial no.','misslist', 'talker', 'audio side', 'precursor = target F0','target time', 'past resp. correct', 'past trial catch', 'target F0']
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
 
         fig_dir = Path('D:/behavmodelfigs/correctresp_or_miss/')
@@ -610,7 +628,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
 
     # plt.tight_layout()
 
-    plt.suptitle('Target words: miss versus hit model', fontsize=25)
+    # plt.suptitle('Target words: miss versus hit model', fontsize=25)
     plt.subplots_adjust(wspace=0.2, hspace=0.4)
 
     # plt.tight_layout()
