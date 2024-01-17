@@ -668,13 +668,15 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         # Convert the text width from points to inches
         text_width_inches = text_width_pt / 72.27
 
-        mosaic = ['A', 'B', 'C'], ['D', 'B', 'E']
+        mosaic = ['A', 'B'], ['D', 'B'], ['C', 'E']
         ferret_id_only = ['F1702', 'F1815', 'F1803', 'F2002', 'F2105']
 
         # fig = plt.figure(figsize=(20, 10))
-        fig = plt.figure(figsize=(text_width_inches * 3, (text_width_inches / 2) * 3))
+        figsize = (text_width_inches * 2, text_width_inches * 2)
+        gridspec_kw = {'width_ratios': [1, 1], 'height_ratios': [1, 1, 1]}
 
-        ax_dict = fig.subplot_mosaic(mosaic)
+        # Create the figure with subplots
+        fig, ax_dict = plt.subplot_mosaic(mosaic, figsize=figsize, gridspec_kw=gridspec_kw)
 
         # Plot the elbow plot
         ax_dict['A'].plot(feature_labels, cumulative_importances, marker='o', color='cyan')
@@ -767,13 +769,6 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         # ax_dict['C'].annotate('c)', xy=get_axis_limits(ax_dict['C']), xytext=(-0.1, ax_dict['C'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
         # ax_dict['D'].annotate('d)', xy=get_axis_limits(ax_dict['D']), xytext=(-0.1, ax_dict['D'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
         # ax_dict['E'].annotate('e)', xy=get_axis_limits(ax_dict['E']), xytext=(-0.1, ax_dict['E'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-
-        import matplotlib.transforms as mtransforms
-        # for label, ax in ax_dict.items():
-        #     # label physical distance to the left and up:
-        #     trans = mtransforms.ScaledTranslation(-20 / 72, 7 / 72, fig.dpi_scale_trans)
-        #     ax.text(0.0, 1.05, label, transform=ax.transAxes + trans,
-        #             fontsize=25, va='bottom', weight='bold')
 
         # plt.tight_layout()
         # plt.suptitle('Correct hit response reaction times', fontsize=25)

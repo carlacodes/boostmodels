@@ -245,7 +245,7 @@ def run_optuna_study_falsealarm(dataframe, y, ferret_as_feature=False):
             ["pitchof0oflastword", "time_elapsed", "trialNum", "talker", "side", "intra_trial_roving", "pastcorrectresp",
              "pastcatchtrial",
              "falsealarm"]]
-        labels = ["F0", "time since start of trial", "trial no", "talker", "audio side", "intra-trial F0 roving",
+        labels = ["F0", "time in trial", "trial no", "talker", "audio side", "intra-trial F0 roving",
                   "past resp. correct", "past trial catch", "falsealarm"]
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
 
@@ -448,8 +448,8 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput, ferret_as_feature=False, one
         # dfuse = df[["pitchoftarg", "pastcatchtrial", "trialNum", "talker", "side", "precur_and_targ_same",
         #             "timeToTarget",
         #             "realRelReleaseTimes", "ferret", "pastcorrectresp"]]
-        labels = ["time since trial start", "ferret ID", "trial number", "talker", "audio side",
-                  "intra-trial F0 roving", "past response correct", "past trial was catch", "falsealarm", "F0"]
+        labels = ["time in trial", "ferret ID", "trial no.", "talker", "audio side",
+                  "intra-trial F0 roving", "past resp. correct", "past trial catch", "falsealarm", "F0"]
         labels_mixed_effects = ["time_since_trial_start", "ferret_ID", "trial_number", "talker", "audio_side",
                   "intra_trial_F0_roving", "past_response_correct", "past_trial_was_catch", "falsealarm", "F0"]
         df_to_use2 = df_to_use.copy()
@@ -585,7 +585,6 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     # plt.title('Mean SHAP value over ferret ID', fontsize=18)
     plt.savefig(fig_dir /'ferretIDbysideofaudio1409.png', dpi=500, bbox_inches='tight')
     plt.show()
-    #time since start of trial
 
 
 
