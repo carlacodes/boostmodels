@@ -874,6 +874,7 @@ def run_mixed_effects_model_correctrxntime(df):
     train_r2 = []
     coefficients = []
     p_values = []
+    random_effects_df = pd.DataFrame()
     for train_index, test_index in kf.split(df):
         train, test = df.iloc[train_index], df.iloc[test_index]
 
@@ -891,11 +892,11 @@ def run_mixed_effects_model_correctrxntime(df):
 
         print(result.summary())
         params = result.params
-        #combiune params and random effects into one series
-        params = pd.concat([params, random_effects_2.mean(axis=0)], axis=0)
+        # combiune params and random effects into one series
+        # params = pd.concat([params, random_effects_2.mean(axis=0)], axis=0)
 
         coefficients.append(params)
-
+        random_effects_df = pd.concat([random_effects_df, random_effects_2])
 
         p_values.append(result.pvalues)
         var_resid = result.scale
@@ -971,7 +972,10 @@ def run_mixed_effects_model_correctrxntime(df):
     mean_coefficients = pd.DataFrame(coefficients).mean()
     print(mean_coefficients)
     mean_coefficients.to_csv('D:\mixedeffectmodelsbehavioural\models/mixedeffects_csvs/correctrxntimemodel_coefficients.csv')
-
+    mean_random_effects = random_effects_df.mean(axis=0)
+    print(mean_random_effects)
+    big_df = pd.concat([mean_coefficients, mean_random_effects], axis=0)
+    big_df.to_csv('D:/mixedeffectmodelsbehavioural/models/correctrxntimemodel_mean_coefficients_and_random_effects.csv')
 
     #export
     # np.savetxt(f"mixedeffects_csvs/correctrxntimemodel_mse_train_mean.csv", [np.mean(train_mse)], delimiter=",")

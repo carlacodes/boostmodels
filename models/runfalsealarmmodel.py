@@ -297,6 +297,8 @@ def run_mixed_effects_model_falsealarm(df):
     test_acc = []
     coefficients = []
     p_values   = []
+    std_errors = []
+    random_effects_df = pd.DataFrame()
     for train_index, test_index in kf.split(df):
         train, test = df.iloc[train_index], df.iloc[test_index]
 
@@ -312,14 +314,7 @@ def run_mixed_effects_model_falsealarm(df):
                 random_effects_2[ferret] = random_effects[i].values
             except:
                 continue
-        # random_effects = pd.concat(random_effects.values(), axis=1)
-        # #rework the dataframe so each column  is a random effect
-        # random_effects.columns = random_effects.columns.str.replace('Group Var', 'Ferret')
-        # random_effects.columns = random_effects.columns.str.replace('0', 'F1702')
-        # random_effects.columns = random_effects.columns.str.replace('1', 'F1815')
-        # random_effects.columns = random_effects.columns.str.replace('2', 'F1803')
-        # random_effects.columns = random_effects.columns.str.replace('3', 'F2002')
-        # random_effects.columns = random_effects.columns.str.replace('4', 'F2105')
+
         #
         #flatten the random_effects
         print(random_effects)
@@ -335,9 +330,10 @@ def run_mixed_effects_model_falsealarm(df):
         conditional_r2 = (var_fixed_effect + var_random_effect) / total_var
         params = result.params
         #combiune params and random effects into one series
-        params = pd.concat([params, random_effects_2.mean(axis=0)], axis=0)
+        # params = pd.concat([params, random_effects_2.mean(axis=0)], axis=0)
 
         coefficients.append(params)
+        random_effects_df = pd.concat([random_effects_df, random_effects_2])
         p_values.append(result.pvalues)
 
         # Generate confusion matrix for train set
@@ -364,6 +360,8 @@ def run_mixed_effects_model_falsealarm(df):
         y_true = test['falsealarm'].to_numpy()
         confusion_matrix_test = confusion_matrix(y_true, y_pred)
         print(confusion_matrix_test)
+
+        std_errors.append(result.bse)
 
         # Calculate balanced accuracy for test set
         balanced_accuracy_test = balanced_accuracy_score(y_true, y_pred)
@@ -432,6 +430,11 @@ def run_mixed_effects_model_falsealarm(df):
     print(np.mean(test_acc))
     mean_coefficients = pd.DataFrame(coefficients).mean()
     mean_coefficients.to_csv('mixedeffects_csvs/falsealarm_mean_coefficients.csv')
+
+    mean_random_effects = random_effects_df.mean(axis=0)
+    print(mean_random_effects)
+    big_df = pd.concat([mean_coefficients, mean_random_effects], axis=0)
+    big_df.to_csv('mixedeffects_csvs/falsealarm_mean_coefficients_and_random_effects.csv')
 
     print(mean_coefficients)    #export
     np.savetxt(f"mixedeffects_csvs/falsealarm_balac_train_mean.csv", [np.mean(train_acc)], delimiter=",")
@@ -997,13 +1000,13 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
 
     # Create the figure with the desired figsize
     mosaic = ['A', 'B'], ['D', 'B'], ['C', 'E']
-    # fig = plt.figure(figsize=(20, 10))
-    figsize = ( (text_width_inches / 2) * 3, text_width_inches * 3)
-    figsize = (text_width_inches * 2, text_width_inches * 2)
-    gridspec_kw = {'width_ratios': [1, 1], 'height_ratios': [1, 1, 1]}
+    ferret_id_only = ['F1702', 'F1815', 'F1803', 'F2002', 'F2105']
 
-    # Create the figure with subplots
-    fig, ax_dict = plt.subplot_mosaic(mosaic, figsize = figsize, gridspec_kw=gridspec_kw)
+    # fig = plt.figure(figsize=(20, 10))
+    fig = plt.figure(figsize=((text_width_inches / 2) * 4, text_width_inches * 4))
+
+    ax_dict = fig.subplot_mosaic(mosaic)
+
 
     # fig, axes = plt.subplots(nrows=2, ncols=3, figsize=(text_width_inches, text_width_inches),
     #                          gridspec_kw={'width_ratios': [1, 1, 1], 'height_ratios': [1, 1], 'hspace': 0.2})

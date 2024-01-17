@@ -117,6 +117,7 @@ def run_mixed_effects_model_correctresp(df):
     test_acc = []
     coefficients = []
     p_values = []
+    random_effects_df = pd.DataFrame()
     for train_index, test_index in kf.split(df):
         train, test = df.iloc[train_index], df.iloc[test_index]
 
@@ -147,9 +148,10 @@ def run_mixed_effects_model_correctresp(df):
         print(result.summary())
         params = result.params
         #combiune params and random effects into one series
-        params = pd.concat([params, random_effects_2.mean(axis=0)], axis=0)
+        # params = pd.concat([params, random_effects_2.mean(axis=0)], axis=0)
 
         coefficients.append(params)
+        random_effects_df = pd.concat([random_effects_df, random_effects_2])
 
         p_values.append(result.pvalues)
 
@@ -234,6 +236,12 @@ def run_mixed_effects_model_correctresp(df):
     mean_coefficients = pd.DataFrame(coefficients).mean()
     print(mean_coefficients)
     mean_coefficients.to_csv('mixedeffects_csvs/correctresp_mean_coefficients.csv')
+
+    mean_random_effects = random_effects_df.mean(axis=0)
+    print(mean_random_effects)
+    big_df = pd.concat([mean_coefficients, mean_random_effects], axis=0)
+    big_df.to_csv('mixedeffects_csvs/correctresp_mean_coefficients_and_random_effects.csv')
+
     #export to dataframe
     # np.savetxt(f"mixedeffects_csvs/correctresp_balac_train_mean.csv", [np.mean(train_acc)], delimiter=",")
     # np.savetxt(f"mixedeffects_csvs/correctresp_balac_test_mean.csv", [np.mean(test_acc)], delimiter=",")
@@ -385,6 +393,38 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
 
     plt.show()
     #make the y labels smaller
+    #do an example force plot for the data point with the highest miss probability
+    #get the index of the data point with the highest miss probability
+    max_miss_prob = np.max(ypred[:,1])
+    max_miss_prob_index = np.where(ypred[:,1] == max_miss_prob)[0][0]
+
+    shap_values_for_max_miss_prob = shap_values2[max_miss_prob_index]
+    #do a force plot for that data point
+    explainer = shap.TreeExplainer(xg_reg)
+    explanation = explainer.shap_values(dfx)  # Corrected this line
+    max_miss_probe = np.max(ypred[:, 1])
+    max_shap_index = explanation[1].sum(axis=1).argmax()
+
+    cumulative_shap_values = explanation[1].sum(axis=1)
+
+    # Find the indices of the top 10 instances with the highest cumulative Shapley values
+    top_10_indices = cumulative_shap_values.argsort()[-10:][::-1]
+
+    # Create force plots for the top 10 instances
+    for i in top_10_indices:
+        force_plot_top_10 = shap.force_plot(explainer.expected_value[1], explanation[1][i, :], dfx.iloc[i, :])
+        shap.save_html(str(fig_savedir / f'forceplot_top_10_{i}.png'), force_plot_top_10)
+
+    # Create a force plot for the data point with the maximum Shapley value
+    force_plot_max = shap.force_plot(explainer.expected_value[1], explanation[1][max_shap_index, :],
+                                     dfx.iloc[max_shap_index, :])
+    shap.save_html(str(fig_savedir / 'forceplot_max_shap.html'), force_plot_max)
+
+    force_plot = shap.force_plot(explainer.expected_value[1], explanation[1], dfx)
+    shap.save_html(str(fig_savedir / 'forceplot.html'), force_plot)
+
+
+
 
 
     fig, ax = plt.subplots()
@@ -502,9 +542,8 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     text_width_inches = text_width_pt / 72.27
 
     # mosaic = ['A', 'B'], ['D', 'B'], ['C', 'E']
-    mosaic = ['A', 'B', 'C'], ['D', 'B', 'E']
+    # mosaic = ['A', 'B', 'C'], ['D', 'B', 'E']
 
-    ferret_id_only = ['F1702', 'F1815', 'F1803', 'F2002', 'F2105']
 
     # # fig = plt.figure(figsize=(20, 10))
     # figsize = (text_width_inches*(1/4), text_width_inches)
@@ -516,11 +555,11 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     # # fig, ax_dict = plt.subplot_mosaic(mosaic, figsize=figsize, gridspec_kw=gridspec_kw)
     # fig, ax_dict = plt.subplot_mosaic(mosaic, figsize = (4,10))
 
-    mosaic = ['A', 'B', 'C'], ['D', 'B', 'E']
+    mosaic = ['A', 'B'], ['D', 'B'], ['C', 'E']
     ferret_id_only = ['F1702', 'F1815', 'F1803', 'F2002', 'F2105']
 
     # fig = plt.figure(figsize=(20, 10))
-    fig = plt.figure(figsize=(text_width_inches * 4, (text_width_inches / 2) * 4))
+    fig = plt.figure(figsize=((text_width_inches / 2) * 4, text_width_inches * 4))
 
     ax_dict = fig.subplot_mosaic(mosaic)
 
@@ -630,7 +669,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
             text.set_fontfamily('sans-serif')
             text.set_color('black')
 
-    plt.subplots_adjust(wspace=0.6, hspace=0.3)
+    plt.subplots_adjust(wspace=0.35, hspace=0.5)
     # plt.tight_layout()
 
     # plt.tight_layout()
