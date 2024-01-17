@@ -40,35 +40,14 @@ def shap_summary_plot(
         savefig=False,
         savefig_path=None,
     ):
-    if ax is None:
-        fig, ax = plt.subplots()
+    plt.rcParams['font.family'] = 'sans-serif'
+
     if isinstance(cmap, str):
         cmap = matplotlib.colormaps[cmap]
+    plt.sca(ax)
     shap.plots.beeswarm(shap_values2, show=False, color=cmap)
-    fig, ax = plt.gcf(), plt.gca()
 
-    fig.set_size_inches(4, 12)
-    ax.set_xlabel('Log(odds) miss', fontsize=36)
-    colorbar = fig.axes[1]
-    # change the font size of the color bar
-    colorbar.tick_params(labelsize=30)
-    # change the label of the color bar
-    colorbar.set_ylabel(None)
-    # ax.set_yticks(range(len(feature_labels)))
-    # for some reason y ticks are set in reverse order
-    ax.set_yticklabels(np.flip(feature_labels), fontsize=17, rotation=45)
-    # ax.set_yticklabels(np.reverse(feature_labels), fontsize=17, rotation = 45)
-    # ax.set_ylabel('Features', fontsize=18)
-    # pull legend from figure
-    # Pull legend from figure
-    legend_handles, legend_labels = ax.get_legend_handles_labels()
-    # reinsert the legend_hanldes and labels
-    ax.legend(legend_handles, ['Hit', 'Miss'], loc='upper right', fontsize=18)
 
-    if savefig:
-        fig.savefig(savefig_path, dpi=300)
-    if show_plots:
-        fig.show()
 def objective(trial, X, y):
     param_grid = {
         "colsample_bytree": trial.suggest_float("colsample_bytree", 0.1, 1),
@@ -265,7 +244,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
         df_to_use = dataframe[["trialNum", "misslist", "talker", "side", "precur_and_targ_same",
                                "targTimes", "pastcorrectresp",
                                "pastcatchtrial", "pitchoftarg", "ferret"]]
-        labels = ['trial no.','misslist', 'talker', 'audio side', 'precursor = target F0','target time', 'past resp. correct', 'past trial catch',"target F0", 'ferret ID']
+        labels = ['trial no.','misslist', 'talker', 'audio side', 'precur. = targ. F0','target time', 'past resp. correct', 'past trial catch',"target F0", 'ferret ID']
 
         run_mixed_effects_model_correctresp(df_to_use)
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
@@ -287,7 +266,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
                            "targTimes","pastcorrectresp",
                            "pastcatchtrial", "pitchoftarg"]]
         #
-        labels = ['trial no.','misslist', 'talker', 'audio side', 'precursor = target F0','target time', 'past resp. correct', 'past trial catch', 'target F0']
+        labels = ['trial no.','misslist', 'talker', 'audio side', "precur.= targ. F0",'target time', 'past resp. correct', 'past trial catch', 'target F0']
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
 
         fig_dir = Path('D:/behavmodelfigs/correctresp_or_miss/')
@@ -414,12 +393,12 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     plt.show()
 
 
-    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "precursor = target F0"], cmap=cmapcustom, show=True)
+    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "precur.= targ. F0"], cmap=cmapcustom, show=True)
     shap.plots.scatter(shap_values2[:, "audio side"], color=shap_values2[:, "ferret ID"], cmap=cmapcustom, show=True)
-    shap.plots.scatter(shap_values2[:,  "trial no."], color=shap_values2[:, "precursor = target F0"], cmap=cmapcustom, show=True)
+    shap.plots.scatter(shap_values2[:,  "trial no."], color=shap_values2[:, "precur.= targ. F0"], cmap=cmapcustom, show=True)
     shap.plots.scatter(shap_values2[:, "target time"], color=shap_values2[:, "ferret ID"], cmap=cmapcustom, show=True)
 
-    shap.plots.scatter(shap_values2[:, "target F0"], color=shap_values2[:, "precursor = target F0"], cmap=cmapcustom, show=True)
+    shap.plots.scatter(shap_values2[:, "target F0"], color=shap_values2[:, "precur.= targ. F0"], cmap=cmapcustom, show=True)
 
 
     fig, ax = plt.subplots()
@@ -525,7 +504,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     ferret_id_only = ['F1702', 'F1815', 'F1803', 'F2002', 'F2105']
 
     # fig = plt.figure(figsize=(20, 10))
-    figsize = (text_width_inches * 2, text_width_inches * 2)
+    figsize = (text_width_inches * 6, text_width_inches * 8)
     gridspec_kw = {'width_ratios': [1, 1], 'height_ratios': [1, 1, 1]}
 
     # Create the figure with subplots
@@ -545,18 +524,25 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     # ax_dict['B'].imshow(summary_img, aspect='auto', )
     # ax_dict['B'].axis('off')  # Turn off axis ticks and labels
     # ax_dict['B'].set_title('Miss vs hit', fontsize=13)
-    ax = ax_dict['B']
-    shap_summary_plot(shap_values2, feature_labels, show_plots=False, ax=ax, cmap=cmapcustom)
+    axmini = ax_dict['B']
+    shap_summary_plot(shap_values2, feature_labels, show_plots=False, ax=axmini, cmap=cmapcustom)
+    ax_dict['B'].set_yticklabels(np.flip(feature_labels), fontsize=12, rotation=45)
+    ax_dict['B'].set_xlabel('Log(odds) miss', fontsize=12)
+    cb_ax = fig.axes[5]
+    cb_ax.tick_params(labelsize=8)
+    cb_ax.set_ylabel('Value', fontsize=8)
+
 
 
     ax_dict['D'].barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, color='peru')
     # ax_dict['D'].set_title("Permutation importances on predicting a miss")
     ax_dict['D'].set_xlabel("Permutation importance", fontsize=18)
+    plt.rcParams['font.family'] = 'sans-serif'
 
     shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "target F0"], ax=ax_dict['E'],
                        cmap=cmapcustom, show=False)
     fig, ax = plt.gcf(), plt.gca()
-    cb_ax = fig.axes[5]
+    cb_ax = fig.axes[6]
     # # Modifying color bar parameters
     # cb_ax.tick_params(labelsize=15)
     # cb_ax.set_ylabel("precursor = target F0 word", fontsize=15)
@@ -564,8 +550,8 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     # ax_dict['E'].set_title('Talker versus impact on miss probability', fontsize=18)
     cb_ax.set_yticks([1, 2, 3,4, 5])
     cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
-    cb_ax.set_ylabel("target F0 (Hz)", fontsize=12)
-    cb_ax.tick_params(labelsize=15)
+    cb_ax.set_ylabel("target F0 (Hz)", fontsize=8)
+    cb_ax.tick_params(labelsize=8)
     # ax_dict['E'].set_xlabel('Talker', fontsize=16)
     ax_dict['E'].set_xlabel('')
 
@@ -577,14 +563,12 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     fig, ax = plt.gcf(), plt.gca()
     # ax_dict['C'].set_title('Miss vs hit', fontsize=12)
 
-    cb_ax = fig.axes[7]
+    cb_ax = fig.axes[8]
     cb_ax.set_yticks([1, 2, 3,4, 5])
     cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
-    cb_ax.tick_params(labelsize=15)
-    cb_ax.set_ylabel("target F0 (Hz)", fontsize=12)
-
-    # Modifying color bar parameters
-    cb_ax.tick_params(labelsize=15)
+    cb_ax.tick_params(labelsize=8)
+    cb_ax.set_ylabel("target F0 (Hz)", fontsize=8)
+    cb_ax.tick_params(labelsize=8)
     ax_dict['C'].set_ylabel('Log(odds) miss', fontsize=18)
     # ax_dict['C'].set_xlabel('Ferret ID', fontsize=16)
     ax_dict['C'].set_xlabel('')
@@ -612,13 +596,27 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     # plt.tight_layout()
 
     # plt.suptitle('Target words: miss versus hit model', fontsize=25)
-    for ax in ax_dict.values():
-        ax.tick_params(axis='both', which='major', labelsize=13)
-        ax.tick_params(axis='both', which='minor', labelsize=8)
-    plt.subplots_adjust(wspace=0.2, hspace=0.3)
+    # for ax in ax_dict.values():
+    #     ax.tick_params(axis='both', which='major', labelsize=8)
+    #     ax.tick_params(axis='both', which='minor', labelsize=8)
     for key, ax in ax_dict.items():
-        ax.xaxis.label.set_size(16)
-        ax.yaxis.label.set_size(16)
+        if key == 'B':
+            ax.yaxis.label.set_size(4)
+            ax.xaxis.label.set_size(8)
+            ax.tick_params(axis='y', which='major', labelsize=7)
+            ax.tick_params(axis='x', which='major', labelsize=8)
+            ax.tick_params(axis='y', which='minor', labelsize=7)
+
+            ax.tick_params(axis='x', which='minor', labelsize=8)
+
+        else:
+            ax.tick_params(axis='both', which='major', labelsize=8)
+            ax.tick_params(axis='both', which='minor', labelsize=8)
+            ax.xaxis.label.set_size(8)
+            ax.yaxis.label.set_size(8)
+
+    plt.subplots_adjust(wspace=0.4, hspace=0.6)
+    # plt.tight_layout()
 
     # plt.tight_layout()
     plt.savefig(fig_dir / 'big_summary_plot_1606_noannotation.png', dpi=500, bbox_inches="tight")
@@ -627,11 +625,11 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     plt.show()
     # Plot the scatter plot for trial number and precursor pitch
     fig, ax = plt.subplots()
-    shap.plots.scatter(shap_values2[:,  "trial no."], color=shap_values2[:, "precursor = target F0"],
+    shap.plots.scatter(shap_values2[:,  "trial no."], color=shap_values2[:, "precur.= targ. F0"],
                        ax=ax, cmap=cmapcustom, show=False)
     cb_ax = fig.axes[1]
     cb_ax.tick_params(labelsize=15)
-    cb_ax.set_ylabel("precursor = target F0", fontsize=14)
+    cb_ax.set_ylabel("precur.= targ. F0", fontsize=14)
     cb_ax.set_yticks([0.25, 0.75])
     cb_ax.set_yticklabels(['True', 'False'])
     plt.title('Trial number', fontsize=18)
@@ -642,7 +640,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
 
     # Plot the scatter plot for side of audio presentation and precursor pitch
     fig, ax = plt.subplots(figsize=(10, 10))
-    shap.plots.scatter(shap_values2[:, "audio side"], color=shap_values2[:, "precursor = target F0"],
+    shap.plots.scatter(shap_values2[:, "audio side"], color=shap_values2[:, "precur.= targ. F0"],
                        ax=ax, cmap=cmapcustom, show=False)
     cb_ax = fig.axes[1]
     cb_ax.tick_params(labelsize=15)
@@ -656,14 +654,14 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
 
 
     fig, ax = plt.subplots()
-    shap.plots.scatter(shap_values2[:,  "trial no."], color=shap_values2[:, "precursor = target F0"], ax=ax, cmap = cmapcustom, show = False)
+    shap.plots.scatter(shap_values2[:,  "trial no."], color=shap_values2[:, "precur.= targ. F0"], ax=ax, cmap = cmapcustom, show = False)
     fig, ax = plt.gcf(), plt.gca()
     cb_ax = fig.axes[1]
     # Modifying color bar parameters
     cb_ax.tick_params(labelsize=15)
     # cb_ax.set_yticks([1, 2, 3,4, 5])
     # cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
-    cb_ax.set_ylabel("precursor = target F0", fontsize=15)
+    cb_ax.set_ylabel("precur.= targ. F0", fontsize=15)
     plt.title('Trial number and its effect on the \n miss probability', fontsize = 18)
     plt.xlabel('Trial number', fontsize = 15)
     plt.ylabel('SHAP value', fontsize = 15)
@@ -671,7 +669,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     plt.show()
 
     fig, ax = plt.subplots(figsize=(10, 10))
-    shap.plots.scatter(shap_values2[:, "audio side"], color=shap_values2[:, "precursor = target F0"], ax=ax, cmap = cmapcustom, show = False)
+    shap.plots.scatter(shap_values2[:, "audio side"], color=shap_values2[:, "precur.= targ. F0"], ax=ax, cmap = cmapcustom, show = False)
     fig, ax = plt.gcf(), plt.gca()
     cb_ax = fig.axes[1]
     # Modifying color bar parameters
@@ -688,7 +686,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
 
 
     fig, ax = plt.subplots(figsize=(10, 10))
-    shap.plots.scatter(shap_values2[:, "precursor = target F0"], color=shap_values2[:,  "trial no."], ax=ax, cmap = cmapcustom, show = False)
+    shap.plots.scatter(shap_values2[:, "precur.= targ. F0"], color=shap_values2[:,  "trial no."], ax=ax, cmap = cmapcustom, show = False)
     fig, ax = plt.gcf(), plt.gca()
     cb_ax = fig.axes[1]
     # Modifying color bar parameters
@@ -703,7 +701,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     # plt.savefig(fig_dir / 'precursortargpitchintrialnumber.png', dpi=1000, bbox_inches = "tight")
     plt.show()
     #
-    # shap.plots.scatter(shap_values2[:, "pitch of target"], color=shap_values2[:, "precursor = target F0"], show=False, cmap = cmapcustom)
+    # shap.plots.scatter(shap_values2[:, "pitch of target"], color=shap_values2[:, "precur.= targ. F0"], show=False, cmap = cmapcustom)
     # fig, ax = plt.gcf(), plt.gca()
     # # Get colorbar
     # cb_ax = fig.axes[1]
@@ -711,7 +709,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     # cb_ax.tick_params(labelsize=15)
     # cb_ax.set_yticks([1, 2, 3,4, 5])
     # # cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
-    # cb_ax.set_ylabel("precursor = target F0", fontsize=12)
+    # cb_ax.set_ylabel("precur.= targ. F0", fontsize=12)
     # # cb_ax.set_yticklabels( ['109 Hz', '124 Hz', '144 Hz', '191 Hz', '251 Hz'], fontsize=15)
     # plt.ylabel('SHAP value', fontsize=10)
     # plt.title('Pitch of target \n versus impact in miss probability', fontsize=18)
@@ -721,7 +719,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     # plt.show()
 
 
-    shap.plots.scatter(shap_values2[:, "precursor = target F0"], color=shap_values2[:, "talker"])
+    shap.plots.scatter(shap_values2[:, "precur.= targ. F0"], color=shap_values2[:, "talker"])
     plt.show()
     shap.plots.scatter(shap_values2[:,  "trial no."], color=shap_values2[:, "talker"], show=False)
     plt.title('trial number \n vs. SHAP value impact')
@@ -748,7 +746,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     plt.show()
 
     fig, ax = plt.subplots(figsize=(15, 55))
-    shap.plots.scatter(shap_values2[:, "precursor = target F0"], color=shap_values2[:,  "trial no."], show=False)
+    shap.plots.scatter(shap_values2[:, "precur.= targ. F0"], color=shap_values2[:,  "trial no."], show=False)
     plt.title('SHAP values as a function of the pitch of the target, \n coloured by the target presentation time',
               fontsize=18)
     plt.ylabel('SHAP value', fontsize=18)
