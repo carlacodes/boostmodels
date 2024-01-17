@@ -463,7 +463,7 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput, ferret_as_feature=False, one
             ["time_elapsed", "trialNum", "talker", "side", "intra_trial_roving", "pastcorrectresp",
              "pastcatchtrial",
              "falsealarm", "pitchof0oflastword"]]
-        labels = [ "time since trial start", "trial number", "talker", "audio side", "intra-trial F0 roving",
+        labels = [ "time in trial", "trial number", "talker", "audio side", "intra-trial F0 roving",
                   "past response correct", "past trial was catch", "falsealarm", "F0"]
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
 
@@ -558,7 +558,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
 
 
     fig, ax = plt.subplots()
-    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "time since trial start"], show=False, ax=ax, cmap = cmapcustom)
+    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "time in trial"], show=False, ax=ax, cmap = cmapcustom)
     colorbar_scatter = fig.axes[1]
     # colorbar_scatter.set_yticks([0,1])
     # colorbar_scatter.set_yticklabels(['Left', 'Right'], fontsize=18)
@@ -635,13 +635,13 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "intra-trial F0 roving"], cmap=cmapcustom)
     shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "F0"], cmap=cmapcustom)
     shap.plots.scatter(shap_values2[:, "audio side"], color=shap_values2[:, "ferret ID"], cmap=cmapcustom)
-    shap.plots.scatter(shap_values2[:, "F0"], color=shap_values2[:, "time since trial start"], cmap=cmapcustom)
+    shap.plots.scatter(shap_values2[:, "F0"], color=shap_values2[:, "time in trial"], cmap=cmapcustom)
     shap.plots.scatter(shap_values2[:, "past response correct"], color=shap_values2[:, "ferret ID"], cmap=cmapcustom)
 
 
 
     fig, ax = plt.subplots(figsize=(5, 5))
-    shap.plots.scatter(shap_values2[:, "F0"], color=shap_values2[:, "time since trial start"], show= False,  ax=ax, cmap=cmapcustom)
+    shap.plots.scatter(shap_values2[:, "F0"], color=shap_values2[:, "time in trial"], show= False,  ax=ax, cmap=cmapcustom)
     cax = fig.axes[1]
     cax.tick_params(labelsize=15)
     cax.set_ylabel("Time since start of trial", fontsize=12)
@@ -718,7 +718,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
 
 
     fig, ax = plt.subplots(figsize=(5, 5))
-    shap.plots.scatter(shap_values2[:, "F0"], color=shap_values2[:, "time since trial start"], show=False, ax=ax,
+    shap.plots.scatter(shap_values2[:, "F0"], color=shap_values2[:, "time in trial"], show=False, ax=ax,
                        cmap=cmapcustom)
     cax = fig.axes[1]
     cax.tick_params(labelsize=15)
@@ -734,7 +734,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.show()
 
     fig, ax = plt.subplots(figsize=(5, 5))
-    shap.plots.scatter(shap_values2[:, "time since trial start"], color=shap_values2[:, "F0"], show=False, ax=ax,
+    shap.plots.scatter(shap_values2[:, "time in trial"], color=shap_values2[:, "F0"], show=False, ax=ax,
                        cmap=cmapcustom)
     cax = fig.axes[1]
     cax.tick_params(labelsize=15)
@@ -752,7 +752,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.show()
 
     fig, ax = plt.subplots(figsize=(5, 5))
-    shap.plots.scatter(shap_values2[:, "F0"], color=shap_values2[:, "trial number"], show=False, ax=ax,
+    shap.plots.scatter(shap_values2[:, "F0"], color=shap_values2[:, "trial no."], show=False, ax=ax,
                        cmap=cmapcustom)
     cax = fig.axes[1]
     cax.tick_params(labelsize=15)
@@ -771,7 +771,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.show()
 
     fig, ax = plt.subplots(figsize=(5, 5))
-    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "trial number"], show=False, ax=ax,
+    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "trial no."], show=False, ax=ax,
                        cmap=cmapcustom)
     cax = fig.axes[1]
     cax.tick_params(labelsize=15)
@@ -906,10 +906,10 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
 
     plt.tight_layout()
     plt.subplots_adjust(left=-10, right=0.5)
-    shap.plots.scatter(shap_values2[:, "time since trial start"], color=shap_values2[:, "ferret ID"], show= True,
+    shap.plots.scatter(shap_values2[:, "time in trial"], color=shap_values2[:, "ferret ID"], show= True,
                        cmap=cmapcustom)
 
-    shap.plots.scatter(shap_values2[:, "trial number"], color=shap_values2[:, "ferret ID"], show= True,
+    shap.plots.scatter(shap_values2[:, "trial no."], color=shap_values2[:, "ferret ID"], show= True,
                        cmap=cmapcustom)
 
     fig, ax = plt.subplots(figsize=(5, 5))
@@ -944,7 +944,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     shap.plots.scatter(shap_values2[:, "intra-trial F0 roving"], color=shap_values2[:, "F0"], show=True, cmap=cmapcustom)
     shap.plots.scatter(shap_values2[:, "intra-trial F0 roving"], color=shap_values2[:, "ferret ID"], show=True, cmap=cmapcustom)
 
-    shap.plots.scatter(shap_values2[:, "time since trial start"], color=shap_values2[:, "trial number"], show=False, cmap=cmapcustom)
+    shap.plots.scatter(shap_values2[:, "time in trial"], color=shap_values2[:, "trial no."], show=False, cmap=cmapcustom)
     fig, ax = plt.gcf(), plt.gca()
     # Get colorbar
     cb_ax = fig.axes[1]
@@ -959,7 +959,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.show()
 
 
-    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "trial number"], show=False, cmap=cmapcustom)
+    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "trial no."], show=False, cmap=cmapcustom)
     fig, ax = plt.gcf(), plt.gca()
     # Get colorbar
     cb_ax = fig.axes[1]
@@ -974,7 +974,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.savefig(fig_dir / 'ferretIDcolouredbytrialnumber1409.png', dpi=500)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "time since trial start"], color=shap_values2[:, "F0"], show=False,
+    shap.plots.scatter(shap_values2[:, "time in trial"], color=shap_values2[:, "F0"], show=False,
                        cmap=cmapcustom)
     fig, ax = plt.gcf(), plt.gca()
     # Get colorbar
@@ -1059,7 +1059,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     # cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
     # cb_ax.tick_params(labelsize=15)
     # cb_ax.set_ylabel("precursor F0 (Hz)", fontsize=15)
-    # shap.plots.scatter(shap_values2[:, "F0"], color=shap_values2[:, "time since trial start"], show= False, ax =ax_dict['C'],  cmap=cmapcustom)
+    # shap.plots.scatter(shap_values2[:, "F0"], color=shap_values2[:, "time in trial"], show= False, ax =ax_dict['C'],  cmap=cmapcustom)
     shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "F0"], show= False, ax =ax_dict['C'],  cmap=cmapcustom)
 
     fig, ax = plt.gcf(), plt.gca()
