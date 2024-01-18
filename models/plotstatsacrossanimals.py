@@ -1634,9 +1634,9 @@ def run_repeated_anova(stats_dict_inter, stats_dict_intra, stats_dict_control):
                 female_tukey['talker'] = np.ones(len(female_tukey))
                 male_tukey['talker'] = np.ones(len(male_tukey)) * 2
                 posthoc = pd.concat([female_tukey, male_tukey])
-        else:
-            # No interaction, perform comparisons for roving type only
-            posthoc = pg.pairwise_tukey(data=stats_dict_all, dv=value, between='roving_type')
+            else:
+                # No interaction, perform comparisons for roving type only
+                posthoc = pg.pairwise_tukey(data=stats_dict_all, dv=value, between='roving_type')
         numerator = anovaresults['F'][0] * anovaresults['ddof1'][0]
         denominator = numerator + anovaresults['ddof2'][0]
         partial_eta_squared = numerator / denominator

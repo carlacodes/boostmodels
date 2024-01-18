@@ -114,11 +114,6 @@ def run_mixed_effects_model_correctresp(df):
     #calculate the probability of a miss when the targtimes >=5.5
     df['misslist'] = df['misslist'].astype(int)
     df['targTimes'] = df['targTimes'].astype(float)
-
-    df_hightargtime = df[df['targTimes'] >= 5.5]
-
-
-
     kf = KFold(n_splits=5, shuffle=True, random_state=123)
     fold_index = 1
     train_acc = []
@@ -231,6 +226,7 @@ def run_mixed_effects_model_correctresp(df):
 
     result_coefficients = result_coefficients.sort_values(by='coefficients', ascending=False)
     ax.bar(result_coefficients.index, result_coefficients['coefficients'], color = 'peru')
+    ax.errorbar(result_coefficients.index, result_coefficients['coefficients'], yerr=result_coefficients['std_error'], fmt='none', ecolor='black', elinewidth=1, capsize=2)
     # ax.set_xticklabels(result_coefficients['features'], rotation=45, ha='right')
     # if the mean p value is less than 0.05, then add a star to the bar plot
     for i in range(len(result_coefficients)):
@@ -247,13 +243,14 @@ def run_mixed_effects_model_correctresp(df):
     print(np.mean(train_acc))
     print(np.mean(test_acc))
     mean_coefficients = pd.DataFrame(coefficients).mean()
+    mean_coefficients = pd.concat([mean_coefficients, p_values_df, std_error_df], axis=1, keys=['coefficients', 'p_values', 'std_error'])
     print(mean_coefficients)
     mean_coefficients.to_csv('mixedeffects_csvs/correctresp_mean_coefficients.csv')
 
     mean_random_effects = random_effects_df.mean(axis=0)
     print(mean_random_effects)
     big_df = pd.concat([mean_coefficients, mean_random_effects], axis=0)
-    big_df.to_csv('mixedeffects_csvs/correctresp_mean_coefficients_and_random_effects.csv')
+    mean_random_effects.to_csv('mixedeffects_csvs/random_effects.csv')
 
     #export to dataframe
     # np.savetxt(f"mixedeffects_csvs/correctresp_balac_train_mean.csv", [np.mean(train_acc)], delimiter=",")
@@ -898,7 +895,7 @@ def run_correct_responsepipeline(ferrets):
         ferret_as_feature = True
 
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbcorrectrespornotwithoptuna(
-        resultingcr_df, optimization=True, ferret_as_feature = ferret_as_feature, one_ferret=one_ferret, ferrets=ferrets)
+        resultingcr_df, optimization=False, ferret_as_feature = ferret_as_feature, one_ferret=one_ferret, ferrets=ferrets)
     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
 

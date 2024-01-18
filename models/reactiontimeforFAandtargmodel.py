@@ -291,12 +291,12 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     mae_test = cross_val_score(xg_reg, X_test, y_test, scoring='neg_median_absolute_error', cv=kfold)
     r2_test = cross_val_score(xg_reg, X_test, y_test, scoring='r2', cv=kfold)
     print("MSE on test: %.4f" % (np.mean(mse_test)))
-    print("negative MSE training: %.2f%%" % (np.mean(results) * 100.0))
+    print("negative MSE training: %.4f" % (np.mean(results)))
     print('r2 on test: %.4f' % (np.mean(r2_test)))
     print('r2 on training: %.4f' % (np.mean(results_r2)))
     mae = median_absolute_error(ypred, y_test)
     print("MAE on test: %.4f" % (np.mean(mae_test)))
-    print("negative MAE training: %.2f%%" % (np.mean(results_mae) * 100.0))
+    print("negative MAE training: %.2f" % (np.mean(results_mae)))
 
     # export all scoring results
     trainandtestaccuracy = {
@@ -1476,7 +1476,7 @@ def main():
     # ferrets = ['F1815_Cruella']# , 'F2105_Clove']
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
 
-    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=False, talker=2, noise_floor=True)
+    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=False, talker=2, noise_floor=False)
 
     # for ferret in ferrets:
     #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)
