@@ -1001,16 +1001,26 @@ def run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature = 
     df_use = extract_release_times_data(ferrets)
     #export to csv
     df_use.to_csv('D:\dfformixedmodels\correctrxntime_data.csv')
+    df_use2 = df_use.copy()
 
     if noise_floor == True:
         #shuffle the realRelReleaseTimes column 100 times
-        for i in range(1000):
-            df_use['realRelReleaseTimes'] = df_use['realRelReleaseTimes'].sample(frac=1)
+        for i in range(10000):
+            df_use2['realRelReleaseTimes'] = np.random.permutation(df_use2['realRelReleaseTimes'])
+        #compare the columns
+        releasetimecolumn = df_use['realRelReleaseTimes']
+        releasetimecolumn2 = df_use2['realRelReleaseTimes']
+
+        #check if they are identical
+        print(np.array_equal(releasetimecolumn, releasetimecolumn2))
+
+        talker_column = df_use['talker']
+        talker_column2 = df_use2['talker']
+        print(np.array_equal(talker_column, talker_column2))
+        df_use = df_use2
 
 
 
-
-    df_use2 = df_use.copy()
     # run_mixed_effects_model_correctrxntime(df_use2)
     col = 'realRelReleaseTimes'
     dfx = df_use.loc[:, df_use.columns != col]

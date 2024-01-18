@@ -350,9 +350,9 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     bal_accuracy_train = cross_val_score(xg_reg, X_train, y_train, scoring='balanced_accuracy', cv=kfold)
 
     bal_accuracy = cross_val_score(xg_reg, X_test, y_test, scoring='balanced_accuracy', cv=kfold)
-    print("Accuracy: %.2f%%" % (np.mean(results) * 100.0))
+    print("Bal. accuracy, test: %.2f%%" % (np.mean(results) * 100.0))
     print(results)
-    print('Balanced Accuracy: %.2f%%' % (np.mean(bal_accuracy) * 100.0))
+    print('Balanced Accuracy, train: %.2f%%' % (np.mean(bal_accuracy) * 100.0))
 
     shap_values1 = shap.TreeExplainer(xg_reg).shap_values(dfx)
 
