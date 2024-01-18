@@ -1329,7 +1329,7 @@ def run_mixed_effects_model_absrxntime(df, talker =1):
 def predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=False, talker=2, noise_floor = False):
     df_use = extract_releasedata_withdist(ferrets, talker=talker)
     df_use2 = df_use.copy()
-    run_mixed_effects_model_absrxntime(df_use2, talker = talker)
+    # run_mixed_effects_model_absrxntime(df_use2, talker = talker)
     col = 'centreRelease'
 
     if noise_floor == True:
@@ -1482,7 +1482,7 @@ def main():
     # ferrets = ['F1815_Cruella']# , 'F2105_Clove']
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
 
-    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=False, talker=2, noise_floor=False)
+    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=False, talker=1, noise_floor=True)
 
     # for ferret in ferrets:
     #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)
