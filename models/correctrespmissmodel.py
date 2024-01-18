@@ -111,6 +111,14 @@ def run_mixed_effects_model_correctresp(df):
     #split the data into training and test set
     #drop the rows with missing values
     df = df.dropna()
+    #calculate the probability of a miss when the targtimes >=5.5
+    df['misslist'] = df['misslist'].astype(int)
+    df['targTimes'] = df['targTimes'].astype(float)
+
+    df_hightargtime = df[df['targTimes'] >= 5.5]
+
+
+
     kf = KFold(n_splits=5, shuffle=True, random_state=123)
     fold_index = 1
     train_acc = []
@@ -847,7 +855,6 @@ def run_correct_responsepipeline(ferrets):
     resultingcr_df = behaviouralhelperscg.get_df_behav(ferrets=ferrets, includefaandmiss=False, includemissonly=True, startdate='04-01-2020',
                                   finishdate='03-01-2023')
     resultingcr_df['talker'] = resultingcr_df['talker'].replace({1: 2, 2: 1})
-
     filepath = Path('D:/dfformixedmodels/correctresponsemodel_dfuse.csv')
     filepath.parent.mkdir(parents=True, exist_ok=True)
     resultingcr_df.to_csv(filepath)

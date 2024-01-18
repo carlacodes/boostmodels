@@ -226,7 +226,6 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     from pathlib import Path
     if ferret_as_feature:
         if one_ferret:
-
             fig_savedir = Path('figs/correctrxntimemodel/ferret_as_feature/' + ferrets)
             if fig_savedir.exists():
                 pass
@@ -1000,10 +999,19 @@ def run_mixed_effects_model_correctrxntime(df):
     result = pd.DataFrame.from_dict(results)
     result.to_csv(f"D:\mixedeffectmodelsbehavioural\models/mixedeffects_csvs/correctrxntimemodel_m ixed_effect_results.csv")
     return result
-def run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature = False ):
+def run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature = False, noise_floor = False):
     df_use = extract_release_times_data(ferrets)
     #export to csv
     df_use.to_csv('D:\dfformixedmodels\correctrxntime_data.csv')
+
+    if noise_floor == True:
+        #shuffle the realRelReleaseTimes column 100 times
+        for i in range(1000):
+            df_use['realRelReleaseTimes'] = df_use['realRelReleaseTimes'].sample(frac=1).reset_index(drop=True)
+
+
+
+
     df_use2 = df_use.copy()
     run_mixed_effects_model_correctrxntime(df_use2)
     col = 'realRelReleaseTimes'

@@ -238,6 +238,8 @@ class behaviouralhelperscg():
             elif includemissonly is True:
                 newdata = newdata[
                     (newdata.response == 0) | (newdata.response == 1) | (newdata.response == 7) ]
+                #remove all targ times greater than 5.5s
+                newdata = newdata[(newdata.timeToTarget < 5.5)]
             else:
                 newdata = newdata[newdata.correctresp == 1]
                 newdata = newdata[(newdata.catchTrial == 0)]
