@@ -117,6 +117,8 @@ def run_mixed_effects_model_correctresp(df):
     test_acc = []
     coefficients = []
     p_values = []
+    std_error = []
+    std_error_re = []
     random_effects_df = pd.DataFrame()
     for train_index, test_index in kf.split(df):
         train, test = df.iloc[train_index], df.iloc[test_index]
@@ -147,13 +149,14 @@ def run_mixed_effects_model_correctresp(df):
 
         print(result.summary())
         params = result.params
-        #combiune params and random effects into one series
-        # params = pd.concat([params, random_effects_2.mean(axis=0)], axis=0)
+
 
         coefficients.append(params)
         random_effects_df = pd.concat([random_effects_df, random_effects_2])
 
         p_values.append(result.pvalues)
+        std_error.append(result.bse)
+        std_error_re.append(result.bse_re)
 
         total_var = var_fixed_effect + var_random_effect + var_resid
         marginal_r2 = var_fixed_effect / total_var
@@ -199,8 +202,10 @@ def run_mixed_effects_model_correctresp(df):
     #calculate the mean accuracy
     coefficients_df = pd.DataFrame(coefficients).mean()
     p_values_df = pd.DataFrame(p_values).mean()
+    std_error_df = pd.DataFrame(std_error).mean()
+    std_error_re_df = pd.DataFrame(std_error_re).mean()
     # combine into one dataframe
-    result_coefficients = pd.concat([coefficients_df, p_values_df], axis=1, keys=['coefficients', 'p_values'])
+    result_coefficients = pd.concat([coefficients_df, p_values_df, std_error_df], axis=1, keys=['coefficients', 'p_values', 'std_error'])
     fig, ax = plt.subplots()
     # sort the coefficients by their mean value
     result_coefficients.index = result_coefficients.index.str.replace('Group Var', 'ferret ID')
@@ -409,11 +414,19 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
 
     # Find the indices of the top 10 instances with the highest cumulative Shapley values
     top_10_indices = cumulative_shap_values.argsort()[-10:][::-1]
+    #find the indices where the log odds of miss is greater than 0.5
+    log_odds_greater_than_05 = np.where(explanation[1].sum(axis=1) > 0.5)[0]
+    #find the indices where the log odds for time to target presentation is greater than 0.5
+    log_odds_greater_than_05_time = np.where(explanation[1][:, 4] > 0.5)[0]
+    #find the indices where the log odds for time to target presentation is greater than 0.5
+
 
     # Create force plots for the top 10 instances
-    for i in top_10_indices:
+    for i in log_odds_greater_than_05_time:
         force_plot_top_10 = shap.force_plot(explainer.expected_value[1], explanation[1][i, :], dfx.iloc[i, :])
-        shap.save_html(str(fig_savedir / f'forceplot_top_10_{i}.png'), force_plot_top_10)
+        shap.save_html(str(fig_savedir / f'forceplot_odds_greater_than_05_time_{i}.html'), force_plot_top_10)
+        shap.save_html(str(fig_savedir / f'forceplot_odds_greater_than_05_time_{i}.svg'), force_plot_top_10)
+
 
     # Create a force plot for the data point with the maximum Shapley value
     force_plot_max = shap.force_plot(explainer.expected_value[1], explanation[1][max_shap_index, :],
@@ -541,8 +554,6 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     # Convert the text width from points to inches
     text_width_inches = text_width_pt / 72.27
 
-    # mosaic = ['A', 'B'], ['D', 'B'], ['C', 'E']
-    # mosaic = ['A', 'B', 'C'], ['D', 'B', 'E']
 
 
     # # fig = plt.figure(figsize=(20, 10))

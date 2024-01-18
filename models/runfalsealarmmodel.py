@@ -27,7 +27,21 @@ from sklearn.model_selection import KFold
 from sklearn.metrics import confusion_matrix, balanced_accuracy_score
 
 
+def shap_summary_plot(
+        shap_values2,
+        feature_labels,
+        ax=None,
+        cmap = "viridis",
+        show_plots=False,
+        savefig=False,
+        savefig_path=None,
+    ):
+    plt.rcParams['font.family'] = 'sans-serif'
 
+    if isinstance(cmap, str):
+        cmap = matplotlib.colormaps[cmap]
+    plt.sca(ax)
+    shap.plots.beeswarm(shap_values2, show=False, color=cmap)
 
 def get_axis_limits(ax, scale=1):
     return ax.get_xlim()[0] * scale, (ax.get_ylim()[1] * scale)
@@ -238,14 +252,14 @@ def run_optuna_study_falsealarm(dataframe, y, ferret_as_feature=False):
         #             "timeToTarget",
         #             "realRelReleaseTimes", "ferret", "pastcorrectresp"]]
         labels = ["F0", "time in trial", "ferret ID", "trial no.", "talker", "audio side",
-                  "intra-trial F0 roving", "past resp. correct", "past trial catch", "falsealarm"]
+                  "intra-F0 roving", "past resp. correct", "past trial catch", "falsealarm"]
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
     else:
         df_to_use = dataframe[
             ["pitchof0oflastword", "time_elapsed", "trialNum", "talker", "side", "intra_trial_roving", "pastcorrectresp",
              "pastcatchtrial",
              "falsealarm"]]
-        labels = ["F0", "time in trial", "trial no", "talker", "audio side", "intra-trial F0 roving",
+        labels = ["F0", "time in trial", "trial no", "talker", "audio side", "intra-F0 roving",
                   "past resp. correct", "past trial catch", "falsealarm"]
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
 
@@ -452,7 +466,7 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput, ferret_as_feature=False, one
         #             "timeToTarget",
         #             "realRelReleaseTimes", "ferret", "pastcorrectresp"]]
         labels = ["time in trial", "ferret ID", "trial no.", "talker", "audio side",
-                  "intra-trial F0 roving", "past resp. correct", "past trial catch", "falsealarm", "F0"]
+                  "intra-F0 roving", "past resp. correct", "past trial catch", "falsealarm", "F0"]
         labels_mixed_effects = ["time_since_trial_start", "ferret_ID", "trial_number", "talker", "audio_side",
                   "intra_trial_F0_roving", "past_response_correct", "past_trial_was_catch", "falsealarm", "F0"]
         df_to_use2 = df_to_use.copy()
@@ -466,8 +480,8 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput, ferret_as_feature=False, one
             ["time_elapsed", "trialNum", "talker", "side", "intra_trial_roving", "pastcorrectresp",
              "pastcatchtrial",
              "falsealarm", "pitchof0oflastword"]]
-        labels = [ "time in trial", "trial number", "talker", "audio side", "intra-trial F0 roving",
-                  "past response correct", "past trial was catch", "falsealarm", "F0"]
+        labels = [ "time in trial", "trial number", "talker", "audio side", "intra-F0 roving",
+                  "past resp. correct", "past trial was catch", "falsealarm", "F0"]
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
 
     col = 'falsealarm'
@@ -634,11 +648,11 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     # partial dependency plots
 
     # Plot the scatter plot with the colormap
-    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "intra-trial F0 roving"], cmap=cmapcustom)
+    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "intra-F0 roving"], cmap=cmapcustom)
     shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "F0"], cmap=cmapcustom)
     shap.plots.scatter(shap_values2[:, "audio side"], color=shap_values2[:, "ferret ID"], cmap=cmapcustom)
     shap.plots.scatter(shap_values2[:, "F0"], color=shap_values2[:, "time in trial"], cmap=cmapcustom)
-    shap.plots.scatter(shap_values2[:, "past response correct"], color=shap_values2[:, "ferret ID"], cmap=cmapcustom)
+    shap.plots.scatter(shap_values2[:, "past resp. correct"], color=shap_values2[:, "ferret ID"], cmap=cmapcustom)
 
 
 
@@ -684,7 +698,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.savefig(fig_dir / 'ferretIDbysideofaudio_violin1409.png', dpi=500, bbox_inches='tight')
     plt.show()
 
-    intra_values = shap_values2[:, "intra-trial F0 roving"].data
+    intra_values = shap_values2[:, "intra-F0 roving"].data
     ferret_ids = shap_values2[:, "ferret ID"].data
     shap_values = shap_values2[:, "ferret ID"].values
 
@@ -709,7 +723,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     # change legend labels
     handles, labels = ax.get_legend_handles_labels()
     labels = ['False', 'True']
-    ax.legend(handles=handles[0:], labels=labels[0:], title="intra-trial F0 roving", fontsize=14, title_fontsize=16)
+    ax.legend(handles=handles[0:], labels=labels[0:], title="intra-F0 roving", fontsize=14, title_fontsize=16)
     ax.set_title('Intra trial F0 roving', fontsize=25)
 
     plt.savefig(fig_dir / 'ferretIDbyINTRA_violin1409.png', dpi=500, bbox_inches='tight')
@@ -794,7 +808,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
 
     fig, ax = plt.subplots(figsize=(5, 5))
 
-    shap.plots.scatter(shap_values2[:, "intra-trial F0 roving"], color=shap_values2[:, "ferret ID"], ax=ax,
+    shap.plots.scatter(shap_values2[:, "intra-F0 roving"], color=shap_values2[:, "ferret ID"], ax=ax,
                        cmap=cmapcustom, show=False)
 
     fig, ax = plt.gcf(), plt.gca()
@@ -896,7 +910,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.show()
 
     fig, ax = plt.subplots(figsize=(5, 5))
-    shap.plots.scatter(shap_values2[:, "intra-trial F0 roving"], color=shap_values2[:, "ferret ID"], show= False, ax =ax,  cmap=cmapcustom)
+    shap.plots.scatter(shap_values2[:, "intra-F0 roving"], color=shap_values2[:, "ferret ID"], show= False, ax =ax,  cmap=cmapcustom)
     cax = fig.axes[1]
     cax.tick_params(labelsize=15)
     cax.set_ylabel("Ferret ID", fontsize=12)
@@ -915,7 +929,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
                        cmap=cmapcustom)
 
     fig, ax = plt.subplots(figsize=(5, 5))
-    shap.plots.scatter(shap_values2[:, "intra-trial F0 roving"], color=shap_values2[:, "F0"], show= False,
+    shap.plots.scatter(shap_values2[:, "intra-F0 roving"], color=shap_values2[:, "F0"], show= False,
                        cmap=cmapcustom)
     # plt.xticks([0, 1], labels = ["No", "Yes"])
     fig, ax = plt.gcf(), plt.gca()
@@ -927,7 +941,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.title('Intra-trial roving \n versus impact in false alarm probability', fontsize=18)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "F0"], color=shap_values2[:, "intra-trial F0 roving"], show=False,
+    shap.plots.scatter(shap_values2[:, "F0"], color=shap_values2[:, "intra-F0 roving"], show=False,
                        cmap=cmapcustom)
     fig, ax = plt.gcf(), plt.gca()
     cb_ax = fig.axes[1]
@@ -942,9 +956,9 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.xlabel('precursor F0 word', fontsize=16)
     plt.savefig(fig_dir / 'precursor F0intratrialrove1409.png', dpi=500)
     plt.show()
-    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "intra-trial F0 roving"], show=True, cmap=cmapcustom)
-    shap.plots.scatter(shap_values2[:, "intra-trial F0 roving"], color=shap_values2[:, "F0"], show=True, cmap=cmapcustom)
-    shap.plots.scatter(shap_values2[:, "intra-trial F0 roving"], color=shap_values2[:, "ferret ID"], show=True, cmap=cmapcustom)
+    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "intra-F0 roving"], show=True, cmap=cmapcustom)
+    shap.plots.scatter(shap_values2[:, "intra-F0 roving"], color=shap_values2[:, "F0"], show=True, cmap=cmapcustom)
+    shap.plots.scatter(shap_values2[:, "intra-F0 roving"], color=shap_values2[:, "ferret ID"], show=True, cmap=cmapcustom)
 
     shap.plots.scatter(shap_values2[:, "time in trial"], color=shap_values2[:, "trial no."], show=False, cmap=cmapcustom)
     fig, ax = plt.gcf(), plt.gca()
@@ -1020,10 +1034,18 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     ax_dict['A'].tick_params(axis='x', which='major', labelsize=12)
 
     # rotate x-axis labels for better readability
-    summary_img = mpimg.imread(fig_dir / 'ranked_features1409.png')
-    ax_dict['B'].imshow(summary_img, aspect='auto', )
-    ax_dict['B'].axis('off')  # Turn off axis ticks and labels
-    ax_dict['B'].set_xlabel('Log(odds) FA', fontsize=18)
+    # summary_img = mpimg.imread(fig_dir / 'ranked_features1409.png')
+    # ax_dict['B'].imshow(summary_img, aspect='auto', )
+    # ax_dict['B'].axis('off')  # Turn off axis ticks and labels
+    # ax_dict['B'].set_xlabel('Log(odds) FA', fontsize=18)
+    axmini = ax_dict['B']
+    shap_summary_plot(shap_values2, feature_labels, show_plots=False, ax=axmini, cmap=cmapcustom)
+    ax_dict['B'].set_yticklabels(np.flip(feature_labels), fontsize=12, rotation=45, fontfamily='sans-serif')
+    ax_dict['B'].set_xlabel('Log(odds) FA', fontsize=12)
+    # ax_dict['B'].set_xticks([-1, -0.5, 0, 0.5, 1])
+    cb_ax = fig.axes[5]
+    cb_ax.tick_params(labelsize=8)
+    cb_ax.set_ylabel('Value', fontsize=8, fontfamily='sans-serif')
 
 
     ax_dict['D'].barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, color='slategray')
@@ -1050,27 +1072,16 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     # change legend labels
     handles, labels =  ax_dict['E'].get_legend_handles_labels()
     labels = ['False', 'True']
-    ax_dict['E'].legend(handles=handles[0:], labels=labels[0:], title="", fontsize=12, title_fontsize=12)
-    ax_dict['E'].set_xlabel('Intra trial F0 roving', fontsize=18)
-
-    # shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "F0"], ax=ax_dict['C'],
-    #                    cmap =cmapcustom, show=False)
-    # fig, ax = plt.gcf(), plt.gca()
-    # cb_ax = fig.axes[1]
-    # cb_ax.set_yticks([1, 2, 3,4, 5])
-    # cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
-    # cb_ax.tick_params(labelsize=15)
-    # cb_ax.set_ylabel("precursor F0 (Hz)", fontsize=15)
-    # shap.plots.scatter(shap_values2[:, "F0"], color=shap_values2[:, "time in trial"], show= False, ax =ax_dict['C'],  cmap=cmapcustom)
+    ax_dict['E'].legend(handles=handles[0:], labels=labels[0:], title="", fontsize=4, title_fontsize=12)
+    ax_dict['E'].set_xlabel('Intra trial F0 roving', fontsize=8)
     shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "F0"], show= False, ax =ax_dict['C'],  cmap=cmapcustom)
 
     fig, ax = plt.gcf(), plt.gca()
-    cax = fig.axes[5]
-    cax.tick_params(labelsize=15)
+    cax = fig.axes[6]
+    cax.tick_params(labelsize=8)
     cax.set_yticks([1, 2, 3, 4, 5])
     cax.set_yticklabels(['109', '124', '144', '191', '251'])
-    cax.set_ylabel("F0 (Hz)", fontsize=18)
-    # ax_dict['C'].set_xlim(0.8, 5.2)
+    cax.set_ylabel("F0 (Hz)", fontsize=8)
 
     ax_dict['C'].set_xlabel('talker', fontsize=18)
     ax_dict['C'].set_xticks([1,2])
@@ -1095,11 +1106,26 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     # plt.tight_layout()
     # plt.suptitle('Non-target and target words: false alarm vs. no false alarm model', fontsize=25)
     # plt.tight_layout()
+    for key, ax in ax_dict.items():
+        if key == 'B':
+            ax.tick_params(axis='y', which='major', labelsize=5.7)
+            ax.tick_params(axis='x', which='major', labelsize=6)
+            ax.tick_params(axis='both', which='minor', labelsize=6)
+            ax.xaxis.label.set_size(8)
+            ax.yaxis.label.set_size(8)
 
-    plt.subplots_adjust(wspace=0.3, hspace=0.6)
-    for ax in ax_dict.values():
-        ax.tick_params(axis='both', which='major', labelsize=18)
-        ax.tick_params(axis='both', which='minor', labelsize=8)
+        else:
+
+            ax.tick_params(axis='y', which='major', labelsize=6)
+            ax.tick_params(axis='x', which='major', labelsize=6)
+            ax.tick_params(axis='both', which='minor', labelsize=6)
+            ax.xaxis.label.set_size(8)
+            ax.yaxis.label.set_size(8)
+        for text in [ax.xaxis.label, ax.yaxis.label] + ax.get_xticklabels() + ax.get_yticklabels():
+            text.set_fontfamily('sans-serif')
+            text.set_color('black')
+
+    plt.subplots_adjust(wspace=0.35, hspace=0.5)
 
 
     plt.savefig(fig_dir / 'big_summary_plot_2_noannotations.png', dpi=500, bbox_inches="tight")
@@ -1201,7 +1227,7 @@ def runlgbfaornot(dataframe):
     plt.show()
 
     fig, ax = plt.subplots(figsize=(15, 15))
-    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "intra-trial F0 roving"])
+    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "intra-F0 roving"])
     fig.tight_layout()
     plt.tight_layout()
     plt.subplots_adjust(left=-10, right=0.5)
@@ -1210,10 +1236,10 @@ def runlgbfaornot(dataframe):
     shap.plots.scatter(shap_values2[:, "F0"], color=shap_values2[:, "talker"])
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "intra-trial F0 roving"], show=False)
+    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "intra-F0 roving"], show=False)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "intra-trial F0 roving"], color=shap_values2[:, "talker"])
+    shap.plots.scatter(shap_values2[:, "intra-F0 roving"], color=shap_values2[:, "talker"])
     plt.show()
 
     fig, ax = plt.subplots(figsize=(15, 15))
@@ -1223,13 +1249,13 @@ def runlgbfaornot(dataframe):
     plt.show()
 
     fig, ax = plt.subplots(figsize=(15, 15))
-    shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "intra-trial F0 roving"], show=False)
+    shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "intra-F0 roving"], show=False)
     plt.title('False alarm model - SHAP values as a function of cosine similarity \n, coloured by intra trial roving')
     fig.tight_layout()
     plt.savefig('D:/behavmodelfigs/cosinesimdepenencyplot14091409.png', dpi=500)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "intra-trial F0 roving"], color=shap_values2[:, "cosinesim"], show=False)
+    shap.plots.scatter(shap_values2[:, "intra-F0 roving"], color=shap_values2[:, "cosinesim"], show=False)
     plt.savefig('D:/behavmodelfigs/intratrialrovingcosinecolor14091409.png', dpi=500)
 
     plt.show()
@@ -1629,6 +1655,10 @@ def plot_reaction_times_interandintra(ferrets):
     # plot the reaction times by animal
     resultingdf = behaviouralhelperscg.get_reactiontime_data(ferrets=ferrets, startdate='04-01-2020',
                                                              finishdate='01-10-2022')
+    resultingdf['lickReleasefromtrialstart'] = resultingdf['lickRelease'] - resultingdf['startTrialLick']
+    resultingdf['responseTimereltostart'] = (resultingdf['responseTime'] / 24414.0625) - resultingdf['startTrialLick']
+
+
     df_use = resultingdf
 
     df_left_by_ferret = {}
@@ -1739,7 +1769,6 @@ def plot_reaction_times_interandintra(ferrets):
         ax_dict[str(ferret)].set_xlabel('reaction time relative \n to target presentation (s)', fontsize=10)
     fig.tight_layout()
 
-    font_props = fm.FontProperties(weight='bold', size=17)
 
     # ax_dict['0'].annotate('A', xy=get_axis_limits(ax_dict['0']),
     #                       xytext=(-0.1, ax_dict['0'].title.get_position()[1] + 0.01), textcoords='axes fraction',
@@ -1759,6 +1788,26 @@ def plot_reaction_times_interandintra(ferrets):
 
     plt.savefig('D:/behavmodelfigs/reaction_times_by_ferret_panel.png', dpi=500)
     plt.savefig('D:/behavmodelfigs/reaction_times_by_ferret_panel.png', dpi=500)
+
+    plt.show()
+
+    fig = plt.figure(figsize=(20, 5))
+    #filter so response == 0 or 1
+    ax_dict = fig.subplot_mosaic(mosaic)
+    color_animal = ['blue', 'red', 'green', 'orange', 'darkmagenta', 'orangered']
+    for ferret in ferrets:
+        df_by_ferret_total[ferret] = df_by_ferret_total[ferret].loc[(df_by_ferret_total[ferret]['response'] == 1) | (df_by_ferret_total[ferret]['response'] == 0)]
+        sns.distplot(df_by_ferret_total[ferret]['responseTimereltostart'], color=color_animal[ferret],
+                     ax=ax_dict[str(ferret)])
+
+        ax_dict[str(ferret)].set_title('response times for ' + str(ferret_labels[ferret]) +'\n, max response time:' + str(np.max(df_by_ferret_total[ferret]['responseTimereltostart'])), fontsize=12)
+        # if ferret == 0:
+        #     ax_dict[str(ferret)].legend(fontsize=8)
+        ax_dict[str(ferret)].set_xlabel('response time relative \n to trial start lick (s)', fontsize=10)
+    fig.tight_layout()
+
+    plt.savefig('D:/behavmodelfigs/abs_response_times_by_ferret_panel.png', dpi=500)
+    plt.savefig('D:/behavmodelfigs/abs_response_times_by_ferret_panel.png', dpi=500)
 
     plt.show()
 
@@ -2060,7 +2109,7 @@ def plot_reaction_times_interandintra_swarm(ferrets):
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
     # plot_reaction_times_interandintra_violin(ferrets)
-    # plot_reaction_times_interandintra(ferrets)
+    plot_reaction_times_interandintra(ferrets)
 
     # plot_reaction_times_interandintra_swarm(ferrets)
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(

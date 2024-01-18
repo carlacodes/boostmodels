@@ -27,6 +27,21 @@ import sklearn
 from sklearn.model_selection import train_test_split
 from helpers.behaviouralhelpersformodels import *\
 
+def shap_summary_plot(
+        shap_values2,
+        feature_labels,
+        ax=None,
+        cmap = "viridis",
+        show_plots=False,
+        savefig=False,
+        savefig_path=None,
+    ):
+    plt.rcParams['font.family'] = 'sans-serif'
+
+    if isinstance(cmap, str):
+        cmap = matplotlib.colormaps[cmap]
+    plt.sca(ax)
+    shap.plots.beeswarm(shap_values2, show=False, color=cmap)
 def get_axis_limits(ax, scale=1):
     return ax.get_xlim()[0] * scale, (ax.get_ylim()[1] * scale)
 def run_optuna_study_releasetimes(X, y):
@@ -161,7 +176,7 @@ def runlgbreleasetimes_for_a_ferret(data, paramsinput=None, ferret=1, ferret_nam
     # labels[11] = 'distance to sensor'
     # labels[10] = 'target F0'
     # labels[9] = 'trial number'
-    # labels[8] = 'precursor = target F0'
+    # labels[8] = "precur. = targ. F0"
     # labels[7] = 'male talker'
     # labels[6] = 'time until target'
     # labels[5] = 'target F0 - precursor F0'
@@ -358,7 +373,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     shap_values2 = explainer(X_train)
     # shap.plots.scatter(shap_values2[:, "side of audio"], color=shap_values2[:, "ferret ID"], show=True, cmap = matplotlib.colormaps[cmapname])
     fig, ax = plt.subplots(figsize=(10,10))
-    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "precursor = target F0"], show=False, cmap = matplotlib.colormaps[cmapname])
+    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "precur. = targ. F0"], show=False, cmap = matplotlib.colormaps[cmapname])
     plt.xticks([1,2], labels = ['male', 'female'])
     if one_ferret:
         plt.title('Talker versus impact \n on reaction time for ' + ferrets, fontsize=20)
@@ -368,7 +383,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
 
     custom_colors = ['dodgerblue',  'green', "limegreen"]  # Add more colors as needed
     cmapcustom = mcolors.LinearSegmentedColormap.from_list('my_custom_cmap', custom_colors, N=1000)
-    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "precursor = target F0"], show=False, ax=ax, cmap = cmapcustom)
+    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "precur. = targ. F0"], show=False, ax=ax, cmap = cmapcustom)
     colorbar_scatter = fig.axes[1]
     colorbar_scatter.set_yticks([0,1])
     colorbar_scatter.set_yticklabels(['False', 'True'], fontsize=18)
@@ -399,13 +414,13 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     import seaborn as sns
 
     ferret_ids = shap_values2[:, "ferret ID"].data
-    precursor_values = shap_values2[:, "precursor = target F0"].data
+    precursor_values = shap_values2[:, "precur. = targ. F0"].data
     shap_values = shap_values2[:, "ferret ID"].values
 
     # Create a DataFrame with the necessary data
     data_df = pd.DataFrame({
         "ferret ID": ferret_ids,
-        "precursor = target F0": precursor_values,
+        "precur. = targ. F0": precursor_values,
         "SHAP value": shap_values
     })
 
@@ -413,7 +428,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     cmapcustom = mcolors.LinearSegmentedColormap.from_list('my_custom_cmap', custom_colors, N=1000)
 
     fig, ax = plt.subplots(figsize=(10, 6))
-    sns.violinplot(x="ferret ID", y="SHAP value", hue="precursor = target F0", data=data_df, split=True, inner="quart",
+    sns.violinplot(x="ferret ID", y="SHAP value", hue="precur. = targ. F0", data=data_df, split=True, inner="quart",
                    palette=custom_colors, ax=ax)
 
     ax.set_xticks([0, 1, 2, 3, 4])
@@ -422,14 +437,14 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     ax.set_ylabel('Impact on reaction time', fontsize=20)  # Corrected y-label
     handles, labels = ax.get_legend_handles_labels()
     labels_new = ['false', 'true']
-    ax.legend(handles=handles[0:], labels=labels_new, title="precursor = target F0", fontsize=14, title_fontsize=16)
+    ax.legend(handles=handles[0:], labels=labels_new, title="precur. = targ. F0", fontsize=14, title_fontsize=16)
 
 
     # plt.title('Mean SHAP value over ferret ID', fontsize=18)
 
     # Optionally add a legend
-    # ax.legend(title="precursor = target F0", fontsize=14, title_fontsize=16)
-    ax.set_title('Precursor = target F0',  fontsize = 20)
+    # ax.legend(title="precur. = targ. F0", fontsize=14, title_fontsize=16)
+    ax.set_title("precur. = targ. F0",  fontsize = 20)
 
     plt.savefig(fig_savedir / 'ferretIDbyprecurequaltargF0_violin.png', dpi=500, bbox_inches='tight')
     plt.show()
@@ -525,7 +540,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     plt.savefig(fig_savedir /'targtimescolouredbytrialnumber.png', dpi=300)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "precursor = target F0"], color=shap_values2[:, "talker"], show=False, cmap = matplotlib.colormaps[cmapname])
+    shap.plots.scatter(shap_values2[:, "precur. = targ. F0"], color=shap_values2[:, "talker"], show=False, cmap = matplotlib.colormaps[cmapname])
     fig, ax = plt.gcf(), plt.gca()
     # Get colorbar
     cb_ax = fig.axes[1]
@@ -538,11 +553,11 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     else:
         plt.title('Precursor = target F0 over reaction time impact', fontsize=20)
     plt.ylabel('SHAP value', fontsize=16)
-    plt.xlabel('Precursor = target F0', fontsize=16)
+    plt.xlabel("precur. = targ. F0", fontsize=16)
     plt.savefig(fig_savedir /'pitchofprecur_equals_target_colouredbytalker.png', dpi=500)
     plt.show()
 
-    shap.plots.scatter(shap_values2[:, "target F0"], color=shap_values2[:, "precursor = target F0"], show=False, cmap = matplotlib.colormaps[cmapname])
+    shap.plots.scatter(shap_values2[:, "target F0"], color=shap_values2[:, "precur. = targ. F0"], show=False, cmap = matplotlib.colormaps[cmapname])
     fig, ax = plt.gcf(), plt.gca()
     # Get colorbar
     cb_ax = fig.axes[1]
@@ -587,7 +602,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         plt.show()
 
         if ferret_as_feature:
-            shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "precursor = target F0"], show=False,
+            shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "precur. = targ. F0"], show=False,
                                cmap=matplotlib.colormaps[cmapname])
             fig, ax = plt.gcf(), plt.gca()
             # Get colorbar
@@ -671,12 +686,9 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         mosaic = ['A', 'B'], ['D', 'B'], ['C', 'E']
         ferret_id_only = ['F1702', 'F1815', 'F1803', 'F2002', 'F2105']
 
-        # fig = plt.figure(figsize=(20, 10))
-        figsize = (text_width_inches * 2, text_width_inches * 2)
-        gridspec_kw = {'width_ratios': [1, 1], 'height_ratios': [1, 1, 1]}
+        fig = plt.figure(figsize=((text_width_inches / 2) * 4, text_width_inches * 4))
 
-        # Create the figure with subplots
-        fig, ax_dict = plt.subplot_mosaic(mosaic, figsize=figsize, gridspec_kw=gridspec_kw)
+        ax_dict = fig.subplot_mosaic(mosaic)
 
         # Plot the elbow plot
         ax_dict['A'].plot(feature_labels, cumulative_importances, marker='o', color='cyan')
@@ -686,39 +698,24 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         ax_dict['A'].set_xticklabels(feature_labels, rotation=20, ha='right')  # rotate x-axis labels for better readability
 
         # rotate x-axis labels for better readability
-        summary_img = mpimg.imread(fig_savedir / 'shapsummaryplot_allanimals2.png')
-        ax_dict['B'].imshow(summary_img, aspect='auto', )
-        ax_dict['B'].set_xlabel('SHAP Value (impact \n on rxn times)', fontsize=18)
-        #turn off y axis
-        ax_dict['B'].set_yticks([])
-        ax_dict['B'].set_yticklabels([])
-        ax_dict['B'].set_ylabel(None)
-        ax_dict['B'].axis('off')
-        #add text to the plot where the x axis is
-        from matplotlib.font_manager import FontProperties
-        font_props = FontProperties()
-        font_props.set_size(18)
-        ax_dict['B'].annotate(
-            'SHAP Value (impact \n on rxn times)',
-            xy=(0.5, 0.5),  # Center of the subplot
-            xytext=(0.5, 0),  # No offset
-            textcoords='axes fraction',
-            ha='center',  # Horizontal alignment
-            va='center',  # Vertical alignment
-            fontproperties=font_props,
-            zorder=10
-        )
+        # summary_img = mpimg.imread(fig_savedir / 'shapsummaryplot_allanimals2.png')
+        # ax_dict['B'].imshow(summary_img, aspect='auto', )
+        # ax_dict['B'].set_xlabel('SHAP Value (impact \n on rxn times)', fontsize=18)
+        # #turn off y axis
+        # ax_dict['B'].set_yticks([])
+        # ax_dict['B'].set_yticklabels([])
+        # ax_dict['B'].set_ylabel(None)
+        # ax_dict['B'].axis('off')
+        # #add text to the plot where the x axis is
+        axmini = ax_dict['B']
+        shap_summary_plot(shap_values2, feature_labels, show_plots=False, ax=axmini, cmap=cmapcustom)
+        ax_dict['B'].set_yticklabels(np.flip(feature_labels), fontsize=12, rotation=45, fontfamily='sans-serif')
+        ax_dict['B'].set_xlabel('Impact on rxn time', fontsize=12)
+        # ax_dict['B'].set_xticks([-1, -0.5, 0, 0.5, 1])
+        cb_ax = fig.axes[5]
+        cb_ax.tick_params(labelsize=8)
+        cb_ax.set_ylabel('Value', fontsize=8, fontfamily='sans-serif')
 
-        # ax_dict['B'].annotate(
-        #     'SHAP Value (impact \n on rxn times)',
-        #     xy=(0.5, -0.2),  # Adjust the x-position as needed
-        #     xytext=(0, -0.25),  # Adjust the y-position as needed
-        #     textcoords='axes fraction',
-        #     ha='center',  # Horizontal alignment
-        #     va='center',  # Vertical alignment
-        #     fontproperties=font_props,
-        #     zorder=10
-        # )
 
         # ax_dict['B'].set_title('Ranked list of features over their \n impact on reaction time', fontsize=13)
 
@@ -731,10 +728,10 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "target F0"], ax=ax_dict['E'],
                            cmap=matplotlib.colormaps[cmapname], show=False)
         fig, ax = plt.gcf(), plt.gca()
-        cb_ax = fig.axes[5]
+        cb_ax = fig.axes[6]
         # Modifying color bar parameters
-        cb_ax.tick_params(labelsize=15)
-        cb_ax.set_ylabel("target F0 (Hz)", fontsize=12)
+        cb_ax.tick_params(labelsize=8)
+        cb_ax.set_ylabel("target F0 (Hz)", fontsize=8)
         cb_ax.set_yticks([1,2,3,4,5])
         cb_ax.set_yticklabels(['109', '124', '144 ', '191', '251'])
         cb_ax.set_yticklabels(['109', '124', '144 ', '191', '251'])
@@ -747,14 +744,13 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "target F0"], ax=ax_dict['C'],
                            cmap = matplotlib.colormaps[cmapname], show=False)
         fig, ax = plt.gcf(), plt.gca()
-        cb_ax = fig.axes[7]
+        cb_ax = fig.axes[8]
         cb_ax.set_yticks([1, 2, 3,4, 5])
         cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
-        cb_ax.tick_params(labelsize=15)
-        cb_ax.set_ylabel("target F0 (Hz)", fontsize=18)
+        cb_ax.tick_params(labelsize=8)
+        cb_ax.set_ylabel("target F0 (Hz)", fontsize=8)
 
         # Modifying color bar parameters
-        cb_ax.tick_params(labelsize=15)
         ax_dict['C'].set_ylabel('Impact on reaction time', fontsize=18)
         ax_dict['C'].set_xlabel('Ferret ID', fontsize=18)
         ax_dict['C'].set_xticks([0, 1, 2, 3, 4])
@@ -773,7 +769,26 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         # plt.tight_layout()
         # plt.suptitle('Correct hit response reaction times', fontsize=25)
 
-        plt.subplots_adjust(wspace=0.2, hspace=0.4)
+        for key, ax in ax_dict.items():
+            if key == 'B':
+                ax.tick_params(axis='y', which='major', labelsize=5.7)
+                ax.tick_params(axis='x', which='major', labelsize=6)
+                ax.tick_params(axis='both', which='minor', labelsize=6)
+                ax.xaxis.label.set_size(8)
+                ax.yaxis.label.set_size(8)
+
+            else:
+
+                ax.tick_params(axis='y', which='major', labelsize=6)
+                ax.tick_params(axis='x', which='major', labelsize=6)
+                ax.tick_params(axis='both', which='minor', labelsize=6)
+                ax.xaxis.label.set_size(8)
+                ax.yaxis.label.set_size(8)
+            for text in [ax.xaxis.label, ax.yaxis.label] + ax.get_xticklabels() + ax.get_yticklabels():
+                text.set_fontfamily('sans-serif')
+                text.set_color('black')
+
+        plt.subplots_adjust(wspace=0.35, hspace=0.5)
 
         plt.savefig(fig_savedir / 'big_summary_plot_1606.png', dpi=500, bbox_inches="tight")
         plt.savefig(fig_savedir / 'big_summary_plot_1606.pdf', dpi=500, bbox_inches="tight")
@@ -812,36 +827,36 @@ def extract_release_times_data(ferrets):
     dfuse = df[[ "pitchoftarg", "pastcatchtrial", "trialNum", "talker", "side", "precur_and_targ_same",
                 "timeToTarget",
                 "realRelReleaseTimes", "ferret", "pastcorrectresp"]]
-    labels = ['target F0', 'past trial catch', 'trial no.', 'talker', 'side of audio', 'precursor = target F0', 'target time', 'realRelReleaseTimes', 'ferret ID', 'past resp. correct']
+    labels = ['target F0', 'past trial catch', 'trial no.', 'talker', 'side of audio', "precur. = targ. F0", 'target time', 'realRelReleaseTimes', 'ferret ID', 'past resp. correct']
     dfuse = dfuse.rename(columns=dict(zip(dfuse.columns, labels)))
     #plot the proportion of trials that have target F0 = precursor F0 for each subset of target F0
     targ_1 = dfuse[dfuse['target F0'] == 1]
-    targ_1_precur_and_targ_same = targ_1[targ_1['precursor = target F0'] == 1]
-    targ_1_precur_and_targ_diff = targ_1[targ_1['precursor = target F0'] == 0]
+    targ_1_precur_and_targ_same = targ_1[targ_1["precur. = targ. F0"] == 1]
+    targ_1_precur_and_targ_diff = targ_1[targ_1["precur. = targ. F0"] == 0]
     targ_2 = dfuse[dfuse['target F0'] == 2]
-    targ_2_precur_and_targ_same = targ_2[targ_2['precursor = target F0'] == 1]
-    targ_2_precur_and_targ_diff = targ_2[targ_2['precursor = target F0'] == 0]
+    targ_2_precur_and_targ_same = targ_2[targ_2["precur. = targ. F0"] == 1]
+    targ_2_precur_and_targ_diff = targ_2[targ_2["precur. = targ. F0"] == 0]
 
     targ_3 = dfuse[dfuse['target F0'] == 3]
-    targ_3_precur_and_targ_same = targ_3[targ_3['precursor = target F0'] == 1]
-    targ_3_precur_and_targ_diff = targ_3[targ_3['precursor = target F0'] == 0]
+    targ_3_precur_and_targ_same = targ_3[targ_3["precur. = targ. F0"] == 1]
+    targ_3_precur_and_targ_diff = targ_3[targ_3["precur. = targ. F0"] == 0]
 
     targ_4 = dfuse[dfuse['target F0'] == 4]
-    targ_4_precur_and_targ_same = targ_4[targ_4['precursor = target F0'] == 1]
-    targ_4_precur_and_targ_diff = targ_4[targ_4['precursor = target F0'] == 0]
+    targ_4_precur_and_targ_same = targ_4[targ_4["precur. = targ. F0"] == 1]
+    targ_4_precur_and_targ_diff = targ_4[targ_4["precur. = targ. F0"] == 0]
     targ_5 = dfuse[dfuse['target F0'] == 5]
-    targ_5_precur_and_targ_same = targ_5[targ_5['precursor = target F0'] == 1]
-    targ_5_precur_and_targ_diff = targ_5[targ_5['precursor = target F0'] == 0]
+    targ_5_precur_and_targ_same = targ_5[targ_5["precur. = targ. F0"] == 1]
+    targ_5_precur_and_targ_diff = targ_5[targ_5["precur. = targ. F0"] == 0]
 
     #plot the proportion of trials that have target F0 = precursor F0 for each subset of target F0
     fig, ax = plt.subplots()
-    sns.barplot(x='target F0', y='precursor = target F0', data=dfuse, palette='Set2')
+    sns.barplot(x='target F0', y="precur. = targ. F0", data=dfuse, palette='Set2')
     plt.title('Proportion of trials with precursor = target F0 \n for each target F0', fontsize=18)
     plt.show()
 
     #plot whether the precursor = target F0 over the target F0
     fig,ax = plt.subplots()
-    sns.scatterplot(data=dfuse, x='target F0', y='precursor = target F0', hue='ferret ID', palette='Set2')
+    sns.scatterplot(data=dfuse, x='target F0', y="precur. = targ. F0", hue='ferret ID', palette='Set2')
     plt.show()
     return dfuse
 
@@ -850,7 +865,7 @@ def run_mixed_effects_model_correctrxntime(df):
     #relabel the labels by addding underscore for each label
     ferrets = ['F1702', 'F1815', 'F1803', 'F2002', 'F2105']
     for col in df.columns:
-        if col == 'precursor = target F0':
+        if col == "precur. = targ. F0":
             #rename this column to make it easier to work with
             df.rename(columns={col: 'precursor_equals_target_F0'}, inplace=True)
         else:
@@ -977,14 +992,7 @@ def run_mixed_effects_model_correctrxntime(df):
     big_df = pd.concat([mean_coefficients, mean_random_effects], axis=0)
     big_df.to_csv('D:/mixedeffectmodelsbehavioural/models/correctrxntimemodel_mean_coefficients_and_random_effects.csv')
 
-    #export
-    # np.savetxt(f"mixedeffects_csvs/correctrxntimemodel_mse_train_mean.csv", [np.mean(train_mse)], delimiter=",")
-    #
-    # np.savetxt(f"mixedeffects_csvs/correctrxntimemodel_mse_test_mean.csv", [np.mean(test_mse)], delimiter=",")
-    # np.savetxt(f"mixedeffects_csvs/correctrxntimemodel_mae_train_mean.csv", [np.mean(train_mae)], delimiter=",")
-    # np.savetxt(f"mixedeffects_csvs/correctrxntimemodel_mae_test_mean.csv", [np.mean(test_mae)], delimiter=",")
-    # np.savetxt(f"mixedeffects_csvs/correctrxntimemodel_r2_train_mean.csv", [np.mean(train_r2)], delimiter=",")
-    # np.savetxt(f"mixedeffects_csvs/correctrxntimemodel_r2_test_mean.csv", [np.mean(test_r2)], delimiter=",")
+
     #make a results dictionary
     results = {'train_mse': train_mse, 'test_mse': test_mse, 'train_mae': train_mae, 'test_mae': test_mae, 'train_r2': train_r2, 'test_r2': test_r2,
                   'mean_train_mse': np.mean(train_mse), 'mean_test_mse': np.mean(test_mse), 'mean_train_mae': np.mean(train_mae), 'mean_test_mae': np.mean(test_mae), 'mean_train_r2': np.mean(train_r2), 'mean_test_r2': np.mean(test_r2)}
