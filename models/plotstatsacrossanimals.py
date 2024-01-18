@@ -1616,19 +1616,27 @@ def run_repeated_anova(stats_dict_inter, stats_dict_intra, stats_dict_control):
         #
         # posthocresults = posthoc
         # print(posthocresults)
-        if 'roving_type x talker' in anovaresults.index and anovaresults.at['roving_type x talker', 'p-GG-corr'] < 0.05:
-            # Interaction is significant, perform posthoc comparisons
-            posthoc = pg.pairwise_ttests(data=stats_dict_all, dv=value, within=['roving_type', 'talker'],
-                                         subject='ferret', padjust='bonf')
-            posthocresults = posthoc
-            print(posthocresults)
-
+        if 'roving_type * talker' in anovaresults.values:
+            # index_of_interaction = anovaresults.columns.get_loc('roving_type * talker')
+            #get the valuse in the Source column
+            #get the index of the interaction
+            index_of_interaction = anovaresults.index[anovaresults['Source'] == 'roving_type * talker'].tolist()[0]
+            if anovaresults['p-GG-corr'][index_of_interaction] < 0.05:
+                # Interaction is significant, perform posthoc comparisons
+                posthoc = pg.pairwise_ttests(data=stats_dict_all, dv=value, within=['roving_type', 'talker'],
+                                             subject='ferret', padjust='bonf')
+                posthocresults = posthoc
+                female_df = stats_dict_all[stats_dict_all['talker'] == 1]
+                male_df = stats_dict_all[stats_dict_all['talker'] == 2]
+                female_tukey = pg.pairwise_tukey(data=female_df, dv=value, between='roving_type')
+                male_tukey = pg.pairwise_tukey(data=male_df, dv=value, between='roving_type')
+                #add a talker column
+                female_tukey['talker'] = np.ones(len(female_tukey))
+                male_tukey['talker'] = np.ones(len(male_tukey)) * 2
+                posthoc = pd.concat([female_tukey, male_tukey])
         else:
             # No interaction, perform comparisons for roving type only
-            posthoc = pg.pairwise_ttests(data=stats_dict_all, dv=value, within=['roving_type'], subject='ferret',
-                                         padjust='bonf')
-            posthocresults = posthoc
-            print(posthocresults)
+            posthoc = pg.pairwise_tukey(data=stats_dict_all, dv=value, between='roving_type')
         numerator = anovaresults['F'][0] * anovaresults['ddof1'][0]
         denominator = numerator + anovaresults['ddof2'][0]
         partial_eta_squared = numerator / denominator
@@ -1637,6 +1645,9 @@ def run_repeated_anova(stats_dict_inter, stats_dict_intra, stats_dict_control):
 
         anovaresults.to_csv(
             f'D:\mixedeffectmodelsbehavioural\metrics/rmanova_twolayer_{value}_acrosstalkers.csv')
+
+        posthoc.to_csv(
+            f'D:\mixedeffectmodelsbehavioural\metrics/posthocresults_twolayer_{value}_acrosstalkers.csv')
 
         print(anovaresults)
     return

@@ -207,9 +207,9 @@ def runlgbreleasetimes_for_a_ferret(data, paramsinput=None, ferret=1, ferret_nam
     return xg_reg, ypred, y_test, mse_test
 
 
-def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferret=False, ferrets=None, talker=1):
+def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferret=False, ferrets=None, talker=1, noise_floor=False):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2,
-                                                        random_state=42, noise_floor = False)
+                                                        random_state=42)
 
     from pathlib import Path
     if ferret_as_feature:
@@ -233,13 +233,14 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
 
         else:
             fig_savedir = Path('figs/absolutereleasemodel/' + 'talker' + str(talker))
-
     if noise_floor == True:
         fig_savedir = fig_savedir / 'with_noise_floor'
     if fig_savedir.exists():
         pass
     else:
         fig_savedir.mkdir(parents=True, exist_ok=True)
+
+
 
     xg_reg = lgb.LGBMRegressor(random_state=42, verbose=1, **paramsinput)
     # xg_reg = lgb.LGBMRegressor( colsample_bytree=0.3, learning_rate=0.1,
@@ -1145,7 +1146,7 @@ def extract_releasedata_withdist(ferrets, talker=1):
     return df_use
 
 
-def run_correctrxntime_model(ferrets, optimization=False, ferret_as_feature=False):
+def run_correctrxntime_model(ferrets, optimization=False, ferret_as_feature=False, noise_floor = False):
     df_use = extract_releasedata_withdist(ferrets)
     col = 'realRelReleaseTimes'
     dfx = df_use.loc[:, df_use.columns != col]
@@ -1175,7 +1176,7 @@ def run_correctrxntime_model(ferrets, optimization=False, ferret_as_feature=Fals
                 best_params)
 
     xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx, df_use[col], paramsinput=best_params,
-                                                        ferret_as_feature=ferret_as_feature)
+                                                        ferret_as_feature=ferret_as_feature, noise_floor=noise_floor)
 
 def run_mixed_effects_model_absrxntime(df, talker =1):
     #split the data into training and test set
@@ -1328,16 +1329,16 @@ def predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feat
     if noise_floor == True:
         #shuffle the realRelReleaseTimes column 100 times
         for i in range(1000):
-            df_use2['realRelReleaseTimes'] = np.random.permutation(df_use2['realRelReleaseTimes'])
+            df_use2['centreRelease'] = np.random.permutation(df_use2['centreRelease'])
         #compare the columns
-        releasetimecolumn = df_use['realRelReleaseTimes']
-        releasetimecolumn2 = df_use2['realRelReleaseTimes']
+        releasetimecolumn = df_use['centreRelease']
+        releasetimecolumn2 = df_use2['centreRelease']
 
         #check if they are identical
         print(np.array_equal(releasetimecolumn, releasetimecolumn2))
 
-        talker_column = df_use['talker']
-        talker_column2 = df_use2['talker']
+        talker_column = df_use['dist10']
+        talker_column2 = df_use2['dist10']
         print(np.array_equal(talker_column, talker_column2))
         #figure out which fraction of the data is the sam
         same_list = []
@@ -1467,7 +1468,7 @@ def predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feat
 
     xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx, df_use[col], paramsinput=best_params,
                                                         ferret_as_feature=ferret_as_feature, one_ferret=one_ferret,
-                                                        ferrets=ferrets, talker=talker)
+                                                        ferrets=ferrets, talker=talker, noise_floor=noise_floor)
 
 
 def main():
