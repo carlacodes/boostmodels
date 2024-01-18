@@ -1005,7 +1005,7 @@ def run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature = 
 
     if noise_floor == True:
         #shuffle the realRelReleaseTimes column 100 times
-        for i in range(10000):
+        for i in range(1000):
             df_use2['realRelReleaseTimes'] = np.random.permutation(df_use2['realRelReleaseTimes'])
         #compare the columns
         releasetimecolumn = df_use['realRelReleaseTimes']
@@ -1017,6 +1017,16 @@ def run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature = 
         talker_column = df_use['talker']
         talker_column2 = df_use2['talker']
         print(np.array_equal(talker_column, talker_column2))
+        #figure out which fraction of the data is the sam
+        same_list = []
+        for i in range(len(talker_column)):
+            if releasetimecolumn.values[i] == releasetimecolumn2.values[i]:
+                same_list.append(1)
+            else:
+                same_list.append(0)
+        #get the ratio of the same values
+        print(sum(same_list)/len(same_list))
+
         df_use = df_use2
 
 

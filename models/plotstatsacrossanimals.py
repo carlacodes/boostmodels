@@ -1524,7 +1524,7 @@ def run_repeated_anova(stats_dict_inter, stats_dict_intra, stats_dict_control):
             anovaresults = AnovaRM(stats_dict_all, value, 'ferret', within=['roving_type']).fit()
             #export to csv.
             # anovaresults.export_to_csv('anovaresults_' + str(talker) + '_' + value + '.csv')
-            #run tukey post hoc test
+            #run tukey post hoc test, need to check if correct and accounts for
             posthoc = MultiComparison(stats_dict_all[value], stats_dict_all['roving_type'])
             posthocresults = posthoc.tukeyhsd()
             print(posthocresults)
@@ -1542,7 +1542,6 @@ def run_repeated_anova(stats_dict_inter, stats_dict_intra, stats_dict_control):
             tukey_df.to_csv(f'D:\mixedeffectmodelsbehavioural\metrics/posthocresults_by_rovingtype_{value}_talker_{talker}.csv')
             anovaresults.anova_table.to_csv(f'D:\mixedeffectmodelsbehavioural\metrics/anova_results_by_rovingtype_{value}_talker_{talker}.csv')
 
-            print(anovaresults)
 
     # stats_dict_inter3 = pd.concat([pd.DataFrame.from_dict(stat_dict_inter2[1]), pd.DataFrame.from_dict(stat_dict_inter2[2])])
     # stats_dict_intra3 = pd.concat([pd.DataFrame.from_dict(stat_dict_intra2[1]), pd.DataFrame.from_dict(stat_dict_intra2[2])])
@@ -1613,10 +1612,23 @@ def run_repeated_anova(stats_dict_inter, stats_dict_intra, stats_dict_control):
     for value in ['hits', 'false_alarms', 'correct_response', 'dprime', 'bias']:
         anovaresults = pg.rm_anova(data=stats_dict_all, dv=value, within=['roving_type', 'talker'], subject='ferret')
         #run posthoc tests
-        posthoc = pg.pairwise_ttests(data=stats_dict_all, dv=value, within=['roving_type', 'talker'], subject='ferret', padjust='bonf')
+        # posthoc = pg.pairwise_ttests(data=stats_dict_all, dv=value, within=['roving_type', 'talker'], subject='ferret', padjust='bonf')
+        #
+        # posthocresults = posthoc
+        # print(posthocresults)
+        if 'roving_type x talker' in anovaresults.index and anovaresults.at['roving_type x talker', 'p-GG-corr'] < 0.05:
+            # Interaction is significant, perform posthoc comparisons
+            posthoc = pg.pairwise_ttests(data=stats_dict_all, dv=value, within=['roving_type', 'talker'],
+                                         subject='ferret', padjust='bonf')
+            posthocresults = posthoc
+            print(posthocresults)
 
-        posthocresults = posthoc
-        print(posthocresults)
+        else:
+            # No interaction, perform comparisons for roving type only
+            posthoc = pg.pairwise_ttests(data=stats_dict_all, dv=value, within=['roving_type'], subject='ferret',
+                                         padjust='bonf')
+            posthocresults = posthoc
+            print(posthocresults)
         numerator = anovaresults['F'][0] * anovaresults['ddof1'][0]
         denominator = numerator + anovaresults['ddof2'][0]
         partial_eta_squared = numerator / denominator
@@ -1643,7 +1655,7 @@ if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
     df = behaviouralhelperscg.get_stats_df(ferrets=ferrets, startdate='04-01-2016', finishdate='01-03-2023')
     kw_dict =  kw_test(df)
-    stats_dict_all_inter, stats_dict_inter = run_stats_calc_by_pitch_mf(df, ferrets, stats_dict_empty, pitch_param='inter_trial_roving')
+    # stats_dict_all_inter, stats_dict_inter = run_stats_calc_by_pitch_mf(df, ferrets, stats_dict_empty, pitch_param='inter_trial_roving')
     stats_dict_all_intermf, stats_dict_intermf = run_stats_calc(df, ferrets, pitch_param='inter_trial_roving')
     stats_dict_all_intra, stats_dict_intra = run_stats_calc(df, ferrets, pitch_param='intra_trial_roving')
     stats_dict_all_control, stats_dict_control = run_stats_calc(df, ferrets, pitch_param='control_trial')
