@@ -873,6 +873,17 @@ def run_mixed_effects_model_correctrxntime(df):
 
     equation = 'realRelReleaseTimes ~target_F0 + past_trial_catch + trial_no_ + talker + side_of_audio + precursor_equals_target_F0 + target_time + past_resp__correct'
 
+    df['past_resp__correct'] = df['past_resp__correct'].astype('category')
+    df['side_of_audio'] = df['side_of_audio'].astype('category')
+    df['side_of_audio'] = df['side_of_audio'].replace({0: 'Left', 1: 'Right'})
+
+    df['talker'] = df['talker'].astype('category')
+    df['precursor_equals_target_F0'] = df['precursor_equals_target_F0'].astype('category')
+    df['target_F0'] = df['target_F0'].astype('category')
+    df['talker'] = df['talker'].replace({1: 'Male', 2: 'Female'})
+    df['target_F0'] = df['target_F0'].replace({1: '109 Hz', 2: '124 Hz', 3: '144 Hz', 4: '191 Hz', 5: '251 Hz'})
+    df['ferret_ID'] = df['ferret_ID'].astype('category')
+    df['past_trial_catch'] = df['past_trial_catch'].astype('category')
 
     #drop the rows with missing values
     df = df.dropna()
@@ -886,6 +897,8 @@ def run_mixed_effects_model_correctrxntime(df):
     train_r2 = []
     coefficients = []
     p_values = []
+    std_error = []
+    std_error_re = []
     random_effects_df = pd.DataFrame()
     for train_index, test_index in kf.split(df):
         train, test = df.iloc[train_index], df.iloc[test_index]
@@ -911,6 +924,9 @@ def run_mixed_effects_model_correctrxntime(df):
         random_effects_df = pd.concat([random_effects_df, random_effects_2])
 
         p_values.append(result.pvalues)
+        std_error.append(result.bse)
+        std_error_re.append(result.bse_re)
+
         var_resid = result.scale
         var_random_effect = float(result.cov_re.iloc[0])
         var_fixed_effect = result.predict(df).var()
@@ -953,8 +969,10 @@ def run_mixed_effects_model_correctrxntime(df):
         print(mse)
     coefficients_df = pd.DataFrame(coefficients).mean()
     p_values_df = pd.DataFrame(p_values).mean()
+    std_error_df = pd.DataFrame(std_error).mean()
+    std_error_re_df = pd.DataFrame(std_error_re).mean()
     # combine into one dataframe
-    result_coefficients = pd.concat([coefficients_df, p_values_df], axis=1, keys=['coefficients', 'p_values'])
+    result_coefficients = pd.concat([coefficients_df, p_values_df, std_error_df], axis=1, keys=['coefficients', 'p_values', 'std_error'])
     fig, ax = plt.subplots()
     # sort the coefficients by their mean value
     result_coefficients.index = result_coefficients.index.str.replace('Group Var', 'Ferret')
@@ -962,6 +980,8 @@ def run_mixed_effects_model_correctrxntime(df):
     result_coefficients = result_coefficients.sort_values(by='coefficients', ascending=False)
 
     ax.bar(result_coefficients.index, result_coefficients['coefficients'], color = 'cyan')
+    ax.errorbar(result_coefficients.index, result_coefficients['coefficients'], yerr=result_coefficients['std_error'], fmt='none', ecolor='black', elinewidth=1, capsize=2)
+
     # ax.set_xticklabels(result_coefficients['features'], rotation=45, ha='right')
     # if the mean p value is less than 0.05, then add a star to the bar plot
     for i in range(len(result_coefficients)):
@@ -982,20 +1002,22 @@ def run_mixed_effects_model_correctrxntime(df):
     print(np.mean(train_r2))
     print(np.mean(test_r2))
     mean_coefficients = pd.DataFrame(coefficients).mean()
+    mean_coefficients = pd.concat([mean_coefficients, p_values_df, std_error_df], axis=1,
+                                  keys=['coefficients', 'p_values', 'std_error'])
     print(mean_coefficients)
-    mean_coefficients.to_csv('D:\mixedeffectmodelsbehavioural\models/mixedeffects_csvs/correctrxntimemodel_coefficients.csv')
+    mean_coefficients.to_csv('mixedeffects_csvs/correctrxntimemodel_mean_coefficients.csv')
+
     mean_random_effects = random_effects_df.mean(axis=0)
     print(mean_random_effects)
     big_df = pd.concat([mean_coefficients, mean_random_effects], axis=0)
-    big_df.to_csv('D:/mixedeffectmodelsbehavioural/models/correctrxntimemodel_mean_coefficients_and_random_effects.csv')
-
+    mean_random_effects.to_csv('mixedeffects_csvs//correctrxntimemodel__effects.csv')
 
     #make a results dictionary
     results = {'train_mse': train_mse, 'test_mse': test_mse, 'train_mae': train_mae, 'test_mae': test_mae, 'train_r2': train_r2, 'test_r2': test_r2,
                   'mean_train_mse': np.mean(train_mse), 'mean_test_mse': np.mean(test_mse), 'mean_train_mae': np.mean(train_mae), 'mean_test_mae': np.mean(test_mae), 'mean_train_r2': np.mean(train_r2), 'mean_test_r2': np.mean(test_r2)}
     #make results into a dataframe
     result = pd.DataFrame.from_dict(results)
-    result.to_csv(f"D:\mixedeffectmodelsbehavioural\models/mixedeffects_csvs/correctrxntimemodel_m ixed_effect_results.csv")
+    result.to_csv(f"D:\mixedeffectmodelsbehavioural\models/mixedeffects_csvs/correctrxntimemodel_mixed_effect_results.csv")
     return result
 def run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature = False, noise_floor = False):
     df_use = extract_release_times_data(ferrets)
@@ -1031,7 +1053,7 @@ def run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature = 
 
 
 
-    # run_mixed_effects_model_correctrxntime(df_use2)
+    run_mixed_effects_model_correctrxntime(df_use2)
     col = 'realRelReleaseTimes'
     dfx = df_use.loc[:, df_use.columns != col]
 
@@ -1107,7 +1129,7 @@ def run_correctrxntime_model_for_a_ferret(ferrets, optimization = False, ferret_
 def main():
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']  # , 'F2105_Clove']
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature=True, noise_floor=True)
+    run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature=True, noise_floor=False)
     #
     # for ferret in ferrets:
     #     run_correctrxntime_model_for_a_ferret([ferret], optimization=False, ferret_as_feature=False)

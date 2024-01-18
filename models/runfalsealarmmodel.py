@@ -303,6 +303,21 @@ def run_mixed_effects_model_falsealarm(df):
     labels_mixed_effects = ["time_since_trial_start", "ferret_ID", "trial_number", "talker", "audio_side",
                             "intra_trial_F0_roving", "past_response_correct", "past_trial_was_catch", "falsealarm",
                             "F0"]
+
+    df['past_response_correct'] = df['past_response_correct'].astype('category')
+    df['audio_side'] = df['audio_side'].astype('category')
+    df['audio_side'] = df['audio_side'].replace({0: 'Left', 1: 'Right'})
+
+    df['talker'] = df['talker'].astype('category')
+
+    df['past_trial_was_catch'] = df['past_trial_was_catch'].astype('category')
+    df['F0'] = df['F0'].astype('category')
+    df['talker'] = df['talker'].replace({1: 'Male', 2: 'Female'})
+    df['F0'] = df['F0'].replace({1: '109 Hz', 2: '124 Hz', 3: '144 Hz', 4: '191 Hz', 5: '251 Hz'})
+    df['ferret_ID'] = df['ferret_ID'].astype('category')
+    df["intra_trial_F0_roving"] = df["intra_trial_F0_roving"].astype('category')
+
+
     df = df.dropna()
     df['talker'] = df['talker'].replace({1: 2, 2: 1})
     kf = KFold(n_splits=5, shuffle=True, random_state=123)
@@ -311,7 +326,8 @@ def run_mixed_effects_model_falsealarm(df):
     test_acc = []
     coefficients = []
     p_values   = []
-    std_errors = []
+    std_error = []
+    std_error_re = []
     random_effects_df = pd.DataFrame()
     for train_index, test_index in kf.split(df):
         train, test = df.iloc[train_index], df.iloc[test_index]
@@ -349,6 +365,8 @@ def run_mixed_effects_model_falsealarm(df):
         coefficients.append(params)
         random_effects_df = pd.concat([random_effects_df, random_effects_2])
         p_values.append(result.pvalues)
+        std_error.append(result.bse)
+        std_error_re.append(result.bse_re)
 
         # Generate confusion matrix for train set
         y_pred_train = result.predict(train)
@@ -375,7 +393,6 @@ def run_mixed_effects_model_falsealarm(df):
         confusion_matrix_test = confusion_matrix(y_true, y_pred)
         print(confusion_matrix_test)
 
-        std_errors.append(result.bse)
 
         # Calculate balanced accuracy for test set
         balanced_accuracy_test = balanced_accuracy_score(y_true, y_pred)
@@ -395,10 +412,12 @@ def run_mixed_effects_model_falsealarm(df):
     coefficients_df = pd.DataFrame(coefficients).mean()
     index = coefficients_df.index
     p_values_df = pd.DataFrame(p_values).mean()
+    std_error_df = pd.DataFrame(std_error).mean()
+    std_error_re_df = pd.DataFrame(std_error_re).mean()
     labels_mixed_effects_df = pd.DataFrame(labels_mixed_effects)
     #combine into one dataframe
 
-    result_coefficients = pd.concat([coefficients_df, p_values_df], axis=1, keys=['coefficients', 'p_values'])
+    result_coefficients = pd.concat([coefficients_df, p_values_df, std_error_df], axis=1, keys=['coefficients', 'p_values', 'std_error'])
     fig, ax = plt.subplots()
     result_coefficients.index = result_coefficients.index.str.replace('Group Var', 'Ferret')
 
@@ -410,6 +429,8 @@ def run_mixed_effects_model_falsealarm(df):
 
     result_coefficients = result_coefficients.sort_values(by='coefficients', ascending=False)
     ax.bar(result_coefficients.index, result_coefficients['coefficients'])
+    ax.errorbar(result_coefficients.index, result_coefficients['coefficients'], yerr=result_coefficients['std_error'], fmt='none', ecolor='black', elinewidth=1, capsize=2)
+
     # ax.set_xticklabels(result_coefficients['features'], rotation=45, ha='right')
     #if the mean p value is less than 0.05, then add a star to the bar plot
     for i in range(len(result_coefficients)):
@@ -443,12 +464,14 @@ def run_mixed_effects_model_falsealarm(df):
     print(np.mean(train_acc))
     print(np.mean(test_acc))
     mean_coefficients = pd.DataFrame(coefficients).mean()
+    mean_coefficients = pd.concat([mean_coefficients, p_values_df, std_error_df], axis=1, keys=['coefficients', 'p_values', 'std_error'])
+    print(mean_coefficients)
     mean_coefficients.to_csv('mixedeffects_csvs/falsealarm_mean_coefficients.csv')
 
     mean_random_effects = random_effects_df.mean(axis=0)
     print(mean_random_effects)
     big_df = pd.concat([mean_coefficients, mean_random_effects], axis=0)
-    big_df.to_csv('mixedeffects_csvs/falsealarm_mean_coefficients_and_random_effects.csv')
+    mean_random_effects.to_csv('mixedeffects_csvs/false_alarm_random_effects.csv')
 
     print(mean_coefficients)    #export
     np.savetxt(f"mixedeffects_csvs/falsealarm_balac_train_mean.csv", [np.mean(train_acc)], delimiter=",")
@@ -2104,8 +2127,8 @@ def plot_reaction_times_interandintra_swarm(ferrets):
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    plot_reaction_times_interandintra_violin(ferrets)
-    plot_reaction_times_interandintra(ferrets)
+    # plot_reaction_times_interandintra_violin(ferrets)
+    # plot_reaction_times_interandintra(ferrets)
 
     # plot_reaction_times_interandintra_swarm(ferrets)
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runfalsealarmpipeline(

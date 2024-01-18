@@ -114,6 +114,21 @@ def run_mixed_effects_model_correctresp(df):
     #calculate the probability of a miss when the targtimes >=5.5
     df['misslist'] = df['misslist'].astype(int)
     df['targTimes'] = df['targTimes'].astype(float)
+    df['pastcorrectresp'] = df['pastcorrectresp'].astype('category')
+    df['precur_and_targ_same'] = df['precur_and_targ_same'].astype('category')
+    df['side'] = df['side'].astype('category')
+    df['side'] = df['side'].replace({0: 'Left', 1: 'Right'})
+
+    df['talker'] = df['talker'].astype('category')
+    df['precur_and_targ_same'] = df['precur_and_targ_same'].astype('category')
+    df['pastcatchtrial'] = df['pastcatchtrial'].astype('category')
+    df['pitchoftarg'] = df['pitchoftarg'].astype('category')
+    df['talker'] = df['talker'].replace({1: 'Male', 2: 'Female'})
+    df['pitchoftarg'] = df['pitchoftarg'].replace({1: '109 Hz', 2: '124 Hz', 3: '144 Hz', 4: '191 Hz', 5: '251 Hz'})
+    df['ferret'] = df['ferret'].astype('category')
+
+
+
     kf = KFold(n_splits=5, shuffle=True, random_state=123)
     fold_index = 1
     train_acc = []
@@ -253,8 +268,8 @@ def run_mixed_effects_model_correctresp(df):
     mean_random_effects.to_csv('mixedeffects_csvs/random_effects.csv')
 
     #export to dataframe
-    # np.savetxt(f"mixedeffects_csvs/correctresp_balac_train_mean.csv", [np.mean(train_acc)], delimiter=",")
-    # np.savetxt(f"mixedeffects_csvs/correctresp_balac_test_mean.csv", [np.mean(test_acc)], delimiter=",")
+    np.savetxt(f"mixedeffects_csvs/correctresp_balac_train_mean.csv", [np.mean(train_acc)], delimiter=",")
+    np.savetxt(f"mixedeffects_csvs/correctresp_balac_test_mean.csv", [np.mean(test_acc)], delimiter=",")
     return result
 
 def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization = False, ferret_as_feature=False, one_ferret = False, ferrets = None):

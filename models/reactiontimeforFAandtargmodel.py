@@ -1228,6 +1228,7 @@ def run_mixed_effects_model_absrxntime(df, talker =1):
     test_r2 = []
     coefficients = []
     p_values = []
+    std_error = []
     for train_index, test_index in kf.split(df):
         train, test = df.iloc[train_index], df.iloc[test_index]
 
@@ -1262,6 +1263,7 @@ def run_mixed_effects_model_absrxntime(df, talker =1):
         #calculate the median absolute error
         mae = median_absolute_error(y_test, ypred)
         p_values.append(result.pvalues)
+        std_error.append(result.bse)
         test_mae.append(mae)
         print(mae)
 
@@ -1269,6 +1271,7 @@ def run_mixed_effects_model_absrxntime(df, talker =1):
 
     coefficients_df = pd.DataFrame(coefficients).mean()
     p_values_df = pd.DataFrame(p_values).mean()
+    std_error_df = pd.DataFrame(std_error).mean()
     # combine into one dataframe
     if talker == 1:
         color_text = 'purple'
@@ -1276,13 +1279,15 @@ def run_mixed_effects_model_absrxntime(df, talker =1):
     else:
         color_text = 'darkorange'
         talker_text = 'Male Talker'
-    result_coefficients = pd.concat([coefficients_df, p_values_df], axis=1, keys=['coefficients', 'p_values'])
+    result_coefficients = pd.concat([coefficients_df, p_values_df, std_error_df], axis=1, keys=['coefficients', 'p_values', 'std_error'])
     #replace GroupVar with text Ferret
     fig, ax = plt.subplots(figsize = (20,5))
     # sort the coefficients by their mean value
     result_coefficients = result_coefficients.sort_values(by='coefficients', ascending=False)
 
     ax.bar(result_coefficients.index, result_coefficients['coefficients'], color=color_text)
+    ax.errorbar(result_coefficients.index, result_coefficients['coefficients'], yerr=result_coefficients['std_error'], fmt='none', ecolor='black', elinewidth=1, capsize=2)
+
     # ax.set_xticklabels(result_coefficients['features'], rotation=45, ha='right')
     # if the mean p value is less than 0.05, then add a star to the bar plot
     for i in range(len(result_coefficients)):
@@ -1302,6 +1307,7 @@ def run_mixed_effects_model_absrxntime(df, talker =1):
     print(np.mean(train_mae))
     print(np.mean(test_mae))
     mean_coefficients = pd.DataFrame(coefficients).mean()
+    mean_coefficients = pd.concat([mean_coefficients, p_values_df, std_error_df], axis=1, keys=['coefficients', 'p_values', 'std_error'])
     print(mean_coefficients)
     mean_coefficients.to_csv(f"mixedeffects_csvs/absrxntimemodel_talker_{talker}_mean_coefficients.csv")
     #export
@@ -1323,7 +1329,7 @@ def run_mixed_effects_model_absrxntime(df, talker =1):
 def predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=False, talker=2, noise_floor = False):
     df_use = extract_releasedata_withdist(ferrets, talker=talker)
     df_use2 = df_use.copy()
-    # run_mixed_effects_model_absrxntime(df_use2, talker = talker)
+    run_mixed_effects_model_absrxntime(df_use2, talker = talker)
     col = 'centreRelease'
 
     if noise_floor == True:
