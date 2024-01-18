@@ -213,7 +213,7 @@ def runlgbreleasetimes_for_a_ferret(data, paramsinput=None, ferret=1, ferret_nam
 
 
 
-def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_ferret=False, ferrets=None):
+def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_ferret=False, ferrets=None, noise_floor = False):
 
 
     X_train, X_test, y_train, y_test = train_test_split(X,y, test_size=0.2,
@@ -227,22 +227,20 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     if ferret_as_feature:
         if one_ferret:
             fig_savedir = Path('figs/correctrxntimemodel/ferret_as_feature/' + ferrets)
-            if fig_savedir.exists():
-                pass
-            else:
-                fig_savedir.mkdir(parents=True, exist_ok=True)
         else:
             fig_savedir = Path('../figs/correctrxntimemodel/ferret_as_feature')
     else:
         if one_ferret:
-
             fig_savedir = Path('figs/correctrxntimemodel/'+ ferrets)
-            if fig_savedir.exists():
-                pass
-            else:
-                fig_savedir.mkdir(parents=True, exist_ok=True)
         else:
             fig_savedir = Path('../figs/correctrxntimemodel/')
+    if noise_floor == True:
+        fig_savedir = fig_savedir / 'noise_floor'
+
+    if fig_savedir.exists():
+        pass
+    else:
+        fig_savedir.mkdir(parents=True, exist_ok=True)
 
     xg_reg = lgb.LGBMRegressor(random_state=42, verbose=1, **paramsinput)
     # xg_reg = lgb.LGBMRegressor( colsample_bytree=0.3, learning_rate=0.1,
@@ -1007,13 +1005,13 @@ def run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature = 
     if noise_floor == True:
         #shuffle the realRelReleaseTimes column 100 times
         for i in range(1000):
-            df_use['realRelReleaseTimes'] = df_use['realRelReleaseTimes'].sample(frac=1).reset_index(drop=True)
+            df_use['realRelReleaseTimes'] = df_use['realRelReleaseTimes'].sample(frac=1)
 
 
 
 
     df_use2 = df_use.copy()
-    run_mixed_effects_model_correctrxntime(df_use2)
+    # run_mixed_effects_model_correctrxntime(df_use2)
     col = 'realRelReleaseTimes'
     dfx = df_use.loc[:, df_use.columns != col]
 
@@ -1048,7 +1046,7 @@ def run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature = 
 
 
 
-    xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx, df_use[col], paramsinput=best_params, ferret_as_feature=ferret_as_feature, ferrets = ferrets)
+    xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx, df_use[col], paramsinput=best_params, ferret_as_feature=ferret_as_feature, ferrets = ferrets, noise_floor=noise_floor)
 
 
 
@@ -1089,7 +1087,7 @@ def run_correctrxntime_model_for_a_ferret(ferrets, optimization = False, ferret_
 def main():
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']  # , 'F2105_Clove']
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature=True)
+    run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature=True, noise_floor=True)
     #
     # for ferret in ferrets:
     #     run_correctrxntime_model_for_a_ferret([ferret], optimization=False, ferret_as_feature=False)

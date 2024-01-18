@@ -2042,19 +2042,15 @@ def plot_reaction_times_interandintra_violin(ferrets):
     fig, ax = plt.subplots(figsize=(10, 6))
     sns.violinplot(x="roving_type", y="release_values", hue="talker", data=data_df, split=True, inner="quart",
                    palette='Set2', ax=ax)
-
+    max_release_time = np.max(df_use['realRelReleaseTimes'])
     ax.set_xticks([0, 1, 2])
     ax.set_xticklabels(['control', 'inter', 'intra'], fontsize=18, rotation=45)
     ax.set_xlabel('')
     ax.set_ylabel('Release time (s)', fontsize=18)  # Corrected y-label
-
-
-    # Optionally add a legend
-    # change legend labels
+    plt.ylim([0,2])
     handles, labels = ax.get_legend_handles_labels()
     labels = ['Male', 'Female']
     ax.legend(handles=handles[0:], labels=labels[0:], title="talker", fontsize=14, title_fontsize=16)
-    # ax.set_title('Talker type', fontsize=25)
     plt.savefig( 'D:/behavmodelfigs/rovingtypebytalker_violin14091409.png', dpi=500, bbox_inches='tight')
     plt.show()
     print('done')
@@ -2108,7 +2104,7 @@ def plot_reaction_times_interandintra_swarm(ferrets):
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    # plot_reaction_times_interandintra_violin(ferrets)
+    plot_reaction_times_interandintra_violin(ferrets)
     plot_reaction_times_interandintra(ferrets)
 
     # plot_reaction_times_interandintra_swarm(ferrets)

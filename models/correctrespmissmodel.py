@@ -275,12 +275,12 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
         dfx = df_to_use.loc[:, df_to_use.columns != col]
         if optimization == False:
             # load the saved params
-            paramsinput = np.load('../optuna_results/correctresponse_optunaparams_ferretasfeature_2105.npy', allow_pickle=True).item()
+            paramsinput = np.load('../optuna_results/correctresponse_optunaparams_ferretasfeature_180124.npy', allow_pickle=True).item()
         else:
             study = run_optuna_study_correctresp(dfx.to_numpy(), df_to_use['misslist'].to_numpy())
             print(study.best_params)
             paramsinput = study.best_params
-            np.save('../optuna_results/correctresponse_optunaparams_ferretasfeature_2105.npy', study.best_params)
+            np.save('../optuna_results/correctresponse_optunaparams_ferretasfeature_180124.npy', study.best_params)
 
     else:
         df_to_use = dataframe[["trialNum", "misslist", "talker", "side", "precur_and_targ_same",
@@ -296,17 +296,17 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
         if optimization == False:
             # load the saved params
             if one_ferret:
-                paramsinput = np.load('../optuna_results/correctresponse_optunaparams'+ferrets+'_2305.npy', allow_pickle=True).item()
+                paramsinput = np.load('../optuna_results/correctresponse_optunaparams'+ferrets+'_180124.npy', allow_pickle=True).item()
             else:
-                paramsinput = np.load('../optuna_results/correctresponse_optunaparams_2305.npy', allow_pickle=True).item()
+                paramsinput = np.load('../optuna_results/correctresponse_optunaparams_180124.npy', allow_pickle=True).item()
         else:
             study = run_optuna_study_correctresp(dfx.to_numpy(), df_to_use['misslist'].to_numpy())
             print(study.best_params)
             paramsinput = study.best_params
             if one_ferret:
-                np.save('../optuna_results/correctresponse_optunaparams_2305'+ferrets+'.npy', study.best_params)
+                np.save('../optuna_results/correctresponse_optunaparams_180124'+ferrets+'.npy', study.best_params)
             else:
-                np.save('../optuna_results/correctresponse_optunaparams_2305.npy', study.best_params)
+                np.save('../optuna_results/correctresponse_optunaparams_180124.npy', study.best_params)
 
 
     X_train, X_test, y_train, y_test = train_test_split(dfx, df_to_use['misslist'], test_size=0.2, random_state=123)
@@ -898,7 +898,7 @@ def run_correct_responsepipeline(ferrets):
         ferret_as_feature = True
 
     xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2 = runlgbcorrectrespornotwithoptuna(
-        resultingcr_df, optimization=False, ferret_as_feature = ferret_as_feature, one_ferret=one_ferret, ferrets=ferrets)
+        resultingcr_df, optimization=True, ferret_as_feature = ferret_as_feature, one_ferret=one_ferret, ferrets=ferrets)
     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
 
