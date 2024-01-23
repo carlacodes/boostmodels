@@ -1542,49 +1542,6 @@ def run_repeated_anova(stats_dict_inter, stats_dict_intra, stats_dict_control):
             tukey_df.to_csv(f'D:\mixedeffectmodelsbehavioural\metrics/posthocresults_by_rovingtype_{value}_talker_{talker}.csv')
             anovaresults.anova_table.to_csv(f'D:\mixedeffectmodelsbehavioural\metrics/anova_results_by_rovingtype_{value}_talker_{talker}.csv')
 
-
-    # stats_dict_inter3 = pd.concat([pd.DataFrame.from_dict(stat_dict_inter2[1]), pd.DataFrame.from_dict(stat_dict_inter2[2])])
-    # stats_dict_intra3 = pd.concat([pd.DataFrame.from_dict(stat_dict_intra2[1]), pd.DataFrame.from_dict(stat_dict_intra2[2])])
-    # stats_dict_control3 = pd.concat([pd.DataFrame.from_dict(stat_dict_control2[1]), pd.DataFrame.from_dict(stat_dict_control2[2])])
-    #
-    # #concatrenate the dataframes
-    # #add a roving type column
-    # stats_dict_inter3['roving_type'] = 'inter'
-    # stats_dict_intra3['roving_type'] = 'intra'
-    # stats_dict_control3['roving_type'] = 'control'
-    # #concatenate the dataframes
-    # stats_dict_all = pd.concat([stats_dict_inter3, stats_dict_intra3, stats_dict_control3])
-    # #make a dataframe with the data
-    # stats_dict_all = stats_dict_all.reset_index()
-    # #rename the index column
-    # stats_dict_all = stats_dict_all.rename(columns = {'index': 'ferret'})
-    #
-    #
-    # for value in ['hits', 'false_alarms', 'correct_response', 'dprime', 'bias']:
-    #     anovaresults = AnovaRM(stats_dict_all, value, 'ferret', within=['roving_type']).fit()
-    #     #export to csv.
-    #     # anovaresults.export_to_csv('anovaresults_' + str(talker) + '_' + value + '.csv')
-    #     #run tukey post hoc test
-    #     posthoc = MultiComparison(stats_dict_all[value], stats_dict_all['roving_type'])
-    #     posthocresults = posthoc.tukeyhsd()
-    #     print(posthocresults)
-    #     numerator = anovaresults.anova_table['F Value'][0] * anovaresults.anova_table['Num DF'][0]
-    #     denominator = numerator + anovaresults.anova_table['Den DF'][0]
-    #     partial_eta_squared = numerator / denominator
-    #
-    #
-    #     eta_squared_df = pd.DataFrame({'partial_eta_squared': [partial_eta_squared]})
-    #     eta_squared_df.to_csv(f'D:\mixedeffectmodelsbehavioural\metrics/eta_squared_rovingtype_{value}_acrosstalkers.csv')
-    #     #export to csv
-    #     tukey_df = pd.DataFrame(data=posthocresults._results_table.data[1:],
-    #                             columns=posthocresults._results_table.data[0])
-    #
-    #     tukey_df.to_csv(f'D:\mixedeffectmodelsbehavioural\metrics/posthocresults_by_rovingtype_{value}_acrosstalkers.csv')
-    #     anovaresults.anova_table.to_csv(f'D:\mixedeffectmodelsbehavioural\metrics/anova_results_by_rovingtype_{value}_acrosstalkers.csv')
-    #
-    #     print(anovaresults)
-
-
     # stats_dict_female = pd.concat([pd.DataFrame.from_dict(stat_dict_inter2[1]), pd.DataFrame.from_dict(stat_dict_intra2[1]), pd.DataFrame.from_dict(stat_dict_control2[1])])
     # stats_dict_male = pd.concat([pd.DataFrame.from_dict(stat_dict_inter2[2]), pd.DataFrame.from_dict(stat_dict_intra2[2]), pd.DataFrame.from_dict(stat_dict_control2[2])])
     stats_dict_all = pd.DataFrame()
