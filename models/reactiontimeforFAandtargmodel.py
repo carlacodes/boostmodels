@@ -386,17 +386,26 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     # # ax.set_yticklabels(labels)
     # plt.savefig(fig_savedir / 'shapsummaryplot_allanimals2.png', dpi=400, bbox_inches='tight')
     # plt.show()
-
+    print('calculating permutation importance now')
     result = permutation_importance(xg_reg, X_test, y_test, n_repeats=100,
                                     random_state=123, n_jobs=2)
 
     # sorted_idx = result.importances_mean.argsort()
+    print('finished calculating permutation importance now')
     sorted_idx = (result.importances.mean(axis=1)).argsort()
     # sorted_idx = result.importances.argsort() # sort from lowest to highest
     fig, ax = plt.subplots(figsize=(8, 18))
     test = result.importances[sorted_idx].mean(axis=1).T
     ax.barh(feature_labels_words, result.importances[sorted_idx].mean(axis=1), color='cyan')
     # save the permutation importance values
+    #concatenate into one array
+    #make a dataframed
+    permutation_importance_dataframe = pd.DataFrame(result.importances[sorted_idx].mean(axis=1), index=np.flip(feature_labels_words))
+    permutation_importance_array = np.concatenate((feature_labels_words, result.importances[sorted_idx].mean(axis=1)), axis=0)
+
+    #save the dataframe
+    np.save(fig_savedir / f'permutation_importance_dataframe_talker_{talker}.npy', permutation_importance_dataframe)
+    np.save(fig_savedir / f'permutation_importance_array_talker_{talker}.npy', permutation_importance_array)
 
     if one_ferret:
         np.save(fig_savedir / 'permutation_importance_values.npy', result.importances[sorted_idx].mean(axis=1).T)
@@ -1482,7 +1491,7 @@ def main():
     # ferrets = ['F1815_Cruella']# , 'F2105_Clove']
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
 
-    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=False, talker=1, noise_floor=False)
+    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=False, talker=2, noise_floor=False)
 
     # for ferret in ferrets:
     #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)
