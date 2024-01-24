@@ -12,6 +12,7 @@ from sklearn.model_selection import KFold
 from sklearn.metrics import confusion_matrix, balanced_accuracy_score, r2_score
 import shap
 import matplotlib
+import seaborn as sns
 import lightgbm as lgb
 import optuna
 from optuna.integration import LightGBMPruningCallback
@@ -134,31 +135,7 @@ def runlgbreleasetimes_for_a_ferret(data, paramsinput=None, ferret=1, ferret_nam
     print(mse_train)
     shap_values = shap.TreeExplainer(xg_reg).shap_values(dfx)
 
-    # cumulative_importances_list = []
-    # for shap_values in shap_values1:
-    #     feature_importances = np.abs(shap_values).sum(axis=0)
-    #     cumulative_importances = np.cumsum(feature_importances)
-    #     cumulative_importances_list.append(cumulative_importances)
-
-    # Calculate the combined cumulative sum of feature importances
-    # cumulative_importances_combined = np.sum(np.abs(shap_values), axis=0)
-    # feature_labels = dfx.columns
-    # # Plot the elbow plot
-    # plt.figure(figsize=(10, 6))
-    # plt.plot(feature_labels, cumulative_importances_combined, marker='o', color = 'slategray')
-    # plt.xlabel('Features')
-    # plt.ylabel('Cumulative Feature Importance')
-    # plt.title('Elbow Plot of Cumulative Feature Importance for False Alarm Model')
-    # plt.xticks(rotation=45, ha='right')  # rotate x-axis labels for better readability
-    # plt.savefig('D:/behavmodelfigs/fa_or_not_model/elbowplot.png', dpi=500, bbox_inches='tight')
-    # plt.show()
-
     fig, ax = plt.subplots(figsize=(15, 15))
-    # title kwargs still does nothing so need this workaround for summary plots
-
-
-
-
     shap.summary_plot(shap_values, dfx, show=False)
     fig, ax = plt.gcf(), plt.gca()
     plt.title('Features over their impact \n on reaction time for ' + ferret_name)
@@ -406,9 +383,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     plt.title('Time to target presentation', fontsize = 20)
     plt.savefig(fig_savedir /'ferretIDbytimetotarget.png', dpi=500, bbox_inches='tight')
     plt.show()
-    import seaborn as sns
-    # import pandas as pd
-    import seaborn as sns
+
 
     ferret_ids = shap_values2[:, "ferret ID"].data
     precursor_values = shap_values2[:, "precur. = targ. F0"].data
@@ -437,10 +412,8 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     ax.legend(handles=handles[0:], labels=labels_new, title="precur. = targ. F0", fontsize=14, title_fontsize=16)
 
 
-    # plt.title('Mean SHAP value over ferret ID', fontsize=18)
 
-    # Optionally add a legend
-    # ax.legend(title="precur. = targ. F0", fontsize=14, title_fontsize=16)
+
     ax.set_title("precur. = targ. F0",  fontsize = 20)
 
     plt.savefig(fig_savedir / 'ferretIDbyprecurequaltargF0_violin.png', dpi=500, bbox_inches='tight')
@@ -496,9 +469,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     ax.set_xlabel('Ferret ID', fontsize=18)
     ax.set_ylabel('Impact on reaction time', fontsize=18)  # Corrected y-label
 
-    # plt.title('Mean SHAP value over ferret ID', fontsize=18)
 
-    # Optionally add a legend
     ax.legend(title="side of audio", fontsize=14, title_fontsize=16)
     #change legend labels
     handles, labels = ax.get_legend_handles_labels()
@@ -659,8 +630,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         cb_ax.set_yticks([0, 1, 2, 3, 4])
         cb_ax.set_yticklabels(['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'])
         cb_ax.set_ylabel("ferret ", fontsize=12)
-        # plt.xticks([0, 1, 2, 3, 4], labels=['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'],
-        #            fontsize=15)
+
         plt.ylabel('SHAP value', fontsize=18)
 
         plt.title('Side of audio versus impact on reaction time', fontsize=18)
@@ -691,19 +661,9 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         ax_dict['A'].plot(feature_labels, cumulative_importances, marker='o', color='cyan')
         ax_dict['A'].set_xlabel('Features', fontsize=18)
         ax_dict['A'].set_ylabel('Cumulative Feature Importance', fontsize=18)
-        # ax_dict['A'].set_title('Elbow Plot of Cumulative Feature Importance for Rxn Time Prediction')
         ax_dict['A'].set_xticklabels(feature_labels, rotation=20, ha='right')  # rotate x-axis labels for better readability
 
-        # rotate x-axis labels for better readability
-        # summary_img = mpimg.imread(fig_savedir / 'shapsummaryplot_allanimals2.png')
-        # ax_dict['B'].imshow(summary_img, aspect='auto', )
-        # ax_dict['B'].set_xlabel('SHAP Value (impact \n on rxn times)', fontsize=18)
-        # #turn off y axis
-        # ax_dict['B'].set_yticks([])
-        # ax_dict['B'].set_yticklabels([])
-        # ax_dict['B'].set_ylabel(None)
-        # ax_dict['B'].axis('off')
-        # #add text to the plot where the x axis is
+
         axmini = ax_dict['B']
         shap_summary_plot(shap_values2, feature_labels, show_plots=False, ax=axmini, cmap=cmapcustom)
         ax_dict['B'].set_yticklabels(np.flip(feature_labels), fontsize=12, rotation=45, fontfamily='sans-serif')
@@ -714,7 +674,6 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         cb_ax.set_ylabel('Value', fontsize=8, fontfamily='sans-serif')
 
 
-        # ax_dict['B'].set_title('Ranked list of features over their \n impact on reaction time', fontsize=13)
 
 
         ax_dict['D'].barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, color='cyan')
@@ -733,7 +692,6 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         cb_ax.set_yticklabels(['109', '124', '144 ', '191', '251'])
         cb_ax.set_yticklabels(['109', '124', '144 ', '191', '251'])
         ax_dict['E'].set_ylabel('Impact on reaction time', fontsize=18)
-        # ax_dict['E'].set_title('Talker versus impact on reaction time', fontsize=13)
         ax_dict['E'].set_xlabel('Talker', fontsize=18)
         ax_dict['E'].set_xticks([1,2])
         ax_dict['E'].set_xticklabels(['Male', 'Female'], rotation=45, ha='right')
@@ -751,20 +709,8 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         ax_dict['C'].set_ylabel('Impact on reaction time', fontsize=18)
         ax_dict['C'].set_xlabel('Ferret ID', fontsize=18)
         ax_dict['C'].set_xticks([0, 1, 2, 3, 4])
-        # ax_dict['C'].set_title('Ferret ID versus impact on reaction time', fontsize=13)
-
         ax_dict['C'].set_xticklabels(ferret_id_only, rotation=45, ha='right')
-        # ax_dict['C'].set_title('Ferret ID and precursor = target F0 versus SHAP value on miss probability', fontsize=18)
-        #remove padding outside the figures
-        #
-        # ax_dict['A'].annotate('a)', xy=get_axis_limits(ax_dict['A']), xytext=(-0.1, ax_dict['A'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props, zorder=10)
-        # ax_dict['B'].annotate('b)', xy=get_axis_limits(ax_dict['B']), xytext=(-0.1, ax_dict['B'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-        # ax_dict['C'].annotate('c)', xy=get_axis_limits(ax_dict['C']), xytext=(-0.1, ax_dict['C'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-        # ax_dict['D'].annotate('d)', xy=get_axis_limits(ax_dict['D']), xytext=(-0.1, ax_dict['D'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-        # ax_dict['E'].annotate('e)', xy=get_axis_limits(ax_dict['E']), xytext=(-0.1, ax_dict['E'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
 
-        # plt.tight_layout()
-        # plt.suptitle('Correct hit response reaction times', fontsize=25)
 
         for key, ax in ax_dict.items():
             if key == 'B':
@@ -797,21 +743,6 @@ def extract_release_times_data(ferrets):
     df = behaviouralhelperscg.get_df_behav(ferrets=ferrets, includefaandmiss=False, startdate='04-01-2020', finishdate='01-03-2023')
     #switch talker values so 1 is 2, and 2 is 1 simultaneously
     df['talker'] = df['talker'].replace({1: 2, 2: 1})
-    #
-    # df_intra = df[df['intra_trial_roving'] == 1]
-    # df_inter = df[df['inter_trial_roving'] == 1]
-    # df_control = df[df['control_trial'] == 1]
-    #
-    # if len(df_intra) > len(df_inter)*1.2:
-    #     df_intra = df_intra.sample(n=len(df_inter), random_state=123)
-    # elif len(df_inter) > len(df_intra)*1.2:
-    #     df_inter = df_inter.sample(n=len(df_intra), random_state=123)
-    #
-    # if len(df_control) > len(df_intra)*1.2:
-    #     df_control = df_control.sample(n=len(df_intra), random_state=123)
-    # elif len(df_control) > len(df_inter)*1.2:
-    #     df_control = df_control.sample(n=len(df_inter), random_state=123)
-    #
 
     df_pitchtargsame = df[df['precur_and_targ_same'] == 1]
     df_pitchtargdiff = df[df['precur_and_targ_same'] == 0]
@@ -820,12 +751,12 @@ def extract_release_times_data(ferrets):
     elif len(df_pitchtargdiff) > len(df_pitchtargsame)*1.2:
         df_pitchtargdiff = df_pitchtargdiff.sample(n=len(df_pitchtargsame), random_state=123)
     df = pd.concat([df_pitchtargsame, df_pitchtargdiff], axis = 0)
-    # df = pd.concat([df_intra, df_inter, df_control], axis = 0)
     dfuse = df[[ "pitchoftarg", "pastcatchtrial", "trialNum", "talker", "side", "precur_and_targ_same",
                 "timeToTarget",
                 "realRelReleaseTimes", "ferret", "pastcorrectresp"]]
     labels = ['target F0', 'past trial catch', 'trial no.', 'talker', 'side of audio', "precur. = targ. F0", 'target time', 'realRelReleaseTimes', 'ferret ID', 'past resp. correct']
     dfuse = dfuse.rename(columns=dict(zip(dfuse.columns, labels)))
+
     #plot the proportion of trials that have target F0 = precursor F0 for each subset of target F0
     targ_1 = dfuse[dfuse['target F0'] == 1]
     targ_1_precur_and_targ_same = targ_1[targ_1["precur. = targ. F0"] == 1]
@@ -876,7 +807,6 @@ def run_mixed_effects_model_correctrxntime(df):
     df['past_resp__correct'] = df['past_resp__correct'].astype('category')
     df['side_of_audio'] = df['side_of_audio'].astype('category')
     df['side_of_audio'] = df['side_of_audio'].replace({0: 'Left', 1: 'Right'})
-
     df['talker'] = df['talker'].astype('category')
     df['precursor_equals_target_F0'] = df['precursor_equals_target_F0'].astype('category')
     df['target_F0'] = df['target_F0'].astype('category')
@@ -888,7 +818,6 @@ def run_mixed_effects_model_correctrxntime(df):
     #drop the rows with missing values
     df = df.dropna()
     kf = KFold(n_splits=5, shuffle=True, random_state=123)
-    fold_index = 1
     train_mse = []
     test_mse = []
     train_mae = []
@@ -917,8 +846,7 @@ def run_mixed_effects_model_correctrxntime(df):
 
         print(result.summary())
         params = result.params
-        # combiune params and random effects into one series
-        # params = pd.concat([params, random_effects_2.mean(axis=0)], axis=0)
+
 
         coefficients.append(params)
         random_effects_df = pd.concat([random_effects_df, random_effects_2])
