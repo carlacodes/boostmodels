@@ -575,7 +575,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
         #                              fontsize=15)  # rotate x-axis labels for better readability
 
         data_perm_importance = (result.importances[sorted_idx].mean(axis=1).T)
-        labels = (feature_labels_words_permutation)
+        labels = np.flip(feature_labels_words_permutation)
 
         # Bar plot on the first axes
         ax_dict['D1'].barh(labels[0], data_perm_importance[-1], color=talker_color)
@@ -825,54 +825,55 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
         # Display the chart
         plt.savefig(os.path.join((fig_savedir), str(talker) + '_permutationimportance_plot_2906_noannotation.png'), dpi=500, bbox_inches='tight')
         plt.show()
-        words_to_plot = [
-        "he takes",
-        "today",
-        "of science",
-        "but",
-        "sailor",
-        "any",
-        "accurate",
-        "in contrast",
-        "researched",
-        "boats",
-        "took",
-        "when a",
-        "craft"
-    ]
-        words_to_plot = words_to_plot[::-1]
-        feature_labels_words = feature_labels_words[::-1]
+        if talker == 1:
+            words_to_plot = [
+            "he takes",
+            "today",
+            "of science",
+            "but",
+            "sailor",
+            "any",
+            "accurate",
+            "in contrast",
+            "researched",
+            "boats",
+            "took",
+            "when a",
+            "craft"
+        ]
+            words_to_plot = words_to_plot[::-1]
+            feature_labels_words = feature_labels_words[::-1]
 
-        fig, ax = plt.subplots(figsize=(15, 5))
-        # do the same plot as above but with the words to plot
-        # get the indices of the words to plot
-        indices = []
-        # need to reverse the feature labels words to match the permutation importance values
+            fig, ax = plt.subplots(figsize=(15, 5))
+            # do the same plot as above but with the words to plot
+            # get the indices of the words to plot
+            indices = []
+            # need to reverse the feature labels words to match the permutation importance values
 
-        for word in words_to_plot:
-            index = np.where(feature_labels_words == word)[0][0]
-            indices.append(index)
-        indices = np.array(indices)
-        indices = indices.flatten()
+            for word in words_to_plot:
+                index = np.where(feature_labels_words == word)[0][0]
+                indices.append(index)
+            indices = np.array(indices)
+            indices = indices.flatten()
 
-        # get the values of the words to plot
-        values = data_perm_importance[indices]
-        # get the labels of the words to plot
-        labels = feature_labels_words[indices]
-        data_for_plot = pd.DataFrame({'labels': labels, 'values': values})
-        # data_for_plot = data_for_plot.sort_values(by='values', ascending=True)
-        labels = data_for_plot['labels']
-        values = data_for_plot['values']
-        plt.xticks(fontsize = 15)
-        plt.yticks(fontsize = 15)
+            # get the values of the words to plot
+            values = data_perm_importance[indices]
+            # get the labels of the words to plot
+            labels = feature_labels_words[indices]
+            data_for_plot = pd.DataFrame({'labels': labels, 'values': values})
+            # data_for_plot = data_for_plot.sort_values(by='values', ascending=True)
+            labels = data_for_plot['labels']
+            values = data_for_plot['values']
+            plt.xticks(fontsize = 15)
+            plt.yticks(fontsize = 15)
 
-        # plot the values
-        ax.barh(labels, values, color=talker_color)
-        ax.set_xlabel('Permutation importance', fontsize=20)
-        ax.set_title('Permutation importance of words in absolute reaction time model, ' + talker_word + ' talker',
-                        fontsize=20)
-        plt.savefig(os.path.join((fig_savedir), str(talker) + 'permutationimportance_plot_frombehaviouralmodel_2906_noannotation.png'), dpi=500, bbox_inches='tight')
-        plt.show()
+            # plot the values
+            ax.barh(labels, values, color=talker_color)
+            ax.set_xlabel('Permutation importance', fontsize=20)
+            ax.set_title('Permutation importance of words in absolute reaction time model, ' + talker_word + ' talker',
+                            fontsize=20)
+            plt.savefig(os.path.join((fig_savedir), str(talker) + 'permutationimportance_plot_frombehaviouralmodel_2906_noannotation.png'), dpi=500, bbox_inches='tight')
+            plt.show()
 
 
 
@@ -1492,7 +1493,7 @@ def main():
     # ferrets = ['F1815_Cruella']# , 'F2105_Clove']
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
 
-    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=False, talker=2, noise_floor=False)
+    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=False, talker=1, noise_floor=False)
 
     # for ferret in ferrets:
     #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)
