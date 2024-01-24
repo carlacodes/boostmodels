@@ -108,6 +108,12 @@ def objective_releasetimes(trial, X, y):
     return np.mean(cv_scores)
 def runlgbreleasetimes_for_a_ferret(data, paramsinput=None, ferret=1, ferret_name='F1815_Cruella'
                                     ):
+    ''' this function runs the LGBM model for the correct release times for a single ferret, then returns the model and calls the visualisation functions implementing SHAP.
+    :param data: dataframe containing the data
+    :param paramsinput: parameters for the LGBM model
+    :param ferret: ferret ID
+    :param ferret_name: ferret name
+    :return: model, ypred, y_test, mse_test'''
     data = data[data['ferret'] == ferret]
     col = 'realRelReleaseTimes'
     dfx = data.loc[:, data.columns != col]
