@@ -322,8 +322,6 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     print(results)
     shap_values = shap.TreeExplainer(xg_reg).shap_values(X)
     fig, ax = plt.subplots(figsize=(15, 15))
-    # title kwargs still does nothing so need this workaround for summary plots
-    cmapname = "viridis"
 
     feature_importances = np.abs(shap_values).sum(axis=0)
     sorted_indices = np.argsort(feature_importances)
@@ -390,18 +388,23 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     result = permutation_importance(xg_reg, X_test, y_test, n_repeats=100,
                                     random_state=123, n_jobs=2)
 
-    # sorted_idx = result.importances_mean.argsort()
     print('finished calculating permutation importance now')
     sorted_idx = (result.importances.mean(axis=1)).argsort()
-    # sorted_idx = result.importances.argsort() # sort from lowest to highest
+    if talker == 1:
+        feature_labels_words_permutation = female_word_labels[sorted_idx]
+    else:
+        feature_labels_words_permutation = male_word_labels[sorted_idx]
+
     fig, ax = plt.subplots(figsize=(8, 18))
-    test = result.importances[sorted_idx].mean(axis=1).T
-    ax.barh(feature_labels_words, result.importances[sorted_idx].mean(axis=1), color='cyan')
+    ax.barh(feature_labels_words_permutation, result.importances[sorted_idx].mean(axis=1), color='cyan')
     # save the permutation importance values
     #concatenate into one array
     #make a dataframed
-    permutation_importance_dataframe = pd.DataFrame(result.importances[sorted_idx].mean(axis=1), index=np.flip(feature_labels_words))
-    permutation_importance_array = np.concatenate((feature_labels_words, result.importances[sorted_idx].mean(axis=1)), axis=0)
+    permutation_importance_dataframe = pd.DataFrame(result.importances[sorted_idx].mean(axis=1), index=(feature_labels_words_permutation))
+    #concatenate the arrays horizontally
+    permutation_importance_array = np.concatenate(((feature_labels_words_permutation).reshape(-1,1), (sorted_idx).reshape(-1,1), result.importances[sorted_idx].mean(axis=1).reshape(-1,1)), axis=1)
+
+
 
     #save the dataframe
     np.save(fig_savedir / f'permutation_importance_dataframe_talker_{talker}.npy', permutation_importance_dataframe)
@@ -411,7 +414,6 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
         np.save(fig_savedir / 'permutation_importance_values.npy', result.importances[sorted_idx].mean(axis=1).T)
         np.save(fig_savedir / 'permutation_importance_labels.npy', feature_labels_words)
 
-    # rotate y -axis labels for better readability
     plt.yticks(rotation=45, ha='right')
     # make font size smaller for y tick labels
     plt.yticks(fontsize=10)
@@ -573,7 +575,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
         #                              fontsize=15)  # rotate x-axis labels for better readability
 
         data_perm_importance = (result.importances[sorted_idx].mean(axis=1).T)
-        labels = (feature_labels_words)
+        labels = (feature_labels_words_permutation)
 
         # Bar plot on the first axes
         ax_dict['D1'].barh(labels[0], data_perm_importance[-1], color=talker_color)
@@ -738,7 +740,6 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
 
         D = librosa.amplitude_to_db(np.abs(librosa.stft(worddict[int(top_words[0]) - 1].flatten())))
         cax = librosa.display.specshow(D, x_axis='time', y_axis='log', sr=24414.0625, ax=ax_dict['C'], cmap=cmap_color)
-        ax_dict['C'].legend()
         ax_dict['C'].set_title(f" instruments")
         ax_dict['C'].set_xlabel('Time (s)')
         ax_dict['C'].set_xticks(np.round(np.arange(0.1, len(worddict[int(top_words[0]) - 1]) / 24414.0625, 0.1), 2))
