@@ -114,6 +114,7 @@ def runlgbreleasetimes_for_a_ferret(data, paramsinput=None, ferret=1, ferret_nam
     :param ferret: ferret ID
     :param ferret_name: ferret name
     :return: model, ypred, y_test, mse_test'''
+
     data = data[data['ferret'] == ferret]
     col = 'realRelReleaseTimes'
     dfx = data.loc[:, data.columns != col]
@@ -156,18 +157,7 @@ def runlgbreleasetimes_for_a_ferret(data, paramsinput=None, ferret=1, ferret_nam
         'mean_mse_train': np.mean(mse_train),
     }
     np.save('metrics/modelmse' + ferret_name + '.npy', trainandtestaccuracy)
-    # labels[11] = 'distance to sensor'
-    # labels[10] = 'target F0'
-    # labels[9] = 'trial number'
-    # labels[8] = "precur. = targ. F0"
-    # labels[7] = 'male talker'
-    # labels[6] = 'time until target'
-    # labels[5] = 'target F0 - precursor F0'
-    # labels[4] = 'day of week'
-    # labels[3] = 'precursor F0'
-    # labels[2] = 'past trial was catch'
-    # labels[1] = 'trial took place in AM'
-    # labels[0] = 'past trial was correct'
+
 
     ax.set_yticklabels(labels)
     plt.savefig('figs/shap_summary_plot_correct_release_times_' + ferret_name + '.png', dpi=300, bbox_inches='tight')
