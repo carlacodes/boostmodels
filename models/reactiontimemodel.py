@@ -221,10 +221,6 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         fig_savedir.mkdir(parents=True, exist_ok=True)
 
     xg_reg = lgb.LGBMRegressor(random_state=42, verbose=1, **paramsinput)
-    # xg_reg = lgb.LGBMRegressor( colsample_bytree=0.3, learning_rate=0.1,
-    #                           max_depth=10, alpha=10, n_estimators=10, random_state=42, verbose=1)
-
-
     xg_reg.fit(X_train, y_train, verbose=1)
     ypred = xg_reg.predict(X_test)
     lgb.plot_importance(xg_reg)
@@ -302,15 +298,9 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
 
     shap.summary_plot(shap_values, X, show=False, cmap = matplotlib.colormaps[cmapname])
     fig, ax = plt.gcf(), plt.gca()
-    # if one_ferret:
-    #     plt.title('Features over impact in reaction time for ' + ferrets)
-    # else:
-    #     plt.title('Features over impact in reaction time')
     plt.xlabel('SHAP value (impact on model output) on reaction time')
 
-    import matplotlib.image as mpimg
     fig.set_size_inches(9, 15)
-    # ax.set_xlabel('SHAP Value (impact \n on model output)', fontsize=36)
     #get the color bar
     colorbar = fig.axes[1]
     #change the font size of the color bar
@@ -321,11 +311,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     ax.tick_params(axis='y', which='major', labelsize=25, rotation = 45)
     ax.tick_params(axis='x', which='major', labelsize=25)
     ax.set_xlabel(None)
-    # ax.set_yticklabels(np.flip(feature_labels), fontsize=17, rotation = 45)
-
-    # ax.set_ylabel('Features', fontsize=18)
     plt.savefig(fig_savedir / 'shapsummaryplot_allanimals2.png', dpi=300, bbox_inches='tight')
-
     plt.show()
 
 
@@ -346,7 +332,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     shap.dependence_plot("target time", shap_values, X)  #
     explainer = shap.Explainer(xg_reg, X)
     shap_values2 = explainer(X_train)
-    # shap.plots.scatter(shap_values2[:, "side of audio"], color=shap_values2[:, "ferret ID"], show=True, cmap = matplotlib.colormaps[cmapname])
+
     fig, ax = plt.subplots(figsize=(10,10))
     shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "precur. = targ. F0"], show=False, cmap = matplotlib.colormaps[cmapname])
     plt.xticks([1,2], labels = ['male', 'female'])
@@ -380,7 +366,6 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     ax.set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18, rotation=45)
     ax.set_xlabel('Ferret ID', fontsize=18)
     ax.set_ylabel('Impact on reaction time', fontsize=18)
-    # plt.title('Mean SHAP value over ferret ID', fontsize=18)
     plt.title('Time to target presentation', fontsize = 20)
     plt.savefig(fig_savedir /'ferretIDbytimetotarget.png', dpi=500, bbox_inches='tight')
     plt.show()
