@@ -187,14 +187,19 @@ def runlgbreleasetimes_for_a_ferret(data, paramsinput=None, ferret=1, ferret_nam
 
 
 def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_ferret=False, ferrets=None, noise_floor = False):
-
+    ''' run the LGBM model for the correct release times for all ferrets, then returns the model and calls the visualisation functions implementing SHAP.
+    :param X: dataframe containing the TRAIN data
+    :param y: dataframe containing the TEST data
+    :param paramsinput: parameters for the LGBM model
+    :param ferret_as_feature: whether to include ferret ID as a feature
+    :param one_ferret: whether to run the model for one ferret or all ferrets
+    :param ferrets: ferret ID
+    :param noise_floor: whether to include the noise floor
+    :return: model, ypred, y_test, mse_test
+    '''
 
     X_train, X_test, y_train, y_test = train_test_split(X,y, test_size=0.2,
                                                         random_state=42)
-
-    # param = {'max_depth': 2, 'eta': 1, 'objective': 'reg:squarederror'}
-    # param['nthread'] = 4
-    # param['eval_metric'] = 'auc'
 
     from pathlib import Path
     if ferret_as_feature:
