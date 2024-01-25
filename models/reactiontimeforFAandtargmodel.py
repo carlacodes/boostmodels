@@ -1445,41 +1445,7 @@ def predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feat
     else:
         one_ferret = False
 
-    # #plot distribution of dfx by counting the number of non naans in each column
-    # # dfx.count(axis=0).plot(kind='bar')
-    # # plt.show()
-    # # plot distribution of dfx by counting the number of non naans in each row
-    #
-    # female_word_labels = ['instruments', 'when a', 'sailor', 'in a small', 'craft', 'faces', 'of the might',
-    #                       'of the vast', 'atlantic', 'ocean', 'today', 'he takes', 'the same', 'risks',
-    #                       'that generations', 'took', 'before', 'him', 'but', 'in contrast', 'them', 'he can meet',
-    #                       'any', 'emergency', 'that comes', 'his way', 'confidence', 'that stems', 'profound', 'trust',
-    #                       'advance', 'of science', 'boats', 'stronger', 'more stable', 'protecting', 'against',
-    #                       'and du', 'exposure', 'tools and', 'more ah', 'accurate', 'the more', 'reliable',
-    #                       'helping in', 'normal weather', 'and conditions', 'food', 'and drink', 'of better',
-    #                       'researched', 'than easier', 'to cook', 'than ever', 'before']
-    # male_word_labels = ['instruments', 'when a', 'sailor', 'in a', 'small', 'craft', 'faces', 'the might', 'of the',
-    #                     'vast', 'atlantic', 'ocean', 'today', 'he', 'takes', 'the same', 'risks', 'that generations',
-    #                     'took', 'before him', 'but', 'in contrast', 'to them', 'he', 'can meet', 'any', 'emergency',
-    #                     'that comes', 'his way', 'with a', 'confidence', 'that stems', 'from', 'profound', 'trust',
-    #                     'in the', 'advances', 'of science', 'boats', 'as stronger', 'and more', 'stable', 'protecting',
-    #                     'against', 'undue', 'exposure', 'tools', 'and', 'accurate', 'and more', 'reliable', 'helping',
-    #                     'in all', 'weather', 'and']
-    #
-    # fig, ax = plt.subplots(figsize=(30, 10))
-    # dfx.count(axis=0).plot(kind='bar')
-    # ax.set_xticks(np.arange(0,55,1))
-    # ax.set_yticks(np.arange(0, 5000, 200))
-    # if talker==1:
-    #     ax.set_xticklabels(female_word_labels, rotation=45, fontsize=8)
-    #     plt.title('Distribution of non nan values by column in dfx for female talker')
-    #
-    # else:
-    #     ax.set_xticklabels(male_word_labels, rotation=45, fontsize=8)
-    #     plt.title('Distribution of non nan values by column in dfx for male talker')
-    #
-    # plt.savefig('D:\mixedeffectmodelsbehavioural\models/figs/absolutereleasemodel/distribution_non_nan_values_by_column_dfx_talker' + str(talker) + '.png')
-    # plt.show()
+
 
     xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx, df_use[col], paramsinput=best_params,
                                                         ferret_as_feature=ferret_as_feature, one_ferret=one_ferret,
