@@ -1483,6 +1483,75 @@ def predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feat
     xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx, df_use[col], paramsinput=best_params,
                                                         ferret_as_feature=ferret_as_feature, one_ferret=one_ferret,
                                                         ferrets=ferrets, talker=talker, noise_floor=noise_floor, bootstrap_words = bootstrap_words)
+def compare_bootstrap_permutation_test_results():
+    load_dir = 'D:\mixedeffectmodelsbehavioural\models/figs/absolutereleasemodel/'
+    array_female_raw = np.load(load_dir+'/talker1/'+'with_no_bootstrap_words/permutation_importance_array_talker_1.npy')
+    array_female_bootstrap = np.load(load_dir+'/talker1/'+'permutation_importance_array_talker_1.npy')
+    array_male_raw = np.load(load_dir+'/talker2/'+'with_no_bootstrap_words/permutation_importance_array_talker_2.npy')
+    array_male_bootstrap= np.load(load_dir+'/talker2/'+'permutation_importance_array_talker_2.npy')
+    #rearrange array_male_bootstrap so it's in the same order  as array_male_raw
+    words_raw = array_male_raw[:,0]
+    words_bootstrap = array_male_bootstrap[:,0]
+
+    words_raw_female = array_female_raw[:,0]
+    words_bootstrap_female = array_female_bootstrap[:,0]
+
+    words_raw
+    #make a dictionary with the words and the permutation importance values
+    #rearrange the words_bootstrap so that it's in the same order as words_raw
+    array_male_bootstrap_reordered = []
+    for word in words_raw:
+        index = np.where(words_bootstrap == word)[0][0]
+        array_male_bootstrap_reordered.append(array_male_bootstrap[index, :])
+    array_male_bootstrap_reordered = np.array(array_male_bootstrap_reordered)
+
+
+    array_female_bootstrap_reordered = []
+    for word in words_raw_female:
+        index = np.where(words_bootstrap_female == word)[0][0]
+        array_female_bootstrap_reordered.append(array_female_bootstrap[index, :])
+    array_female_bootstrap_reordered = np.array(array_female_bootstrap_reordered)
+
+
+
+
+
+    #make a dataframe with the permutation importance values out of the two permutation importance arrays
+    female_df = pd.DataFrame(array_female_raw[:,2].astype(float), columns=['permutation_importance'], index = array_female_raw[:,0] )
+    female_df['permutation_importance_bootstrap'] = array_female_bootstrap_reordered[:,2].astype(float)
+    male_df = pd.DataFrame(array_male_raw[:,2].astype(float), columns=['permutation_importance'], index = array_male_raw[:,0] )
+    male_df['permuation_importance_bootstrap'] = array_male_bootstrap_reordered[:,2].astype(float)
+    female_df.reset_index(inplace=True)
+    male_df.reset_index(inplace=True)
+
+    fig, ax = plt.subplots(figsize = (20,5))
+    import seaborn as sns
+    # plt.scatter(x=female_df['permutation_importance'], y=female_df['permutation_importance_bootstrap'], color='purple')
+    sns.scatterplot(data = female_df, x='permutation_importance', y='permutation_importance_bootstrap', color='purple', label = 'female')
+    sns.scatterplot(data= male_df, x='permutation_importance', y='permuation_importance_bootstrap', color='darkorange', label = 'male')
+    #make the xticks rounded
+    ax.set_xlim(0, 0.03)
+    ax.set_ylim(0, 0.04)
+    ax.legend()
+    ax.set_xlabel('Permutation importanced without bootstrapping')
+    ax.set_ylabel('Permutation importance with bootstrapping')
+    plt.title('Permutation Importance vs Permutation Importance with Bootstrap Words')
+
+    # ax.get_xaxis().set_major_formatter(plt.FuncFormatter(lambda x, loc: "{:.2f}".format(x)))
+    # ax.xaxis.set_major_locator(plt.MaxNLocator(nbins=10))
+    plt.show()
+
+
+    plt.show()
+
+    ax.set_xlabel('Permutation Importance')
+    ax.set_ylabel('Permutation Importance with Bootstrap Words')
+    ax.set_title('Permutation Importance vs Permutation Importance with Bootstrap Words')
+    plt.savefig('D:\mixedeffectmodelsbehavioural\models/figs/absolutereleasemodel/permutation_importance_vs_permutation_importance_bootstrap.png')
+    plt.show()
+
+    fig, ax = plt.subplots(figsize = (20,5))
+    plt.scatter()
 
 
 def main():
