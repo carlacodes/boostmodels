@@ -1319,14 +1319,7 @@ def run_mixed_effects_model_absrxntime(df, talker =1):
     mean_coefficients = pd.concat([mean_coefficients, p_values_df, std_error_df], axis=1, keys=['coefficients', 'p_values', 'std_error'])
     print(mean_coefficients)
     mean_coefficients.to_csv(f"mixedeffects_csvs/absrxntimemodel_talker_{talker}_mean_coefficients.csv")
-    #export
-    # np.savetxt(f"mixedeffects_csvs/absrxntimemodel_talker_{talker}_mse_train_mean.csv", [np.mean(train_mse)], delimiter=",")
-    # np.savetxt(f"mixedeffects_csvs/absrxntimemodel_talker_{talker}_mse_test_mean.csv", [np.mean(test_mse)], delimiter=",")
-    # np.savetxt(f"mixedeffects_csvs/absrxntimemodel_talker_{talker}_mae_train_mean.csv", [np.mean(train_mae)], delimiter=",")
-    # np.savetxt(f"mixedeffects_csvs/absrxntimemodel_talker_{talker}_mae_test_mean.csv", [np.mean(test_mae)], delimiter=",")
-    # np.savetxt(f"mixedeffects_csvs/absrxntimemodel_talker_{talker}_r2_train_mean.csv", [np.mean(train_r2)], delimiter=",")
-    # np.savetxt(f"mixedeffects_csvs/absrxntimemodel_talker_{talker}_r2_test_mean.csv", [np.mean(test_r2)], delimiter=",")
-    #make dictionary
+
     results = {'train_mse': train_mse, 'test_mse': test_mse, 'train_mae': train_mae, 'test_mae': test_mae, 'train_r2': train_r2, 'test_r2': test_r2,
                'mean_train_mse': np.mean(train_mse), 'mean_test_mse': np.mean(test_mse), 'mean_train_mae': np.mean(train_mae), 'mean_test_mae': np.mean(test_mae),'mean_train_r2': np.mean(train_r2), 'mean_test_r2': np.mean(test_r2)}
     df_results = pd.DataFrame.from_dict(results)
