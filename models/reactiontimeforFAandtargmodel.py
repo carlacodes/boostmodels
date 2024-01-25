@@ -1143,12 +1143,9 @@ def extract_releasedata_withdist(ferrets, talker=1, bootstrap_words = True):
         # Display the chart
         plt.savefig(os.path.join('D:\mixedeffectmodelsbehavioural/models/figs/absolutereleasemodel/', str(talker) + '_distcounts_plot.png'), dpi=500, bbox_inches='tight')
         plt.show()
-        #     labels = ['instruments', 'when a', 'sailor', 'in a small', 'craft', 'faces', 'of the might', 'of the vast', 'atlantic', 'ocean', 'today', 'he takes', 'the same', 'risks', 'that generations', 'took', 'before', 'him', 'but', 'in contrast', 'them', 'he can meet', 'any', 'emergency', 'that comes', 'his way', 'confidence', 'that stems', 'profound', 'trust', 'advance', 'of science', 'boats', 'stronger', 'more stable', 'protecting', 'against', 'and du', 'exposure', 'tools and', 'more ah', 'accurate', 'the more', 'reliable', 'helping in', 'normal weather', 'and conditions', 'food', 'and drink', 'of better', 'researched', 'than easier', 'to cook', 'than ever', 'before', 'rev. instruments', 'pink noise']
-        # else:
-        #     labels = ['instruments', 'when a', 'sailor', 'in a', 'small', 'craft', 'faces', 'the might', 'of the', 'vast', 'atlantic', 'ocean', 'today', 'he', 'takes', 'the same', 'risks', 'that generations', 'took', 'before him', 'but', 'in contrast', 'to them', 'he', 'can meet', 'any', 'emergency', 'that comes', 'his way', 'with a', 'confidence', 'that stems', 'from', 'profound', 'trust', 'in the', 'advances', 'of science', 'boats', 'as stronger', 'and more', 'stable', 'protecting', 'against', 'undue', 'exposure', 'tools', 'and', 'accurate', 'and more', 'reliable', 'helping', 'in all', 'weather', 'and', 'rev. instruments', 'pink noise']
 
-        # df_use = pd.concat([df_dist, df['centreRelease']], axis=1)
-        df_use = df_dist
+    df_use = df_dist
+
     # drop the distractors column
 
 
