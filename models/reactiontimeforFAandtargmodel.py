@@ -1523,22 +1523,31 @@ def compare_bootstrap_permutation_test_results():
     male_df['permuation_importance_bootstrap'] = array_male_bootstrap_reordered[:,2].astype(float)
     female_df.reset_index(inplace=True)
     male_df.reset_index(inplace=True)
-
+    #remove instruments from both dataframes
+    female_df = female_df[female_df.index != 'instruments']
+    male_df = male_df[male_df.index != 'instruments']
     fig, ax = plt.subplots(figsize = (20,5))
     import seaborn as sns
     # plt.scatter(x=female_df['permutation_importance'], y=female_df['permutation_importance_bootstrap'], color='purple')
     sns.scatterplot(data = female_df, x='permutation_importance', y='permutation_importance_bootstrap', color='purple', label = 'female')
     sns.scatterplot(data= male_df, x='permutation_importance', y='permuation_importance_bootstrap', color='darkorange', label = 'male')
     #make the xticks rounded
+    #get the spearmans correlation
+    from scipy.stats import spearmanr
+    spearman_corr_female, _ = spearmanr(female_df['permutation_importance'], female_df['permutation_importance_bootstrap'])
+    spearman_corr_male, _ =spearmanr(male_df['permutation_importance'], male_df['permuation_importance_bootstrap'])
+
+
     ax.set_xlim(0, 0.03)
     ax.set_ylim(0, 0.04)
+    #put spearman correlation in a text box
+    plt.annotate(f"Spearman's correlation female: {spearman_corr_female:.2f}, spearman's correlation male: {spearman_corr_male:.2f}",
+                 xy=(0.05, 0.95), xycoords='axes fraction',
+                 fontsize=12, ha='left', va='top', color='blue')
     ax.legend()
     ax.set_xlabel('Permutation importanced without bootstrapping')
     ax.set_ylabel('Permutation importance with bootstrapping')
     plt.title('Permutation Importance vs Permutation Importance with Bootstrap Words')
-
-    # ax.get_xaxis().set_major_formatter(plt.FuncFormatter(lambda x, loc: "{:.2f}".format(x)))
-    # ax.xaxis.set_major_locator(plt.MaxNLocator(nbins=10))
     plt.show()
 
 
