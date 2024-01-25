@@ -7,7 +7,8 @@ from sklearn.model_selection import KFold
 from sklearn.model_selection import cross_val_score
 from sklearn.inspection import permutation_importance
 from helpers.embedworddurations import *
-
+from scipy.stats import spearmanr
+import seaborn as sns
 import shap
 import matplotlib
 import math
@@ -1496,7 +1497,6 @@ def compare_bootstrap_permutation_test_results():
     words_raw_female = array_female_raw[:,0]
     words_bootstrap_female = array_female_bootstrap[:,0]
 
-    words_raw
     #make a dictionary with the words and the permutation importance values
     #rearrange the words_bootstrap so that it's in the same order as words_raw
     array_male_bootstrap_reordered = []
@@ -1527,13 +1527,11 @@ def compare_bootstrap_permutation_test_results():
     female_df = female_df[female_df.index != 'instruments']
     male_df = male_df[male_df.index != 'instruments']
     fig, ax = plt.subplots(figsize = (20,5))
-    import seaborn as sns
     # plt.scatter(x=female_df['permutation_importance'], y=female_df['permutation_importance_bootstrap'], color='purple')
     sns.scatterplot(data = female_df, x='permutation_importance', y='permutation_importance_bootstrap', color='purple', label = 'female')
     sns.scatterplot(data= male_df, x='permutation_importance', y='permuation_importance_bootstrap', color='darkorange', label = 'male')
     #make the xticks rounded
     #get the spearmans correlation
-    from scipy.stats import spearmanr
     spearman_corr_female, _ = spearmanr(female_df['permutation_importance'], female_df['permutation_importance_bootstrap'])
     spearman_corr_male, _ =spearmanr(male_df['permutation_importance'], male_df['permuation_importance_bootstrap'])
 
@@ -1543,24 +1541,15 @@ def compare_bootstrap_permutation_test_results():
     #put spearman correlation in a text box
     plt.annotate(f"Spearman's correlation female: {spearman_corr_female:.2f}, spearman's correlation male: {spearman_corr_male:.2f}",
                  xy=(0.05, 0.95), xycoords='axes fraction',
-                 fontsize=12, ha='left', va='top', color='blue')
+                 fontsize=12, ha='left', va='top', color='black')
     ax.legend()
-    ax.set_xlabel('Permutation importanced without bootstrapping')
+    ax.set_xlabel('Permutation importance without bootstrapping')
     ax.set_ylabel('Permutation importance with bootstrapping')
-    plt.title('Permutation Importance vs Permutation Importance with Bootstrap Words')
+    plt.title('Permutation Importance vs Permutation Importance with Subsampling')
+    plt.savefig('D:\mixedeffectmodelsbehavioural\models/figs/absolutereleasemodel/permutation_importance_vs_permutation_importance_with_subsampling.png')
     plt.show()
 
 
-    plt.show()
-
-    ax.set_xlabel('Permutation Importance')
-    ax.set_ylabel('Permutation Importance with Bootstrap Words')
-    ax.set_title('Permutation Importance vs Permutation Importance with Bootstrap Words')
-    plt.savefig('D:\mixedeffectmodelsbehavioural\models/figs/absolutereleasemodel/permutation_importance_vs_permutation_importance_bootstrap.png')
-    plt.show()
-
-    fig, ax = plt.subplots(figsize = (20,5))
-    plt.scatter()
 
 
 def main():
