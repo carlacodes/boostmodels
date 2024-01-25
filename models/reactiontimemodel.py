@@ -775,8 +775,10 @@ def extract_release_times_data(ferrets):
     return dfuse
 
 def run_mixed_effects_model_correctrxntime(df):
-    #split the data into training and test set
-    #relabel the labels by addding underscore for each label
+    '''this function runs a mixed effects model on the reaction time data to later compare with the LGBM model
+    :param df: dataframe with the reaction time data
+    :return result: mixed effects model results'''
+
     ferrets = ['F1702', 'F1815', 'F1803', 'F2002', 'F2105']
     for col in df.columns:
         if col == "precur. = targ. F0":
@@ -787,7 +789,6 @@ def run_mixed_effects_model_correctrxntime(df):
             df.rename(columns={col: col.replace(" ", "_")}, inplace=True)
     for col in df.columns:
             df.rename(columns={col: col.replace(".", "_")}, inplace=True)
-
     equation = 'realRelReleaseTimes ~target_F0 + past_trial_catch + trial_no_ + talker + side_of_audio + precursor_equals_target_F0 + target_time + past_resp__correct'
 
     df['past_resp__correct'] = df['past_resp__correct'].astype('category')
@@ -801,7 +802,6 @@ def run_mixed_effects_model_correctrxntime(df):
     df['ferret_ID'] = df['ferret_ID'].astype('category')
     df['past_trial_catch'] = df['past_trial_catch'].astype('category')
 
-    #drop the rows with missing values
     df = df.dropna()
     kf = KFold(n_splits=5, shuffle=True, random_state=123)
     train_mse = []
@@ -817,12 +817,9 @@ def run_mixed_effects_model_correctrxntime(df):
     random_effects_df = pd.DataFrame()
     for train_index, test_index in kf.split(df):
         train, test = df.iloc[train_index], df.iloc[test_index]
-
         model = smf.mixedlm(equation, train, groups=train["ferret_ID"])
         result = model.fit()
-
         random_effects = result.random_effects
-
         random_effects_2 = pd.DataFrame()
         for i, ferret in enumerate(ferrets):
             try:
@@ -836,7 +833,6 @@ def run_mixed_effects_model_correctrxntime(df):
 
         coefficients.append(params)
         random_effects_df = pd.concat([random_effects_df, random_effects_2])
-
         p_values.append(result.pvalues)
         std_error.append(result.bse)
         std_error_re.append(result.bse_re)
@@ -866,8 +862,6 @@ def run_mixed_effects_model_correctrxntime(df):
         print(mse_train)
 
         #calculate the r2
-
-
         ypred = result.predict(test)
         y_test = test['realRelReleaseTimes']
         mse = mean_squared_error(y_test, ypred)
@@ -876,15 +870,15 @@ def run_mixed_effects_model_correctrxntime(df):
         test_mse.append(mse)
         #calculate the median absolute error
         mae = median_absolute_error(y_test, ypred)
-
         test_mae.append(mae)
         print(mae)
-
         print(mse)
+
     coefficients_df = pd.DataFrame(coefficients).mean()
     p_values_df = pd.DataFrame(p_values).mean()
     std_error_df = pd.DataFrame(std_error).mean()
     std_error_re_df = pd.DataFrame(std_error_re).mean()
+
     # combine into one dataframe
     result_coefficients = pd.concat([coefficients_df, p_values_df, std_error_df], axis=1, keys=['coefficients', 'p_values', 'std_error'])
     fig, ax = plt.subplots()

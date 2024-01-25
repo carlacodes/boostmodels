@@ -207,7 +207,7 @@ def runlgbreleasetimes_for_a_ferret(data, paramsinput=None, ferret=1, ferret_nam
     return xg_reg, ypred, y_test, mse_test
 
 
-def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferret=False, ferrets=None, talker=1, noise_floor=False):
+def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferret=False, ferrets=None, talker=1, noise_floor=False, bootstrap_words = True):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2,
                                                         random_state=42)
 
@@ -235,6 +235,8 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
             fig_savedir = Path('figs/absolutereleasemodel/' + 'talker' + str(talker))
     if noise_floor == True:
         fig_savedir = fig_savedir / 'with_noise_floor'
+    if bootstrap_words == False:
+        fig_savedir = fig_savedir / 'with_no_bootstrap_words'
     if fig_savedir.exists():
         pass
     else:
@@ -880,7 +882,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     return xg_reg, ypred, y_test, results
 
 
-def extract_releasedata_withdist(ferrets, talker=1):
+def extract_releasedata_withdist(ferrets, talker=1, bootstrap_words = True):
     df = behaviouralhelperscg.get_df_rxntimebydist(ferrets=ferrets, includefa=True, startdate='04-01-2020',
                                                    finishdate='01-03-2023', talker_param=talker)
     df_intra = df[df['intra_trial_roving'] == 1]
@@ -916,239 +918,237 @@ def extract_releasedata_withdist(ferrets, talker=1):
     #get the counts of each column in the dataframe and then find the mean count
 
     # Calculate the mean count of each word (excluding 'dist1') in the dataframe
-    word_counts = df_dist.count(axis=0)
+    if bootstrap_words == True:
+        word_counts = df_dist.count(axis=0)
+        # Determine the minimum count among the words (excluding 'dist1')
+        min_count = word_counts.min()
+        # List to hold subsampled DataFrames for each word
+        subsampled_dfs = []
 
-    # Determine the minimum count among the words (excluding 'dist1')
-    min_count = word_counts.min()
+        # Iterate through each word (excluding 'dist1', and 'centreRelease')
+        col_list = df_dist.columns.drop(['dist1', 'centreRelease']).to_list()
+        for k in range(1, 20):
+            count = 0
+            #shuffle the columns
 
-    # List to hold subsampled DataFrames for each word
-    subsampled_dfs = []
-
-    # Iterate through each word (excluding 'dist1', 'dist2', and 'centreRelease')
-    col_list = df_dist.columns.drop(['dist1', 'centreRelease']).to_list()
-
-    for k in range(1, 20):
-        count = 0
-        #shuffle the columns
-
-        # random.shuffle(col_list)
-        col_list = np.flip(col_list)
+            # random.shuffle(col_list)
+            col_list = np.flip(col_list)
 
 
-        for col in col_list:
-            word_df_notna = df_dist[df_dist[col].notna()]
-            word_df_na = df_dist[df_dist[col].isna()]
+            for col in col_list:
+                word_df_notna = df_dist[df_dist[col].notna()]
+                word_df_na = df_dist[df_dist[col].isna()]
 
-            # Stratified subsampling based on the original frequencies
-            if col == 'dist20' or col =='dist42'or col=='dist5':
-                print('higher freq word')
-                n_samples = int(min_count * 0.025)
-            elif col =='dist32' or col =='dist2':
-                print('super high freq word')
-                continue
-            else:
-                n_samples = int(min_count)
-            word_df_notna_subsampled = word_df_notna.sample(n=n_samples, random_state=123, replace=True)
-            word_df_na_subsampled = word_df_na.sample(n=n_samples, random_state=123, replace=True)
+                # Stratified subsampling based on the original frequencies
+                if col == 'dist20' or col =='dist42'or col=='dist5':
+                    print('higher freq word')
+                    n_samples = int(min_count * 0.025)
+                elif col =='dist32' or col =='dist2':
+                    print('super high freq word')
+                    continue
+                else:
+                    n_samples = int(min_count)
+                word_df_notna_subsampled = word_df_notna.sample(n=n_samples, random_state=123, replace=True)
+                word_df_na_subsampled = word_df_na.sample(n=n_samples, random_state=123, replace=True)
 
-            # Append to list of DataFrames
-            subsampled_dfs.append(pd.concat([word_df_notna_subsampled, word_df_na_subsampled], axis=0))
+                # Append to list of DataFrames
+                subsampled_dfs.append(pd.concat([word_df_notna_subsampled, word_df_na_subsampled], axis=0))
 
-        # Concatenate the subsampled DataFrames for each word to create the final dataframe
-    df_dist = pd.concat(subsampled_dfs, axis=0)
+            # Concatenate the subsampled DataFrames for each word to create the final dataframe
+        df_dist = pd.concat(subsampled_dfs, axis=0)
 
-    female_word_labels = ['instruments', 'when a', 'sailor', 'in a small', 'craft', 'faces', 'of the might',
-                          'of the vast', 'atlantic', 'ocean', 'today', 'he takes', 'the same', 'risks',
-                          'that generations', 'took', 'before', 'him', 'but', 'in contrast', 'them', 'he can meet',
-                          'any', 'emergency', 'that comes', 'his way', 'confidence', 'that stems', 'profound', 'trust',
-                          'advance', 'of science', 'boats', 'stronger', 'more stable', 'protecting', 'against',
-                          'and du', 'exposure', 'tools and', 'more ah', 'accurate', 'the more', 'reliable',
-                          'helping in', 'normal weather', 'and conditions', 'food', 'and drink', 'of better',
-                          'researched', 'than easier', 'to cook', 'than ever', 'before']
-    male_word_labels = ['instruments', 'when a', 'sailor', 'in a', 'small', 'craft', 'faces', 'the might', 'of the',
-                        'vast', 'atlantic', 'ocean', 'today', 'he', 'takes', 'the same', 'risks', 'that generations',
-                        'took', 'before him', 'but', 'in contrast', 'to them', 'he', 'can meet', 'any', 'emergency',
-                        'that comes', 'his way', 'with a', 'confidence', 'that stems', 'from', 'profound', 'trust',
-                        'in the', 'advances', 'of science', 'boats', 'as stronger', 'and more', 'stable', 'protecting',
-                        'against', 'undue', 'exposure', 'tools', 'and', 'accurate', 'and more', 'reliable', 'helping',
-                        'in all', 'weather', 'and']
+        female_word_labels = ['instruments', 'when a', 'sailor', 'in a small', 'craft', 'faces', 'of the might',
+                              'of the vast', 'atlantic', 'ocean', 'today', 'he takes', 'the same', 'risks',
+                              'that generations', 'took', 'before', 'him', 'but', 'in contrast', 'them', 'he can meet',
+                              'any', 'emergency', 'that comes', 'his way', 'confidence', 'that stems', 'profound', 'trust',
+                              'advance', 'of science', 'boats', 'stronger', 'more stable', 'protecting', 'against',
+                              'and du', 'exposure', 'tools and', 'more ah', 'accurate', 'the more', 'reliable',
+                              'helping in', 'normal weather', 'and conditions', 'food', 'and drink', 'of better',
+                              'researched', 'than easier', 'to cook', 'than ever', 'before']
+        male_word_labels = ['instruments', 'when a', 'sailor', 'in a', 'small', 'craft', 'faces', 'the might', 'of the',
+                            'vast', 'atlantic', 'ocean', 'today', 'he', 'takes', 'the same', 'risks', 'that generations',
+                            'took', 'before him', 'but', 'in contrast', 'to them', 'he', 'can meet', 'any', 'emergency',
+                            'that comes', 'his way', 'with a', 'confidence', 'that stems', 'from', 'profound', 'trust',
+                            'in the', 'advances', 'of science', 'boats', 'as stronger', 'and more', 'stable', 'protecting',
+                            'against', 'undue', 'exposure', 'tools', 'and', 'accurate', 'and more', 'reliable', 'helping',
+                            'in all', 'weather', 'and']
 
-    fig, ax = plt.subplots(figsize=(30, 10))
+        fig, ax = plt.subplots(figsize=(30, 10))
 
-    # Plot them in order in a bar plot from highest to lowest
-    # Drop centrelrease
-    df_dist_counts = df_dist.drop(['centreRelease'], axis=1)
-    df_dist_counts = df_dist_counts.count(axis=0)
+        # Plot them in order in a bar plot from highest to lowest
+        # Drop centrelrease
+        df_dist_counts = df_dist.drop(['centreRelease'], axis=1)
+        df_dist_counts = df_dist_counts.count(axis=0)
 
-    # Sort the values as well as female_word_labels
-    sorted_idx_distlabels = df_dist_counts.argsort()
-    df_dist_counts = df_dist_counts.sort_values(ascending=False)
-    if talker == 1:
-        talker_color = 'purple'
-    else:
-        talker_color = 'orange'
-    df_dist_counts.plot.bar(ax=ax, color = talker_color)
-    ax.set_xlabel('Word', fontsize = 18)
-    ax.set_ylabel('Number of occurrences', fontsize = 18)
+        # Sort the values as well as female_word_labels
+        sorted_idx_distlabels = df_dist_counts.argsort()
+        df_dist_counts = df_dist_counts.sort_values(ascending=False)
+        if talker == 1:
+            talker_color = 'purple'
+        else:
+            talker_color = 'orange'
+        df_dist_counts.plot.bar(ax=ax, color = talker_color)
+        ax.set_xlabel('Word', fontsize = 18)
+        ax.set_ylabel('Number of occurrences', fontsize = 18)
 
-    ax.set_xticks(np.arange(0, 55, 1))
-    if talker == 1:
-        ax.set_xticklabels(np.flip(np.array(female_word_labels)[sorted_idx_distlabels]), rotation=45, fontsize=15)
-        plt.title('Distribution of bootstrapped words for female talker model', fontsize = 25)
-    else:
-        ax.set_xticklabels(np.flip(np.array(male_word_labels)[sorted_idx_distlabels]), rotation=45, fontsize=15)
-        plt.title('Distribution of bootstrapped words for male talker model', fontsize = 25)
+        ax.set_xticks(np.arange(0, 55, 1))
+        if talker == 1:
+            ax.set_xticklabels(np.flip(np.array(female_word_labels)[sorted_idx_distlabels]), rotation=45, fontsize=15)
+            plt.title('Distribution of bootstrapped words for female talker model', fontsize = 25)
+        else:
+            ax.set_xticklabels(np.flip(np.array(male_word_labels)[sorted_idx_distlabels]), rotation=45, fontsize=15)
+            plt.title('Distribution of bootstrapped words for male talker model', fontsize = 25)
 
-    plt.savefig(
-        'D:\mixedeffectmodelsbehavioural\models/figs/absolutereleasemodel/distribution_non_nan_values_by_column_dfx_talker' + str(
-            talker) + '.png')
-    plt.show()
+        plt.savefig(
+            'D:\mixedeffectmodelsbehavioural\models/figs/absolutereleasemodel/distribution_non_nan_values_by_column_dfx_talker' + str(
+                talker) + '.png')
+        plt.show()
 
-    fig, ax = plt.subplots(figsize=(30, 10))
-    ax.barh(np.array(female_word_labels)[sorted_idx_distlabels][0], df_dist_counts[-1], color=talker_color)
+        fig, ax = plt.subplots(figsize=(30, 10))
+        ax.barh(np.array(female_word_labels)[sorted_idx_distlabels][0], df_dist_counts[-1], color=talker_color)
 
-    # ax_dict['D1'].set_xlabel("Permutation importance", fontsize=15)
-    ax.set_ylabel("Feature", fontsize=15)
-    ax.set_yticks(np.flip(np.array(female_word_labels)[sorted_idx_distlabels])[0])
-    # ax_dict['D1'].set_yticklabels(labels[0], ha='right', fontsize=15)
+        # ax_dict['D1'].set_xlabel("Permutation importance", fontsize=15)
+        ax.set_ylabel("Feature", fontsize=15)
+        ax.set_yticks(np.flip(np.array(female_word_labels)[sorted_idx_distlabels])[0])
+        # ax_dict['D1'].set_yticklabels(labels[0], ha='right', fontsize=15)
 
-    # Bar plot on the second axes
-    ax.barh(np.array(female_word_labels)[sorted_idx_distlabels][1:], df_dist_counts[1:], color=talker_color)
-    # ax_dict['D2'].set_title("Permutation importance features on absolute reaction time, " + talker_word + " talker",
-    #                         fontsize=15)
-    ax.set_xlabel("Permutation importance", fontsize=15)
-    ax.set_yticks(np.array(female_word_labels)[sorted_idx_distlabels][1:])
-    ax.set_yticklabels(np.array(female_word_labels)[sorted_idx_distlabels][1:], ha='right', fontsize=15)
+        # Bar plot on the second axes
+        ax.barh(np.array(female_word_labels)[sorted_idx_distlabels][1:], df_dist_counts[1:], color=talker_color)
+        # ax_dict['D2'].set_title("Permutation importance features on absolute reaction time, " + talker_word + " talker",
+        #                         fontsize=15)
+        ax.set_xlabel("Permutation importance", fontsize=15)
+        ax.set_yticks(np.array(female_word_labels)[sorted_idx_distlabels][1:])
+        ax.set_yticklabels(np.array(female_word_labels)[sorted_idx_distlabels][1:], ha='right', fontsize=15)
 
-    # zoom-in / limit the view to different portions of the data
-    ax.set_xlim(0, np.max(df_dist_counts) * 1.1)  # Adjust the limit based on your data
-    ax.set_xlim(0, 0.06)  # Adjust the limit based on your data
+        # zoom-in / limit the view to different portions of the data
+        ax.set_xlim(0, np.max(df_dist_counts) * 1.1)  # Adjust the limit based on your data
+        ax.set_xlim(0, 0.06)  # Adjust the limit based on your data
 
-    # hide the spines between ax_dict['D1'] and ax_dict['D2']
-    ax.spines['right'].set_visible(False)
-    ax.spines['left'].set_visible(False)
-    ax.yaxis.tick_left()
-    ax.tick_params(labeltop='off')  # don't put tick labels at the top
-    ax.yaxis.tick_right()
+        # hide the spines between ax_dict['D1'] and ax_dict['D2']
+        ax.spines['right'].set_visible(False)
+        ax.spines['left'].set_visible(False)
+        ax.yaxis.tick_left()
+        ax.tick_params(labeltop='off')  # don't put tick labels at the top
+        ax.yaxis.tick_right()
 
-    # Make the spacing between the two axes a bit smaller
-    plt.subplots_adjust(wspace=0.15)
-    if talker == 1:
-        ax.set_xticklabels(np.flip(np.array(female_word_labels)[sorted_idx_distlabels]), rotation=45, fontsize=15)
-        plt.title('Distribution of bootstrapped words for female talker model', fontsize=25)
-    else:
-        ax.set_xticklabels(np.flip(np.array(male_word_labels)[sorted_idx_distlabels]), rotation=45, fontsize=15)
-        plt.title('Distribution of bootstrapped words for male talker model', fontsize=25)
+        # Make the spacing between the two axes a bit smaller
+        plt.subplots_adjust(wspace=0.15)
+        if talker == 1:
+            ax.set_xticklabels(np.flip(np.array(female_word_labels)[sorted_idx_distlabels]), rotation=45, fontsize=15)
+            plt.title('Distribution of bootstrapped words for female talker model', fontsize=25)
+        else:
+            ax.set_xticklabels(np.flip(np.array(male_word_labels)[sorted_idx_distlabels]), rotation=45, fontsize=15)
+            plt.title('Distribution of bootstrapped words for male talker model', fontsize=25)
 
-    plt.savefig(
-        'D:\mixedeffectmodelsbehavioural\models/figs/absolutereleasemodel/distribution_non_nan_values_by_column_dfx_talker_shrunk' + str(
-            talker) + '.png')
-    plt.show()
+        plt.savefig(
+            'D:\mixedeffectmodelsbehavioural\models/figs/absolutereleasemodel/distribution_non_nan_values_by_column_dfx_talker_shrunk' + str(
+                talker) + '.png')
+        plt.show()
 
-    fig, ax1 = plt.subplots(figsize=(10, 10))  # Adjust the figsize as needed
+        fig, ax1 = plt.subplots(figsize=(10, 10))  # Adjust the figsize as needed
 
-    # Bar plot on the first axes (left y-axis)
-    bar_labels = np.array(female_word_labels)[sorted_idx_distlabels]
-    bar_width = df_dist_counts[-1]  # Set bar width to the corresponding value
+        # Bar plot on the first axes (left y-axis)
+        bar_labels = np.array(female_word_labels)[sorted_idx_distlabels]
+        bar_width = df_dist_counts[-1]  # Set bar width to the corresponding value
 
-    ax1.barh(bar_labels[0], bar_width, color=talker_color)
+        ax1.barh(bar_labels[0], bar_width, color=talker_color)
 
-    ax1.set_ylabel("Feature", fontsize=15)
-    ax1.set_yticks([bar_labels[0]])
-    ax1.set_yticklabels([bar_labels[0]], ha='right', fontsize=15)
+        ax1.set_ylabel("Feature", fontsize=15)
+        ax1.set_yticks([bar_labels[0]])
+        ax1.set_yticklabels([bar_labels[0]], ha='right', fontsize=15)
 
-    # Set the x-limits for the left axes to cover the space for dist1
-    max_width = max(np.max(bar_width), np.max(df_dist_counts[1:]))
-    ax1.set_xlim(0, max_width * 1.1)  # Adjust the limit based on your data
+        # Set the x-limits for the left axes to cover the space for dist1
+        max_width = max(np.max(bar_width), np.max(df_dist_counts[1:]))
+        ax1.set_xlim(0, max_width * 1.1)  # Adjust the limit based on your data
 
-    # Create a second y-axis on the right side
-    ax2 = ax1.twinx()
+        # Create a second y-axis on the right side
+        ax2 = ax1.twinx()
 
-    # Bar plot on the second axes (right y-axis)
-    bar_widths = df_dist_counts[1:]  # Set bar widths to the corresponding values
-    ax2.barh(bar_labels[1:], bar_widths, color=talker_color)
+        # Bar plot on the second axes (right y-axis)
+        bar_widths = df_dist_counts[1:]  # Set bar widths to the corresponding values
+        ax2.barh(bar_labels[1:], bar_widths, color=talker_color)
 
-    ax2.set_xlabel("Permutation importance", fontsize=15)
-    ax2.set_yticks(bar_labels[1:])
-    ax2.set_yticklabels(bar_labels[1:], ha='right', fontsize=15)
+        ax2.set_xlabel("Permutation importance", fontsize=15)
+        ax2.set_yticks(bar_labels[1:])
+        ax2.set_yticklabels(bar_labels[1:], ha='right', fontsize=15)
 
-    # Set the x-limits for the right axes to cover the space for dist2 and others
-    ax2.set_xlim(0, max_width * 1.1)  # Adjust the limit based on your data
+        # Set the x-limits for the right axes to cover the space for dist2 and others
+        ax2.set_xlim(0, max_width * 1.1)  # Adjust the limit based on your data
 
-    # Hide the x-axis tick labels and spines for both axes
-    ax1.set_xticklabels([])  # Remove x-axis tick labels for ax1
-    ax2.set_xticklabels([])  # Remove x-axis tick labels for ax2
-    ax1.spines['top'].set_visible(False)  # Hide the top spine for ax1
-    ax1.spines['bottom'].set_visible(False)  # Hide the bottom spine for ax1
-    ax2.spines['top'].set_visible(False)  # Hide the top spine for ax2
-    ax2.spines['bottom'].set_visible(False)  # Hide the bottom spine for ax2
+        # Hide the x-axis tick labels and spines for both axes
+        ax1.set_xticklabels([])  # Remove x-axis tick labels for ax1
+        ax2.set_xticklabels([])  # Remove x-axis tick labels for ax2
+        ax1.spines['top'].set_visible(False)  # Hide the top spine for ax1
+        ax1.spines['bottom'].set_visible(False)  # Hide the bottom spine for ax1
+        ax2.spines['top'].set_visible(False)  # Hide the top spine for ax2
+        ax2.spines['bottom'].set_visible(False)  # Hide the bottom spine for ax2
 
-    # Make the spacing between the two axes a bit smaller
-    plt.subplots_adjust(wspace=0.15)
+        # Make the spacing between the two axes a bit smaller
+        plt.subplots_adjust(wspace=0.15)
 
-    if talker == 1:
-        ax1.set_title('Distribution of bootstrapped words for female talker model', fontsize=25)
-    else:
-        ax1.set_title('Distribution of bootstrapped words for male talker model', fontsize=25)
+        if talker == 1:
+            ax1.set_title('Distribution of bootstrapped words for female talker model', fontsize=25)
+        else:
+            ax1.set_title('Distribution of bootstrapped words for male talker model', fontsize=25)
 
-    plt.tight_layout()  # Ensure all elements fit within the figure
-    plt.savefig(
-        'D:\mixedeffectmodelsbehavioural\models/figs/absolutereleasemodel/distribution_non_nan_values_by_column_dfx_talker_shrunk' + str(
-            talker) + '.png')
-    plt.show()
+        plt.tight_layout()  # Ensure all elements fit within the figure
+        plt.savefig(
+            'D:\mixedeffectmodelsbehavioural\models/figs/absolutereleasemodel/distribution_non_nan_values_by_column_dfx_talker_shrunk' + str(
+                talker) + '.png')
+        plt.show()
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 15), gridspec_kw={'width_ratios': [4, 1]})
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 15), gridspec_kw={'width_ratios': [4, 1]})
 
-    # Plotting dist_counts on the first subplot
-    dist_counts = df_dist_counts  # Replace this with your actual data
+        # Plotting dist_counts on the first subplot
+        dist_counts = df_dist_counts  # Replace this with your actual data
 
-    # Bar plot on the first subplot
-    ax1.barh(np.arange(0, len(dist_counts), 1), dist_counts[:], color=talker_color)
-    ax1.set_xlim(0, max(dist_counts[1:]) + 0.002)  # Adjust xlim for the majority of values
-    ax1.set_yticks(np.arange(0, len(dist_counts), 1))
-    ax1.set_yticklabels(np.flip(bar_labels[:]), rotation=45)
+        # Bar plot on the first subplot
+        ax1.barh(np.arange(0, len(dist_counts), 1), dist_counts[:], color=talker_color)
+        ax1.set_xlim(0, max(dist_counts[1:]) + 0.002)  # Adjust xlim for the majority of values
+        ax1.set_yticks(np.arange(0, len(dist_counts), 1))
+        ax1.set_yticklabels(np.flip(bar_labels[:]), rotation=45)
 
-    # Plotting dist_counts on the second subplot
-    # You need to adapt the following lines for the correct data and limits
-    ax2.barh(np.arange(0, len(dist_counts), 1), dist_counts[:], color=talker_color)
-    ax2.set_xlim(max(dist_counts[1:]) + 0.002, max(dist_counts) + 0.05)  # Adjust xlim for the outlier
-    ax2.set_yticklabels([])
-    #make the x ticks in sciencetific notation
-    ax1.ticklabel_format(axis='x', style='sci', scilimits=(0, 0))
-    ax2.ticklabel_format(axis='x', style='sci', scilimits=(0, 0))
-    plt.tight_layout()
-    fig.subplots_adjust(top=0.85)
-    fig.subplots_adjust(wspace=0)
+        # Plotting dist_counts on the second subplot
+        # You need to adapt the following lines for the correct data and limits
+        ax2.barh(np.arange(0, len(dist_counts), 1), dist_counts[:], color=talker_color)
+        ax2.set_xlim(max(dist_counts[1:]) + 0.002, max(dist_counts) + 0.05)  # Adjust xlim for the outlier
+        ax2.set_yticklabels([])
+        #make the x ticks in sciencetific notation
+        ax1.ticklabel_format(axis='x', style='sci', scilimits=(0, 0))
+        ax2.ticklabel_format(axis='x', style='sci', scilimits=(0, 0))
+        plt.tight_layout()
+        fig.subplots_adjust(top=0.85)
+        fig.subplots_adjust(wspace=0)
 
-    ax1.spines['right'].set_visible(False)
-    ax2.spines['left'].set_visible(False)
+        ax1.spines['right'].set_visible(False)
+        ax2.spines['left'].set_visible(False)
 
-    # Remove ticks in the middle
-    ax1.tick_params(right=False)
-    ax2.tick_params(left=False)
+        # Remove ticks in the middle
+        ax1.tick_params(right=False)
+        ax2.tick_params(left=False)
 
-    # Add a break in the x-axis
-    d = .015  # how big to make the diagonal lines in axes coordinates
-    kwargs = dict(transform=ax1.transAxes, color='k', clip_on=False)
-    ax1.plot((1 - d, 1 + d), (-d, +d), **kwargs)
-    ax1.plot((1 - d, 1 + d), (1 - d, 1 + d), **kwargs)
+        # Add a break in the x-axis
+        d = .015  # how big to make the diagonal lines in axes coordinates
+        kwargs = dict(transform=ax1.transAxes, color='k', clip_on=False)
+        ax1.plot((1 - d, 1 + d), (-d, +d), **kwargs)
+        ax1.plot((1 - d, 1 + d), (1 - d, 1 + d), **kwargs)
 
-    # Add a common x-axis label
-    fig.text(0.5, 0.00, 'Number of instances', ha='center', va='center', fontsize=12)
-    if talker == 1:
-        ax1.set_title('Distribution of bootstrapped words for female talker model', fontsize=18)
-    else:
-        ax1.set_title('Distribution of bootstrapped words for male talker model', fontsize=18)
+        # Add a common x-axis label
+        fig.text(0.5, 0.00, 'Number of instances', ha='center', va='center', fontsize=12)
+        if talker == 1:
+            ax1.set_title('Distribution of bootstrapped words for female talker model', fontsize=18)
+        else:
+            ax1.set_title('Distribution of bootstrapped words for male talker model', fontsize=18)
 
-    # Display the chart
-    plt.savefig(os.path.join('D:\mixedeffectmodelsbehavioural/models/figs/absolutereleasemodel/', str(talker) + '_distcounts_plot.png'), dpi=500, bbox_inches='tight')
-    plt.show()
-    #     labels = ['instruments', 'when a', 'sailor', 'in a small', 'craft', 'faces', 'of the might', 'of the vast', 'atlantic', 'ocean', 'today', 'he takes', 'the same', 'risks', 'that generations', 'took', 'before', 'him', 'but', 'in contrast', 'them', 'he can meet', 'any', 'emergency', 'that comes', 'his way', 'confidence', 'that stems', 'profound', 'trust', 'advance', 'of science', 'boats', 'stronger', 'more stable', 'protecting', 'against', 'and du', 'exposure', 'tools and', 'more ah', 'accurate', 'the more', 'reliable', 'helping in', 'normal weather', 'and conditions', 'food', 'and drink', 'of better', 'researched', 'than easier', 'to cook', 'than ever', 'before', 'rev. instruments', 'pink noise']
-    # else:
-    #     labels = ['instruments', 'when a', 'sailor', 'in a', 'small', 'craft', 'faces', 'the might', 'of the', 'vast', 'atlantic', 'ocean', 'today', 'he', 'takes', 'the same', 'risks', 'that generations', 'took', 'before him', 'but', 'in contrast', 'to them', 'he', 'can meet', 'any', 'emergency', 'that comes', 'his way', 'with a', 'confidence', 'that stems', 'from', 'profound', 'trust', 'in the', 'advances', 'of science', 'boats', 'as stronger', 'and more', 'stable', 'protecting', 'against', 'undue', 'exposure', 'tools', 'and', 'accurate', 'and more', 'reliable', 'helping', 'in all', 'weather', 'and', 'rev. instruments', 'pink noise']
+        # Display the chart
+        plt.savefig(os.path.join('D:\mixedeffectmodelsbehavioural/models/figs/absolutereleasemodel/', str(talker) + '_distcounts_plot.png'), dpi=500, bbox_inches='tight')
+        plt.show()
+        #     labels = ['instruments', 'when a', 'sailor', 'in a small', 'craft', 'faces', 'of the might', 'of the vast', 'atlantic', 'ocean', 'today', 'he takes', 'the same', 'risks', 'that generations', 'took', 'before', 'him', 'but', 'in contrast', 'them', 'he can meet', 'any', 'emergency', 'that comes', 'his way', 'confidence', 'that stems', 'profound', 'trust', 'advance', 'of science', 'boats', 'stronger', 'more stable', 'protecting', 'against', 'and du', 'exposure', 'tools and', 'more ah', 'accurate', 'the more', 'reliable', 'helping in', 'normal weather', 'and conditions', 'food', 'and drink', 'of better', 'researched', 'than easier', 'to cook', 'than ever', 'before', 'rev. instruments', 'pink noise']
+        # else:
+        #     labels = ['instruments', 'when a', 'sailor', 'in a', 'small', 'craft', 'faces', 'the might', 'of the', 'vast', 'atlantic', 'ocean', 'today', 'he', 'takes', 'the same', 'risks', 'that generations', 'took', 'before him', 'but', 'in contrast', 'to them', 'he', 'can meet', 'any', 'emergency', 'that comes', 'his way', 'with a', 'confidence', 'that stems', 'from', 'profound', 'trust', 'in the', 'advances', 'of science', 'boats', 'as stronger', 'and more', 'stable', 'protecting', 'against', 'undue', 'exposure', 'tools', 'and', 'accurate', 'and more', 'reliable', 'helping', 'in all', 'weather', 'and', 'rev. instruments', 'pink noise']
 
-    # df_use = pd.concat([df_dist, df['centreRelease']], axis=1)
-    df_use = df_dist
+        # df_use = pd.concat([df_dist, df['centreRelease']], axis=1)
+        df_use = df_dist
     # drop the distractors column
 
 
@@ -1337,8 +1337,8 @@ def run_mixed_effects_model_absrxntime(df, talker =1):
 
     
     return result
-def predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=False, talker=2, noise_floor = False):
-    df_use = extract_releasedata_withdist(ferrets, talker=talker)
+def predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=False, talker=2, noise_floor = False, bootstrap_words = False):
+    df_use = extract_releasedata_withdist(ferrets, talker=talker, bootstrap_words=bootstrap_words)
     df_use2 = df_use.copy()
     # run_mixed_effects_model_absrxntime(df_use2, talker = talker)
     col = 'centreRelease'
@@ -1485,7 +1485,7 @@ def predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feat
 
     xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx, df_use[col], paramsinput=best_params,
                                                         ferret_as_feature=ferret_as_feature, one_ferret=one_ferret,
-                                                        ferrets=ferrets, talker=talker, noise_floor=noise_floor)
+                                                        ferrets=ferrets, talker=talker, noise_floor=noise_floor, bootstrap_words = bootstrap_words)
 
 
 def main():
@@ -1493,7 +1493,7 @@ def main():
     # ferrets = ['F1815_Cruella']# , 'F2105_Clove']
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
 
-    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=False, talker=2, noise_floor=False)
+    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=False, talker=2, noise_floor=False, bootstrap_words=False)
 
     # for ferret in ferrets:
     #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)
