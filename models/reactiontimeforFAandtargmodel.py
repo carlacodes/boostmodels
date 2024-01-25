@@ -929,13 +929,7 @@ def extract_releasedata_withdist(ferrets, talker=1, bootstrap_words = True):
         # Iterate through each word (excluding 'dist1', and 'centreRelease')
         col_list = df_dist.columns.drop(['dist1', 'centreRelease']).to_list()
         for k in range(1, 20):
-            count = 0
-            #shuffle the columns
-
-            # random.shuffle(col_list)
             col_list = np.flip(col_list)
-
-
             for col in col_list:
                 word_df_notna = df_dist[df_dist[col].notna()]
                 word_df_na = df_dist[df_dist[col].isna()]
