@@ -1092,13 +1092,17 @@ def extract_releasedata_withdist(ferrets, talker=1, bootstrap_words = True):
         kwargs = dict(transform=ax1.transAxes, color='k', clip_on=False)
         ax1.plot((1 - d, 1 + d), (-d, +d), **kwargs)
         ax1.plot((1 - d, 1 + d), (1 - d, 1 + d), **kwargs)
+        #increase the font size of the x ticks
+        ax1.tick_params(axis='x', labelsize=20)
+        ax2.tick_params(axis='x', labelsize=20)
+
 
         # Add a common x-axis label
-        fig.text(0.5, 0.00, 'Number of instances', ha='center', va='center', fontsize=12)
+        fig.text(0.5, 0.00, 'Number of instances', ha='center', va='center', fontsize=25)
         if talker == 1:
-            ax1.set_title('Distribution of bootstrapped words for female talker model', fontsize=18)
+            ax1.set_title('Distribution of bootstrapped words for female talker model', fontsize=25)
         else:
-            ax1.set_title('Distribution of bootstrapped words for male talker model', fontsize=18)
+            ax1.set_title('Distribution of bootstrapped words for male talker model', fontsize=25)
 
         # Display the chart
         plt.savefig(os.path.join('D:\mixedeffectmodelsbehavioural/models/figs/absolutereleasemodel/', str(talker) + '_distcounts_plot.png'), dpi=500, bbox_inches='tight')
@@ -1431,9 +1435,6 @@ def compare_bootstrap_permutation_test_results():
     array_female_bootstrap_reordered = np.array(array_female_bootstrap_reordered)
 
 
-
-
-
     #make a dataframe with the permutation importance values out of the two permutation importance arrays
     female_df = pd.DataFrame(array_female_raw[:,2].astype(float), columns=['permutation_importance'], index = array_female_raw[:,0] )
     female_df['permutation_importance_bootstrap'] = array_female_bootstrap_reordered[:,2].astype(float)
@@ -1444,7 +1445,7 @@ def compare_bootstrap_permutation_test_results():
     #remove instruments from both dataframes
     female_df = female_df[female_df.index != 'instruments']
     male_df = male_df[male_df.index != 'instruments']
-    fig, ax = plt.subplots(figsize = (20,5))
+    fig, ax = plt.subplots(figsize = (10,5))
     # plt.scatter(x=female_df['permutation_importance'], y=female_df['permutation_importance_bootstrap'], color='purple')
     sns.scatterplot(data = female_df, x='permutation_importance', y='permutation_importance_bootstrap', color='purple', label = 'female')
     sns.scatterplot(data= male_df, x='permutation_importance', y='permuation_importance_bootstrap', color='darkorange', label = 'male')
@@ -1457,25 +1458,27 @@ def compare_bootstrap_permutation_test_results():
     ax.set_xlim(0, 0.03)
     ax.set_ylim(0, 0.04)
     #put spearman correlation in a text box
-    plt.annotate(f"Spearman's correlation female: {spearman_corr_female:.2f}, spearman's correlation male: {spearman_corr_male:.2f}",
+    plt.annotate(f"spearman's correlation female: {spearman_corr_female:.2f}, \n spearman's correlation male: {spearman_corr_male:.2f}",
                  xy=(0.05, 0.95), xycoords='axes fraction',
-                 fontsize=12, ha='left', va='top', color='black')
-    ax.legend()
-    ax.set_xlabel('Permutation importance without bootstrapping')
-    ax.set_ylabel('Permutation importance with bootstrapping')
-    plt.title('Permutation Importance vs Permutation Importance with Subsampling')
-    plt.savefig('D:\mixedeffectmodelsbehavioural\models/figs/absolutereleasemodel/permutation_importance_vs_permutation_importance_with_subsampling.png')
+                 fontsize=15, ha='left', va='top', color='black')
+    ax.legend(fontsize=12, loc = 'lower right')
+    ax.set_xlabel('Permutation importance \n without subsampling', fontsize = 18)
+    ax.set_ylabel('Permutation importance \n  with subsampling', fontsize = 18)
+    plt.title('Permutation Importances vs Permutation Importances with Subsampling', fontsize = 18)
+    plt.savefig('D:\mixedeffectmodelsbehavioural\models/figs/absolutereleasemodel/permutation_importance_vs_permutation_importance_with_subsampling.png', bbox_inches='tight')
     plt.show()
+    return
 
 
 
 
 def main():
+    # compare_bootstrap_permutation_test_results()
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
     # ferrets = ['F1815_Cruella']# , 'F2105_Clove']
     # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
 
-    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=False, talker=1, noise_floor=False, bootstrap_words=False)
+    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=False, talker=2, noise_floor=False, bootstrap_words=True)
 
     # for ferret in ferrets:
     #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)
