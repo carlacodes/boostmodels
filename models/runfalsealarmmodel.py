@@ -1082,7 +1082,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
         "SHAP value": shap_values
     })
     sns.violinplot(x="ferret ID", y="SHAP value", hue="intra-trial roving", data=data_df, split=True, inner="quart",
-                   palette=custom_colors, ax=ax_dict['E'])
+                   palette=custom_colors, ax=ax_dict['E'], linewidth=0.5)
 
     ax_dict['E'].set_xticks([0, 1, 2, 3, 4])
     ax_dict['E'].set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], rotation=45)
