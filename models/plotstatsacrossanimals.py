@@ -384,23 +384,16 @@ def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'inter_trial_
         df_noncatchnoncorrection = df[(df['catchTrial'] == 0) & (df['correctionTrial'] == 0)]
         df_catchnoncorrection = df[(df['catchTrial'] == 1) & (df['correctionTrial'] == 0)]
         df_noncorrection = df[(df['correctionTrial'] == 0)]
-
     else:
-
         df_noncatchnoncorrection = df[(df['catchTrial'] == 0) & (df['correctionTrial'] == 0) & ((df[pitch_param] == 1) |(df['control_trial'] == 1))]
         df_catchnoncorrection = df[(df['catchTrial'] == 1) & (df['correctionTrial'] == 0) & ((df[pitch_param] == 1) |(df['control_trial'] == 1))]
         df_noncorrection = df[(df['correctionTrial'] == 0) & ((df[pitch_param] == 1) | (df['control_trial'] == 1))]
-    count = int(0)
 
-
-    talkers = [1,2]
     stats_dict[1] = {}
     stats_dict[2] = {}
     stats_dict[3] = {}
     stats_dict[4] = {}
     stats_dict[5] = {}
-
-
 
     stats_dict[1]['hits'] = {}
     stats_dict[1]['false_alarms']= {}
@@ -434,9 +427,6 @@ def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'inter_trial_
     stats_dict[5]['dprime']= {}
     stats_dict[5]['bias'] = {}
 
-
-
-
     count = 0
     pitch_list = [1,2,3,4,5]
     data_dict = {}
@@ -452,14 +442,10 @@ def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'inter_trial_
 
     rm_anova_dataframe = pd.DataFrame(columns=['pitch', 'ferret', 'hits', 'false_alarms', 'correct_response'])
     for ferret in ferrets:
-
         selected_ferret = df_noncatchnoncorrection[df_noncatchnoncorrection['ferret'] == count]
         selected_ferret_catch = df_catchnoncorrection[df_catchnoncorrection['ferret'] == count]
         selected_ferret_all = df_noncorrection[df_noncorrection['ferret'] == count]
-
         for pitch in pitch_list:
-
-
             selected_ferret_talker = selected_ferret[selected_ferret['pitchoftarg'] == pitch]
             selected_ferret_all_talker = selected_ferret_all[selected_ferret_all['f0'] == pitch]
 
@@ -509,14 +495,11 @@ def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'inter_trial_
         posthoc_df.to_csv(f'D:/mixedeffectmodelsbehavioural/metrics/posthoc_results_{value}.csv')
 
     stats_dict_all = {}
-
     stats_dict_all[1]= {}
     stats_dict_all[2]= {}
     stats_dict_all[3]= {}
     stats_dict_all[4]= {}
     stats_dict_all[5]= {}
-
-
 
     for pitch in pitch_list:
         df_noncatchnoncorrection_talker = df_noncatchnoncorrection[df_noncatchnoncorrection['pitchoftarg'] == pitch]
@@ -637,14 +620,11 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
     ax1.set_ylim(0, 1)
     ax1.set_ylabel('P(hits)')
     ax1.set_title('Hits')
-
     width = 0.25  # the width of the bars
     multiplier = 0
     gap_width = 0.2
 
-
     ax1.set_xticks([0.25, 1.25], ['Female', 'Male'])
-
     color_map = plt.cm.get_cmap('tab10')  # Choose a colormap
 
     for attribute, measurement in stats_dict_all_combined.items():
@@ -795,20 +775,16 @@ def plot_stats_by_pitch(stats_dict_all_combined, stats_dict_combined, stats_dict
     :param stats_dict_all_combined: dictionary of stats across all ferrets
     :param stats_dict_combined: dictionary of stats by ferret
     :return: None'''
-
-
     width = 0.25  # the width of the bars
     multiplier = 0
     gap_width = 0.2  # Width of the gap between series
     ferret_ids = ['F1702', 'F1815', 'F1803', 'F2002', 'F2105']
     text_width_pt = 419.67816  # Replace with your value
-
     # Convert the text width from points to inches
     text_width_inches = text_width_pt / 72.27
     fig, ((ax1, ax2)) = plt.subplots(2,1, layout='constrained',figsize=(0.8*text_width_inches,0.9*text_width_inches))
     #make a panel for the subplots to go into
     color_map = plt.cm.get_cmap('tab20')
-
     colors_to_remove = [0, 1, 2, 3 ,4,5]
 
     # Create a colormap without the specified colors
@@ -978,7 +954,6 @@ def plot_stats_by_pitch_lineplot(stats_dict_all_combined, stats_dict_combined, s
 
     ax1.plot(offsets1_f, hits_f, color='grey', linestyle='--', marker='o', label='Female Talker', markersize=12, alpha=0.5)
     ax1.plot(offsets1_m, hits_m, color='blue', linestyle='--', marker='o', label='Male Talker', markersize=12, alpha=0.5)
-
 
     offsets2_f = offsets2[len(offsets2)//2:]
     false_alarms_f = false_alarms[len(false_alarms)//2:]
@@ -1226,7 +1201,6 @@ def run_repeated_anova(stats_dict_inter, stats_dict_intra, stats_dict_control):
         stats_dict_all = stats_dict_all.append(stat_dict_intra3)
         stats_dict_all = stats_dict_all.append(stat_dict_inter3)
         stats_dict_all = stats_dict_all.append(stat_dict_control3)
-
     #make a dataframe with the data
     stats_dict_all = stats_dict_all.reset_index()
     #rename the index column
@@ -1235,11 +1209,6 @@ def run_repeated_anova(stats_dict_inter, stats_dict_intra, stats_dict_control):
 
     for value in ['hits', 'false_alarms', 'correct_response', 'dprime', 'bias']:
         anovaresults = pg.rm_anova(data=stats_dict_all, dv=value, within=['roving_type', 'talker'], subject='ferret')
-        #run posthoc tests
-        # posthoc = pg.pairwise_ttests(data=stats_dict_all, dv=value, within=['roving_type', 'talker'], subject='ferret', padjust='bonf')
-        #
-        # posthocresults = posthoc
-        # print(posthocresults)
         if 'roving_type * talker' in anovaresults.values:
             # index_of_interaction = anovaresults.columns.get_loc('roving_type * talker')
             #get the valuse in the Source column
@@ -1266,20 +1235,13 @@ def run_repeated_anova(stats_dict_inter, stats_dict_intra, stats_dict_control):
         partial_eta_squared = numerator / denominator
 
         eta_squared_df = pd.DataFrame({'partial_eta_squared': [partial_eta_squared]})
-
         anovaresults.to_csv(
             f'D:\mixedeffectmodelsbehavioural\metrics/rmanova_twolayer_{value}_acrosstalkers.csv')
 
         posthoc.to_csv(
             f'D:\mixedeffectmodelsbehavioural\metrics/posthocresults_twolayer_{value}_acrosstalkers.csv')
-
         print(anovaresults)
     return
-
-
-    #run the repeated measures ANOVA
-    #ANOVA
-    #stats_dict_all = stats_dict_all.dropna()
 
 
 
