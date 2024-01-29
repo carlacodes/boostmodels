@@ -1004,6 +1004,12 @@ def run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature = 
 
 
 def run_correctrxntime_model_for_a_ferret(ferrets, optimization = False, ferret_as_feature = False ):
+    '''this function runs the LGBM model on the reaction time data for a single ferret
+    :param ferrets: list of ferrets to include
+    :param optimization: whether to run the optimization or not
+    :param ferret_as_feature: whether to include ferret as a feature or not
+    :return: xg_reg: the trained model, ypred: the predicted values, y_test: the true values, results: the results of the model
+    '''
     df_use = extract_release_times_data(ferrets)
     col = 'realRelReleaseTimes'
     dfx = df_use.loc[:, df_use.columns != col]
