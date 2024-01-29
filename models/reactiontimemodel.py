@@ -15,8 +15,8 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import sklearn
 from sklearn.model_selection import train_test_split
-from helpers.behaviouralhelpersformodels import *\
-
+from helpers.behaviouralhelpersformodels import * \
+from pathlib import Path
 def shap_summary_plot(
         shap_values2,
         feature_labels,
@@ -30,10 +30,7 @@ def shap_summary_plot(
     :param cmap: color map
     :return: SHAP summary plot
     '''
-
-
     plt.rcParams['font.family'] = 'sans-serif'
-
     if isinstance(cmap, str):
         cmap = matplotlib.colormaps[cmap]
     plt.sca(ax)
@@ -192,8 +189,6 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
 
     X_train, X_test, y_train, y_test = train_test_split(X,y, test_size=0.2,
                                                         random_state=42)
-
-    from pathlib import Path
     if ferret_as_feature:
         if one_ferret:
             fig_savedir = Path('figs/correctrxntimemodel/ferret_as_feature/' + ferrets)
@@ -261,14 +256,10 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     print(results)
     shap_values = shap.TreeExplainer(xg_reg).shap_values(X)
     fig, ax = plt.subplots(figsize=(15, 15))
-    # title kwargs still does nothing so need this workaround for summary plots
     cmapname = "viridis"
-
-
 
     feature_importances = np.abs(shap_values).sum(axis=0)
     sorted_indices = np.argsort(feature_importances)
-
     sorted_indices = sorted_indices[::-1]
     feature_importances = feature_importances[sorted_indices]
     feature_labels = X.columns[sorted_indices]
