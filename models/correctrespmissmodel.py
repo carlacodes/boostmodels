@@ -15,17 +15,20 @@ import matplotlib.colors as mcolors
 from sklearn.model_selection import train_test_split
 from helpers.behaviouralhelpersformodels import *
 import sklearn.metrics as metrics
-import random
 
 def shap_summary_plot(
         shap_values2,
         feature_labels,
         ax=None,
         cmap = "viridis",
-        show_plots=False,
-        savefig=False,
-        savefig_path=None,
     ):
+    '''plot the shap summary plot
+    :param shap_values2: shap values
+    :param feature_labels: feature labels
+    :param ax: axis
+    :param cmap: color map
+    :return: none
+    '''
     plt.rcParams['font.family'] = 'sans-serif'
 
     if isinstance(cmap, str):
@@ -638,9 +641,6 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
             text.set_color('black')
 
     plt.subplots_adjust(wspace=0.35, hspace=0.5)
-    # plt.tight_layout()
-
-    # plt.tight_layout()
     plt.savefig(fig_dir / 'big_summary_plot_1606_noannotation.png', dpi=500, bbox_inches="tight")
     plt.savefig(fig_dir / 'big_summary_plot_1606_noannotation.pdf', dpi=500, bbox_inches="tight")
 
