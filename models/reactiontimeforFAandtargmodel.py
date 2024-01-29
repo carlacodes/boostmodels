@@ -20,6 +20,7 @@ from sklearn.model_selection import train_test_split
 from helpers.behaviouralhelpersformodels import *
 import matplotlib.font_manager as fm
 import matplotlib.image as mpimg
+import matplotlib.cm as cm
 import librosa
 import librosa.display
 import statsmodels.formula.api as smf
@@ -263,12 +264,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
     else:
         fig_savedir.mkdir(parents=True, exist_ok=True)
 
-
-
     xg_reg = lgb.LGBMRegressor(random_state=42, verbose=1, **paramsinput)
-    # xg_reg = lgb.LGBMRegressor( colsample_bytree=0.3, learning_rate=0.1,
-    #                           max_depth=10, alpha=10, n_estimators=10, random_state=42, verbose=1)
-
     xg_reg.fit(X_train, y_train, verbose=1)
     ypred = xg_reg.predict(X_test)
     lgb.plot_importance(xg_reg)
@@ -294,8 +290,6 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
                         'in all', 'weather', 'and']
 
     kfold = KFold(n_splits=5)
-
-
     results = cross_val_score(xg_reg, X_train, y_train, scoring='neg_mean_squared_error', cv=kfold)
     results_mae = cross_val_score(xg_reg, X_train, y_train, scoring='neg_median_absolute_error', cv=kfold)
     results_r2 = cross_val_score(xg_reg, X_train, y_train, scoring='r2', cv=kfold)
@@ -334,8 +328,6 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
 
     print(results)
     shap_values = shap.TreeExplainer(xg_reg).shap_values(X)
-    fig, ax = plt.subplots(figsize=(15, 15))
-
     feature_importances = np.abs(shap_values).sum(axis=0)
     sorted_indices = np.argsort(feature_importances)
 
@@ -375,14 +367,9 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
 
     fig, ax = plt.subplots(figsize=(8, 18))
     ax.barh(feature_labels_words_permutation, result.importances[sorted_idx].mean(axis=1), color='cyan')
-    # save the permutation importance values
-    #concatenate into one array
-    #make a dataframed
     permutation_importance_dataframe = pd.DataFrame(result.importances[sorted_idx].mean(axis=1), index=(feature_labels_words_permutation))
     #concatenate the arrays horizontally
     permutation_importance_array = np.concatenate(((feature_labels_words_permutation).reshape(-1,1), (sorted_idx).reshape(-1,1), result.importances[sorted_idx].mean(axis=1).reshape(-1,1)), axis=1)
-
-
 
     #save the dataframe
     np.save(fig_savedir / f'permutation_importance_dataframe_talker_{talker}.npy', permutation_importance_dataframe)
@@ -417,9 +404,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
 
             permutation_importance_values = np.load(load_dir / 'permutation_importance_values.npy')
             permutation_importance_labels = np.load(load_dir / 'permutation_importance_labels.npy')
-            # put into dictionary
-            # get the top 5 words
-            # need permutation importances in descending order rather than ascending order to match labels
+
             permutation_importance_values = np.flip(permutation_importance_values)
             top_words = permutation_importance_values[1:6]
             top_labels = permutation_importance_labels[1:6]
@@ -428,11 +413,6 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
             permutation_importance_dict[ferret] = top_words
             permutation_importance_labels_dict[ferret] = top_labels
 
-        # common_labels = set.intersection(*[set(labels) for labels in permutation_importance_labels_dict.values()])
-
-        # Plotting the stacked bar plot
-        # Determine the unique set of all labels
-        # Determine the unique set of all labels
         all_labels = set().union(*[set(labels) for labels in permutation_importance_labels_dict.values()])
 
         # Plotting the stacked bar plot
@@ -440,9 +420,6 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
         width = 0.5
 
         positions = np.arange(len(all_labels))
-
-
-
         dirfemale = 'D:/Stimuli/19122022/FemaleSounds24k_addedPinkNoiseRevTargetdB.mat'
         dirmale = 'D:/Stimuli/19122022/MaleSounds24k_addedPinkNoiseRevTargetdB.mat'
         word_times, worddictionary_female = run_word_durations(dirfemale)
@@ -484,11 +461,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
         else:
             color_list_bar = ['red', 'chocolate', 'lightsalmon', 'peachpuff', 'orange']
         bottom = np.zeros(len(all_labels))
-        # fig = plt.figure(figsize=(text_width_inches*3, (text_height_inches)*3))
-
         fig, ax = plt.subplots(figsize=(15,5))
-
-
         for i, ferret in enumerate(permutation_importance_dict.keys()):
             values = np.zeros(len(all_labels))
             labels_ferret = permutation_importance_labels_dict[ferret]
@@ -523,10 +496,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
         # rotate x-axis labels for better readability
         # summary_img = mpimg.imread(fig_savedir / 'shapsummaryplot_allanimals2.png')
         bottom = np.zeros(len(all_labels))
-        import matplotlib.cm as cm
 
-        # Your code here...
-        my_cmap = cm.get_cmap(cmap_color)  # Choose a colormap
         for i, ferret in enumerate(permutation_importance_dict.keys()):
             values = np.zeros(len(all_labels))
             labels_ferret = permutation_importance_labels_dict[ferret]
@@ -542,15 +512,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
         ax_dict['B'].set_xticks(np.arange(len(all_labels)))
         ax_dict['B'].set_xticklabels(all_labels, rotation=70, fontsize=10)
         ax_dict['B'].legend()
-        # # ax_dict['B'].subplots_adjust(bottom=0.3)  # Adjust the bottom margin to accommodate rotated xtick labels
-        # ax_dict['D'].barh(np.flip(feature_labels_words), result.importances[sorted_idx].mean(axis=1).T, color=talker_color)
-        # ax_dict['D'].set_title("Permutation importance features on absolute reaction time, " + talker_word + " talker ",
-        #                        fontsize=15)
-        # ax_dict['D'].set_xlabel("Permutation importance", fontsize=15)
-        # ax_dict['D'].set_ylabel("Feature", fontsize=15)
-        # ax_dict['D'].set_yticks(np.flip(feature_labels_words))
-        # ax_dict['D'].set_yticklabels(np.flip(feature_labels_words), ha='right',
-        #                              fontsize=15)  # rotate x-axis labels for better readability
+
 
         data_perm_importance = (result.importances[sorted_idx].mean(axis=1).T)
         labels = np.flip(feature_labels_words_permutation)
@@ -562,7 +524,6 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
         # ax_dict['D1'].set_xlabel("Permutation importance", fontsize=15)
         ax_dict['D1'].set_ylabel("Feature", fontsize=15)
         ax_dict['D1'].set_yticks(labels[0])
-        # ax_dict['D1'].set_yticklabels(labels[0], ha='right', fontsize=15)
 
         # Bar plot on the second axes
         ax_dict['D2'].barh(labels[1:], data_perm_importance[1:], color=talker_color)
@@ -586,8 +547,6 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
         # Make the spacing between the two axes a bit smaller
         plt.subplots_adjust(wspace=0.15)
 
-
-
         d = 0.015  # how big to make the diagonal lines in axes coordinates
         # arguments to pass plot, just so we don't keep repeating them
         kwargs = dict(transform=ax_dict['D1'].transAxes, color='k', clip_on=False)
@@ -598,10 +557,6 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
         ax_dict['D2'].plot((-d, d), (-d, +d), **kwargs)  # top-right diagonal
         ax_dict['D2'].plot((-d, d), (1 - d, 1 + d), **kwargs)  # bottom-right diagonal
 
-
-
-        # ax_dict['D'].set_yticklabels(np.flip(feature_labels_words), rotation=45, ha='right', fontsize=10)  # rotate x-axis labels for better readability
-        # Plot spectrogram
         if talker == 1:
             worddict = worddictionary_female
         elif talker == 2:
@@ -623,7 +578,6 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
         # pxx, freq, t, cax = ax_dict['C'].specgram(worddict[int(top_words[0]) - 1].flatten(), Fs=24414.0625, mode = 'psd', cmap = cmap_color)
         D = librosa.amplitude_to_db(np.abs(librosa.stft(worddict[int(top_words[0]) - 1].flatten())))
         cax = librosa.display.specshow(D, x_axis='time', y_axis='log', sr=24414.0625, ax=ax_dict['C'], cmap=cmap_color)
-        # fig.colorbar(cax, ax=None)
         ax_dict['C'].legend()
         ax_dict['C'].set_title(f" instruments")
         ax_dict['C'].set_xlabel('Time (s)')
@@ -682,22 +636,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
         fig.tight_layout()
         plt.show()
 
-        # #separate spectrogram plots
-        # fig, ax = plt.subplots(figsize=(15,6))
-        # #remove spines
-        # ax.spines['top'].set_visible(False)
-        # ax.spines['right'].set_visible(False)
-        # ax.spines['left'].set_visible(False)
-        # ax.spines['bottom'].set_visible(False)
-        # #remove ticks
-        # ax.tick_params(axis=u'both', which=u'both',length=0)
-        # #remove y axis
-        # ax.yaxis.set_visible(False)
-        # ax.axis('off')
-        #
-        # plt.show()
         fig = plt.figure(figsize=(15,7))
-
         mosaic = [ 'H', 'I' ,'J', 'K'], [ 'C',  'F', 'E','G' ]
         ax_dict = fig.subplot_mosaic(mosaic)
 
@@ -852,8 +791,6 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
                             fontsize=20)
             plt.savefig(os.path.join((fig_savedir), str(talker) + 'permutationimportance_plot_frombehaviouralmodel_2906_noannotation.png'), dpi=500, bbox_inches='tight')
             plt.show()
-
-
 
     return xg_reg, ypred, y_test, results
 
