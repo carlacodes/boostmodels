@@ -13,10 +13,8 @@ import shap
 import lightgbm as lgb
 import optuna
 from optuna.integration import LightGBMPruningCallback
-from sklearn.model_selection import StratifiedKFold
 import os
 import matplotlib.pyplot as plt
-import matplotlib.colors as mcolors
 import sklearn
 from sklearn.model_selection import train_test_split
 from helpers.behaviouralhelpersformodels import *
