@@ -32,10 +32,13 @@ def shap_summary_plot(
         feature_labels,
         ax=None,
         cmap = "viridis",
-        show_plots=False,
-        savefig=False,
-        savefig_path=None,
     ):
+    ''' run shap summary plot
+    :param shap_values2: shap values
+    :param feature_labels: feature labels
+    :param ax: axis
+    :param cmap: color map
+    :return: none'''
     plt.rcParams['font.family'] = 'sans-serif'
 
     if isinstance(cmap, str):
@@ -46,32 +49,6 @@ def shap_summary_plot(
 def get_axis_limits(ax, scale=1):
     return ax.get_xlim()[0] * scale, (ax.get_ylim()[1] * scale)
 
-def cli_reaction_time(path=None,
-                      output=None,
-                      ferrets=None,
-                      startdate=None,
-                      finishdate=None):
-    if output is None:
-        output = behaviourOutput
-
-    if path is None:
-        path = behaviouralDataPath
-
-    dataSet = BehaviourDataSet(filepath=path,
-                               startDate=startdate,
-                               finishDate=finishdate,
-                               ferrets=ferrets,
-                               outDir=output)
-
-    allData = dataSet._load()
-    # for ferret in ferrets:
-    ferret = ferrets
-    ferrData = allData.loc[allData.ferretname == ferret]
-    # if ferret == 'F1702_Zola':
-    #     ferrData = ferrData.loc[(ferrData.dates != '2021-10-04 10:25:00')]
-
-    ferretFigs = reactionTimeAnalysis(ferrData)
-    dataSet._save(figs=ferretFigs, file_name='reaction_times_{}_{}_{}.pdf'.format(ferret, startdate, finishdate))
 
 
 # editing to extract different vars from df
