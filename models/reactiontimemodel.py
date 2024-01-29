@@ -509,8 +509,6 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     cb_ax = fig.axes[1]
     # Modifying color bar parameters
     cb_ax.tick_params(labelsize=15)
-    # cb_ax.set_yticks([1, 2, 3,4, 5])
-    # cb_ax.set_yticklabels(['109', '124', '144', '191', '251'])
     cb_ax.set_ylabel("Pitch of precursor = target", fontsize=12)
     plt.ylabel('SHAP value', fontsize=18)
     if one_ferret:
@@ -632,9 +630,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         ferret_id_only = ['F1702', 'F1815', 'F1803', 'F2002', 'F2105']
 
         fig = plt.figure(figsize=((text_width_inches / 2) * 4, text_width_inches * 4))
-
         ax_dict = fig.subplot_mosaic(mosaic)
-
         # Plot the elbow plot
         ax_dict['A'].plot(feature_labels, cumulative_importances, marker='o', color='cyan')
         ax_dict['A'].set_xlabel('Features', fontsize=18)
@@ -650,10 +646,6 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         cb_ax = fig.axes[5]
         cb_ax.tick_params(labelsize=8)
         cb_ax.set_ylabel('Value', fontsize=8, fontfamily='sans-serif')
-
-
-
-
         ax_dict['D'].barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, color='cyan')
         # ax_dict['D'].set_title("Permutation importances on reaction time")
         ax_dict['D'].set_xlabel("Permutation importance", fontsize = 18)
@@ -697,9 +689,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
                 ax.tick_params(axis='both', which='minor', labelsize=6)
                 ax.xaxis.label.set_size(8)
                 ax.yaxis.label.set_size(8)
-
             else:
-
                 ax.tick_params(axis='y', which='major', labelsize=6)
                 ax.tick_params(axis='x', which='major', labelsize=6)
                 ax.tick_params(axis='both', which='minor', labelsize=6)
@@ -710,7 +700,6 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
                 text.set_color('black')
 
         plt.subplots_adjust(wspace=0.35, hspace=0.5)
-
         plt.savefig(fig_savedir / 'big_summary_plot_1606.png', dpi=500, bbox_inches="tight")
         plt.savefig(fig_savedir / 'big_summary_plot_1606.pdf', dpi=500, bbox_inches="tight")
         plt.show()
@@ -725,7 +714,6 @@ def extract_release_times_data(ferrets):
     df = behaviouralhelperscg.get_df_behav(ferrets=ferrets, includefaandmiss=False, startdate='04-01-2020', finishdate='01-03-2023')
     #switch talker values so 1 is 2, and 2 is 1 simultaneously
     df['talker'] = df['talker'].replace({1: 2, 2: 1})
-
     df_pitchtargsame = df[df['precur_and_targ_same'] == 1]
     df_pitchtargdiff = df[df['precur_and_targ_same'] == 0]
     if len(df_pitchtargsame) > len(df_pitchtargdiff)*1.2:
@@ -825,8 +813,6 @@ def run_mixed_effects_model_correctrxntime(df):
 
         print(result.summary())
         params = result.params
-
-
         coefficients.append(params)
         random_effects_df = pd.concat([random_effects_df, random_effects_2])
         p_values.append(result.pvalues)
@@ -880,14 +866,11 @@ def run_mixed_effects_model_correctrxntime(df):
     fig, ax = plt.subplots()
     # sort the coefficients by their mean value
     result_coefficients.index = result_coefficients.index.str.replace('Group Var', 'Ferret')
-
     result_coefficients = result_coefficients.sort_values(by='coefficients', ascending=False)
 
     ax.bar(result_coefficients.index, result_coefficients['coefficients'], color = 'cyan')
     ax.errorbar(result_coefficients.index, result_coefficients['coefficients'], yerr=result_coefficients['std_error'], fmt='none', ecolor='black', elinewidth=1, capsize=2)
 
-    # ax.set_xticklabels(result_coefficients['features'], rotation=45, ha='right')
-    # if the mean p value is less than 0.05, then add a star to the bar plot
     for i in range(len(result_coefficients)):
         if result_coefficients['p_values'][i] < 0.05:
             ax.text(i, 0.00, '*', fontsize=20)
@@ -929,7 +912,7 @@ def run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature = 
     :param optimization: whether to run the optimization or not
     :param ferret_as_feature: whether to include ferret as a feature or not
     :param noise_floor: whether to shuffle the release times column 100 times to see if the model is predicting the noise floor
-    :return: xg_reg: the trained model, ypred: the predicted values, y_test: the true values, results: the results of the model'''
+    :return: None'''
 
     df_use = extract_release_times_data(ferrets)
     #export to csv
@@ -962,8 +945,6 @@ def run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature = 
 
         df_use = df_use2
 
-
-
     run_mixed_effects_model_correctrxntime(df_use2)
     col = 'realRelReleaseTimes'
     dfx = df_use.loc[:, df_use.columns != col]
@@ -995,9 +976,6 @@ def run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature = 
             best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
             best_params = best_study_results.best_params
             np.save('../optuna_results/best_paramsreleastimemodel_allferrets_ferretasfeature.npy', best_params)
-
-
-
 
     xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx, df_use[col], paramsinput=best_params, ferret_as_feature=ferret_as_feature, ferrets = ferrets, noise_floor=noise_floor)
 
