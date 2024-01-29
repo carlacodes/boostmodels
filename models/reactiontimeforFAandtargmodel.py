@@ -453,7 +453,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
         ax.set_title(
             'Elbow plot of cumulative feature importance in absolute reaction time model, ' + talker_word + ' talker',
             fontsize=15)
-        ax.set_xticklabels(feature_labels_words, rotation=35, ha='right',fontsize=10)
+        ax.set_xticklabels(feature_labels_words, rotation=35, ha='right',fontsize=20)
         plt.savefig(os.path.join((fig_savedir), str(talker) + 'elobowplot_1606_noannotation.pdf'), dpi=500, bbox_inches='tight')
         plt.show()
         if talker == 1:
@@ -475,7 +475,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
         ax.set_title('Top 5 features for predicting absolute release time, ' + talkerlist[talker - 1] + ' talker',
                                fontsize=30)
         ax.set_xticks(np.arange(len(all_labels)))
-        ax.set_xticklabels(all_labels, rotation=70, fontsize=10)
+        ax.set_xticklabels(all_labels, rotation=70, fontsize=20)
         ax.legend(fontsize=20)
         plt.savefig(os.path.join((fig_savedir), str(talker) + 'stackedbarplot_1606_noannotation.pdf'), dpi=500, bbox_inches='tight')
         plt.show()
