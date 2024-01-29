@@ -182,6 +182,12 @@ def objective(trial, X, y):
 
 
 def run_optuna_study_falsealarm(dataframe, y, ferret_as_feature=False):
+    ''' run optuna study for false alarm model
+    :param dataframe: dataframe
+    :param y: labels
+    :param ferret_as_feature: whether to include ferret as a feature
+    :return: optuna study'''
+
     study = optuna.create_study(direction="minimize", study_name="LGBM Classifier")
     if ferret_as_feature:
         df_to_use = dataframe[
