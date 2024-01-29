@@ -7,7 +7,6 @@ import scipy.stats as stats
 import matplotlib.pyplot as plt
 from helpers.behaviouralhelpersformodels import *
 from helpers.calculate_stats import *
-import matplotlib.font_manager as fm
 
 
 def kw_test(df):
@@ -353,14 +352,12 @@ def run_stats_calc_by_pitch_mf(df, ferrets, stats_dict, pitch_param = 'inter_tri
             stats_dict[i+1]['correct_response'][ferret] = (len(selected_ferret_talker[selected_ferret_talker['hit']==True]) + len(selected_ferret_catch_talker[selected_ferret_catch_talker['response'] == 3]))/ (len(selected_ferret_talker) + len(selected_ferret_catch_talker))
         count += 1
     stats_dict_all = {}
-
     stats_dict_all[1]= {}
     stats_dict_all[2]= {}
     stats_dict_all[3]= {}
     stats_dict_all[4]= {}
     stats_dict_all[5]= {}
     stats_dict_all[6] = {}
-
 
     for i, pitch in enumerate(pitch_list):
         correct_response = np.mean(list(stats_dict[i+1]['correct_response'].values()))
