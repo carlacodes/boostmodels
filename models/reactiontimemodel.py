@@ -720,7 +720,6 @@ def extract_release_times_data(ferrets):
     plt.title('Proportion of trials with precursor = target F0 \n for each target F0', fontsize=18)
     plt.show()
 
-    #plot whether the precursor = target F0 over the target F0
     fig,ax = plt.subplots()
     sns.scatterplot(data=dfuse, x='target F0', y="precur. = targ. F0", hue='ferret ID', palette='Set2')
     plt.show()
@@ -794,8 +793,6 @@ def run_mixed_effects_model_correctrxntime(df):
         total_var = var_fixed_effect + var_random_effect + var_resid
         marginal_r2 = var_fixed_effect / total_var
         conditional_r2 = (var_fixed_effect + var_random_effect) / total_var
-
-
 
         print("marginal R2: {:.3f}".format(marginal_r2))
         print("conditional R2: {:.3f}".format(conditional_r2))
