@@ -1,24 +1,17 @@
-import sklearn.metrics
 import seaborn as sns
-# from instruments.io.BehaviourIO import BehaviourDataSet
 from sklearn.inspection import permutation_importance
-from instruments.behaviouralAnalysis import reactionTimeAnalysis  # outputbehaviordf
 from pathlib import Path
-
 from sklearn.model_selection import cross_val_score
 import statsmodels.formula.api as smf
 from sklearn.model_selection import KFold
 from sklearn.metrics import confusion_matrix, balanced_accuracy_score
-
 import shap
 import matplotlib
 import lightgbm as lgb
 import optuna
 from sklearn.model_selection import StratifiedKFold
-
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
-import sklearn
 from sklearn.model_selection import train_test_split
 from helpers.behaviouralhelpersformodels import *
 import sklearn.metrics as metrics
