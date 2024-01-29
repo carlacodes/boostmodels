@@ -542,8 +542,6 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     fig, ax = plt.subplots()
     shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "time in trial"], show=False, ax=ax, cmap = cmapcustom)
     colorbar_scatter = fig.axes[1]
-    # colorbar_scatter.set_yticks([0,1])
-    # colorbar_scatter.set_yticklabels(['Left', 'Right'], fontsize=18)
     colorbar_scatter.set_ylabel('Time since trial start', fontsize=15)
     ax.set_xticks([0,1,2,3,4])
     ax.set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18, rotation=45)
