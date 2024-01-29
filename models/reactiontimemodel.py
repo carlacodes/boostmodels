@@ -112,14 +112,12 @@ def runlgbreleasetimes_for_a_ferret(data, paramsinput=None, ferret=1, ferret_nam
 
     X_train, X_test, y_train, y_test = train_test_split(dfx, data['realRelReleaseTimes'], test_size=0.2,
                                                         random_state=123)
-
     xg_reg = lgb.LGBMRegressor(random_state=123, verbose=1, **paramsinput)
     xg_reg.fit(X_train, y_train, verbose=1)
     ypred = xg_reg.predict(X_test)
     lgb.plot_importance(xg_reg)
     plt.title('feature importances for the LGBM Correct Release Times model for ferret ' + ferret_name)
     plt.show()
-
     kfold = KFold(n_splits=5)
     mse_train = cross_val_score(xg_reg, X_train, y_train, scoring='neg_mean_squared_error', cv=kfold)
 
@@ -136,7 +134,6 @@ def runlgbreleasetimes_for_a_ferret(data, paramsinput=None, ferret=1, ferret_nam
     fig, ax = plt.gcf(), plt.gca()
     plt.title('Features over their impact \n on reaction time for ' + ferret_name)
     plt.xlabel('SHAP value (impact on model output) on reaction time' + ferret_name)
-
     labels = [item.get_text() for item in ax.get_yticklabels()]
     print(labels)
     trainandtestaccuracy ={
@@ -146,15 +143,11 @@ def runlgbreleasetimes_for_a_ferret(data, paramsinput=None, ferret=1, ferret_nam
         'mean_mse_train': np.mean(mse_train),
     }
     np.save('metrics/modelmse' + ferret_name + '.npy', trainandtestaccuracy)
-
-
     ax.set_yticklabels(labels)
     plt.savefig('figs/shap_summary_plot_correct_release_times_' + ferret_name + '.png', dpi=300, bbox_inches='tight')
-
     plt.show()
 
     shap.dependence_plot("timeToTarget", shap_values, dfx)  #
-
     explainer = shap.Explainer(xg_reg, X_train)
     shap_values2 = explainer(X_train)
     fig, ax = plt.subplots(figsize=(15, 15))
@@ -162,17 +155,14 @@ def runlgbreleasetimes_for_a_ferret(data, paramsinput=None, ferret=1, ferret_nam
     fig.tight_layout()
 
     plt.subplots_adjust(left=-10, right=0.5)
-
     plt.show()
     shap.plots.scatter(shap_values2[:, "pitchoftarg"], color=shap_values2[:, "talker"])
     plt.title('Reaction Time Model')
     plt.show()
-    # logthe release times
     shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"],
                        title='Correct Responses - Reaction Time Model SHAP response \n vs. trial number for' + ferret_name)
 
     return xg_reg, ypred, y_test, mse_test
-
 
 
 def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_ferret=False, ferrets=None, noise_floor = False):
