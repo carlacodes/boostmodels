@@ -1119,39 +1119,39 @@ def extract_releasedata_withdist(ferrets, talker=1, bootstrap_words = True):
     # df_use = df_use.rename(columns=dict(zip(df_use.columns, labels)))
 
     return df_use
-
-
-def run_correctrxntime_model(ferrets, optimization=False, ferret_as_feature=False, noise_floor = False):
-    df_use = extract_releasedata_withdist(ferrets)
-    col = 'realRelReleaseTimes'
-    dfx = df_use.loc[:, df_use.columns != col]
-
-    # remove ferret as possible feature
-    if ferret_as_feature == False:
-        col2 = 'ferret'
-        dfx = dfx.loc[:, dfx.columns != col2]
-        if optimization == False:
-            best_params = np.load('../optuna_results/best_paramsreleastimemodel_allferrets.npy',
-                                  allow_pickle=True).item()
-        else:
-            best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
-            best_params = best_study_results.best_params
-            np.save('../optuna_results/best_paramsreleastimemodel_allferrets.npy', best_params)
-    else:
-        dfx = dfx
-        if optimization == False:
-            best_params = np.load(
-                'D:\mixedeffectmodelsbehavioural\optuna_results/best_paramsreleastimemodel_allferrets_ferretasfeature.npy',
-                allow_pickle=True).item()
-        else:
-            best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
-            best_params = best_study_results.best_params
-            np.save(
-                'D:\mixedeffectmodelsbehavioural\optuna_results/best_paramsreleastimemodel_allferrets_ferretasfeature.npy',
-                best_params)
-
-    xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx, df_use[col], paramsinput=best_params,
-                                                        ferret_as_feature=ferret_as_feature, noise_floor=noise_floor)
+#
+#
+# def run_correctrxntime_model(ferrets, optimization=False, ferret_as_feature=False, noise_floor = False):
+#     df_use = extract_releasedata_withdist(ferrets)
+#     col = 'realRelReleaseTimes'
+#     dfx = df_use.loc[:, df_use.columns != col]
+#
+#     # remove ferret as possible feature
+#     if ferret_as_feature == False:
+#         col2 = 'ferret'
+#         dfx = dfx.loc[:, dfx.columns != col2]
+#         if optimization == False:
+#             best_params = np.load('../optuna_results/best_paramsreleastimemodel_allferrets.npy',
+#                                   allow_pickle=True).item()
+#         else:
+#             best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
+#             best_params = best_study_results.best_params
+#             np.save('../optuna_results/best_paramsreleastimemodel_allferrets.npy', best_params)
+#     else:
+#         dfx = dfx
+#         if optimization == False:
+#             best_params = np.load(
+#                 'D:\mixedeffectmodelsbehavioural\optuna_results/best_paramsreleastimemodel_allferrets_ferretasfeature.npy',
+#                 allow_pickle=True).item()
+#         else:
+#             best_study_results = run_optuna_study_releasetimes(dfx.to_numpy(), df_use[col].to_numpy())
+#             best_params = best_study_results.best_params
+#             np.save(
+#                 'D:\mixedeffectmodelsbehavioural\optuna_results/best_paramsreleastimemodel_allferrets_ferretasfeature.npy',
+#                 best_params)
+#
+#     xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx, df_use[col], paramsinput=best_params,
+#                                                         ferret_as_feature=ferret_as_feature, noise_floor=noise_floor)
 
 def run_mixed_effects_model_absrxntime(df, talker =1):
     '''run a mixed effects model on the absolute reaction time data
