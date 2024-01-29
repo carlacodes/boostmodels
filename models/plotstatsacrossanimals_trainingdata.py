@@ -1,68 +1,12 @@
-import numpy as np
-import pandas as pd
-import sklearn.metrics
-# from rpy2.robjects import pandas2ri
-import seaborn as sns
-from sklearn.metrics import mean_squared_error
-from sklearn.model_selection import KFold
-from sklearn.model_selection import cross_val_score
-from sklearn.inspection import permutation_importance
+
 import scikit_posthocs as sp
 from statsmodels.stats.multicomp import MultiComparison
-from statsmodels.stats.multicomp import pairwise_tukeyhsd
 from matplotlib.colors import ListedColormap
-
-import shap
-import matplotlib
-import lightgbm as lgb
-import optuna
 from statsmodels.stats.anova import AnovaRM
-
-from optuna.integration import LightGBMPruningCallback
-from sklearn.model_selection import StratifiedKFold
-import statsmodels.api as sm
-import pingouin as pg
-# scaler = MinMaxScaler()
-import os
 import scipy.stats as stats
-import xgboost as xgb
 import matplotlib.pyplot as plt
-# import rpy2.robjects.numpy2ri
-import matplotlib.colors as mcolors
-import sklearn
-from sklearn.model_selection import train_test_split
 from helpers.behaviouralhelpersformodels import *
 from helpers.calculate_stats import *
-
-
-# def kw_test(df):
-#     df_noncatchnoncorrection_intra = df[(df['catchTrial'] == 0) & (df['correctionTrial'] == 0) & (df['intra_trial_roving'] == 1)]
-#     df_catchnoncorrection_intra = df[(df['catchTrial'] == 1) & (df['correctionTrial'] == 0) & (df['intra_trial_roving'] == 1)]
-#     df_noncorrection_intra = df[(df['correctionTrial'] == 0) & (df['intra_trial_roving'] == 1)]
-#
-#     df_noncatchnoncorrection_inter = df[(df['catchTrial'] == 0) & (df['correctionTrial'] == 0) & (df['inter_trial_roving'] == 1)]
-#     df_catchnoncorrection_inter = df[(df['catchTrial'] == 1) & (df['correctionTrial'] == 0) & (df['inter_trial_roving'] == 1)]
-#     df_noncorrection_inter = df[(df['correctionTrial'] == 0) & (df['inter_trial_roving'] == 1)]
-#
-#     df_noncatchnoncorrection_control = df[(df['catchTrial'] == 0) & (df['correctionTrial'] == 0) & (df['control_trial'] == 1)]
-#     df_catchnoncorrection_control = df[(df['catchTrial'] == 1) & (df['correctionTrial'] == 0) & (df['control_trial'] == 1)]
-#     df_noncorrection_control = df[(df['correctionTrial'] == 0) & (df['control_trial'] == 1)]
-#
-#     #run kw test on each talker comparing between the three conditions inter control and intra
-#     talkers = [1,2]
-#     kw_dict = {}
-#     kw_dict['hits'] = {}
-#     kw_dict['false_alarms'] = {}
-#     kw_dict['correct_response'] = {}
-#     kw_dict['dprime'] = {}
-#     kw_dict['bias'] = {}
-#     for talker in talkers:
-#         kw_dict['hits'][talker] = stats.kruskal(df_noncatchnoncorrection[df_noncatchnoncorrection['talker'] == talker]['hit'], df_noncorrection[df_noncorrection['talker'] == talker]['falsealarm'], df_catchnoncorrection[df_catchnoncorrection['talker'] == talker]['response'] == 3)
-#         kw_dict['false_alarms'][talker] = stats.kruskal(df_noncorrection[df_noncorrection['talker'] == talker]['falsealarm'], df_catchnoncorrection[df_catchnoncorrection['talker'] == talker]['response'] == 3)
-#         kw_dict['correct_response'][talker] = stats.kruskal(df_catchnoncorrection[df_catchnoncorrection['talker'] == talker]['response'] == 3)
-#         kw_dict['dprime'][talker] = stats.kruskal(df_noncatchnoncorrection[df_noncatchnoncorrection['talker'] == talker]['hit'], df_noncorrection[df_noncorrection['talker'] == talker]['falsealarm'])
-#         kw_dict['bias'][talker] = stats.kruskal(df_noncatchnoncorrection[df_noncatchnoncorrection['talker'] == talker]['hit'], df_noncorrection[df_noncorrection['talker'] == talker]['falsealarm'])
-#
 
 def kw_test(df):
     conditions = ['inter_trial_roving', 'intra_trial_roving', 'control_trial']
@@ -128,78 +72,6 @@ def kw_test(df):
     kw_dict_all_df.to_csv(f'D:\mixedeffectmodelsbehavioural\metrics/trainingdata/kw_dict_byrovetype.csv')
 
     return kw_dict
-
-# def kw_test(df):
-#     conditions = ['inter_trial_roving', 'intra_trial_roving', 'control_trial']
-#     columns_to_compare = ['hit', 'falsealarm', 'realRelReleaseTimes']
-#
-#     # run kw test on each talker comparing between the three conditions
-#     talkers = df['talker'].unique()
-#     kw_dict = {}
-#
-#     for column in columns_to_compare:
-#         kw_dict[column] = {}
-#         for condition in conditions:
-#             kw_dict[column][condition] = {}
-#             for talker in talkers:
-#                 data = df[df['talker'] == talker]
-#                 if column == 'hit' or column == 'realRelReleaseTimes' :
-#                     data = data[data['catchTrial'] != 1]
-#                     #drop na values
-#                     data = data.dropna(subset=[column])
-#                 group_values = []
-#
-#                 # Get data for the current column, condition, and talker
-#                 for cond in conditions:
-#                     group_values.append(data[(data[cond] == 1) & (data['talker'] == talker)][column])
-#
-#                 # Perform Kruskal-Wallis test for the current column, condition, and talker
-#                 kw_stat, kw_p_value = stats.kruskal(*group_values)
-#                 data_total = np.concatenate(group_values)
-#
-#                 k = len(group_values)
-#                 n = len(data_total)
-#
-#                 # Calculate Eta-squared effect size
-#                 eta_squared = (kw_stat - k + 1) / (n - k)
-#
-#                 #compute the effect size
-#
-#                 kw_dict[column][condition][talker] = {'kw_stat': kw_stat, 'p_value': kw_p_value, 'effect_size': eta_squared}
-#                 #calculate
-#
-#     return kw_dict
-
-# def kw_test2(df):
-#     conditions = ['inter_trial_roving', 'intra_trial_roving', 'control_trial']
-#     columns_to_compare = ['hit', 'falsealarm', 'realRelReleaseTimes']
-#
-#     talkers = df['talker'].unique()
-#     kw_dict = {}
-#
-#     for column in columns_to_compare:
-#         kw_dict[column] = {}
-#         for condition in conditions:
-#             kw_dict[column][condition] = {}
-#             for talker in talkers:
-#                 data = df[df['talker'] == talker]
-#                 if column in ['hit', 'realRelReleaseTimes']:
-#                     data = data[data['catchTrial'] != 1]
-#                     data = data.dropna(subset=[column])
-#
-#                 group_values = [data[(data[cond] == 1) & (data['talker'] == talker)][column] for cond in conditions]
-#                 kw_stat, kw_p_value = stats.kruskal(*group_values)
-#                 data_total = np.concatenate(group_values)
-#
-#                 k = len(group_values)
-#                 n = len(data_total)
-#
-#                 eta_squared = (kw_stat - k + 1) / (n - k)
-#
-#                 kw_dict[column][condition][talker] = {'kw_stat': kw_stat, 'p_value': kw_p_value,
-#                                                       'effect_size': eta_squared}
-#
-#     return kw_dict
 
 
 def run_stats_calc(df, ferrets, pitch_param = 'control_trial'):
