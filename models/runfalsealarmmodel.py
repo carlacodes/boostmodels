@@ -1186,10 +1186,6 @@ def runfalsealarmpipeline(ferrets, optimization=False, ferret_as_feature=False):
     :return: xg_reg, ypred, y_test, results, shap_values1, X_train, y_train, bal_accuracy, shap_values2'''
     resultingfa_df = behaviouralhelperscg.get_false_alarm_behavdata(ferrets=ferrets, startdate='04-01-2020',
                                                               finishdate='01-03-2023')
-
-
-    if len(ferrets) == 1:
-        one_ferret = True
     len_of_data_male = {}
     len_of_data_female = {}
     len_of_data_female_intra = {}
