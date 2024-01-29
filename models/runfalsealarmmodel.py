@@ -51,23 +51,6 @@ def get_axis_limits(ax, scale=1):
 
 
 
-def plotpredictedversusactual(predictedrelease, dfuse):
-    fig, ax = plt.subplots()
-    ax.scatter(dfuse['realRelReleaseTimes'], predictedrelease, alpha=0.5)
-    ax.set_xlabel('Actual Release Time')
-    ax.set_ylabel('Predicted Release Time (s)')
-    ax.set_title('Predicted vs. Actual Release Time (s)')
-    ax.plot([0, 1], [0, 1], transform=ax.transAxes)
-    plt.show()
-    fig, ax = plt.subplots()
-    ax.scatter(dfuse['realRelReleaseTimes'], dfuse['realRelReleaseTimes'] - predictedrelease, alpha=0.5)
-    ax.set_xlabel('Actual Release Time (s)')
-    ax.set_ylabel('Actual - Predicted Release Time (s)')
-    ax.set_title('Actual - Predicted Release Time (s)')
-    ax.plot([0, 1], [0, 0], transform=ax.transAxes)
-    plt.show()
-
-
 def plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use):
     fig, ax = plt.subplots()
     ax.scatter(dfcat_use['correctresp'], predictedcorrectresp, alpha=0.5)
@@ -1829,7 +1812,9 @@ def plot_reaction_times_interandintra_swarm(ferrets):
 
 
 def plot_reaction_times_interandintra_violin(ferrets):
-    # plot the reaction times by animal
+    ''' plot the reaction times by animal, violin plot format
+    :param ferrets: list of ferrets to include in the analysis
+    :return: df_by_ferret: dictionary of dataframes containing the reaction times by ferret'''
     resultingdf = behaviouralhelperscg.get_reactiontime_data(ferrets=ferrets, startdate='04-01-2020',
                                                              finishdate='01-10-2022')
     #only get correct hit trials for the swarm plot
@@ -1858,10 +1843,6 @@ def plot_reaction_times_interandintra_violin(ferrets):
             pitch_type_array.append(0)
     df_use['roving_type'] = pitch_type_array
 
-
-
-
-
     roving_type = df_use['roving_type'].values
     talker_values = df_use["female_talker"].values
     release_values = df_use["realRelReleaseTimes"].values
@@ -1889,6 +1870,11 @@ def plot_reaction_times_interandintra_violin(ferrets):
 
 
 def plot_reaction_times_interandintra_swarm(ferrets):
+    ''' plot the reaction times by animal, swarm format
+    :param ferrets: list of ferrets to include in the analysis
+    :return: resultingdf: dictionary of dataframes containing the reaction times by ferret
+    '''
+
     # plot the reaction times by animal
     resultingdf = behaviouralhelperscg.get_reactiontime_data(ferrets=ferrets, startdate='04-01-2020',
                                                              finishdate='01-10-2022')
@@ -1929,9 +1915,8 @@ def plot_reaction_times_interandintra_swarm(ferrets):
     plt.legend(title='Gender', title_fontsize=12, fontsize=10)
     plt.savefig('D:/behavmodelfigs/reaction_times_by_talker_female_male_interandintra14091409.png', dpi=500)
     plt.show()
-
-
     print('done')
+    return resultingdf
 
 if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
