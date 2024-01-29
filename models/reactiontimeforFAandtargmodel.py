@@ -209,6 +209,19 @@ def runlgbreleasetimes_for_a_ferret(data, paramsinput=None, ferret=1, ferret_nam
 
 
 def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferret=False, ferrets=None, talker=1, noise_floor=False, bootstrap_words = True):
+    '''run the lightgbm model for the absolute release times
+    :param X: the features
+    :param y: the labels
+    :param paramsinput: the parameters for the model
+    :param ferret_as_feature: whether to include the ferret as a feature
+    :param one_ferret: whether to run the model for one ferret or all ferrets
+    :param ferrets: the ferret name
+    :param talker: the talker number
+    :param noise_floor: whether to include the noise floor as a feature
+    :param bootstrap_words: whether to include the bootstrap words as a feature
+    :return: the model, the predictions, the test labels, the test mse
+
+    '''
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2,
                                                         random_state=42)
 
