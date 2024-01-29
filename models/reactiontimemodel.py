@@ -254,8 +254,6 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     feature_importances = feature_importances[sorted_indices]
     feature_labels = X.columns[sorted_indices]
     cumulative_importances = np.cumsum(feature_importances)
-
-
     # Plot the elbow plot
     plt.figure(figsize=(10, 6))
     plt.plot(feature_labels, cumulative_importances, marker='o', color = 'cyan')
@@ -272,7 +270,6 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     shap.summary_plot(shap_values, X, show=False, cmap = matplotlib.colormaps[cmapname])
     fig, ax = plt.gcf(), plt.gca()
     plt.xlabel('SHAP value (impact on model output) on reaction time')
-
     fig.set_size_inches(9, 15)
     #get the color bar
     colorbar = fig.axes[1]
@@ -286,7 +283,6 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     ax.set_xlabel(None)
     plt.savefig(fig_savedir / 'shapsummaryplot_allanimals2.png', dpi=300, bbox_inches='tight')
     plt.show()
-
 
     result = permutation_importance(xg_reg, X_test, y_test, n_repeats=100,
                                     random_state=123, n_jobs=2)
@@ -314,7 +310,6 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     plt.savefig(fig_savedir / 'talker_vs_precursorequaltargF0.png', dpi=300, bbox_inches='tight')
 
     fig, ax = plt.subplots()
-
     custom_colors = ['dodgerblue',  'green', "limegreen"]  # Add more colors as needed
     cmapcustom = mcolors.LinearSegmentedColormap.from_list('my_custom_cmap', custom_colors, N=1000)
     shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "precur. = targ. F0"], show=False, ax=ax, cmap = cmapcustom)
@@ -370,11 +365,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     labels_new = ['false', 'true']
     ax.legend(handles=handles[0:], labels=labels_new, title="precur. = targ. F0", fontsize=14, title_fontsize=16)
 
-
-
-
     ax.set_title("precur. = targ. F0",  fontsize = 20)
-
     plt.savefig(fig_savedir / 'ferretIDbyprecurequaltargF0_violin.png', dpi=500, bbox_inches='tight')
     plt.show()
 
@@ -587,7 +578,6 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         cb_ax.set_yticks([0, 1, 2, 3, 4])
         cb_ax.set_yticklabels(['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove'])
         cb_ax.set_ylabel("ferret ", fontsize=12)
-
         plt.ylabel('SHAP value', fontsize=18)
 
         plt.title('Side of audio versus impact on reaction time', fontsize=18)
@@ -595,7 +585,6 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
         # plt.ylabel('SHAP value', fontsize=18)
         plt.xlabel('side', fontsize=18)
         plt.xticks([0,1], labels=['left', 'right'], fontsize=15)
-
         # rotate xtick labels:
         plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
         plt.savefig(fig_savedir / 'sidecolouredbyferret.png', dpi=1000)
@@ -603,10 +592,8 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
 
     if one_ferret == False:
         text_width_pt = 419.67816  # Replace with your value
-
         # Convert the text width from points to inches
         text_width_inches = text_width_pt / 72.27
-
         mosaic = ['A', 'B'], ['D', 'B'], ['C', 'E']
         ferret_id_only = ['F1702', 'F1815', 'F1803', 'F2002', 'F2105']
 
