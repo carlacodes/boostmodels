@@ -9,7 +9,7 @@ from sklearn.inspection import permutation_importance
 import matplotlib.font_manager as fm
 import statsmodels.formula.api as smf
 from sklearn.model_selection import KFold
-from sklearn.metrics import confusion_matrix, balanced_accuracy_score, r2_score
+from sklearn.metrics import r2_score
 import shap
 import matplotlib
 import seaborn as sns
