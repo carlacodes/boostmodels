@@ -1111,21 +1111,6 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     ax_dict['C'].set_xticklabels(['Female', 'Male'])
 
     ax_dict['C'].set_ylabel('Log(odds) FA', fontsize=18)
-
-
-
-    # ax_dict['A'].annotate('A', xy=get_axis_limits(ax_dict['A']), xytext=(-0.05, ax_dict['A'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props, zorder=10)
-    # ax_dict['B'].annotate('B', xy=get_axis_limits(ax_dict['B']), xytext=(-0.05, ax_dict['B'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-    # ax_dict['C'].annotate('C', xy=get_axis_limits(ax_dict['C']), xytext=(-0.05, ax_dict['C'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-    # ax_dict['D'].annotate('D', xy=get_axis_limits(ax_dict['D']), xytext=(-0.05, ax_dict['D'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-    # ax_dict['E'].annotate('E', xy=get_axis_limits(ax_dict['E']), xytext=(-0.05, ax_dict['E'].title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-    import matplotlib.transforms as mtransforms
-    # for label, ax in ax_dict.items():
-    #     # label physical distance to the left and up:
-    #     trans = mtransforms.ScaledTranslation(-20 / 72, 7 / 72, fig.dpi_scale_trans)
-    #     ax.text(0.0, 1.05, label, transform=ax.transAxes + trans,
-    #             fontsize=25, va='bottom', weight = 'bold')
-
     # plt.tight_layout()
     # plt.suptitle('Non-target and target words: false alarm vs. no false alarm model', fontsize=25)
     # plt.tight_layout()
