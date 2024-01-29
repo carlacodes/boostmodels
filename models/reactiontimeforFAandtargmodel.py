@@ -1192,11 +1192,8 @@ def run_mixed_effects_model_absrxntime(df, talker =1):
 
     #not perfect but for mixed effects model, need to fill the missing rows with 0
     df = df.fillna(0)
-
-
     #drop the rows with missing values
     kf = KFold(n_splits=5, shuffle=True, random_state=123)
-    fold_index = 1
     train_mse = []
     test_mse = []
     train_mae = []
@@ -1218,7 +1215,6 @@ def run_mixed_effects_model_absrxntime(df, talker =1):
 
 
         #calculate the mean squared error
-
         ypred_train = result.predict(train)
         y_train = train['release_time']
         mse_train = mean_squared_error(y_train, ypred_train)
