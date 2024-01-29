@@ -474,6 +474,21 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput, ferret_as_feature=False, one
 
 def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test, bal_accuracy, dfx,
                         ferret_as_feature=False, ferrets = None, one_ferret=False):
+    ''' plot false alarm model
+    :param xg_reg: model
+    :param ypred: predicted labels
+    :param y_test: true labels
+    :param results: cross validation scores
+    :param X_train: training features
+    :param y_train: training labels
+    :param X_test: test features
+    :param bal_accuracy: balanced accuracy
+    :param dfx: features
+    :param ferret_as_feature: whether to include ferret as a feature
+    :param ferrets: ferrets
+    :param one_ferret: whether to run for one ferret
+    :return: none
+    '''
 
     if ferret_as_feature:
         if one_ferret:
@@ -495,12 +510,10 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
             fig_dir = Path('D:/behavmodelfigs/fa_or_not_model/')
 
     shap_values1 = shap.TreeExplainer(xg_reg).shap_values(dfx)
-    #convert shap values to probability of false alarm
-    # shap_values1 = 1/(1+np.exp(-shap_values1))
+
     explainer = shap.Explainer(xg_reg, X_train, feature_names=X_train.columns)
     shap_values2 = explainer(X_train)
-    #convert shape values to probability of false alarm
-    # shap_values2 = 1/(1+np.exp(-shap_values2))
+
 
     custom_colors = ['slategray', 'hotpink', "yellow"]  # Add more colors as needed
     cmapcustom = mcolors.LinearSegmentedColormap.from_list('my_custom_cmap', custom_colors, N=1000)
@@ -514,10 +527,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     feature_importances = feature_importances[sorted_indices]
     feature_labels = dfx.columns[sorted_indices]
     cumulative_importances = np.cumsum(feature_importances)
-    # Calculate the combined cumulative sum of feature importances
-    # cumulative_importances_combined = np.sum(cumulative_importances_list, axis=0)
-    # feature_labels = dfx.columns
-    # Plot the elbow plot
+
     plt.figure(figsize=(10, 6))
     plt.plot(feature_labels, cumulative_importances, marker='o', color='slategray')
     plt.xlabel('Features')
