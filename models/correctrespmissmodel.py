@@ -761,26 +761,6 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
 
 
 
-
-
-def reservoir_sampling_dataframe(df, k):
-    reservoir = []
-    n = 0
-    for index, row in df.iterrows():
-        n += 1
-        if len(reservoir) < k:
-            reservoir.append(row.copy())
-        else:
-            # Randomly replace rows in the reservoir with decreasing probability
-            replace_index = random.randint(0, n - 1)
-            if replace_index < k:
-                reservoir[replace_index] = row.copy()
-
-    # Create a new DataFrame from the reservoir
-    sampled_df = pd.DataFrame(reservoir)
-
-    return sampled_df
-
 def run_correct_responsepipeline(ferrets):
     resultingcr_df = behaviouralhelperscg.get_df_behav(ferrets=ferrets, includefaandmiss=False, includemissonly=True, startdate='04-01-2020',
                                   finishdate='03-01-2023')
