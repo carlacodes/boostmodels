@@ -762,14 +762,15 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
 
 
 def run_correct_responsepipeline(ferrets):
+    '''run the correct response pipeline
+    :param ferrets: which ferret(s) to run the model on
+    :return: xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2'''
     resultingcr_df = behaviouralhelperscg.get_df_behav(ferrets=ferrets, includefaandmiss=False, includemissonly=True, startdate='04-01-2020',
                                   finishdate='03-01-2023')
     resultingcr_df['talker'] = resultingcr_df['talker'].replace({1: 2, 2: 1})
     filepath = Path('D:/dfformixedmodels/correctresponsemodel_dfuse.csv')
     filepath.parent.mkdir(parents=True, exist_ok=True)
     resultingcr_df.to_csv(filepath)
-
-
 
     df_intra = resultingcr_df[resultingcr_df['intra_trial_roving'] == 1]
     df_inter = resultingcr_df[resultingcr_df['inter_trial_roving'] == 1]
@@ -795,10 +796,7 @@ def run_correct_responsepipeline(ferrets):
         df_nomiss = df_nomiss.sample(n=len(df_miss), random_state=123)
     elif len(df_miss) > len(df_nomiss)*1.2:
         df_miss = df_miss.sample(n=len(df_nomiss), random_state=123)
-
     resultingcr_df = pd.concat([df_nomiss, df_miss], axis=0)
-
-
 
     if len(ferrets) == 1:
         one_ferret = True
@@ -815,6 +813,9 @@ def run_correct_responsepipeline(ferrets):
 
 
 def run_models_for_all_or_one_ferret(run_individual_ferret_models):
+    '''run the models for all ferrets or one ferret
+    :param run_individual_ferret_models: whether to run the models for all ferrets or one ferret
+    :return: none'''
     if run_individual_ferret_models:
         ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
         for ferret in ferrets:
