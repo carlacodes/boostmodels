@@ -248,7 +248,6 @@ def run_mixed_effects_model_falsealarm(df):
     '''
     equation = 'falsealarm ~ talker +time_since_trial_start+ trial_number + audio_side + intra_trial_F0_roving + past_response_correct + past_trial_was_catch + F0'
 
-    #split the data into training and test set
     #drop the rows with missing values
     labels_mixed_effects = ["time_since_trial_start", "ferret_ID", "trial_number", "talker", "audio_side",
                             "intra_trial_F0_roving", "past_response_correct", "past_trial_was_catch", "falsealarm",
@@ -374,9 +373,6 @@ def run_mixed_effects_model_falsealarm(df):
     #sort the coefficients by their mean value
 
 
-    # ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-
-
     result_coefficients = result_coefficients.sort_values(by='coefficients', ascending=False)
     ax.bar(result_coefficients.index, result_coefficients['coefficients'])
     ax.errorbar(result_coefficients.index, result_coefficients['coefficients'], yerr=result_coefficients['std_error'], fmt='none', ecolor='black', elinewidth=1, capsize=2)
@@ -394,22 +390,6 @@ def run_mixed_effects_model_falsealarm(df):
     plt.show()
 
     #plot the mean coefficients as a bar plot
-
-    # fig, ax = plt.subplots()
-    # #sort the coefficients by their mean value
-    # pd.DataFrame(coefficients).index
-    # coefficients.index
-    # ax.bar(labels_mixed_effects, pd.DataFrame(coefficients).mean())
-    # ax.set_xticklabels(labels_mixed_effects, rotation=45, ha='right')
-    # #if the mean p value is less than 0.05, then add a star to the bar plot
-    # for i in range(len(p_values)):
-    #     if p_values[i].mean() < 0.05:
-    #         ax.text(i, 0.05, '*', fontsize=20)
-    # ax.set_xlabel('Features')
-    # ax.set_ylabel('Mean Coefficient')
-    # ax.set_title('Mean Coefficient for each Feature')
-    # plt.savefig('D:/behavmodelfigs/fa_or_not_model/mean_coefficients.png', dpi=500, bbox_inches='tight')
-    # plt.show()
 
     print(np.mean(train_acc))
     print(np.mean(test_acc))
