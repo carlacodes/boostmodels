@@ -1,12 +1,7 @@
 import sklearn.metrics
-# from rpy2.robjects import pandas2ri
-import seaborn as sns
 from sklearn.metrics import mean_squared_error, median_absolute_error, r2_score, mean_absolute_error
-from sklearn.model_selection import KFold
-import pandas as pd
 from sklearn.model_selection import cross_val_score
 from sklearn.inspection import permutation_importance
-import matplotlib.font_manager as fm
 import statsmodels.formula.api as smf
 from sklearn.model_selection import KFold
 from sklearn.metrics import r2_score
