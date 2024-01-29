@@ -242,6 +242,10 @@ def run_optuna_study_correctresponse(dataframe, y):
         print(f"\t\t{key}: {value}")
     return study
 def run_mixed_effects_model_falsealarm(df):
+    ''' run mixed effects model for false alarm model
+    :param df: dataframe
+    :return: mixed effects model'
+    '''
     equation = 'falsealarm ~ talker +time_since_trial_start+ trial_number + audio_side + intra_trial_F0_roving + past_response_correct + past_trial_was_catch + F0'
 
     #split the data into training and test set
