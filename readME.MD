@@ -8,5 +8,6 @@ To set up:
 2. git clone this repository
 3. cd into the repository
 4. run `pip install -r requirements.txt`
-5. run  the selected model, i.e. `runfalsealarmmodel.py` for the false alarm model
+5. navigate to the models directory
+6. run  the selected model, i.e. `runfalsealarmmodel.py` for the false alarm model
 
