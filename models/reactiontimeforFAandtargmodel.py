@@ -1369,7 +1369,6 @@ def predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feat
     return results
 def compare_bootstrap_permutation_test_results():
     '''compare the permutation importance values with and without subsampling by plotting, supplmental figure'''
-
     load_dir = 'D:\mixedeffectmodelsbehavioural\models/figs/absolutereleasemodel/'
     array_female_raw = np.load(load_dir+'/talker1/'+'with_no_bootstrap_words/permutation_importance_array_talker_1.npy')
     array_female_bootstrap = np.load(load_dir+'/talker1/'+'permutation_importance_array_talker_1.npy')
@@ -1438,9 +1437,7 @@ def compare_bootstrap_permutation_test_results():
 def main():
     # compare_bootstrap_permutation_test_results()
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-
     predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=False, talker=2, noise_floor=False, bootstrap_words=True)
-
     # for ferret in ferrets:
     #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)
     #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 2)
