@@ -153,6 +153,11 @@ def run_stats_calc(df, ferrets, pitch_param = 'control_trial'):
 
     return stats_dict_all, stats_dict
 def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'control_trial'):
+    '''run stats calculations on the dataframe separated by pitch / F0
+    :param df: dataframe
+    :param ferrets: list of ferrets
+    :param pitch_param: pitch parameter
+    :return: stats_dict_all, stats_dict'''
 
     df_noncatchnoncorrection = df[(df['catchTrial'] == 0) & (df['correctionTrial'] == 0) & (df[pitch_param] == 1)]
     df_catchnoncorrection = df[(df['catchTrial'] == 1) & (df['correctionTrial'] == 0) & (df[pitch_param] == 1)]
@@ -234,8 +239,6 @@ def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'control_tria
 
         df_catchnoncorrection_talker = df_catchnoncorrection[df_catchnoncorrection['pitchoftarg'] == pitch]
 
-
-
         correct_response = np.mean(list(stats_dict[pitch]['correct_response'].values()))
         hits = np.mean(list(stats_dict[pitch]['hits'].values()))
         false_alarms = np.mean(list(stats_dict[pitch]['false_alarms'].values()))
@@ -249,6 +252,11 @@ def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'control_tria
     return stats_dict_all, stats_dict
 
 def run_stats_calc_by_pitch_mf(df, ferrets, stats_dict, pitch_param = 'inter_trial_roving'):
+    ''' run stats calculations on the dataframe separated by pitch type and talker
+    :param df: dataframe
+    :param ferrets: list of ferrets
+    :param pitch_param: pitch parameter
+    :return: stats_dict_all, stats_dict'''
     if pitch_param == None:
         df_noncatchnoncorrection = df[(df['catchTrial'] == 0) & (df['correctionTrial'] == 0)]
         df_catchnoncorrection = df[(df['catchTrial'] == 1) & (df['correctionTrial'] == 0)]
@@ -259,10 +267,6 @@ def run_stats_calc_by_pitch_mf(df, ferrets, stats_dict, pitch_param = 'inter_tri
         df_noncatchnoncorrection = df[(df['catchTrial'] == 0) & (df['correctionTrial'] == 0) & ((df[pitch_param] == 1) |(df['control_trial'] == 1))]
         df_catchnoncorrection = df[(df['catchTrial'] == 1) & (df['correctionTrial'] == 0) & ((df[pitch_param] == 1) |(df['control_trial'] == 1))]
         df_noncorrection = df[(df['correctionTrial'] == 0) & ((df[pitch_param] == 1) | (df['control_trial'] == 1))]
-    count = int(0)
-
-
-    talkers = [1,2]
     stats_dict[1] = {}
     stats_dict[2] = {}
     stats_dict[3] = {}
@@ -359,22 +363,9 @@ def run_stats_calc_by_pitch_mf(df, ferrets, stats_dict, pitch_param = 'inter_tri
 
 
     for i, pitch in enumerate(pitch_list):
-        # df_noncatchnoncorrection_talker = df_noncatchnoncorrection[df_noncatchnoncorrection['pitchoftarg'] == pitch]
-        # df_noncorrection_talker = df_noncorrection[df_noncorrection['pitchoftarg'] == pitch]
-        # df_noncatchnoncorrection_talker_hitrate = df_noncatchnoncorrection_talker[df_noncatchnoncorrection_talker['response'] != 5]
-        #
-        # df_catchnoncorrection_talker = df_catchnoncorrection[df_catchnoncorrection['pitchoftarg'] == pitch]
-        # hits = np.mean(df_noncatchnoncorrection_talker_hitrate['hit'])
-        # false_alarms = np.mean(df_noncorrection_talker['falsealarm'])
-        # correct_rejections = np.mean(df_catchnoncorrection_talker['response'] == 3)
-        # correct_response =  (len(df_noncatchnoncorrection_talker[df_noncatchnoncorrection_talker['hit']==True]) + len(df_catchnoncorrection_talker[df_catchnoncorrection_talker['response'] == 3]))/ (len(df_noncorrection_talker))
-        #take mean of all the values in the dictionary
-
-
         correct_response = np.mean(list(stats_dict[i+1]['correct_response'].values()))
         hits = np.mean(list(stats_dict[i+1]['hits'].values()))
         false_alarms = np.mean(list(stats_dict[i+1]['false_alarms'].values()))
-
         stats_dict_all[i+1]['hits'] = hits
         stats_dict_all[i+1]['false_alarms'] = false_alarms
         stats_dict_all[i+1]['correct_response'] = correct_response
@@ -382,7 +373,13 @@ def run_stats_calc_by_pitch_mf(df, ferrets, stats_dict, pitch_param = 'inter_tri
         stats_dict_all[i+1]['bias'] = CalculateStats.bias(hits, false_alarms)
 
     return stats_dict_all, stats_dict
-def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'inter_trial_roving', kw_test = True, repeated_anova = True ):
+def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'inter_trial_roving', kw_test = True):
+    ''' run stats calculations on the dataframe separated by pitch type and talker
+    :param df: dataframe
+    :param ferrets: list of ferrets
+    :param pitch_param: pitch parameter
+    :return: stats_dict_all, stats_dict'''
+
     if pitch_param == None:
         df_noncatchnoncorrection = df[(df['catchTrial'] == 0) & (df['correctionTrial'] == 0)]
         df_catchnoncorrection = df[(df['catchTrial'] == 1) & (df['correctionTrial'] == 0)]
@@ -525,14 +522,7 @@ def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'inter_trial_
         df_noncatchnoncorrection_talker = df_noncatchnoncorrection[df_noncatchnoncorrection['pitchoftarg'] == pitch]
         df_noncorrection_talker = df_noncorrection[df_noncorrection['pitchoftarg'] == pitch]
         df_noncatchnoncorrection_talker_hitrate = df_noncatchnoncorrection_talker[df_noncatchnoncorrection_talker['response'] != 5]
-
         df_catchnoncorrection_talker = df_catchnoncorrection[df_catchnoncorrection['pitchoftarg'] == pitch]
-        # hits = np.mean(df_noncatchnoncorrection_talker_hitrate['hit'])
-        # false_alarms = np.mean(df_noncorrection_talker['falsealarm'])
-        # correct_rejections = np.mean(df_catchnoncorrection_talker['response'] == 3)
-        # correct_response =  (len(df_noncatchnoncorrection_talker[df_noncatchnoncorrection_talker['hit']==True]) + len(df_catchnoncorrection_talker[df_catchnoncorrection_talker['response'] == 3]))/ (len(df_noncorrection_talker))
-        #take mean of all the values in the dictionary
-
 
         correct_response = np.mean(list(stats_dict[pitch]['correct_response'].values()))
         hits = np.mean(list(stats_dict[pitch]['hits'].values()))
