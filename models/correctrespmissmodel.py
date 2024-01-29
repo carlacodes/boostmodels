@@ -35,6 +35,12 @@ def shap_summary_plot(
 
 
 def objective(trial, X, y):
+    '''run the objective function for optuna
+    :param trial: optuna trial object
+    :param X: training data
+    :param y: training labels
+    :return: mean cross validation score
+    '''
     param_grid = {
         "colsample_bytree": trial.suggest_float("colsample_bytree", 0.1, 1),
         "subsample": trial.suggest_float("subsample", 0.1, 1),
@@ -80,6 +86,11 @@ def get_axis_limits(ax, scale=1):
     return ax.get_xlim()[0] * scale, (ax.get_ylim()[1] * scale)
 
 def run_optuna_study_correctresp(X, y):
+    '''run the optuna study for the correct response model
+    :param X: training data
+    :param y: training labels
+    :return: optuna study object
+    '''
     study = optuna.create_study(direction="minimize", study_name="LGBM Classifier")
     func = lambda trial: objective(trial, X, y)
     study.optimize(func, n_trials=1000)
@@ -92,6 +103,10 @@ def run_optuna_study_correctresp(X, y):
     return study
 
 def run_mixed_effects_model_correctresp(df):
+    '''run the mixed effects model for the correct response model
+    :param df: dataframe
+    :return: mixed effects model object
+    '''
     ferrets= ['F1702', 'F1815', 'F1803', 'F2002', 'F2105']
     equation = 'misslist ~ talker + side + precur_and_targ_same + targTimes + pastcorrectresp + pastcatchtrial + pitchoftarg'
     #split the data into training and test set
@@ -129,13 +144,7 @@ def run_mixed_effects_model_correctresp(df):
 
         model = smf.mixedlm(equation, train, groups=train["ferret"])
         result = model.fit()
-        #get the reference group
-        #
-
         print(result.summary())
-        #store the coefficients in a dictionary
-
-        #
 
         var_resid = result.scale
         var_random_effect = float(result.cov_re.iloc[0])
@@ -220,11 +229,6 @@ def run_mixed_effects_model_correctresp(df):
 
     result_coefficients.index = result_coefficients.index.str.replace('pastcorrectresp', 'past response correct')
     result_coefficients.index = result_coefficients.index.str.replace('precur_and_targ_same', 'precursor = target F0')
-
-
-
-
-
     result_coefficients = result_coefficients.sort_values(by='coefficients', ascending=False)
     ax.bar(result_coefficients.index, result_coefficients['coefficients'], color = 'peru')
     ax.errorbar(result_coefficients.index, result_coefficients['coefficients'], yerr=result_coefficients['std_error'], fmt='none', ecolor='black', elinewidth=1, capsize=2)
@@ -259,6 +263,15 @@ def run_mixed_effects_model_correctresp(df):
     return result
 
 def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization = False, ferret_as_feature=False, one_ferret = False, ferrets = None):
+    '''run the lightgbm model for the correct response model
+    :param dataframe: dataframe
+    :param paramsinput: parameters for the model
+    :param optimization: whether to run the optuna study or not
+    :param ferret_as_feature: whether to include ferret as a feature or not
+    :param one_ferret: whether to run the model on one ferret or not
+    :param ferrets: which ferret(s) to run the model on
+    :return: none
+    '''
     if ferret_as_feature == True:
         df_to_use = dataframe[["trialNum", "misslist", "talker", "side", "precur_and_targ_same",
                                "targTimes", "pastcorrectresp",
@@ -346,12 +359,10 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     results = cross_val_score(xg_reg, X_test, y_test, scoring='accuracy', cv=kfold)
 
     bal_accuracy_train = cross_val_score(xg_reg, X_train, y_train, scoring='balanced_accuracy', cv=kfold)
-
     bal_accuracy = cross_val_score(xg_reg, X_test, y_test, scoring='balanced_accuracy', cv=kfold)
     print("Bal. accuracy, test: %.2f%%" % (np.mean(results) * 100.0))
     print(results)
     print('Balanced Accuracy, train: %.2f%%' % (np.mean(bal_accuracy) * 100.0))
-
     shap_values1 = shap.TreeExplainer(xg_reg).shap_values(dfx)
 
     custom_colors = ['gold',  'peru', "purple"]  # Add more colors as needed
@@ -373,11 +384,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     explainer = shap.Explainer(xg_reg, X_train, feature_names=X_train.columns)
     shap_values2 = explainer(X_train)
 
-
-    # Create a single figure
-    import matplotlib.image as mpimg
     summary_plot_file = 'summary_plot.png'
-    # shap.summary_plot(shap_values1, X_train, show=False, color=cmapsummary)
     shap.plots.beeswarm(shap_values2,  show=False, color=cmapcustom)
     fig, ax = plt.gcf(), plt.gca()
 
@@ -391,10 +398,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     # ax.set_yticks(range(len(feature_labels)))
     #for some reason y ticks are set in reverse order
     ax.set_yticklabels(np.flip(feature_labels), fontsize=17, rotation = 45)
-    # ax.set_yticklabels(np.reverse(feature_labels), fontsize=17, rotation = 45)
-    # ax.set_ylabel('Features', fontsize=18)
-    #pull legend from figure
-    # Pull legend from figure
+
     legend_handles, legend_labels = ax.get_legend_handles_labels()
     #reinsert the legend_hanldes and labels
     ax.legend(legend_handles, ['Hit', 'Miss'], loc='upper right', fontsize=18)
