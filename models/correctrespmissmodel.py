@@ -131,8 +131,6 @@ def run_mixed_effects_model_correctresp(df):
     df['pitchoftarg'] = df['pitchoftarg'].replace({1: '109 Hz', 2: '124 Hz', 3: '144 Hz', 4: '191 Hz', 5: '251 Hz'})
     df['ferret'] = df['ferret'].astype('category')
 
-
-
     kf = KFold(n_splits=5, shuffle=True, random_state=123)
     fold_index = 1
     train_acc = []
