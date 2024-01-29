@@ -688,7 +688,6 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
     multiplier = 0
     gap_width = 0.2
 
-
     for attribute, measurement in stats_dict_all_combined.items():
         for talker, measurement_data in measurement.items():
             print(measurement_data)
@@ -715,7 +714,6 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
 
     ax3.set_ylim(0, 1)
     ax3.set_xticks([0.25, 1.25], ['Female', 'Male'])
-
     ax3.set_ylabel('p(correct)')
     ax3.set_title('Correct responses')
     multiplier = 0
@@ -749,8 +747,6 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
     ax4.set_title('d\'')
     plt.savefig('figs/proportion_hits_falsealarms_correctresp_dprime_bytalker_2706.png', dpi = 500, bbox_inches='tight')
     plt.show()
-
-    #plot the bias in a separate figure
     fig, ax = plt.subplots()
     multiplier = 0
     for attribute, measurement in stats_dict_all_combined.items():
@@ -896,13 +892,18 @@ def plot_stats_by_pitch(stats_dict_all_combined, stats_dict_combined, stats_dict
 
 
 def plot_stats_by_pitch_lineplot(stats_dict_all_combined, stats_dict_combined, stats_dict_all_inter, stats_dict_inter, stats_dict_all_intra, stats_dict_intra):
+    ''' plot general stats across all ferrets, lineplot style
+    :param stats_dict_all_combined: dictionary of stats across all ferrets
+    :param stats_dict_combined: dictionary of stats by ferret
+    :param stats_dict_all_inter: dictionary of stats across all ferrets for inter trial roving
+    :param stats_dict_inter: dictionary of stats by ferret for inter trial roving
+    :param stats_dict_all_intra: dictionary of stats across all ferrets for intra trial roving
+    :param stats_dict_intra: dictionary of stats by ferret for intra trial roving
 
-    #generate bar plots
-    stats = pd.DataFrame.from_dict(stats_dict_all_combined)
-    x = np.arange(len(stats_dict_all_combined))  # the label locations
+    :return: None'''
+
     width = 0.25  # the width of the bars
     multiplier = 0
-    gap_width = 0.2  # Width of the gap between series
     ferret_ids = ['F1702', 'F1815', 'F1803', 'F2002', 'F2105']
     text_width_pt = 419.67816  # Replace with your value
 
@@ -921,10 +922,7 @@ def plot_stats_by_pitch_lineplot(stats_dict_all_combined, stats_dict_combined, s
             offset = width * multiplier
             if multiplier >= 3:
                 offset = width * (multiplier-1)
-    # Add gap offset for the second series
-
             color = color_map(attribute)  # Assign color based on label
-            # rects = ax1.bar(offset, measurement['hits'], width, label='_nolegend_', color=color)
             hits.append(measurement['hits'])
             offsets1.append(offset)
             #scatter plot the corresponding individual ferret data, each ferret is a different marker shape
@@ -937,22 +935,14 @@ def plot_stats_by_pitch_lineplot(stats_dict_all_combined, stats_dict_combined, s
                 offset_jitter = offset + np.random.uniform(-0.05, 0.05)
                 ax1.scatter(offset_jitter, ferret_data, 25, color=color, marker=marker_list[count],label='_nolegend_', edgecolors='black')
                 count += 1
-
             multiplier += 1
-
     ax1.set_ylim(0, 1)
     ax1.set_ylabel('P(hit) by target word F0', fontsize = 12)
     ax1.set_title('Hits')
 
     width = 0.25  # the width of the bars
     multiplier = 0
-    gap_width = 0.2
-
-
-
-
     for attribute, measurement in stats_dict_all_inter.items():
-
             offset = width * multiplier
             if multiplier >= 3:
                 offset = width * (multiplier-1)
@@ -981,12 +971,6 @@ def plot_stats_by_pitch_lineplot(stats_dict_all_combined, stats_dict_combined, s
 
             multiplier += 1
 
-    # ax1.plot(offsets1, hits, color=color, linestyle='--', marker='o', label='_nolegend_', markersize=12, alpha=0.5)
-    #
-    # # Plot lines for the second subplot (ax2)
-    # ax2.plot(offsets2, false_alarms, color=color, linestyle='--', marker='o', label='_nolegend_', markersize=12,
-    #          alpha=0.5)
-
     offsets1_f = offsets1[len(offsets1)//2:]
     hits_f = hits[len(hits)//2:]
     offsets1_m = offsets1[:len(offsets1)//2]
@@ -995,11 +979,6 @@ def plot_stats_by_pitch_lineplot(stats_dict_all_combined, stats_dict_combined, s
     ax1.plot(offsets1_f, hits_f, color='grey', linestyle='--', marker='o', label='Female Talker', markersize=12, alpha=0.5)
     ax1.plot(offsets1_m, hits_m, color='blue', linestyle='--', marker='o', label='Male Talker', markersize=12, alpha=0.5)
 
-
-
-    # Plot lines for the second subplot (ax2)
-    # ax2.plot(offsets2, false_alarms, color=color, linestyle='--', marker='o', label='_nolegend_', markersize=12,
-    #          alpha=0.5)
 
     offsets2_f = offsets2[len(offsets2)//2:]
     false_alarms_f = false_alarms[len(false_alarms)//2:]
@@ -1018,24 +997,10 @@ def plot_stats_by_pitch_lineplot(stats_dict_all_combined, stats_dict_combined, s
     ax1.set_xlabel('F0 (Hz)')
     ax2.set_xticks([0, 0.25, 0.5, 0.75, 1.0], ['109', '124', '144', '191', '251 '])
 
-
-    def get_axis_limits(ax, scale=1):
-        return ax.get_xlim()[0] * scale, (ax.get_ylim()[1] * scale)
-
-    import matplotlib.font_manager as fm
-
-
-    # ax1.annotate('A', xy=get_axis_limits(ax1), xytext=(-0.1, ax1.title.get_position()[1]+0.05), textcoords='axes fraction', fontproperties = font_props, zorder=10)
-    # ax2.annotate('B', xy=get_axis_limits(ax2), xytext=(-0.1, ax2.title.get_position()[1]+0.05), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-    # ax3.annotate('c)', xy=get_axis_limits(ax3), xytext=(-0.1, ax3.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-    # ax4.annotate('d)', xy=get_axis_limits(ax4), xytext=(-0.1, ax4.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-    #
     # plt.suptitle('Proportion of hits, false alarms,\n correct responses and d\' by talker')
     plt.subplots_adjust(wspace=0.0, hspace=0.38)
-
     plt.savefig('figs/proportionofhits_FA_byF0_noaxisannotation.pdf', dpi = 500, bbox_inches='tight')
     plt.savefig('figs/proportionofhits_FA_byF0_noaxisannotation.png', dpi = 500, bbox_inches='tight')
-
     plt.show()
 
     ##no do dprime and correct response
@@ -1046,7 +1011,6 @@ def plot_stats_by_pitch_lineplot(stats_dict_all_combined, stats_dict_combined, s
     text_width_inches = text_width_pt / 72.27
     fig, ((ax1, ax2)) = plt.subplots(2,1, layout='constrained',figsize=(0.8*text_width_inches,0.9*text_width_inches))
     #make a panel for the subplots to go into
-
     color_map = plt.cm.get_cmap('tab10')  # Choose a colormap
     offsets1 = []
     hits = []
@@ -1057,10 +1021,8 @@ def plot_stats_by_pitch_lineplot(stats_dict_all_combined, stats_dict_combined, s
             offset = width * multiplier
             if multiplier >= 3:
                 offset = width * (multiplier-1)
-    # Add gap offset for the second series
 
             color = color_map(attribute)  # Assign color based on label
-            # rects = ax1.bar(offset, measurement['hits'], width, label='_nolegend_', color=color)
             hits.append(measurement['dprime'])
             offsets1.append(offset)
             #scatter plot the corresponding individual ferret data, each ferret is a different marker shape
@@ -1075,31 +1037,18 @@ def plot_stats_by_pitch_lineplot(stats_dict_all_combined, stats_dict_combined, s
                 count += 1
 
             multiplier += 1
-
-    # ax1.set_ylim(0, 1)
     ax1.set_ylabel("d'", fontsize = 12)
     ax1.set_title("d'")
-
     width = 0.25  # the width of the bars
     multiplier = 0
-
-
-
-
     for attribute, measurement in stats_dict_all_inter.items():
-
             offset = width * multiplier
             if multiplier >= 3:
                 offset = width * (multiplier-1)
-            # Add gap offset for the second series
             offsets2.append(offset)
             false_alarms.append(measurement['correct_response'])
             color = color_map(attribute)  # Assign color based on label
-            # rects = ax2.bar(offset, measurement['false_alarms'], width, label='_nolegend_', color=color)
-            #do a line plot
-            # ax2.plot(offset, measurement['correct_response'], color=color, linestyle = '--', marker = 'o', label='_nolegend_', markersize = 12, alpha = 0.5)
 
-            #scatter plot the corresponding individual ferret data, each ferret is a different marker shape
             marker_list = ['p', 's', '<', 'd', "*"]
             count = 0
             for ferret, ferret_data in stats_dict_inter[attribute]['correct_response'].items():
@@ -1111,21 +1060,12 @@ def plot_stats_by_pitch_lineplot(stats_dict_all_combined, stats_dict_combined, s
                 count += 1
 
             multiplier += 1
-    # ax1.plot(offsets1, hits, color=color, linestyle='--', marker='o', label='_nolegend_', markersize=12, alpha=0.5)
-    #split offset1s into half for the second plot
     offsets1_f = offsets1[len(offsets1)//2:]
     hits_f = hits[len(hits)//2:]
     offsets1_m = offsets1[:len(offsets1)//2]
     hits_m = hits[:len(hits)//2]
-
     ax1.plot(offsets1_f, hits_f, color='grey', linestyle='--', marker='o', label='Female Talker', markersize=12, alpha=0.5)
     ax1.plot(offsets1_m, hits_m, color='blue', linestyle='--', marker='o', label='Male Talker', markersize=12, alpha=0.5)
-
-
-
-    # Plot lines for the second subplot (ax2)
-    # ax2.plot(offsets2, false_alarms, color=color, linestyle='--', marker='o', label='_nolegend_', markersize=12,
-    #          alpha=0.5)
 
     offsets2_f = offsets2[len(offsets2)//2:]
     false_alarms_f = false_alarms[len(false_alarms)//2:]
@@ -1134,41 +1074,26 @@ def plot_stats_by_pitch_lineplot(stats_dict_all_combined, stats_dict_combined, s
 
     ax2.plot(offsets2_f, false_alarms_f,  color='grey', linestyle='--', marker='o', label='Female Talker', markersize=12, alpha=0.5)
     ax2.plot(offsets2_m, false_alarms_m,  color='blue', linestyle='--', marker='o', label='Male Talker', markersize=12, alpha=0.5)
-
-
-
     ax2.set_ylim(0, 1)
-    # ax2.legend( loc='upper left')
     ax2.set_ylabel('P(Correct Response) by F0', fontsize = 12)
     ax2.set_title('P(Correct Response)')
     ax2.set_xlabel('F0 of target (Hz)')
     ax1.set_xticks([0, 0.25, 0.5, 0.75, 1.0,], ['109', '124', '144', '191', '251 '])
     ax1.set_xlabel('F0 (Hz)')
     ax2.set_xticks([0, 0.25, 0.5, 0.75, 1.0], ['109', '124', '144', '191', '251 '])
-    # ax2.legend(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=6, loc='upper right')
-
-    import matplotlib.font_manager as fm
-
-
-    # ax1.annotate('A', xy=get_axis_limits(ax1), xytext=(-0.1, ax1.title.get_position()[1]+0.05), textcoords='axes fraction', fontproperties = font_props, zorder=10)
-    # ax2.annotate('B', xy=get_axis_limits(ax2), xytext=(-0.1, ax2.title.get_position()[1]+0.05), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-    # ax3.annotate('c)', xy=get_axis_limits(ax3), xytext=(-0.1, ax3.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-    # ax4.annotate('d)', xy=get_axis_limits(ax4), xytext=(-0.1, ax4.title.get_position()[1]+0.1), textcoords='axes fraction', fontproperties = font_props,zorder=10)
-    #
-    # plt.suptitle('Proportion of hits, false alarms,\n correct responses and d\' by talker')
     plt.subplots_adjust(wspace=0.0, hspace=0.38)
-
     plt.savefig('figs/proportionofhits_dprimecorrect_response_byF0_noaxisannotation.pdf', dpi = 500, bbox_inches='tight')
     plt.savefig('figs/proportionofhits_dprimecorrect_response_byF0_noaxisannotation.png', dpi = 500, bbox_inches='tight')
-
     plt.show()
     return
 
 
 def run_barplot_pipeline():
+    ''' run the pipeline to generate the bar plots
+    :return: None'''
+
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
     df = behaviouralhelperscg.get_stats_df(ferrets=ferrets, startdate='04-01-2016', finishdate='01-03-2023')
-    stats_dict = {}
     pitch_type_list = ['control_trial', 'inter_trial_roving', 'intra_trial_roving']
     stats_dict_all_combined = {}
     stats_dict_combined = {}
@@ -1179,26 +1104,20 @@ def run_barplot_pipeline():
 
     for pitch in pitch_type_list:
         stats_dict_all, stats_dict = run_stats_calc(df, ferrets, pitch_param=pitch)
-        # append to dataframe
-
         stats_dict_all_combined[1][pitch] = stats_dict_all[1][pitch]
         stats_dict_all_combined[2][pitch] = stats_dict_all[2][pitch]
-
         stats_dict_combined[1][pitch] = stats_dict[1][pitch]
         stats_dict_combined[2][pitch] = stats_dict[2][pitch]
-
     plot_stats(stats_dict_all_combined, stats_dict_combined)
 
 def run_simulated_releasetimes():
+    ''' run a simulation of release times'''
     min_time = 0
     max_time = 6
-
     # Number of response times to simulate
     num_samples = 1000
-
     # Simulate response times using a uniform distribution
     simulated_response_times = np.random.uniform(min_time, max_time, num_samples)
-
     # Calculate the mean of the simulated response times
     mean_response_time = np.mean(simulated_response_times)
     #plot the distribution
@@ -1215,17 +1134,15 @@ def run_simulated_releasetimes():
 
     print(f"Simulated Mean Response Time: {mean_response_time:.4f} seconds")
     print(f"Actual Mean Squared Error (MSE): {mse:.4f}")
-
+    return
 
 def run_repeated_anova(stats_dict_inter, stats_dict_intra, stats_dict_control):
-    #run repeated measures ANOVA
-    #get the data into a dataframe
-    #make a dataframe with the data
-    #make a dataframe with the data
-    #flatten the dictionary
-    # stats_dict_inter = {k: v for d in stats_dict_inter.values() for k, v in d.items()}
-    # stats_dict_intra = {k: v for d in stats_dict_intra.values() for k, v in d.items()}
-    # stats_dict_control = {k: v for d in stats_dict_control.values() for k, v in d.items()}
+    ''' run a repeated measures anova on the data
+    :param stats_dict_inter: dictionary of stats for inter trial roving
+    :param stats_dict_intra: dictionary of stats for intra trial roving
+    :param stats_dict_control: dictionary of stats for control trials
+    :return: None'''
+
     stat_dict_inter2 = {}
     stat_dict_intra2 = {}
     stat_dict_control2 = {}
@@ -1239,13 +1156,7 @@ def run_repeated_anova(stats_dict_inter, stats_dict_intra, stats_dict_control):
                 for ferretkey in stats_dict_control[key][trialkey][statkey].keys():
                     list.append(stats_dict_control[key][trialkey][statkey][ferretkey])
                 stat_dict_control2[key][statkey] = list
-    # for key in stats_dict_inter.keys():
-    #     stat_dict_inter2[key] = {}
-    #     for statkey in stats_dict_inter[key].keys():
-    #         list = []
-    #         for ferretkey in stats_dict_inter[key][statkey].keys():
-    #             list.append(stats_dict_inter[key][statkey][ferretkey])
-    #         stat_dict_inter2[key][statkey] = list
+
     for key in stats_dict_intra.keys():
         stat_dict_intra2[key] = {}
         for trialkey in stats_dict_intra[key].keys():
@@ -1265,13 +1176,10 @@ def run_repeated_anova(stats_dict_inter, stats_dict_intra, stats_dict_control):
                     list.append(stats_dict_inter[key][trialkey][statkey][ferretkey])
                 stat_dict_inter2[key][statkey] = list
 
-
-    # stats_dict_inter = pd.DataFrame.from_dict(stats_dict_inter)
     for talker in [1,2]:
         stats_dict_inter2 = pd.DataFrame.from_dict(stat_dict_inter2[talker])
         stats_dict_intra2 = pd.DataFrame.from_dict(stat_dict_intra2[talker])
         stats_dict_control2 = pd.DataFrame.from_dict(stat_dict_control2[talker])
-        #concatrenate the dataframes
         #add a roving type column
         stats_dict_inter2['roving_type'] = 'inter'
         stats_dict_intra2['roving_type'] = 'intra'
@@ -1285,16 +1193,13 @@ def run_repeated_anova(stats_dict_inter, stats_dict_intra, stats_dict_control):
 
         for value in ['hits', 'false_alarms', 'correct_response', 'dprime', 'bias']:
             anovaresults = AnovaRM(stats_dict_all, value, 'ferret', within=['roving_type']).fit()
-            #export to csv.
-            # anovaresults.export_to_csv('anovaresults_' + str(talker) + '_' + value + '.csv')
-            #run tukey post hoc test, need to check if correct and accounts for
+
             posthoc = MultiComparison(stats_dict_all[value], stats_dict_all['roving_type'])
             posthocresults = posthoc.tukeyhsd()
             print(posthocresults)
             numerator = anovaresults.anova_table['F Value'][0] * anovaresults.anova_table['Num DF'][0]
             denominator = numerator + anovaresults.anova_table['Den DF'][0]
             partial_eta_squared = numerator / denominator
-
 
             eta_squared_df = pd.DataFrame({'partial_eta_squared': [partial_eta_squared]})
             eta_squared_df.to_csv(f'D:\mixedeffectmodelsbehavioural\metrics/eta_squared_rovingtype_{value}_talker_{talker}.csv')
@@ -1305,8 +1210,7 @@ def run_repeated_anova(stats_dict_inter, stats_dict_intra, stats_dict_control):
             tukey_df.to_csv(f'D:\mixedeffectmodelsbehavioural\metrics/posthocresults_by_rovingtype_{value}_talker_{talker}.csv')
             anovaresults.anova_table.to_csv(f'D:\mixedeffectmodelsbehavioural\metrics/anova_results_by_rovingtype_{value}_talker_{talker}.csv')
 
-    # stats_dict_female = pd.concat([pd.DataFrame.from_dict(stat_dict_inter2[1]), pd.DataFrame.from_dict(stat_dict_intra2[1]), pd.DataFrame.from_dict(stat_dict_control2[1])])
-    # stats_dict_male = pd.concat([pd.DataFrame.from_dict(stat_dict_inter2[2]), pd.DataFrame.from_dict(stat_dict_intra2[2]), pd.DataFrame.from_dict(stat_dict_control2[2])])
+
     stats_dict_all = pd.DataFrame()
     for talker in [1,2]:
         stat_dict_inter3 = pd.DataFrame.from_dict( stat_dict_inter2[talker])
