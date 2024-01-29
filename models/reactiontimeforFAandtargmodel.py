@@ -42,6 +42,11 @@ def run_optuna_study_releasetimes(X, y):
 
 
 def objective_releasetimes(trial, X, y):
+    '''objective function for the lightgbm model for the absolute release times
+    :param trial: the trial
+    :param X: the features
+    :param y: the labels
+    :return: the mean mse'''
     param_grid = {
         # "device_type": trial.suggest_categorical("device_type", ['gpu']),
         #     colsample_bytree = 0.3, learning_rate = 0.1,
@@ -83,6 +88,15 @@ def objective_releasetimes(trial, X, y):
 
 def runlgbreleasetimes_for_a_ferret(data, paramsinput=None, ferret=1, ferret_name='F1815_Cruella'
                                     ):
+    '''run the lightgbm model for the absolute release times for a ferret
+    :param data: the data
+
+    :param paramsinput: the parameters for the model
+    :param ferret: the ferret number
+    :param ferret_name: the ferret name
+    :return: the model, the predictions, the test labels, the test mse
+    '''
+
     data = data[data['ferret'] == ferret]
     col = 'realRelReleaseTimes'
     dfx = data.loc[:, data.columns != col]
