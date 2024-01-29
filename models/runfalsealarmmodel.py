@@ -487,7 +487,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     :param ferret_as_feature: whether to include ferret as a feature
     :param ferrets: ferrets
     :param one_ferret: whether to run for one ferret
-    :return: none
+    :return: xg_reg, ypred, y_test, results, X_train, y_train, X_test, bal_accuracy, dfx
     '''
 
     if ferret_as_feature:
@@ -565,10 +565,6 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     # plt.title('Mean SHAP value over ferret ID', fontsize=18)
     plt.savefig(fig_dir /'ferretIDbysideofaudio1409.png', dpi=500, bbox_inches='tight')
     plt.show()
-
-
-
-
 
 
     shap.plots.beeswarm(shap_values2, show=False,  color=cmapcustom)
