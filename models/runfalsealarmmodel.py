@@ -1550,8 +1550,6 @@ def plot_reaction_times_interandintra(ferrets):
 
 
     df_use = resultingdf
-
-    df_left_by_ferret = {}
     df_female = df_use.loc[df_use['talker'] == 1]
     df_female_control = df_female.loc[df_female['control_trial'] == 1]
 
@@ -1641,10 +1639,6 @@ def plot_reaction_times_interandintra(ferrets):
     ax_dict['3'].annotate('D', xy=get_axis_limits(ax_dict['3']), xytext=(-0.1, ax_dict['3'].title.get_position()[1]+0.01), textcoords='axes fraction', fontproperties = font_props,zorder=1)
     ax_dict['4'].annotate('E', xy=get_axis_limits(ax_dict['4']), xytext=(-0.1, ax_dict['4'].title.get_position()[1]+0.01), textcoords='axes fraction', fontproperties = font_props,zorder=1)
 
-
-    # plt.savefig('D:/behavmodelfigs/reaction_times_by_ferret_interbigmosaic_280614091409.png', dpi=500)
-    # plt.savefig('D:/behavmodelfigs/reaction_times_by_ferret_interbigmosaic_2806.pdf', dpi=500)
-
     plt.show()
     fig = plt.figure(figsize=(20, 5))
     ax_dict = fig.subplot_mosaic(mosaic)
@@ -1698,20 +1692,20 @@ def plot_reaction_times_interandintra(ferrets):
 
     plt.savefig('D:/behavmodelfigs/abs_response_times_by_ferret_panel.png', dpi=500)
     plt.savefig('D:/behavmodelfigs/abs_response_times_by_ferret_panel.png', dpi=500)
-
     plt.show()
 
     return df_by_ferret
 
 
 def plot_reaction_times_interandintra_swarm(ferrets):
-    # plot the reaction times by animal
+    ''' plot the reaction times by animal, swarm format
+    :param ferrets: list of ferrets to include in the analysis
+    :return: df_by_ferret: dictionary of dataframes containing the reaction times by ferret
+    '''
     resultingdf = behaviouralhelperscg.get_reactiontime_data(ferrets=ferrets, startdate='04-01-2020',
                                                              finishdate='01-10-2022')
     #only get correct hit trials for the swarm plot
     df_use = resultingdf[(resultingdf['realRelReleaseTimes'] >= 0) & (resultingdf['realRelReleaseTimes'] <= 2)]
-
-    df_left_by_ferret = {}
     df_female = df_use.loc[df_use['talker'] == 1]
     df_female_control = df_female.loc[df_female['control_trial'] == 1]
 
@@ -1786,8 +1780,7 @@ def plot_reaction_times_interandintra_swarm(ferrets):
 
     # Convert the text width from points to inches
     text_width_inches = text_width_pt / 72.27
-    # fig, ((ax1, ax2)) = plt.subplots(2,1, layout='constrained',figsize=(0.75*text_width_inches,0.5*text_width_inches))
-    # fig = plt.figure(figsize=(10, 10))
+
     fig = plt.figure(figsize = (1.5*text_width_inches,1.5*text_width_inches))
     ax_dict = fig.subplot_mosaic(mosaic)
     pitchlist = ['109 Hz', '124 Hz', '144 Hz', '191 Hz', '251 Hz']
@@ -1822,23 +1815,6 @@ def plot_reaction_times_interandintra_swarm(ferrets):
     #have the legend go to axdict[5] but information is from other plot
 
     font_props = fm.FontProperties(weight='bold', size=18)
-
-    # ax_dict['0'].annotate('A', xy=get_axis_limits(ax_dict['0']),
-    #                       xytext=(-0.15, ax_dict['0'].title.get_position()[1] + 0.01), textcoords='axes fraction',
-    #                       fontproperties=font_props, zorder=1)
-    # ax_dict['1'].annotate('B', xy=get_axis_limits(ax_dict['1']),
-    #                       xytext=(-0.15, ax_dict['1'].title.get_position()[1] + 0.01), textcoords='axes fraction',
-    #                       fontproperties=font_props, zorder=1)
-    # ax_dict['2'].annotate('C', xy=get_axis_limits(ax_dict['2']),
-    #                       xytext=(-0.15, ax_dict['2'].title.get_position()[1] + 0.01), textcoords='axes fraction',
-    #                       fontproperties=font_props, zorder=1)
-    # ax_dict['3'].annotate('D', xy=get_axis_limits(ax_dict['3']),
-    #                       xytext=(-0.15, ax_dict['3'].title.get_position()[1] + 0.01), textcoords='axes fraction',
-    #                       fontproperties=font_props, zorder=1)
-    # ax_dict['4'].annotate('E', xy=get_axis_limits(ax_dict['4']),
-    #                       xytext=(-0.15, ax_dict['4'].title.get_position()[1] + 0.01), textcoords='axes fraction',
-    #                       fontproperties=font_props, zorder=1)
-
     # #remove spines from ax_dict['5']
     ax_dict['5'].spines['right'].set_visible(False)
     ax_dict['5'].spines['top'].set_visible(False)
@@ -1846,44 +1822,9 @@ def plot_reaction_times_interandintra_swarm(ferrets):
     ax_dict['5'].spines['bottom'].set_visible(False)
     ax_dict['5'].set_xticks([])
     ax_dict['5'].set_yticks([])
-
-
-
     plt.savefig('D:/behavmodelfigs/reaction_times_by_ferret_swarm_byF0_bigmosaic_noannotation14091409.png', dpi=500)
     plt.savefig('D:/behavmodelfigs/reaction_times_by_ferret_swarm_byF0_bigmosaic_noannotation.pdf', dpi=500)
     plt.show()
-
-    # mosaic = ['0', '1', '2', '3', '4'], ['0', '1', '2', '3', '4']
-    # fig = plt.figure(figsize=(20, 5))
-    # ax_dict = fig.subplot_mosaic(mosaic)
-    # for ferret in ferrets:
-    #     sns.swarmplot(df_by_ferret_f_control[ferret]['realRelReleaseTimes'], color='blue', label='control F0, female', ax = ax_dict[str(ferret)], alpha=0.2)
-    #     sns.swarmplot(df_by_ferret_f_rove[ferret]['realRelReleaseTimes'], color='red', label='inter-roved F0, female', ax = ax_dict[str(ferret)], alpha=0.2)
-    #     sns.swarmplot(df_by_ferret_m_control[ferret]['realRelReleaseTimes'], color='green', label='control F0, male', ax = ax_dict[str(ferret)], alpha = 0.2)
-    #     sns.swarmplot(df_by_ferret_m_rove[ferret]['realRelReleaseTimes'], color='orange', label='inter-roved F0, male', ax = ax_dict[str(ferret)], alpha = 0.2)
-    #     sns.swarmplot(df_by_ferret_f_rove_intra[ferret]['realRelReleaseTimes'], color='darkmagenta',
-    #                  label='intra-roved F0, female', ax = ax_dict[str(ferret)], alpha = 0.2)
-    #     sns.swarmplot(df_by_ferret_m_rove_intra[ferret]['realRelReleaseTimes'], color='orangered',
-    #                  label='intra-roved F0, male', ax=ax_dict[str(ferret)], alpha =0.2)
-    #
-    #     ax_dict[str(ferret)].set_title('Reaction times for ' + str(ferret_labels[ferret]), fontsize=12)
-    #     if ferret == 0:
-    #         ax_dict[str(ferret)].legend(fontsize=8)
-    #     ax_dict[str(ferret)].set_xlabel('reaction time relative \n to target presentation (s)', fontsize=10)
-    # fig.tight_layout()
-    #
-    # font_props = fm.FontProperties(weight='bold', size=17)
-    #
-    # ax_dict['0'].annotate('a)', xy=get_axis_limits(ax_dict['0']), xytext=(-0.1, ax_dict['0'].title.get_position()[1]+0.01), textcoords='axes fraction', fontproperties = font_props, zorder=1)
-    # ax_dict['1'].annotate('b)', xy=get_axis_limits(ax_dict['1']), xytext=(-0.1, ax_dict['1'].title.get_position()[1]+0.01), textcoords='axes fraction', fontproperties = font_props,zorder=1)
-    # ax_dict['2'].annotate('c)', xy=get_axis_limits(ax_dict['2']), xytext=(-0.1, ax_dict['2'].title.get_position()[1]+0.01), textcoords='axes fraction', fontproperties = font_props,zorder=1)
-    # ax_dict['3'].annotate('d)', xy=get_axis_limits(ax_dict['3']), xytext=(-0.1, ax_dict['3'].title.get_position()[1]+0.01), textcoords='axes fraction', fontproperties = font_props,zorder=1)
-    # ax_dict['4'].annotate('e)', xy=get_axis_limits(ax_dict['4']), xytext=(-0.1, ax_dict['4'].title.get_position()[1]+0.01), textcoords='axes fraction', fontproperties = font_props,zorder=1)
-    #
-    #
-    # plt.savefig('D:/behavmodelfigs/reaction_times_by_ferret_swarm_interbigmosaic14091409.png', dpi=500)
-    # plt.show()
-
     return df_by_ferret
 
 
