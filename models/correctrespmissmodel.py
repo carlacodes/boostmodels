@@ -7,10 +7,6 @@ from pathlib import Path
 
 from sklearn.model_selection import cross_val_score
 import statsmodels.formula.api as smf
-import pandas as pd
-import numpy as np
-import statsmodels.api as sm
-import statsmodels.formula.api as smf
 from sklearn.model_selection import KFold
 from sklearn.metrics import confusion_matrix, balanced_accuracy_score
 
@@ -18,9 +14,6 @@ import shap
 import matplotlib
 import lightgbm as lgb
 import optuna
-import matplotlib.font_manager as fm
-
-from optuna.integration import LightGBMPruningCallback
 from sklearn.model_selection import StratifiedKFold
 
 import matplotlib.pyplot as plt
@@ -574,17 +567,6 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     # Convert the text width from points to inches
     text_width_inches = text_width_pt / 72.27
 
-
-
-    # # fig = plt.figure(figsize=(20, 10))
-    # figsize = (text_width_inches*(1/4), text_width_inches)
-    # gridspec_kw = {'width_ratios': [1, 1], 'height_ratios': [3, 3, 3]}
-    #
-    # # Create the figure with subplots
-    # plt.rcParams['font.family'] = 'sans-serif'
-    #
-    # # fig, ax_dict = plt.subplot_mosaic(mosaic, figsize=figsize, gridspec_kw=gridspec_kw)
-    # fig, ax_dict = plt.subplot_mosaic(mosaic, figsize = (4,10))
 
     mosaic = ['A', 'B'], ['D', 'B'], ['C', 'E']
     ferret_id_only = ['F1702', 'F1815', 'F1803', 'F2002', 'F2105']
