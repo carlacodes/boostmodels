@@ -1293,6 +1293,15 @@ def run_mixed_effects_model_absrxntime(df, talker =1):
     
     return result
 def predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=False, talker=2, noise_floor = False, bootstrap_words = False):
+    '''run a gradient-boosted regression tree model on the absolute reaction time data
+    ferrets: list of ferrets to include in the model
+    optimization: whether to run an optimization or not
+    ferret_as_feature: whether to include ferret as a feature in the model
+    talker: talker type, 1 is female, 2 is male
+    noise_floor: whether to calculate a noise floor metric for the dataset
+    bootstrap_words: whether to bootstrap the words in the dataset
+    returns: the model results
+    '''
     df_use = extract_releasedata_withdist(ferrets, talker=talker, bootstrap_words=bootstrap_words)
     df_use2 = df_use.copy()
     # run_mixed_effects_model_absrxntime(df_use2, talker = talker)
@@ -1321,14 +1330,12 @@ def predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feat
                 same_list.append(0)
         #get the ratio of the same values
         print(sum(same_list)/len(same_list))
-
         df_use = df_use2
 
     dfx = df_use.loc[:, df_use.columns != col]
     if ferret_as_feature == False:
         col2 = 'ferret'
         dfx = dfx.loc[:, dfx.columns != col2]
-    # count the frequencies of each time a value is not nan by column in dfx
     # count the frequencies of each time a value is not nan by column in dfx
     counts = dfx.count(axis=0)
     # get the minimum value in the counts
@@ -1407,7 +1414,10 @@ def predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feat
     xg_reg, ypred, y_test, results = runlgbreleasetimes(dfx, df_use[col], paramsinput=best_params,
                                                         ferret_as_feature=ferret_as_feature, one_ferret=one_ferret,
                                                         ferrets=ferrets, talker=talker, noise_floor=noise_floor, bootstrap_words = bootstrap_words)
+    return results
 def compare_bootstrap_permutation_test_results():
+    '''compare the permutation importance values with and without subsampling by plotting, supplmental figure'''
+
     load_dir = 'D:\mixedeffectmodelsbehavioural\models/figs/absolutereleasemodel/'
     array_female_raw = np.load(load_dir+'/talker1/'+'with_no_bootstrap_words/permutation_importance_array_talker_1.npy')
     array_female_bootstrap = np.load(load_dir+'/talker1/'+'permutation_importance_array_talker_1.npy')
@@ -1476,8 +1486,6 @@ def compare_bootstrap_permutation_test_results():
 def main():
     # compare_bootstrap_permutation_test_results()
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    # ferrets = ['F1815_Cruella']# , 'F2105_Clove']
-    # ferrets = ['F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
 
     predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=False, talker=2, noise_floor=False, bootstrap_words=True)
 
