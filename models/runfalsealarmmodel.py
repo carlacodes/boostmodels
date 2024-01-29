@@ -51,7 +51,6 @@ def get_axis_limits(ax, scale=1):
 
 
 
-# editing to extract different vars from df
 def plotpredictedversusactual(predictedrelease, dfuse):
     fig, ax = plt.subplots()
     ax.scatter(dfuse['realRelReleaseTimes'], predictedrelease, alpha=0.5)
@@ -84,50 +83,50 @@ def plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use):
     plt.show()
     print(accuracy)
 
-
-def runxgboostreleasetimes(df_use):
-    col = 'realRelReleaseTimes'
-    dfx = df_use.loc[:, df_use.columns != col]
-    # remove ferret as possible feature
-    col = 'ferret'
-
-    dfx = dfx.loc[:, dfx.columns != col]
-    dfx['pitchoftarg'] = dfx['pitchoftarg'].astype('category')
-    dfx['side'] = dfx['side'].astype('category')
-    dfx['talker'] = dfx['talker'].astype('category')
-    dfx['stepval'] = dfx['stepval'].astype('category')
-    dfx['pitchofprecur'] = dfx['pitchofprecur'].astype('category')
-    dfx['AM'] = dfx['AM'].astype('category')
-    dfx['DaysSinceStart'] = dfx['DaysSinceStart'].astype('category')
-    dfx['precur_and_targ_same'] = dfx['precur_and_targ_same'].astype('category')
-
-    X_train, X_test, y_train, y_test = train_test_split(dfx, df_use['realRelReleaseTimes'], test_size=0.2,
-                                                        random_state=42)
-    dtrain = xgb.DMatrix(X_train, label=y_train, enable_categorical=True)
-    dtest = xgb.DMatrix(X_test, label=y_test, enable_categorical=True)
-
-    param = {'max_depth': 2, 'eta': 1, 'objective': 'reg:squarederror'}
-    param['nthread'] = 4
-    param['eval_metric'] = 'auc'
-    xg_reg = xgb.XGBRegressor(tree_method='gpu_hist', colsample_bytree=0.3,
-                              learning_rate=0.1,
-                              max_depth=10, alpha=10, n_estimators=10, enable_categorical=True)
-    xg_reg.fit(X_train, y_train)
-    ypred = xg_reg.predict(X_test)
-    xgb.plot_importance(xg_reg)
-    plt.show()
-
-    kfold = KFold(n_splits=3, shuffle=True, random_state=42)
-    results = cross_val_score(xg_reg, X_train, y_train, scoring='neg_mean_squared_error', cv=kfold)
-
-    mse = mean_squared_error(ypred, y_test)
-    print("MSE: %.2f" % (mse))
-    print("negative MSE: %.2f%%" % (np.mean(results) * 100.0))
-    print(results)
-    shap_values = shap.TreeExplainer(xg_reg).shap_values(X_train)
-    shap.summary_plot(shap_values, X_train)
-    plt.show()
-    return xg_reg, ypred, y_test, results
+#
+# def runxgboostreleasetimes(df_use):
+#     col = 'realRelReleaseTimes'
+#     dfx = df_use.loc[:, df_use.columns != col]
+#     # remove ferret as possible feature
+#     col = 'ferret'
+#
+#     dfx = dfx.loc[:, dfx.columns != col]
+#     dfx['pitchoftarg'] = dfx['pitchoftarg'].astype('category')
+#     dfx['side'] = dfx['side'].astype('category')
+#     dfx['talker'] = dfx['talker'].astype('category')
+#     dfx['stepval'] = dfx['stepval'].astype('category')
+#     dfx['pitchofprecur'] = dfx['pitchofprecur'].astype('category')
+#     dfx['AM'] = dfx['AM'].astype('category')
+#     dfx['DaysSinceStart'] = dfx['DaysSinceStart'].astype('category')
+#     dfx['precur_and_targ_same'] = dfx['precur_and_targ_same'].astype('category')
+#
+#     X_train, X_test, y_train, y_test = train_test_split(dfx, df_use['realRelReleaseTimes'], test_size=0.2,
+#                                                         random_state=42)
+#     dtrain = xgb.DMatrix(X_train, label=y_train, enable_categorical=True)
+#     dtest = xgb.DMatrix(X_test, label=y_test, enable_categorical=True)
+#
+#     param = {'max_depth': 2, 'eta': 1, 'objective': 'reg:squarederror'}
+#     param['nthread'] = 4
+#     param['eval_metric'] = 'auc'
+#     xg_reg = xgb.XGBRegressor(tree_method='gpu_hist', colsample_bytree=0.3,
+#                               learning_rate=0.1,
+#                               max_depth=10, alpha=10, n_estimators=10, enable_categorical=True)
+#     xg_reg.fit(X_train, y_train)
+#     ypred = xg_reg.predict(X_test)
+#     xgb.plot_importance(xg_reg)
+#     plt.show()
+#
+#     kfold = KFold(n_splits=3, shuffle=True, random_state=42)
+#     results = cross_val_score(xg_reg, X_train, y_train, scoring='neg_mean_squared_error', cv=kfold)
+#
+#     mse = mean_squared_error(ypred, y_test)
+#     print("MSE: %.2f" % (mse))
+#     print("negative MSE: %.2f%%" % (np.mean(results) * 100.0))
+#     print(results)
+#     shap_values = shap.TreeExplainer(xg_reg).shap_values(X_train)
+#     shap.summary_plot(shap_values, X_train)
+#     plt.show()
+#     return xg_reg, ypred, y_test, results
 
 
 def objective(trial, X, y):
