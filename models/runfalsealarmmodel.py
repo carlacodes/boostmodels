@@ -1031,162 +1031,162 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     return xg_reg, ypred, y_test, results, shap_values1, X_train, y_train, bal_accuracy, shap_values2
 
 
-def runlgbfaornot(dataframe):
-    df_to_use = dataframe[
-        ["cosinesim", "pitchof0oflastword", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
-         "falsealarm", "pastcorrectresp", "pastcatchtrial", "trialNum", "time_elapsed", ]]
-
-    col = 'falsealarm'
-    dfx = df_to_use.loc[:, df_to_use.columns != col]
-    # remove ferret as possible feature
-
-    X_train, X_test, y_train, y_test = train_test_split(dfx, df_to_use['falsealarm'], test_size=0.2, random_state=123)
-    print(X_train.shape)
-    print(X_test.shape)
-
-    dtrain = lgb.Dataset(X_train, label=y_train)
-    dtest = lgb.Dataset(X_test, label=y_test)
-    params2 = {"n_estimators": 9300,
-               "is_unbalanced": True,
-               "colsample_bytree": 0.8163174226131737,
-               "alpha": 4.971464509571637,
-               "learning_rate": 0.2744671988597753,
-               "num_leaves": 530,
-               "max_depth": 15,
-               "min_data_in_leaf": 400,
-               "lambda_l1": 2,
-               "lambda_l2": 44,
-               "min_gain_to_split": 0.008680941888662716,
-               "bagging_fraction": 0.9,
-               "bagging_freq": 1,
-               "feature_fraction": 0.6000000000000001}
-
-    xg_reg = lgb.LGBMClassifier(objective="binary", random_state=123,
-                                **params2)
-
-    xg_reg.fit(X_train, y_train, eval_metric="cross_entropy_lambda", verbose=1000)
-    ypred = xg_reg.predict_proba(X_test)
-
-    kfold = KFold(n_splits=5, shuffle=True, random_state=123)
-    results_training = cross_val_score(xg_reg, X_train, y_train, scoring='balanced_accuracy', cv=kfold)
-    results = cross_val_score(xg_reg, X_test, y_test, scoring='accuracy', cv=kfold)
-    bal_accuracy = cross_val_score(xg_reg, X_test, y_test, scoring='balanced_accuracy', cv=kfold)
-    print("Accuracy on test set: %.2f%%" % (np.mean(results) * 100.0))
-    print(results)
-    print('Balanced Accuracy on test set: %.2f%%' % (np.mean(bal_accuracy) * 100.0))
-
-    shap_values1 = shap.TreeExplainer(xg_reg).shap_values(dfx)
-    explainer = shap.Explainer(xg_reg, dfx)
-    shap_values2 = explainer(X_train)
-    # shap.summary_plot(shap_values1, dfx, show=True, plot_type='dot')
-    shap.plots.beeswarm(shap_values2)
-
-    #export shap_values2 to pickle
-    with open('D:/behavmodelfigs/fa_or_not_model/shap_values2.pkl', 'wb') as f:
-        pickle.dump(shap_values2, f)
-
-    plt.subplots(figsize=(25, 25))
-    # shap.summary_plot(shap_values1, dfx, show=False)
-    shap.plots.bar(shap_values2, show=False)
-    fig, ax = plt.gcf(), plt.gca()
-    plt.title('Ranked list of features over their \n impact in predicting a false alarm', fontsize=18)
-    labels = [item.get_text() for item in ax.get_yticklabels()]
-    print(labels)
-    labels[11] = 'time to target presentation'
-    labels[10] = 'precursor F0'
-    labels[9] = 'trial number'
-    labels[8] = 'past trial was catch'
-    labels[7] = 'side of audio presentation'
-    labels[6] = 'talker'
-    labels[5] = 'past trial was correct'
-    labels[4] = 'AM'
-    labels[3] = 'intra-trial roving'
-    labels[2] = 'day since start of experiment week'
-    labels[1] = 'cosine similarity'
-    labels[0] = 'temporal similarity'
-    ax.set_yticklabels(labels)
-    fig.tight_layout()
-
-    plt.savefig('D:/behavmodelfigs/fa_or_not_model/ranked_features14091409.png', dpi=1000, bbox_inches="tight")
-    plt.show()
-
-    shap.dependence_plot("F0", shap_values1[0], dfx)  #
-    plt.show()
-    result = permutation_importance(xg_reg, X_test, y_test, n_repeats=10,
-                                    random_state=123, n_jobs=2)
-    sorted_idx = result.importances_mean.argsort()
-
-    fig, ax = plt.subplots(figsize=(20, 15))
-    ax.barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T)
-    ax.set_title("Permutation Importances (test set)")
-    fig.tight_layout()
-    plt.savefig('D:/behavmodelfigs/permutation_importance14091409.png', dpi=500)
-    plt.show()
-
-    fig, ax = plt.subplots(figsize=(15, 15))
-    shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "intra-F0 roving"])
-    fig.tight_layout()
-    plt.tight_layout()
-    plt.subplots_adjust(left=-10, right=0.5)
-
-    plt.show()
-    shap.plots.scatter(shap_values2[:, "F0"], color=shap_values2[:, "talker"])
-    plt.show()
-
-    shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "intra-F0 roving"], show=False)
-    plt.show()
-
-    shap.plots.scatter(shap_values2[:, "intra-F0 roving"], color=shap_values2[:, "talker"])
-    plt.show()
-
-    fig, ax = plt.subplots(figsize=(15, 15))
-    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"], show=False)
-    plt.title('False alarm model - trial number as a function of SHAP values, coloured by talker')
-    fig.tight_layout()
-    plt.show()
-
-    fig, ax = plt.subplots(figsize=(15, 15))
-    shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "intra-F0 roving"], show=False)
-    plt.title('False alarm model - SHAP values as a function of cosine similarity \n, coloured by intra trial roving')
-    fig.tight_layout()
-    plt.savefig('D:/behavmodelfigs/cosinesimdepenencyplot14091409.png', dpi=500)
-    plt.show()
-
-    shap.plots.scatter(shap_values2[:, "intra-F0 roving"], color=shap_values2[:, "cosinesim"], show=False)
-    plt.savefig('D:/behavmodelfigs/intratrialrovingcosinecolor14091409.png', dpi=500)
-
-    plt.show()
-    fig, ax = plt.subplots(figsize=(15, 15))
-    shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "pitchoftarg"], show=False)
-    plt.title('False alarm model - trial number as a function of SHAP values, coloured by pitch of target')
-    fig.tight_layout()
-    plt.savefig('D:/behavmodelfigs/trialnumcosinecolor14091409.png', dpi=500)
-    plt.show()
-
-    fig, ax = plt.subplots(figsize=(18, 15))
-    shap.plots.scatter(shap_values2[:, "time_elapsed"], color=shap_values2[:, "cosinesim"], show=False)
-    plt.title('shap values for FA model as a function of time since start of trial, coloured by cosine similarity')
-    fig.tight_layout()
-    plt.savefig('D:/behavmodelfigs/time_elapsedcosinecolor14091409.png', dpi=500)
-    plt.show()
-
-    shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "time_elapsed"], show=False)
-    plt.title('Cosine Similarity as a function of SHAP values, coloured by time_elapsed')
-    plt.savefig('D:/behavmodelfigs/cosinesimtime_elapsed14091409.png', dpi=500)
-    plt.show()
-
-    return xg_reg, ypred, y_test, results, shap_values1, X_train, y_train, bal_accuracy, shap_values2
+# def runlgbfaornot(dataframe):
+#     df_to_use = dataframe[
+#         ["cosinesim", "pitchof0oflastword", "talker", "side", "intra_trial_roving", "DaysSinceStart", "AM",
+#          "falsealarm", "pastcorrectresp", "pastcatchtrial", "trialNum", "time_elapsed", ]]
+#
+#     col = 'falsealarm'
+#     dfx = df_to_use.loc[:, df_to_use.columns != col]
+#     # remove ferret as possible feature
+#
+#     X_train, X_test, y_train, y_test = train_test_split(dfx, df_to_use['falsealarm'], test_size=0.2, random_state=123)
+#     print(X_train.shape)
+#     print(X_test.shape)
+#
+#     dtrain = lgb.Dataset(X_train, label=y_train)
+#     dtest = lgb.Dataset(X_test, label=y_test)
+#     params2 = {"n_estimators": 9300,
+#                "is_unbalanced": True,
+#                "colsample_bytree": 0.8163174226131737,
+#                "alpha": 4.971464509571637,
+#                "learning_rate": 0.2744671988597753,
+#                "num_leaves": 530,
+#                "max_depth": 15,
+#                "min_data_in_leaf": 400,
+#                "lambda_l1": 2,
+#                "lambda_l2": 44,
+#                "min_gain_to_split": 0.008680941888662716,
+#                "bagging_fraction": 0.9,
+#                "bagging_freq": 1,
+#                "feature_fraction": 0.6000000000000001}
+#
+#     xg_reg = lgb.LGBMClassifier(objective="binary", random_state=123,
+#                                 **params2)
+#
+#     xg_reg.fit(X_train, y_train, eval_metric="cross_entropy_lambda", verbose=1000)
+#     ypred = xg_reg.predict_proba(X_test)
+#
+#     kfold = KFold(n_splits=5, shuffle=True, random_state=123)
+#     results_training = cross_val_score(xg_reg, X_train, y_train, scoring='balanced_accuracy', cv=kfold)
+#     results = cross_val_score(xg_reg, X_test, y_test, scoring='accuracy', cv=kfold)
+#     bal_accuracy = cross_val_score(xg_reg, X_test, y_test, scoring='balanced_accuracy', cv=kfold)
+#     print("Accuracy on test set: %.2f%%" % (np.mean(results) * 100.0))
+#     print(results)
+#     print('Balanced Accuracy on test set: %.2f%%' % (np.mean(bal_accuracy) * 100.0))
+#
+#     shap_values1 = shap.TreeExplainer(xg_reg).shap_values(dfx)
+#     explainer = shap.Explainer(xg_reg, dfx)
+#     shap_values2 = explainer(X_train)
+#     # shap.summary_plot(shap_values1, dfx, show=True, plot_type='dot')
+#     shap.plots.beeswarm(shap_values2)
+#
+#     #export shap_values2 to pickle
+#     with open('D:/behavmodelfigs/fa_or_not_model/shap_values2.pkl', 'wb') as f:
+#         pickle.dump(shap_values2, f)
+#
+#     plt.subplots(figsize=(25, 25))
+#     # shap.summary_plot(shap_values1, dfx, show=False)
+#     shap.plots.bar(shap_values2, show=False)
+#     fig, ax = plt.gcf(), plt.gca()
+#     plt.title('Ranked list of features over their \n impact in predicting a false alarm', fontsize=18)
+#     labels = [item.get_text() for item in ax.get_yticklabels()]
+#     print(labels)
+#     labels[11] = 'time to target presentation'
+#     labels[10] = 'precursor F0'
+#     labels[9] = 'trial number'
+#     labels[8] = 'past trial was catch'
+#     labels[7] = 'side of audio presentation'
+#     labels[6] = 'talker'
+#     labels[5] = 'past trial was correct'
+#     labels[4] = 'AM'
+#     labels[3] = 'intra-trial roving'
+#     labels[2] = 'day since start of experiment week'
+#     labels[1] = 'cosine similarity'
+#     labels[0] = 'temporal similarity'
+#     ax.set_yticklabels(labels)
+#     fig.tight_layout()
+#
+#     plt.savefig('D:/behavmodelfigs/fa_or_not_model/ranked_features14091409.png', dpi=1000, bbox_inches="tight")
+#     plt.show()
+#
+#     shap.dependence_plot("F0", shap_values1[0], dfx)  #
+#     plt.show()
+#     result = permutation_importance(xg_reg, X_test, y_test, n_repeats=10,
+#                                     random_state=123, n_jobs=2)
+#     sorted_idx = result.importances_mean.argsort()
+#
+#     fig, ax = plt.subplots(figsize=(20, 15))
+#     ax.barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T)
+#     ax.set_title("Permutation Importances (test set)")
+#     fig.tight_layout()
+#     plt.savefig('D:/behavmodelfigs/permutation_importance14091409.png', dpi=500)
+#     plt.show()
+#
+#     fig, ax = plt.subplots(figsize=(15, 15))
+#     shap.plots.scatter(shap_values2[:, "talker"], color=shap_values2[:, "intra-F0 roving"])
+#     fig.tight_layout()
+#     plt.tight_layout()
+#     plt.subplots_adjust(left=-10, right=0.5)
+#
+#     plt.show()
+#     shap.plots.scatter(shap_values2[:, "F0"], color=shap_values2[:, "talker"])
+#     plt.show()
+#
+#     shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "intra-F0 roving"], show=False)
+#     plt.show()
+#
+#     shap.plots.scatter(shap_values2[:, "intra-F0 roving"], color=shap_values2[:, "talker"])
+#     plt.show()
+#
+#     fig, ax = plt.subplots(figsize=(15, 15))
+#     shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "talker"], show=False)
+#     plt.title('False alarm model - trial number as a function of SHAP values, coloured by talker')
+#     fig.tight_layout()
+#     plt.show()
+#
+#     fig, ax = plt.subplots(figsize=(15, 15))
+#     shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "intra-F0 roving"], show=False)
+#     plt.title('False alarm model - SHAP values as a function of cosine similarity \n, coloured by intra trial roving')
+#     fig.tight_layout()
+#     plt.savefig('D:/behavmodelfigs/cosinesimdepenencyplot14091409.png', dpi=500)
+#     plt.show()
+#
+#     shap.plots.scatter(shap_values2[:, "intra-F0 roving"], color=shap_values2[:, "cosinesim"], show=False)
+#     plt.savefig('D:/behavmodelfigs/intratrialrovingcosinecolor14091409.png', dpi=500)
+#
+#     plt.show()
+#     fig, ax = plt.subplots(figsize=(15, 15))
+#     shap.plots.scatter(shap_values2[:, "trialNum"], color=shap_values2[:, "pitchoftarg"], show=False)
+#     plt.title('False alarm model - trial number as a function of SHAP values, coloured by pitch of target')
+#     fig.tight_layout()
+#     plt.savefig('D:/behavmodelfigs/trialnumcosinecolor14091409.png', dpi=500)
+#     plt.show()
+#
+#     fig, ax = plt.subplots(figsize=(18, 15))
+#     shap.plots.scatter(shap_values2[:, "time_elapsed"], color=shap_values2[:, "cosinesim"], show=False)
+#     plt.title('shap values for FA model as a function of time since start of trial, coloured by cosine similarity')
+#     fig.tight_layout()
+#     plt.savefig('D:/behavmodelfigs/time_elapsedcosinecolor14091409.png', dpi=500)
+#     plt.show()
+#
+#     shap.plots.scatter(shap_values2[:, "cosinesim"], color=shap_values2[:, "time_elapsed"], show=False)
+#     plt.title('Cosine Similarity as a function of SHAP values, coloured by time_elapsed')
+#     plt.savefig('D:/behavmodelfigs/cosinesimtime_elapsed14091409.png', dpi=500)
+#     plt.show()
+#
+#     return xg_reg, ypred, y_test, results, shap_values1, X_train, y_train, bal_accuracy, shap_values2
 
 
 def runfalsealarmpipeline(ferrets, optimization=False, ferret_as_feature=False):
+    '''run the false alarm model pipeline
+    :param ferrets: list of ferrets to use
+    :param optimization: whether to run the optimization or not
+    :param ferret_as_feature: whether to use ferret as a feature or not
+    :return: xg_reg, ypred, y_test, results, shap_values1, X_train, y_train, bal_accuracy, shap_values2'''
     resultingfa_df = behaviouralhelperscg.get_false_alarm_behavdata(ferrets=ferrets, startdate='04-01-2020',
                                                               finishdate='01-03-2023')
-    #extract female talker
-    # resultingfa_df = resultingfa_df[resultingfa_df['talker'] == 1.0]
-    #get the min of thepitchof0oflastword and find which rows have that value
-    # minpitch = np.min(resultingfa_df['pitchof0oflastword'].values)
-    # minpitchrows = resultingfa_df[resultingfa_df['pitchof0oflastword'] == minpitch]
-    # np.min(resultingfa_df['pitchof0oflastword'].values)
+
 
     if len(ferrets) == 1:
         one_ferret = True
