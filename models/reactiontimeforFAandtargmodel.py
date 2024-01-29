@@ -287,17 +287,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
                         'in all', 'weather', 'and']
 
     kfold = KFold(n_splits=5)
-    # results = cross_val_score(xg_reg, X_train, y_train, scoring='neg_mean_squared_error', cv=kfold)
-    # results_mae = cross_val_score(xg_reg, X_train, y_train, scoring='neg_median_absolute_error', cv=kfold)
-    # # mse_train = mean_squared_error(ypred, y_test)
-    #
-    # mse_test = cross_val_score(xg_reg, X_test, y_test, scoring='neg_mean_squared_error', cv=kfold)
-    # mae_test  = cross_val_score(xg_reg, X_test, y_test, scoring='neg_median_absolute_error', cv=kfold)
-    #
-    # print("MSE on test: %.4f" % (np.mean(mse_test)))
-    # print("negative MSE training: %.2f%%" % (np.mean(results) * 100.0))
-    # print("MAE on test: %.4f" % (np.mean(mae_test)))
-    # print("negative MAE training: %.2f%%" % (np.mean(results_mae) * 100.0))
+
 
     results = cross_val_score(xg_reg, X_train, y_train, scoring='neg_mean_squared_error', cv=kfold)
     results_mae = cross_val_score(xg_reg, X_train, y_train, scoring='neg_median_absolute_error', cv=kfold)
