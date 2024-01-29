@@ -35,6 +35,11 @@ def shap_summary_plot(
 def get_axis_limits(ax, scale=1):
     return ax.get_xlim()[0] * scale, (ax.get_ylim()[1] * scale)
 def run_optuna_study_releasetimes(X, y):
+    '''
+    :param X: training data
+    :param y: target variable
+    :return: the optuna study results
+    '''
     study = optuna.create_study(direction="minimize", study_name="LGBM regressor")
     func = lambda trial: objective_releasetimes(trial, X, y)
     study.optimize(func, n_trials=1000)
