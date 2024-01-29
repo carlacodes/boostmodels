@@ -859,6 +859,11 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
 
 
 def extract_releasedata_withdist(ferrets, talker=1, bootstrap_words = True):
+    ''' This function extracts the data from the behavioural database and then subsamples the data so that the number of pitch conditions is realtively equal.
+    :param ferrets: list of ferrets to include in the analysis
+    :param talker: talker to include in the analysis
+    :param bootstrap_words: whether to bootstrap the words or not
+    :return: df_use: dataframe with the subsampled data'''
     df = behaviouralhelperscg.get_df_rxntimebydist(ferrets=ferrets, includefa=True, startdate='04-01-2020',
                                                    finishdate='01-03-2023', talker_param=talker)
     df_intra = df[df['intra_trial_roving'] == 1]
