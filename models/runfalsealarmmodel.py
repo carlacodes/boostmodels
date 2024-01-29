@@ -571,9 +571,7 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
 
 
 
-    # shap.summary_plot(shap_values1, dfx, show=False, color=cmapsummary)
     shap.plots.beeswarm(shap_values2, show=False,  color=cmapcustom)
-    # shap.plots.bees(shap_values1, dfx, show=False, color=cmapsummary)
     fig, ax = plt.gcf(), plt.gca()
     # plt.title('Ranked list of features over their \n impact in predicting a false alarm', fontsize=18)
     # Get the plot's Patch objects
@@ -591,7 +589,6 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     colorbar.tick_params(labelsize=30)
     #change the label of the color bar
     colorbar.set_ylabel(None)
-    # ax.set_xlabel('Log(odds) FA', fontsize=36)
     fig.tight_layout()
     plt.savefig(fig_dir / 'ranked_features1409.png', dpi=1000, bbox_inches="tight")
     plt.show()
@@ -607,17 +604,12 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     plt.savefig(fig_dir / 'permutation_importance1409.png', dpi=500)
     plt.show()
 
-
-    # partial dependency plots
-
     # Plot the scatter plot with the colormap
     shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "intra-F0 roving"], cmap=cmapcustom)
     shap.plots.scatter(shap_values2[:, "ferret ID"], color=shap_values2[:, "F0"], cmap=cmapcustom)
     shap.plots.scatter(shap_values2[:, "audio side"], color=shap_values2[:, "ferret ID"], cmap=cmapcustom)
     shap.plots.scatter(shap_values2[:, "F0"], color=shap_values2[:, "time in trial"], cmap=cmapcustom)
     shap.plots.scatter(shap_values2[:, "past resp. correct"], color=shap_values2[:, "ferret ID"], cmap=cmapcustom)
-
-
 
     fig, ax = plt.subplots(figsize=(5, 5))
     shap.plots.scatter(shap_values2[:, "F0"], color=shap_values2[:, "time in trial"], show= False,  ax=ax, cmap=cmapcustom)
@@ -648,8 +640,6 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     ax.set_xlabel('Ferret ID', fontsize=18)
     ax.set_ylabel('Log(odds) FA', fontsize=18)  # Corrected y-label
 
-    # plt.title('Mean SHAP value over ferret ID', fontsize=18)
-
     # Optionally add a legend
     ax.legend(title="side of audio", fontsize=14, title_fontsize=16)
     # change legend labels
@@ -657,7 +647,6 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     labels = ['left', 'right']
     ax.legend(handles=handles[0:], labels=labels[0:], title="side of audio", fontsize=14, title_fontsize=16)
     ax.set_title('Side of audio presentation', fontsize=25)
-
     plt.savefig(fig_dir / 'ferretIDbysideofaudio_violin1409.png', dpi=500, bbox_inches='tight')
     plt.show()
 
@@ -678,10 +667,6 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     ax.set_xticklabels(['F1702', 'F1815', 'F1803', 'F2002', 'F2105'], fontsize=18, rotation=45)
     ax.set_xlabel('Ferret ID', fontsize=18)
     ax.set_ylabel('Log(odds) FA', fontsize=18)  # Corrected y-label
-
-    # plt.title('Mean SHAP value over ferret ID', fontsize=18)
-
-    # Optionally add a legend
     ax.legend(title="side of audio", fontsize=14, title_fontsize=16)
     # change legend labels
     handles, labels = ax.get_legend_handles_labels()
@@ -691,10 +676,6 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
 
     plt.savefig(fig_dir / 'ferretIDbyINTRA_violin1409.png', dpi=500, bbox_inches='tight')
     plt.show()
-
-
-
-
 
     fig, ax = plt.subplots(figsize=(5, 5))
     shap.plots.scatter(shap_values2[:, "F0"], color=shap_values2[:, "time in trial"], show=False, ax=ax,
@@ -707,9 +688,6 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     ax.set_xticks([1, 2, 3, 4, 5])
     ax.set_xticklabels(['109', '124', '144', '191', '251'], fontsize=18, rotation=45)
     plt.savefig(fig_dir / 'F0bytimestart_supplemental1409.png', dpi=500, bbox_inches='tight')
-    # plt.xlim(0.8, 5.2)
-    # plt.xticks([1, 2, 3, 4, 5], labels = ["109", "124", "144", "191", "251"])
-    # shap.plots.scatter(shap_values2[:, "time since start of trial"], color=shap_values2[:, "F0"], show= True, ax =ax,  cmap=cmapcustom)
     plt.show()
 
     fig, ax = plt.subplots(figsize=(5, 5))
@@ -725,9 +703,6 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     ax.set_xticks([1, 2, 3, 4, 5])
 
     plt.savefig(fig_dir / 'timestartbyF0_supplemental1409.png', dpi=500, bbox_inches='tight')
-    # plt.xlim(0.8, 5.2)
-    # plt.xticks([1, 2, 3, 4, 5], labels = ["109", "124", "144", "191", "251"])
-    # shap.plots.scatter(shap_values2[:, "time since start of trial"], color=shap_values2[:, "F0"], show= True, ax =ax,  cmap=cmapcustom)
     plt.show()
 
     fig, ax = plt.subplots(figsize=(5, 5))
@@ -984,10 +959,6 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
 
     ax_dict = fig.subplot_mosaic(mosaic)
 
-
-    # fig, axes = plt.subplots(nrows=2, ncols=3, figsize=(text_width_inches, text_width_inches),
-    #                          gridspec_kw={'width_ratios': [1, 1, 1], 'height_ratios': [1, 1], 'hspace': 0.2})
-    # Plot the elbow plot
     ax_dict['A'].plot(feature_labels, cumulative_importances, marker='o', color='slategray')
     # ax_dict['A'].set_xlabel('Features', fontsize=18)
     ax_dict['A'].set_ylabel('Cumulative \n feature importance', fontsize=15)
@@ -996,11 +967,6 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
     ax_dict['A'].set_xticklabels(feature_labels, fontsize = 10, rotation=20, ha='right')  # rotate x-axis labels for better readability
     ax_dict['A'].tick_params(axis='x', which='major', labelsize=12)
 
-    # rotate x-axis labels for better readability
-    # summary_img = mpimg.imread(fig_dir / 'ranked_features1409.png')
-    # ax_dict['B'].imshow(summary_img, aspect='auto', )
-    # ax_dict['B'].axis('off')  # Turn off axis ticks and labels
-    # ax_dict['B'].set_xlabel('Log(odds) FA', fontsize=18)
     axmini = ax_dict['B']
     shap_summary_plot(shap_values2, feature_labels, show_plots=False, ax=axmini, cmap=cmapcustom)
     ax_dict['B'].set_yticklabels(np.flip(feature_labels), fontsize=12, rotation=45, fontfamily='sans-serif')
@@ -1012,7 +978,6 @@ def plotfalsealarmmodel(xg_reg, ypred, y_test, results, X_train, y_train, X_test
 
 
     ax_dict['D'].barh(X_test.columns[sorted_idx], result.importances[sorted_idx].mean(axis=1).T, color='slategray')
-
     ax_dict['D'].set_xlabel("Permutation importance", fontsize=18)
     ax_dict['D'].set_yticklabels((X_test.columns[sorted_idx]), fontsize=10, rotation=20, ha='right')
 
