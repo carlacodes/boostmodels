@@ -410,14 +410,20 @@ def run_mixed_effects_model_falsealarm(df):
 
 
 def runlgbfaornotwithoptuna(dataframe, paramsinput, ferret_as_feature=False, one_ferret = False, ferrets = None):
+    ''' run lightgbm model for false alarm model
+    :param dataframe: dataframe
+    :param paramsinput: parameters for lightgbm
+    :param ferret_as_feature: whether to include ferret as a feature
+    :param one_ferret: whether to run for one ferret
+    :param ferrets: ferrets
+    :return: model, predicted labels, true labels, cross validation scores, training features, training labels, test features, balanced accuracy, features'''
+
     if ferret_as_feature:
         df_to_use = dataframe[
             [ "time_elapsed", "ferret", "trialNum", "talker", "side", "intra_trial_roving",
              "pastcorrectresp", "pastcatchtrial",
              "falsealarm", "pitchof0oflastword"]]
-        # dfuse = df[["pitchoftarg", "pastcatchtrial", "trialNum", "talker", "side", "precur_and_targ_same",
-        #             "timeToTarget",
-        #             "realRelReleaseTimes", "ferret", "pastcorrectresp"]]
+
         labels = ["time in trial", "ferret ID", "trial no.", "talker", "audio side",
                   "intra-F0 roving", "past resp. correct", "past trial catch", "falsealarm", "F0"]
         labels_mixed_effects = ["time_since_trial_start", "ferret_ID", "trial_number", "talker", "audio_side",
@@ -443,11 +449,7 @@ def runlgbfaornotwithoptuna(dataframe, paramsinput, ferret_as_feature=False, one
     X_train, X_test, y_train, y_test = train_test_split(dfx, df_to_use['falsealarm'], test_size=0.2, random_state=123)
     print(X_train.shape)
     print(X_test.shape)
-    # ran optuna study 06/03/2022 to find best params, balanced accuracy 57%, accuracy 63%
-    # paramsinput = {'colsample_bytree': 0.7024634011442671, 'alpha': 15.7349076305505, 'is_unbalanced': True,
-    #                'n_estimators': 6900, 'learning_rate': 0.3579458041084967, 'num_leaves': 1790, 'max_depth': 4,
-    #                'min_data_in_leaf': 200, 'lambda_l1': 0, 'lambda_l2': 24, 'min_gain_to_split': 2.34923345270416,
-    #                'bagging_fraction': 0.9, 'bagging_freq': 12, 'feature_fraction': 0.9}
+
 
     xg_reg = lgb.LGBMClassifier(objective="binary", random_state=123,
                                 **paramsinput)
