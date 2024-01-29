@@ -52,6 +52,10 @@ def get_axis_limits(ax, scale=1):
 
 
 def plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use):
+    ''' plot predicted versus actual correct response in the form of a confusion matrix
+    :param predictedcorrectresp: predicted correct response
+    :param dfcat_use: dataframe
+    :return: none'''
     fig, ax = plt.subplots()
     ax.scatter(dfcat_use['correctresp'], predictedcorrectresp, alpha=0.5)
     ax.set_xlabel('Actual Correct Response')
@@ -65,6 +69,7 @@ def plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use):
     accuracy = sklearn.metrics.accuracy_score(dfcat_use['correctresp'], np.round(predictedcorrectresp))
     plt.show()
     print(accuracy)
+    return
 
 #
 # def runxgboostreleasetimes(df_use):
