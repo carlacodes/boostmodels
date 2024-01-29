@@ -1151,6 +1151,11 @@ def run_correctrxntime_model(ferrets, optimization=False, ferret_as_feature=Fals
                                                         ferret_as_feature=ferret_as_feature, noise_floor=noise_floor)
 
 def run_mixed_effects_model_absrxntime(df, talker =1):
+    '''run a mixed effects model on the absolute reaction time data
+    df: dataframe with the absolute reaction time data
+    talker: talker type, 1 is female, 2 is male
+    returns: the model results'''
+
     #split the data into training and test set
     #relabel the labels by addding underscore for each label
     female_word_labels = ['release_time', 'instruments', 'when a', 'sailor', 'in a small', 'craft', 'faces', 'of the might',
