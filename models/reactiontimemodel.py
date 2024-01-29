@@ -55,20 +55,12 @@ def run_optuna_study_releasetimes(X, y):
     return study
 
 def objective_releasetimes(trial, X, y):
-    # param_grid = {
-    #     # "device_type": trial.suggest_categorical("device_type", ['gpu']),
-    # #     colsample_bytree = 0.3, learning_rate = 0.1,
-    # # max_depth = 10, alpha = 10, n_estimators = 10, random_state = 42, verbose = 1
-    #     "colsample_bytree": trial.suggest_float("colsample_bytree", 0.1, 0.6),
-    #     "alpha": trial.suggest_float("alpha", 5, 15),
-    #     "n_estimators": trial.suggest_int("n_estimators", 2, 100, step=2),
-    #     "learning_rate": trial.suggest_float("learning_rate", 0.01, 0.3),
-    #     "max_depth": trial.suggest_int("max_depth", 5, 20),
-    #     "bagging_fraction": trial.suggest_float(
-    #         "bagging_fraction", 0.1, 0.95, step=0.1
-    #     ),
-    #     "bagging_freq": trial.suggest_int("bagging_freq", 0, 30, step=1),
-    # }
+    '''Run an optimisation study for the correct release times model
+    :param trial: optuna trial
+    :param X: training data
+    :param y: target variable
+    :return: mean cross validation score'''
+
     param_grid = {
         "colsample_bytree": trial.suggest_float("colsample_bytree", 0.1, 1.0),
         "alpha": trial.suggest_float("alpha", 5, 15),
@@ -726,6 +718,10 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature = False, one_fe
     return xg_reg, ypred, y_test, results
 
 def extract_release_times_data(ferrets):
+    ''' this function extracts the release times data from the behavioural data
+    :param ferrets: list of ferrets to include
+    :return df: dataframe with the release times data'''
+
     df = behaviouralhelperscg.get_df_behav(ferrets=ferrets, includefaandmiss=False, startdate='04-01-2020', finishdate='01-03-2023')
     #switch talker values so 1 is 2, and 2 is 1 simultaneously
     df['talker'] = df['talker'].replace({1: 2, 2: 1})
@@ -928,6 +924,13 @@ def run_mixed_effects_model_correctrxntime(df):
     result.to_csv(f"D:\mixedeffectmodelsbehavioural\models/mixedeffects_csvs/correctrxntimemodel_mixed_effect_results.csv")
     return result
 def run_correctrxntime_model(ferrets, optimization = False, ferret_as_feature = False, noise_floor = False):
+    '''this function runs the LGBM model on the reaction time data
+    :param ferrets: list of ferrets to include
+    :param optimization: whether to run the optimization or not
+    :param ferret_as_feature: whether to include ferret as a feature or not
+    :param noise_floor: whether to shuffle the release times column 100 times to see if the model is predicting the noise floor
+    :return: xg_reg: the trained model, ypred: the predicted values, y_test: the true values, results: the results of the model'''
+
     df_use = extract_release_times_data(ferrets)
     #export to csv
     df_use.to_csv('D:\dfformixedmodels\correctrxntime_data.csv')
