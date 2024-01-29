@@ -1259,33 +1259,6 @@ def runfalsealarmpipeline(ferrets, optimization=False, ferret_as_feature=False):
     #then reconcatenate the three dfs
     resultingfa_df = pd.concat([df_nofa_intra, df_fa_intra, df_nofa_inter, df_fa_inter, df_nofa_control, df_fa_control], axis = 0)
 
-    #
-    # df_intra = resultingfa_df[resultingfa_df['intra_trial_roving'] == 1]
-    # df_inter = resultingfa_df[resultingfa_df['inter_trial_roving'] == 1]
-    # df_control = resultingfa_df[resultingfa_df['control_trial'] == 1]
-    # # now we need to balance the data, if it's a fifth more than the other, we need to sample it down
-    # if len(df_intra) > len(df_inter)*1.2:
-    #     df_intra = df_intra.sample(n=len(df_inter), random_state=123)
-    # elif len(df_inter) > len(df_intra)*1.2:
-    #     df_inter = df_inter.sample(n=len(df_intra), random_state=123)
-    #
-    # if len(df_control) > len(df_intra)*1.2:
-    #     df_control = df_control.sample(n=len(df_intra), random_state=123)
-    # elif len(df_control) > len(df_inter)*1.2:
-    #     df_control = df_control.sample(n=len(df_inter), random_state=123)
-    #
-    # resultingfa_df = pd.concat([df_intra, df_inter, df_control], axis = 0)
-
-    # subsample from the distribution of df_miss
-
-    # find the middle point between the length of df
-
-
-
-    # resultingfa_df = pd.concat([df_nofa, df_fa], axis=0)
-
-    #find all the df rows where ferret == 0
-    df_ferret0 = resultingfa_df[resultingfa_df['ferret'] == 0]
     filepath = Path('D:/dfformixedmodels/falsealarmmodel_dfuse.csv')
     filepath.parent.mkdir(parents=True, exist_ok=True)
 
@@ -1309,135 +1282,139 @@ def runfalsealarmpipeline(ferrets, optimization=False, ferret_as_feature=False):
         resultingfa_df, params, ferret_as_feature=ferret_as_feature, ferrets = ferrets,  one_ferret=one_ferret)
     return xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2
 
+#
+# def run_reaction_time_fa_pipleine_female(ferrets):
+#     resultingdf = behaviouralhelperscg.get_reactiontime_data(ferrets=ferrets, startdate='04-01-2020',
+#                                                              finishdate='01-10-2022')
+#     df_use = resultingdf.loc[:, resultingdf.columns != 'ferret']
+#     df_use = df_use.loc[df_use['intra_trial_roving'] == 0]
+#     df_use = df_use.loc[df_use['talker'] == 1]
+#     df_use = df_use.loc[:, df_use.columns != 'time_elapsed']
+#     df_use = df_use.loc[:, df_use.columns != 'stepval']
+#     df_use = df_use.loc[:, df_use.columns != 'side']
+#     df_use = df_use.loc[:, df_use.columns != 'AM']
+#     df_use = df_use.loc[:, df_use.columns != 'distractor_or_fa']
+#
+#     df_use = df_use.loc[:, df_use.columns != 'realRelReleaseTimes']
+#
+#     col = 'centreRelease'
+#     dfx = df_use.loc[:, df_use.columns != col]
+#     # remove ferret as possible feature
+#     col = 'ferret'
+#     col2 = ['target', 'startResponseTime', 'distractors', 'recBlock', 'lickRelease2', 'lickReleaseCount',
+#             'PitchShiftMat', 'attenOrder', 'dDurs', 'tempAttens', 'currAttenList', 'attenList', 'fName', 'Level',
+#             'dates', 'ferretname', 'noiseType', 'noiseFile']
+#     dfx = dfx.loc[:, dfx.columns != col]
+#     # for name in col2:
+#     #     dfx = dfx.loc[:, dfx.columns != name]
+#     for column in dfx.columns:
+#         if column == 'AM' or column == 'side':
+#             pass
+#         elif column.isnumeric() == False:
+#             dfx = dfx.loc[:, dfx.columns != column]
+#         elif column.isnumeric():
+#             pass
+#
+#     X_train, X_test, y_train, y_test = train_test_split(dfx, df_use['centreRelease'], test_size=0.2,
+#                                                         random_state=123)
+#
+#     dtrain = lgb.Dataset(X_train, label=y_train)
+#     dtest = lgb.Dataset(X_test, label=y_test)
+#
+#     param = {'max_depth': 2, 'eta': 1, 'objective': 'reg:squarederror'}
+#     param['nthread'] = 4
+#     param['eval_metric'] = 'auc'
+#     evallist = [(dtrain, 'train'), (dtest, 'eval')]
+#     # bst = xgb.train(param, dtrain, num_round, evallist)
+#     xg_reg = lgb.LGBMRegressor(colsample_bytree=0.3, learning_rate=0.1,
+#                                max_depth=10, alpha=10, n_estimators=10, verbose=1)
+#
+#     xg_reg.fit(X_train, y_train, eval_metric='neg_mean_squared_error', verbose=1)
+#     ypred = xg_reg.predict(X_test)
+#     lgb.plot_importance(xg_reg)
+#     plt.title('feature importances for the LGBM release times model (both hits and false alarms)')
+#     plt.show()
+#     kfold = KFold(n_splits=10)
+#     results = cross_val_score(xg_reg, X_train, y_train, scoring='neg_mean_squared_error', cv=kfold)
+#     mse_test = mean_squared_error(ypred, y_test)
+#     print('mse test for female talker model: ', mse_test)
+#     print('mse train for female talker model: ', results.mean())
+#
+#     shap_values1 = shap.TreeExplainer(xg_reg).shap_values(X_train)
+#     fig, ax = plt.subplots(figsize=(15, 65))
+#     shap.summary_plot(shap_values1, X_train, show=False)
+#     plt.title('Ranked list of features over their \n impact in predicting reaction time, female talker', fontsize=18)
+#     fig.tight_layout()
+#     plt.savefig('D:/behavmodelfigs/ranked_features_rxntimealarmhitmodel14091409.png', dpi=500)
+#     plt.show()
+#
+#     return resultingdf
 
-def run_reaction_time_fa_pipleine_female(ferrets):
-    resultingdf = behaviouralhelperscg.get_reactiontime_data(ferrets=ferrets, startdate='04-01-2020',
-                                                             finishdate='01-10-2022')
-    df_use = resultingdf.loc[:, resultingdf.columns != 'ferret']
-    df_use = df_use.loc[df_use['intra_trial_roving'] == 0]
-    df_use = df_use.loc[df_use['talker'] == 1]
-    df_use = df_use.loc[:, df_use.columns != 'time_elapsed']
-    df_use = df_use.loc[:, df_use.columns != 'stepval']
-    df_use = df_use.loc[:, df_use.columns != 'side']
-    df_use = df_use.loc[:, df_use.columns != 'AM']
-    df_use = df_use.loc[:, df_use.columns != 'distractor_or_fa']
-
-    df_use = df_use.loc[:, df_use.columns != 'realRelReleaseTimes']
-
-    col = 'centreRelease'
-    dfx = df_use.loc[:, df_use.columns != col]
-    # remove ferret as possible feature
-    col = 'ferret'
-    col2 = ['target', 'startResponseTime', 'distractors', 'recBlock', 'lickRelease2', 'lickReleaseCount',
-            'PitchShiftMat', 'attenOrder', 'dDurs', 'tempAttens', 'currAttenList', 'attenList', 'fName', 'Level',
-            'dates', 'ferretname', 'noiseType', 'noiseFile']
-    dfx = dfx.loc[:, dfx.columns != col]
-    # for name in col2:
-    #     dfx = dfx.loc[:, dfx.columns != name]
-    for column in dfx.columns:
-        if column == 'AM' or column == 'side':
-            pass
-        elif column.isnumeric() == False:
-            dfx = dfx.loc[:, dfx.columns != column]
-        elif column.isnumeric():
-            pass
-
-    X_train, X_test, y_train, y_test = train_test_split(dfx, df_use['centreRelease'], test_size=0.2,
-                                                        random_state=123)
-
-    dtrain = lgb.Dataset(X_train, label=y_train)
-    dtest = lgb.Dataset(X_test, label=y_test)
-
-    param = {'max_depth': 2, 'eta': 1, 'objective': 'reg:squarederror'}
-    param['nthread'] = 4
-    param['eval_metric'] = 'auc'
-    evallist = [(dtrain, 'train'), (dtest, 'eval')]
-    # bst = xgb.train(param, dtrain, num_round, evallist)
-    xg_reg = lgb.LGBMRegressor(colsample_bytree=0.3, learning_rate=0.1,
-                               max_depth=10, alpha=10, n_estimators=10, verbose=1)
-
-    xg_reg.fit(X_train, y_train, eval_metric='neg_mean_squared_error', verbose=1)
-    ypred = xg_reg.predict(X_test)
-    lgb.plot_importance(xg_reg)
-    plt.title('feature importances for the LGBM release times model (both hits and false alarms)')
-    plt.show()
-    kfold = KFold(n_splits=10)
-    results = cross_val_score(xg_reg, X_train, y_train, scoring='neg_mean_squared_error', cv=kfold)
-    mse_test = mean_squared_error(ypred, y_test)
-    print('mse test for female talker model: ', mse_test)
-    print('mse train for female talker model: ', results.mean())
-
-    shap_values1 = shap.TreeExplainer(xg_reg).shap_values(X_train)
-    fig, ax = plt.subplots(figsize=(15, 65))
-    shap.summary_plot(shap_values1, X_train, show=False)
-    plt.title('Ranked list of features over their \n impact in predicting reaction time, female talker', fontsize=18)
-    fig.tight_layout()
-    plt.savefig('D:/behavmodelfigs/ranked_features_rxntimealarmhitmodel14091409.png', dpi=500)
-    plt.show()
-
-    return resultingdf
-
-
-
-def run_reaction_time_fa_pipleine_male(ferrets):
-    resultingdf = behaviouralhelperscg.get_reactiontime_data(ferrets=ferrets, startdate='04-01-2020',
-                                                             finishdate='01-10-2023')
-    df_use = resultingdf.loc[:, resultingdf.columns != 'ferret']
-    df_use = df_use.loc[df_use['intra_trial_roving'] == 0]
-    df_use = df_use.loc[df_use['talker'] == 2]
-    df_use = df_use.loc[:, df_use.columns != 'time_elapsed']
-    df_use = df_use.loc[:, df_use.columns != 'stepval']
-    df_use = df_use.loc[:, df_use.columns != 'side']
-    df_use = df_use.loc[:, df_use.columns != 'AM']
-
-    df_use = df_use.loc[:, df_use.columns != 'distractor_or_fa']
-    df_use = df_use.loc[:, df_use.columns != 'realRelReleaseTimes']
-
-    col = 'centreRelease'
-    dfx = df_use.loc[:, df_use.columns != col]
-    col = 'ferret'
-    dfx = dfx.loc[:, dfx.columns != col]
-
-    for column in dfx.columns:
-        if column == 'AM' or column == 'side':
-            pass
-        elif column.isnumeric() == False:
-            dfx = dfx.loc[:, dfx.columns != column]
-        elif column.isnumeric():
-            pass
-
-    X_train, X_test, y_train, y_test = train_test_split(dfx, df_use['centreRelease'], test_size=0.2,
-                                                        random_state=123)
-
-    param = {'max_depth': 2, 'eta': 1, 'objective': 'reg:squarederror'}
-    param['nthread'] = 4
-    param['eval_metric'] = 'auc'
-    xg_reg = lgb.LGBMRegressor(colsample_bytree=0.3, learning_rate=0.1,
-                               max_depth=10, alpha=10, n_estimators=10, verbose=1)
-
-    xg_reg.fit(X_train, y_train, eval_metric='neg_mean_squared_error', verbose=1)
-    ypred = xg_reg.predict(X_test)
-    lgb.plot_importance(xg_reg)
-    plt.title('feature importances for the LGBM release times model (both hits and false alarms)')
-    plt.show()
-    kfold = KFold(n_splits=10)
-    results = cross_val_score(xg_reg, X_train, y_train, scoring='neg_mean_squared_error', cv=kfold)
-    mse_test = mean_squared_error(ypred, y_test)
-    print('mse test: ', mse_test)
-    print('mse train: ', results.mean())
-
-    shap_values1 = shap.TreeExplainer(xg_reg).shap_values(X_train)
-    fig, ax = plt.subplots(figsize=(15, 65))
-    shap.summary_plot(shap_values1, X_train, show=False)
-    plt.title('Ranked list of features over their \n impact in predicting reaction time, male talker', fontsize=18)
-    fig.tight_layout()
-    plt.savefig('D:/behavmodelfigs/ranked_features_rxntimealarmhitmodel_male14091409.png', dpi=500)
-    plt.show()
-
-    return resultingdf
+#
+#
+# def run_reaction_time_fa_pipleine_male(ferrets):
+#     resultingdf = behaviouralhelperscg.get_reactiontime_data(ferrets=ferrets, startdate='04-01-2020',
+#                                                              finishdate='01-10-2023')
+#     df_use = resultingdf.loc[:, resultingdf.columns != 'ferret']
+#     df_use = df_use.loc[df_use['intra_trial_roving'] == 0]
+#     df_use = df_use.loc[df_use['talker'] == 2]
+#     df_use = df_use.loc[:, df_use.columns != 'time_elapsed']
+#     df_use = df_use.loc[:, df_use.columns != 'stepval']
+#     df_use = df_use.loc[:, df_use.columns != 'side']
+#     df_use = df_use.loc[:, df_use.columns != 'AM']
+#
+#     df_use = df_use.loc[:, df_use.columns != 'distractor_or_fa']
+#     df_use = df_use.loc[:, df_use.columns != 'realRelReleaseTimes']
+#
+#     col = 'centreRelease'
+#     dfx = df_use.loc[:, df_use.columns != col]
+#     col = 'ferret'
+#     dfx = dfx.loc[:, dfx.columns != col]
+#
+#     for column in dfx.columns:
+#         if column == 'AM' or column == 'side':
+#             pass
+#         elif column.isnumeric() == False:
+#             dfx = dfx.loc[:, dfx.columns != column]
+#         elif column.isnumeric():
+#             pass
+#
+#     X_train, X_test, y_train, y_test = train_test_split(dfx, df_use['centreRelease'], test_size=0.2,
+#                                                         random_state=123)
+#
+#     param = {'max_depth': 2, 'eta': 1, 'objective': 'reg:squarederror'}
+#     param['nthread'] = 4
+#     param['eval_metric'] = 'auc'
+#     xg_reg = lgb.LGBMRegressor(colsample_bytree=0.3, learning_rate=0.1,
+#                                max_depth=10, alpha=10, n_estimators=10, verbose=1)
+#
+#     xg_reg.fit(X_train, y_train, eval_metric='neg_mean_squared_error', verbose=1)
+#     ypred = xg_reg.predict(X_test)
+#     lgb.plot_importance(xg_reg)
+#     plt.title('feature importances for the LGBM release times model (both hits and false alarms)')
+#     plt.show()
+#     kfold = KFold(n_splits=10)
+#     results = cross_val_score(xg_reg, X_train, y_train, scoring='neg_mean_squared_error', cv=kfold)
+#     mse_test = mean_squared_error(ypred, y_test)
+#     print('mse test: ', mse_test)
+#     print('mse train: ', results.mean())
+#
+#     shap_values1 = shap.TreeExplainer(xg_reg).shap_values(X_train)
+#     fig, ax = plt.subplots(figsize=(15, 65))
+#     shap.summary_plot(shap_values1, X_train, show=False)
+#     plt.title('Ranked list of features over their \n impact in predicting reaction time, male talker', fontsize=18)
+#     fig.tight_layout()
+#     plt.savefig('D:/behavmodelfigs/ranked_features_rxntimealarmhitmodel_male14091409.png', dpi=500)
+#     plt.show()
+#
+#     return resultingdf
 
 
 def plot_correct_response_byside(ferrets):
+    '''Plot the proportion of correct responses by side, irrespective of talker and ferret
+    ferrets: list of ferrets to include in the analysis
+    :return: df_left, df_right: dataframes containing the correct responses by side
+    '''
     resultingdf = behaviouralhelperscg.get_reactiontime_data(ferrets=ferrets, startdate='04-01-2020',
                                                             finishdate='01-10-2022')
     df_use = resultingdf
