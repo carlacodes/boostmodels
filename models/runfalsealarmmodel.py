@@ -155,28 +155,7 @@ def objective(trial, X, y):
         "min_sum_hessian_in_leaf": trial.suggest_float("min_sum_hessian_in_leaf", 0.1, 50),
     }
 
-    # param_grid = {
-    #     "boosting_type": trial.suggest_categorical("boosting_type", ["gbdt", "dart"]),
-    #     "num_leaves": trial.suggest_int("num_leaves", 20, 200),
-    #     "max_depth": trial.suggest_int("max_depth", 5, 15),
-    #     "learning_rate": trial.suggest_float("learning_rate", 0.01, 0.1, log=True),
-    #     "subsample_for_bin": trial.suggest_int("subsample_for_bin", 20000, 300000, step=20000),
-    #     "min_child_samples": trial.suggest_int("min_child_samples", 20, 100),
-    #     "reg_alpha": trial.suggest_float("reg_alpha", 0.0, 1.0),
-    #     "reg_lambda": trial.suggest_float("reg_lambda", 0.0, 1.0),
-    #     "colsample_bytree": trial.suggest_float("colsample_bytree", 0.6, 1.0),
-    #     "subsample": trial.suggest_float("subsample", 0.6, 1.0),
-    #     "min_split_gain": trial.suggest_float("min_split_gain", 0.0, 1.0),
-    #     "min_child_weight": trial.suggest_float("min_child_weight", 0.001, 10),
-    #     "n_estimators": trial.suggest_int("n_estimators", 100, 1000, step=100),
-    #     "scale_pos_weight": trial.suggest_float("scale_pos_weight", 1, 10),
-    #     "feature_fraction": trial.suggest_float("feature_fraction", 0.5, 1),
-    #     "bagging_fraction": trial.suggest_float("bagging_fraction", 0.5, 1),
-    #     "bagging_freq": trial.suggest_int("bagging_freq", 1, 10),
-    #     "max_bin": trial.suggest_int("max_bin", 100, 500),
-    #     "min_data_in_leaf": trial.suggest_int("min_data_in_leaf", 10, 100),
-    #     "min_sum_hessian_in_leaf": trial.suggest_float("min_sum_hessian_in_leaf", 0.1, 10),
-    # }
+
 
     cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=123)
 
