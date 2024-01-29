@@ -1540,7 +1540,9 @@ def plot_reaction_times_intra(ferrets):
 
 
 def plot_reaction_times_interandintra(ferrets):
-    # plot the reaction times by animal
+    ''' plot the reaction times by animal
+    :param ferrets: list of ferrets to include in the analysis
+    :return: df_by_ferret: dictionary of dataframes containing the reaction times by ferret'''
     resultingdf = behaviouralhelperscg.get_reactiontime_data(ferrets=ferrets, startdate='04-01-2020',
                                                              finishdate='01-10-2022')
     resultingdf['lickReleasefromtrialstart'] = resultingdf['lickRelease'] - resultingdf['startTrialLick']
