@@ -130,27 +130,12 @@ def plotpredictedversusactualcorrectresponse(predictedcorrectresp, dfcat_use):
 
 
 def objective(trial, X, y):
-    # param_grid = {
-    #     # "device_type": trial.suggest_categorical("device_type", ['gpu']),
-    #     "colsample_bytree": trial.suggest_float("colsample_bytree", 0.3, 1),
-    #     "alpha": trial.suggest_float("alpha", 1, 20),
-    #     "is_unbalanced": trial.suggest_categorical("is_unbalanced", [True]),
-    #     "n_estimators": trial.suggest_int("n_estimators", 100, 10000, step=100),
-    #     "learning_rate": trial.suggest_float("learning_rate", 0.001, 0.5),
-    #     "num_leaves": trial.suggest_int("num_leaves", 20, 3000, step=10),
-    #     "max_depth": trial.suggest_int("max_depth", 3, 20),
-    #     "min_data_in_leaf": trial.suggest_int("min_data_in_leaf", 200, 10000, step=100),
-    #     "lambda_l1": trial.suggest_int("lambda_l1", 0, 100, step=2),
-    #     "lambda_l2": trial.suggest_int("lambda_l2", 0, 100, step=2),
-    #     "min_gain_to_split": trial.suggest_float("min_gain_to_split", 0, 15),
-    #     "bagging_fraction": trial.suggest_float(
-    #         "bagging_fraction", 0.2, 0.95, step=0.1
-    #     ),
-    #     "bagging_freq": trial.suggest_int("bagging_freq", 1, 20, step=1),
-    #     "feature_fraction": trial.suggest_float(
-    #         "feature_fraction", 0.2, 0.95, step=0.1
-    #     ),
-    # }
+    ''' run objective function for optuna
+    :param trial: optuna trial
+    :param X: features
+    :param y: labels
+    :return: mean cross validation score'''
+
     param_grid = {
         "colsample_bytree": trial.suggest_float("colsample_bytree", 0.1, 1),
         "subsample": trial.suggest_float("subsample", 0.1, 1),
