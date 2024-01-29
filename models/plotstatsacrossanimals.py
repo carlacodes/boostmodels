@@ -542,9 +542,6 @@ def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'inter_trial_
         stats_dict_all[pitch]['dprime'] = CalculateStats.dprime(hits, false_alarms)
         stats_dict_all[pitch]['bias'] = CalculateStats.bias(hits, false_alarms)
 
-
-
-
     if kw_test == True:
         kw_dict_rxntime = {}
         columns_to_compare = ['realRelReleaseTimes']
@@ -576,9 +573,6 @@ def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'inter_trial_
                     print(dunn_results)
                 # Print Kruskal-Wallis test results
 
-
-
-
                 k = len(group_values)
                 n = len(data_total)
 
@@ -586,16 +580,8 @@ def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'inter_trial_
                 eta_squared = (kw_stat - k + 1) / (n - k)
 
                 # compute the effect size
-
                 kw_dict_rxntime[column][ferret] = {'kw_stat': kw_stat, 'p_value': kw_p_value,
                                    'effect_size': eta_squared, 'dunn_result': dunn_results}
-        # for key, value in kw_dict_all.items():
-        #     kw_dict['hits'][key] = stats.kruskal(value['hits'], value['false_alarms'], value['correct_response'], value['dprime'], value['bias'])
-        #     kw_dict['false_alarms'][key] = stats.kruskal(value['false_alarms'], value['correct_response'], value['dprime'], value['bias'])
-        #     kw_dict['correct_response'][key] = stats.kruskal(value['correct_response'], value['dprime'], value['bias'])
-        #     kw_dict['dprime'][key] = stats.kruskal(value['dprime'], value['bias'])
-        #     kw_dict['bias'][key] = stats.kruskal(value['bias'])
-        #export kw_dict to csv
         kw_dict_all_df = pd.DataFrame.from_dict(kw_dict_rxntime)
         kw_dict_all_df.to_csv(f'D:\mixedeffectmodelsbehavioural\metrics/kw_dict_bypitch.csv')
         return stats_dict_all, stats_dict, kw_dict
@@ -603,6 +589,10 @@ def run_stats_calc_by_pitch(df, ferrets, stats_dict, pitch_param = 'inter_trial_
     return stats_dict_all, stats_dict
 
 def plot_stats(stats_dict_all_combined, stats_dict_combined):
+    ''' plot general stats across all ferrets
+    :param stats_dict_all_combined: dictionary of stats across all ferrets
+    :param stats_dict_combined: dictionary of stats by ferret
+    :return: None'''
 
     #generate bar plots
     stats = pd.DataFrame.from_dict(stats_dict_all_combined)
