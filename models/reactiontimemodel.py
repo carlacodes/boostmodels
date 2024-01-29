@@ -23,21 +23,14 @@ def shap_summary_plot(
         ax=None,
         cmap = "viridis",
     ):
-        """Visualize the given SHAP values as a summary plot.
-        Parameters
-        ----------
-        shap_values : numpy.array
-            Matrix of SHAP values (# samples x # features)
-        feature_labels : list
-            Names of the features (length # features)
-        ax : matplotlib Axes object, optional
-            Axes object to plot on. If None is passed, new figure and axes objects
-            will be created.
-        Returns
-        -------
-        matplotlib.figure.Figure
-            Figure object housing the summary plot
-        """
+    ''' visualize the SHAP summary plot
+    :param shap_values2: SHAP values
+    :param feature_labels: feature labels
+    :param ax: axis
+    :param cmap: color map
+    :return: SHAP summary plot
+    '''
+
 
     plt.rcParams['font.family'] = 'sans-serif'
 
