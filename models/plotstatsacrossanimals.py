@@ -1,6 +1,5 @@
 import scikit_posthocs as sp
 from statsmodels.stats.multicomp import MultiComparison
-from statsmodels.stats.multicomp import pairwise_tukeyhsd
 from matplotlib.colors import ListedColormap
 import matplotlib.font_manager as fm
 from statsmodels.stats.anova import AnovaRM
@@ -12,12 +11,14 @@ from helpers.calculate_stats import *
 
 
 def kw_test(df):
+    '''run a kruskal wallis test on the data
+    :param df: dataframe
+    :return: kw_dict'''
+
     conditions = ['inter_trial_roving', 'intra_trial_roving', 'control_trial']
     columns_to_compare = ['realRelReleaseTimes']
-
     # Create an empty dictionary to store results
     kw_dict = {}
-
     # Iterate over each unique talker
     for talker in df['talker'].unique():
         kw_dict[talker] = {}
@@ -69,103 +70,22 @@ def kw_test(df):
                 kw_dict[talker][column][ferret]['p_value'] = kw_p_value
                 kw_dict[talker][column][ferret]['effect_size'] = eta_squared
                 kw_dict[talker][column][ferret]['dunn_result'] = dunn_results
-    # #export kw_dict to csv
-    # kw_dict_df = pd.DataFrame.from_dict({(i,j,k): kw_dict[i][j][k]
-    #                         for i in kw_dict.keys()
-    #                         for j in kw_dict[i].keys()
-    #                         for k in kw_dict[i][j].keys()},
-    #                       orient='index')
-    # kw_dict_df.to_csv('D:\mixedeffectmodelsbehavioural\metrics/kw_dict_by_roving_type.csv')
 
     kw_dict_all_df = pd.DataFrame.from_dict(kw_dict)
     kw_dict_all_df.to_csv(f'D:\mixedeffectmodelsbehavioural\metrics/kw_dict_byrovetype.csv')
-
     return kw_dict
-
-# def kw_test(df):
-#     conditions = ['inter_trial_roving', 'intra_trial_roving', 'control_trial']
-#     columns_to_compare = ['hit', 'falsealarm', 'realRelReleaseTimes']
-#
-#     # run kw test on each talker comparing between the three conditions
-#     talkers = df['talker'].unique()
-#     kw_dict = {}
-#
-#     for column in columns_to_compare:
-#         kw_dict[column] = {}
-#         for condition in conditions:
-#             kw_dict[column][condition] = {}
-#             for talker in talkers:
-#                 data = df[df['talker'] == talker]
-#                 if column == 'hit' or column == 'realRelReleaseTimes' :
-#                     data = data[data['catchTrial'] != 1]
-#                     #drop na values
-#                     data = data.dropna(subset=[column])
-#                 group_values = []
-#
-#                 # Get data for the current column, condition, and talker
-#                 for cond in conditions:
-#                     group_values.append(data[(data[cond] == 1) & (data['talker'] == talker)][column])
-#
-#                 # Perform Kruskal-Wallis test for the current column, condition, and talker
-#                 kw_stat, kw_p_value = stats.kruskal(*group_values)
-#                 data_total = np.concatenate(group_values)
-#
-#                 k = len(group_values)
-#                 n = len(data_total)
-#
-#                 # Calculate Eta-squared effect size
-#                 eta_squared = (kw_stat - k + 1) / (n - k)
-#
-#                 #compute the effect size
-#
-#                 kw_dict[column][condition][talker] = {'kw_stat': kw_stat, 'p_value': kw_p_value, 'effect_size': eta_squared}
-#                 #calculate
-#
-#     return kw_dict
-
-# def kw_test2(df):
-#     conditions = ['inter_trial_roving', 'intra_trial_roving', 'control_trial']
-#     columns_to_compare = ['hit', 'falsealarm', 'realRelReleaseTimes']
-#
-#     talkers = df['talker'].unique()
-#     kw_dict = {}
-#
-#     for column in columns_to_compare:
-#         kw_dict[column] = {}
-#         for condition in conditions:
-#             kw_dict[column][condition] = {}
-#             for talker in talkers:
-#                 data = df[df['talker'] == talker]
-#                 if column in ['hit', 'realRelReleaseTimes']:
-#                     data = data[data['catchTrial'] != 1]
-#                     data = data.dropna(subset=[column])
-#
-#                 group_values = [data[(data[cond] == 1) & (data['talker'] == talker)][column] for cond in conditions]
-#                 kw_stat, kw_p_value = stats.kruskal(*group_values)
-#                 data_total = np.concatenate(group_values)
-#
-#                 k = len(group_values)
-#                 n = len(data_total)
-#
-#                 eta_squared = (kw_stat - k + 1) / (n - k)
-#
-#                 kw_dict[column][condition][talker] = {'kw_stat': kw_stat, 'p_value': kw_p_value,
-#                                                       'effect_size': eta_squared}
-#
-#     return kw_dict
 
 
 def run_stats_calc(df, ferrets, pitch_param = 'control_trial'):
+    '''run stats calculations on the dataframe
+    :param df: dataframe
+    :param ferrets: list of ferrets
+    :param pitch_param: pitch parameter
+    :return: stats_dict_all, stats_dict'''
 
     df_noncatchnoncorrection = df[(df['catchTrial'] == 0) & (df['correctionTrial'] == 0) & (df[pitch_param] == 1)]
     df_catchnoncorrection = df[(df['catchTrial'] == 1) & (df['correctionTrial'] == 0) & (df[pitch_param] == 1)]
     df_noncorrection = df[(df['correctionTrial'] == 0) & (df[pitch_param] == 1)]
-    count = int(0)
-    # stats_dict[pitch_param] = {}
-    # stats_dict[pitch_param]['hits'] = {}
-    # stats_dict[pitch_param]['false_alarms'] = {}
-    # stats_dict[pitch_param]['correct_response'] = {}
-
     talkers = [1,2]
     stats_dict = {}
     stats_dict[1] = {}
