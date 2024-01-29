@@ -4,7 +4,7 @@ This is an implementation of lightGBM and SHAP to predict the probability of an 
 and classification trees. This code assumes you have put your behavioural data into a pandas dataframe where each factor or variable of interest is represented as a column.
 
 To set up:
-1. Install python 3.9
+1. Install python 3.9 (in this repository I used conda)
 2. git clone this repository
 3. cd into the repository
 4. run `pip install -r requirements.txt`
