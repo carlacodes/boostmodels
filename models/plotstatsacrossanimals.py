@@ -1,67 +1,15 @@
-import pandas as pd
-import sklearn.metrics
-# from rpy2.robjects import pandas2ri
-import seaborn as sns
-from sklearn.metrics import mean_squared_error
-from sklearn.model_selection import KFold
-from sklearn.model_selection import cross_val_score
-from sklearn.inspection import permutation_importance
 import scikit_posthocs as sp
 from statsmodels.stats.multicomp import MultiComparison
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
 from matplotlib.colors import ListedColormap
-
-import shap
-import matplotlib
-import lightgbm as lgb
-import optuna
+import matplotlib.font_manager as fm
 from statsmodels.stats.anova import AnovaRM
-
-from optuna.integration import LightGBMPruningCallback
-from sklearn.model_selection import StratifiedKFold
-import statsmodels.api as sm
 import pingouin as pg
-# scaler = MinMaxScaler()
-import os
 import scipy.stats as stats
-import xgboost as xgb
 import matplotlib.pyplot as plt
-# import rpy2.robjects.numpy2ri
-import matplotlib.colors as mcolors
-import sklearn
-from sklearn.model_selection import train_test_split
 from helpers.behaviouralhelpersformodels import *
 from helpers.calculate_stats import *
 
-
-# def kw_test(df):
-#     df_noncatchnoncorrection_intra = df[(df['catchTrial'] == 0) & (df['correctionTrial'] == 0) & (df['intra_trial_roving'] == 1)]
-#     df_catchnoncorrection_intra = df[(df['catchTrial'] == 1) & (df['correctionTrial'] == 0) & (df['intra_trial_roving'] == 1)]
-#     df_noncorrection_intra = df[(df['correctionTrial'] == 0) & (df['intra_trial_roving'] == 1)]
-#
-#     df_noncatchnoncorrection_inter = df[(df['catchTrial'] == 0) & (df['correctionTrial'] == 0) & (df['inter_trial_roving'] == 1)]
-#     df_catchnoncorrection_inter = df[(df['catchTrial'] == 1) & (df['correctionTrial'] == 0) & (df['inter_trial_roving'] == 1)]
-#     df_noncorrection_inter = df[(df['correctionTrial'] == 0) & (df['inter_trial_roving'] == 1)]
-#
-#     df_noncatchnoncorrection_control = df[(df['catchTrial'] == 0) & (df['correctionTrial'] == 0) & (df['control_trial'] == 1)]
-#     df_catchnoncorrection_control = df[(df['catchTrial'] == 1) & (df['correctionTrial'] == 0) & (df['control_trial'] == 1)]
-#     df_noncorrection_control = df[(df['correctionTrial'] == 0) & (df['control_trial'] == 1)]
-#
-#     #run kw test on each talker comparing between the three conditions inter control and intra
-#     talkers = [1,2]
-#     kw_dict = {}
-#     kw_dict['hits'] = {}
-#     kw_dict['false_alarms'] = {}
-#     kw_dict['correct_response'] = {}
-#     kw_dict['dprime'] = {}
-#     kw_dict['bias'] = {}
-#     for talker in talkers:
-#         kw_dict['hits'][talker] = stats.kruskal(df_noncatchnoncorrection[df_noncatchnoncorrection['talker'] == talker]['hit'], df_noncorrection[df_noncorrection['talker'] == talker]['falsealarm'], df_catchnoncorrection[df_catchnoncorrection['talker'] == talker]['response'] == 3)
-#         kw_dict['false_alarms'][talker] = stats.kruskal(df_noncorrection[df_noncorrection['talker'] == talker]['falsealarm'], df_catchnoncorrection[df_catchnoncorrection['talker'] == talker]['response'] == 3)
-#         kw_dict['correct_response'][talker] = stats.kruskal(df_catchnoncorrection[df_catchnoncorrection['talker'] == talker]['response'] == 3)
-#         kw_dict['dprime'][talker] = stats.kruskal(df_noncatchnoncorrection[df_noncatchnoncorrection['talker'] == talker]['hit'], df_noncorrection[df_noncorrection['talker'] == talker]['falsealarm'])
-#         kw_dict['bias'][talker] = stats.kruskal(df_noncatchnoncorrection[df_noncatchnoncorrection['talker'] == talker]['hit'], df_noncorrection[df_noncorrection['talker'] == talker]['falsealarm'])
-#
 
 def kw_test(df):
     conditions = ['inter_trial_roving', 'intra_trial_roving', 'control_trial']
@@ -918,12 +866,10 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
             multiplier += 1
 
     ax4.set_xticks([0.25, 1.25], ['Female', 'Male'])
-
     ax4.set_ylabel('d\'')
     ax4.set_title('d\'')
 
 
-    import matplotlib.font_manager as fm
 
     # ax1.annotate('a)', xy=get_axis_limits(ax1))
     # ax2.annotate('b)', xy=get_axis_limits(ax2))
