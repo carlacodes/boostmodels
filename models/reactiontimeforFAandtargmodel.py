@@ -168,6 +168,7 @@ def runlgbreleasetimes_for_a_ferret(data, paramsinput=None, ferret=1, ferret_nam
     cumulative_importances_combined = np.sum(np.abs(shap_values), axis=0)
     feature_labels = dfx.columns
     # Plot the elbow plot
+
     plt.figure(figsize=(10, 6))
     plt.plot(feature_labels, cumulative_importances_combined, marker='o', color='slategray')
     plt.xlabel('Features')
@@ -453,7 +454,7 @@ def runlgbreleasetimes(X, y, paramsinput=None, ferret_as_feature=False, one_ferr
         ax.set_title(
             'Elbow plot of cumulative feature importance in absolute reaction time model, ' + talker_word + ' talker',
             fontsize=15)
-        ax.set_xticklabels(feature_labels_words, rotation=35, ha='right',fontsize=20)
+        ax.set_xticklabels(feature_labels_words, rotation=35, ha='right',fontsize=10)
         plt.savefig(os.path.join((fig_savedir), str(talker) + 'elobowplot_1606_noannotation.pdf'), dpi=500, bbox_inches='tight')
         plt.show()
         if talker == 1:
@@ -1251,7 +1252,7 @@ def predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feat
     ferret_as_feature: whether to include ferret as a feature in the model
     talker: talker type, 1 is female, 2 is male
     noise_floor: whether to calculate a noise floor metric for the dataset
-    bootstrap_words: whether to bootstrap the words in the dataset
+    bootstrap_words: whether to bootstrap the words in the dataset so the number of non-target words is relatively equally distributed
     returns: the model results
     '''
     df_use = extract_releasedata_withdist(ferrets, talker=talker, bootstrap_words=bootstrap_words)
@@ -1437,7 +1438,7 @@ def compare_bootstrap_permutation_test_results():
 def main():
     # compare_bootstrap_permutation_test_results()
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=False, talker=1, noise_floor=False, bootstrap_words=True)
+    predict_rxn_time_with_dist_model(ferrets, optimization=False, ferret_as_feature=False, talker=2, noise_floor=False, bootstrap_words=True)
     # for ferret in ferrets:
     #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 1)
     #     predict_rxn_time_with_dist_model([ferret], optimization=False, ferret_as_feature=False, talker = 2)
