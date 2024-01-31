@@ -11,3 +11,15 @@ To set up:
 5. navigate to the models directory
 6. run  the selected model, i.e. `runfalsealarmmodel.py` for the false alarm model
 
+## Overview of models in this repository:
+1. `runfalsealarmmodel.py` - classifier to predict whether there will be a false alarm during a catch trial
+2. `reactiontimemodel.py` - regression model, predicts the reaction times of correct target trials
+3. `reactiontimeforFAandtargmodel.py` - regression model, predicts the absolute reaction time relative to the trial start solely based on the words presented in the trial
+4. `correctrespmissmodel.py` - predicts the probability of a miss/correct response during a target trial. <br>
+`plotstatsacrossanimals.py` - plots general psychophysics metrics
+## How to use this code
+1. Put your data into a pandas dataframe where each column is a variable of interest
+2. Change data paths as relevant and column names as relevant
+3. Use optuna to fine tune your hyperparameters
+4. Run the finalised model
+
