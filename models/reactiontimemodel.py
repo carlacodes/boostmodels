@@ -15,8 +15,9 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import sklearn
 from sklearn.model_selection import train_test_split
-from helpers.behaviouralhelpersformodels import * \
+from helpers.behaviouralhelpersformodels import *
 from pathlib import Path
+import pickle as pkl
 def shap_summary_plot(
         shap_values2,
         feature_labels,
@@ -954,6 +955,8 @@ def run_correctrxntime_model_for_a_ferret(ferrets, optimization = False, ferret_
     :return: xg_reg: the trained model, ypred: the predicted values, y_test: the true values, results: the results of the model
     '''
     df_use = extract_release_times_data(ferrets)
+    #export df_use to pkl file
+    pkl.dump(df_use, open('D:\mixedeffectmodelsbehavioural\models\pkl_files\correctrxntime_model_data.pkl', 'wb'))
     col = 'realRelReleaseTimes'
     dfx = df_use.loc[:, df_use.columns != col]
 
