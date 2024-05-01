@@ -1,4 +1,6 @@
+import numpy as np
 import scikit_posthocs as sp
+import scipy.stats
 from statsmodels.stats.multicomp import MultiComparison
 from matplotlib.colors import ListedColormap
 from statsmodels.stats.anova import AnovaRM
@@ -1336,6 +1338,31 @@ def compare_real_with_null(df, df_null):
         stats_dict_all_combined_null[2][pitch] = stats_dict_all_null[2][pitch]
         stats_dict_combined_null[1][pitch] = stats_dict_null[1][pitch]
         stats_dict_combined_null[2][pitch] = stats_dict_null[2][pitch]
+    #for each talker, compare the real data with the null distribution using a t-test
+    t_test_df = pd.DataFrame(
+        columns=['talker', 'pitch', 'statistic', 'pvalue', 'alternative', 'mean_real', 'mean_null', 'key'])
+    for talker in [1,2]:
+        for pitch in pitch_type_list:
+            for key in stats_dict_combined[talker][pitch].keys(): #stats_dict_combined[talker][pitch].keys()
+                real_data = stats_dict_combined[talker][pitch][key].values()
+                real_data = [x for x in real_data if str(x) != '-inf' and str(x) != 'nan' and  str(x) != 'inf']
+                null_data = stats_dict_combined_null[talker][pitch][key].values()
+                null_data = [x for x in null_data if str(x) != '-inf' and str(x) != 'NaN' and  str(x) != 'inf']
+                #remove all infs from null data
+                null_data = [x for x in null_data if x!='inf']
+                if key == 'dprime' or key == 'hits' or key == 'correct_response':
+                    ttest = stats.ttest_ind(real_data, null_data, alternative='greater')
+                    print(ttest)
+                    t_test_df = t_test_df.append({'talker': talker, 'pitch': pitch, 'key': key, 'statistic': ttest[0], 'pvalue': ttest[1], 'alternative': 'greater', 'mean_real': np.mean(real_data), 'mean_null': np.mean(null_data)}, ignore_index=True)
+                    #append to a dataframe of t test results
+
+                elif key == 'false_alarms_catch' or key == 'false_alarms':
+                    ttest = stats.ttest_ind(real_data, null_data, alternative='less')
+                    t_test_df = t_test_df.append({'talker': talker, 'pitch': pitch, 'key': key, 'statistic': ttest[0], 'pvalue': ttest[1], 'alternative': 'less', 'mean_real': np.mean(real_data), 'mean_null': np.mean(null_data)}, ignore_index=True)
+                    print(ttest)
+
+    #save t-test results to a csv
+    t_test_df.to_csv('D:/mixedeffectmodelsbehavioural//t_test_results.csv')
     return
 
 
