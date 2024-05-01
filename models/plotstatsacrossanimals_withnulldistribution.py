@@ -126,7 +126,7 @@ def run_stats_calc(df, ferrets, pitch_param = 'control_trial'):
 
             stats_dict[talker][pitch_param]['hits'][ferret] = np.mean(selected_ferret_talker_hitrate['hit'])
             stats_dict[talker][pitch_param]['false_alarms'][ferret] = np.mean(selected_ferret_all_talker['falsealarm'])
-            stats_dict[talker][pitch_param]['false_alarms_catch'][ferret] = np.mean(selected_ferret_all_talker['falsealarm'])
+            stats_dict[talker][pitch_param]['false_alarms_catch'][ferret] = np.mean(selected_ferret_catch_talker['falsealarm'])
 
             stats_dict[talker][pitch_param]['dprime'][ferret] = CalculateStats.dprime(np.mean(selected_ferret_talker_hitrate['hit']), np.mean(selected_ferret_all_talker['falsealarm']))
             stats_dict[talker][pitch_param]['bias'][ferret] = CalculateStats.bias(np.mean(selected_ferret_talker_hitrate['hit']), np.mean(selected_ferret_all_talker['falsealarm']))
@@ -743,8 +743,52 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
     ax4.set_xticks([0.25, 1.25], ['Female', 'Male'])
     ax4.set_ylabel('d\'')
     ax4.set_title('d\'')
-    plt.savefig('figs/proportion_hits_falsealarms_correctresp_dprime_bytalker_2706.png', dpi = 500, bbox_inches='tight')
+
+
+    plt.savefig('figs/proportion_hits_falsealarms_correctresp_dprime_bytalker_01052024.png', dpi = 500, bbox_inches='tight')
     plt.show()
+
+    #add an additional plot for catch trials during false alarms
+    fig, ax = plt.subplots()
+    multiplier = 0
+    for attribute, measurement in stats_dict_all_combined.items():
+        for talker, measurement_data in measurement.items():
+            print(measurement_data)
+            if multiplier < 3:
+                offset = width * multiplier
+            else:
+                offset = (gap_width) + (width * multiplier)
+            color = color_map(
+                np.where(np.array(list(measurement.keys())) == talker)[0][0])
+            if multiplier > 3:
+                label = talker
+            else:
+                label = '_nolegend_'
+            rects = ax.bar(offset, measurement_data['false_alarms_catch'], width, label=label, color=color)
+            #scatter plot the corresponding individual ferret data, each ferret is a different marker shape
+            marker_list = ['o', 's', '<', 'd', "*"]
+            count = 0
+            for ferret, ferret_data in stats_dict_combined[attribute][talker]['false_alarms_catch'].items():
+                #add jitter to offset
+                print('ferret', ferret)
+                print('ferret data', ferret_data)
+                if multiplier < 1:
+                    label_text = ferret
+                else:
+                    label_text = '_nolegend_'
+                offset_jitter = offset + np.random.uniform(-0.05, 0.05)
+                ax.scatter(offset_jitter, ferret_data, 25, color=color, marker=marker_list[count], label=label_text, edgecolors='black')
+                count += 1
+
+            multiplier += 1
+    ax.set_xticks([0.25, 1.25], ['Female', 'Male'])
+    ax.set_ylim(0, 1)
+    ax.set_ylabel('false alarms during catch trials')
+    ax.set_title('false alarms during catch trials')
+    plt.legend(fontsize=8, loc = 'upper right')
+
+    plt.savefig('figs/falsealarms_catch_bytalker_01052024.png', dpi=500, bbox_inches='tight')
+
     fig, ax = plt.subplots()
     multiplier = 0
     for attribute, measurement in stats_dict_all_combined.items():
@@ -784,7 +828,7 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
     ax.set_ylabel('bias', fontsize = 15)
     ax.set_title('Bias across talkers', fontsize = 18)
     plt.legend(fontsize=8, loc = 'lower right')
-    plt.savefig('figs/bias_bytalker_2706.png', dpi=500, bbox_inches='tight')
+    plt.savefig('figs/bias_bytalker_01052024.png', dpi=500, bbox_inches='tight')
     plt.show()
     return
 
@@ -1086,7 +1130,7 @@ def run_barplot_pipeline():
     :return: None'''
 
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    df = behaviouralhelperscg.get_stats_df(ferrets=ferrets, startdate='04-01-2016', finishdate='01-03-2023')
+    df = behaviouralhelperscg.get_stats_df(ferrets=ferrets, startdate='04-01-2016', finishdate='01-03-2023', path = 'D:/Data/L27andL28/')
     pitch_type_list = ['control_trial', 'inter_trial_roving', 'intra_trial_roving']
     stats_dict_all_combined = {}
     stats_dict_combined = {}
@@ -1266,9 +1310,10 @@ def run_repeated_anova(stats_dict_inter, stats_dict_intra, stats_dict_control):
 if __name__ == '__main__':
     run_simulated_releasetimes()
     stats_dict_empty = {}
-    run_barplot_pipeline()
+    # run_barplot_pipeline()
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    df = behaviouralhelperscg.get_stats_df(ferrets=ferrets, startdate='04-01-2016', finishdate='01-03-2023')
+    df = behaviouralhelperscg.get_stats_df(ferrets=ferrets, startdate='04-01-2016', finishdate='01-03-2023', path='D:/Data/L27andL28/')
+    df_null =behaviouralhelperscg.get_stats_df_null_distribution(ferrets=ferrets, startdate='04-01-2016', finishdate='01-03-2023', path='D:/Data/L27andL28/')
     kw_dict =  kw_test(df)
     stats_dict_all_inter, stats_dict_inter = run_stats_calc_by_pitch_mf(df, ferrets, stats_dict_empty, pitch_param='inter_trial_roving')
     stats_dict_all_intermf, stats_dict_intermf = run_stats_calc(df, ferrets, pitch_param='inter_trial_roving')

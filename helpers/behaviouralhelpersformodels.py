@@ -1000,6 +1000,226 @@ class behaviouralhelperscg():
 
         return bigdata
 
+    def get_stats_df_null_distribution(path=None,
+                                  output=None,
+                                  ferrets=None,
+                                  startdate=None,
+                                  finishdate=None):
+        if output is None:
+            output = behaviourOutput
+
+        if path is None:
+            path = behaviouralDataPath
+
+        allData_original, ferrets = extractAllFerretData(ferrets, path, startDate=startdate,
+                                                finishDate=finishdate)
+        #shuffle all elements of allData except lickRelease and startTrialLick
+        allData = allData_original.sample(frac=1).reset_index(drop=True)
+        allData['lickRelease'] = allData_original['lickRelease']
+        allData['startTrialLick'] = allData_original['startTrialLick']
+
+        len_of_data = {}
+        fs = 24414.062500
+        for i in range(0, len(ferrets)):
+            noncorrectiondata = allData[allData['correctionTrial'] == 0]
+            noncorrectiondata = noncorrectiondata[noncorrectiondata['currAtten'] == 0]
+            len_of_data[ferrets[i]] = len(noncorrectiondata[noncorrectiondata['ferret'] == i])
+
+        bigdata = pd.DataFrame()
+        numofferrets = allData['ferret'].unique()
+        for ferret in numofferrets:
+            print(ferret)
+            newdata = allData[allData['ferret'] == ferret]
+            newdata['targTimes'] = newdata['timeToTarget'] / fs
+
+            newdata['centreRelease'] = newdata['lickRelease'] - newdata['startTrialLick']
+            newdata['relReleaseTimes'] = newdata['centreRelease'] - newdata['targTimes']
+            newdata['realRelReleaseTimes'] = newdata['relReleaseTimes'] - newdata['absentTime']
+
+            distractors = newdata['distractors']
+            talkermat = {}
+            talkerlist = newdata['talker']
+
+            for i0 in range(0, len(distractors)):
+                talkermat[i0] = int(talkerlist.values[i0]) * np.ones(len(distractors.values[i0]))
+            talkermat = pd.Series(talkermat, index=talkermat.keys())
+
+            pitchshiftmat = newdata['PitchShiftMat']
+
+            precursorlist = newdata['distractors']
+            catchtriallist = newdata['catchTrial']
+            chosenresponse = newdata['response']
+            realrelreleasetimelist = newdata['realRelReleaseTimes']
+
+            stepval = np.empty(len(pitchshiftmat))
+            distractor_or_fa = np.empty(len(pitchshiftmat))
+
+            intra_trial_roving = []
+            inter_trial_roving = []
+            control_trial = []
+            pitchoftarg = []
+            f0_list = []
+            pitchofprecur = []
+            talkerlist2 = np.empty(len(pitchshiftmat))
+            falsealarm = np.empty(shape=(0, 0))
+            correctresp = np.empty(shape=(0, 0))
+
+            #classify hits as realRelRelease times between 0 and 2s
+            newdata['hit'] = (newdata['realRelReleaseTimes'] >= 0) & (newdata['realRelReleaseTimes'] <= 2)
+
+
+
+            for i in range(0, len(newdata['realRelReleaseTimes'].values)):
+                chosenresponseindex = chosenresponse.values[i]
+
+                realrelreleasetime = realrelreleasetimelist.values[i]
+
+                chosentrial = pitchshiftmat.values[i]
+                is_all_zero = np.all((chosentrial == 0))
+                chosentalker = talkerlist.values[i]
+
+                if is_all_zero or (isinstance(chosentrial, float) and( chosentalker ==2 or chosentalker==1)):
+                    control_trial.append(1)
+                else:
+                    control_trial.append(0)
+
+                if isinstance(chosentrial, float) or is_all_zero:
+                    chosentrial = talkermat.values[i].astype(int)
+                    intra_trial_roving.append(0)
+                else:
+                    intra_trial_roving.append(1)
+
+                if chosentalker == 3 or chosentalker == 5 or chosentalker == 8 or chosentalker == 13:
+                    inter_trial_roving.append(1)
+                else:
+                    inter_trial_roving.append(0)
+
+                chosendisttrial = precursorlist.values[i]
+                if chosentalker == 3:
+                    chosentalker = 1
+                if chosentalker == 8:
+                    chosentalker = 2
+                if chosentalker == 13:
+                    chosentalker = 2
+                if chosentalker == 5:
+                    chosentalker = 1
+                talkerlist2[i] = chosentalker
+
+                # if ((
+                #             chosenresponseindex == 0 or chosenresponseindex == 1) and realrelreleasetime >= 0) or chosenresponseindex == 3 or chosenresponseindex == 7:
+                if newdata['relReleaseTimes'].values[i] < 0:
+                    falsealarm = np.append(falsealarm, 1)
+                else:
+                    falsealarm = np.append(falsealarm, 0)
+                if ((
+                            chosenresponseindex == 0 or chosenresponseindex == 1) and realrelreleasetime >= 0) or chosenresponseindex == 3:
+                    correctresp = np.append(correctresp, 1)
+                else:
+                    correctresp = np.append(correctresp, 0)
+
+                targpos = np.where(chosendisttrial == 1)
+                try:
+                    targpos = int(targpos[0])
+                    precur_pos = targpos - 1
+
+                    if chosentrial[targpos] == 8.0:
+                        f0_list.append(float(3))
+                    elif chosentrial[targpos] == 13.0:
+                        f0_list.append(float(1))
+                    elif chosentrial[targpos] == 1.0:
+                        f0_list.append(float(4))
+                    else:
+                        f0_list.append(float(chosentrial[targpos]))
+
+                    if np.sum(newdata['dDurs'].values[i][:targpos]) / fs <= newdata['centreRelease'].values[i] - newdata['absentTime'].values[i] or newdata['response'].values[i] == 7:
+                        if chosentrial[targpos] == 8.0:
+                            pitchoftarg.append(float(3))
+                        elif chosentrial[targpos] == 13.0:
+                            pitchoftarg.append(float(1))
+                        elif chosentrial[targpos] == 1.0:
+                            pitchoftarg.append(float(4))
+                        else:
+                            pitchoftarg.append( float(chosentrial[targpos]))
+                    else:
+                        pitchoftarg.append(np.nan)
+
+                    if np.sum(newdata['dDurs'].values[i][:precur_pos]) / fs <= newdata['centreRelease'].values[i]- newdata['absentTime'].values[i] or newdata['response'].values[i] == 7:
+                        if chosentrial[precur_pos] == 8.0:
+                            pitchofprecur.append(float(3))
+                        elif chosentrial[precur_pos] == 13.0:
+                            pitchofprecur.append(float(1))
+                        elif chosentrial[precur_pos] == 1.0:
+                            pitchofprecur.append(float(4))
+                        else:
+                            pitchofprecur.append(float(chosentrial[precur_pos]))
+                    else:
+                        pitchofprecur.append(np.nan)
+                except:
+                    pitchoftarg.append(np.nan)
+                    pitchofprecur.append(np.nan)
+                    f0_list.append(np.nan)
+
+            falsealarm = falsealarm[~np.isnan(falsealarm)]
+            correctresp = correctresp[~np.isnan(correctresp)]
+
+            newdata['pitchoftarg'] = pitchoftarg
+            newdata['pitchofprecur'] = pitchofprecur
+
+            falsealarm = falsealarm.astype(int)
+
+
+            newdata['falsealarm'] = falsealarm.tolist()
+            newdata['intra_trial_roving'] = intra_trial_roving
+            newdata['inter_trial_roving'] = inter_trial_roving
+            newdata['control_trial'] = control_trial
+            newdata['correctresp'] = correctresp.tolist()
+            newdata['distractor_or_fa'] = distractor_or_fa.tolist()
+            newdata['talker'] = talkerlist2.tolist()
+            newdata['stepval'] = stepval.tolist()
+            newdata['timeToTarget'] = newdata['timeToTarget'] / 24414.0625
+            newdata['AM'] = newdata['AM'].astype(int)
+            newdata['f0'] = f0_list
+            newdata = newdata[newdata['distractor_or_fa'].values <= 57]
+
+            cosinesimfemale = np.load('D:/Stimuli/cosinesimvectorfemale.npy')
+            cosinesimmale = np.load('D:/Stimuli/cosinesimvectormale.npy')
+            temporalsimfemale = np.load('D:/Stimuli/temporalcorrfemale.npy')
+            temporalsimmale = np.load('D:/Stimuli/temporalcorrmale.npy')
+
+            distinds = newdata['distractor_or_fa'].values
+            distinds = distinds - 1;
+            correspondcosinelist = []
+            correspondtempsimlist = []
+            for i in range(len(distinds)):
+                if newdata['talker'].values[i] == 0:
+                    correspondcosinelist.append(cosinesimfemale[int(distinds[i])])
+                    correspondtempsimlist.append(temporalsimfemale[int(distinds[i])])
+                else:
+                    correspondcosinelist.append(cosinesimmale[int(distinds[i])])
+                    correspondtempsimlist.append(temporalsimmale[int(distinds[i])])
+            newdata['cosinesim'] = correspondcosinelist
+            newdata['temporalsim'] = correspondtempsimlist
+
+            newdata = newdata[(newdata.talker == 1) | (newdata.talker == 2) | (newdata.talker == 3) | (
+                    newdata.talker == 4) | (newdata.talker == 5)]
+            listtodrop = []
+            # Assuming `newdata` is a pandas DataFrame
+            for i3 in range (0, len(newdata)):
+                if np.any(newdata['PitchShiftMat'].values[i3] == 14) or np.any(newdata['PitchShiftMat'].values[i3] == 10):
+                    listtodrop.append(True)
+                else:
+                    listtodrop.append(False)
+            newdata = newdata[~np.array(listtodrop)]
+
+            # newdata = newdata[
+            #     (newdata.pitchofprecur == 1) | (newdata.pitchofprecur == 2) | (newdata.pitchofprecur == 3) | (
+            #             newdata.pitchofprecur == 4) | (newdata.pitchofprecur == 5) | (newdata.pitchofprecur.isnull())]
+
+            bigdata = bigdata.append(newdata)
+
+        return bigdata
+
+
     def get_reactiontime_data(path=None,
                               output=None,
                               ferrets=None,
