@@ -75,7 +75,7 @@ def kw_test(df):
     return kw_dict
 
 
-def run_stats_calc(df, ferrets, pitch_param = 'control_trial'):
+def run_stats_calc(df, ferrets, pitch_param = 'control_trial', null_distribution = False):
     '''run stats calculations on the dataframe
     :param df: dataframe
     :param ferrets: list of ferrets
@@ -119,8 +119,10 @@ def run_stats_calc(df, ferrets, pitch_param = 'control_trial'):
         for talker in talkers:
             selected_ferret_talker = selected_ferret[selected_ferret['talker'] == talker]
             selected_ferret_all_talker = selected_ferret_all[selected_ferret_all['talker'] == talker]
-
-            selected_ferret_talker_hitrate = selected_ferret_talker[selected_ferret_talker['response'] != 5]
+            if null_distribution:
+                selected_ferret_talker_hitrate = selected_ferret_talker[selected_ferret_talker['falsealarm'] == 0]
+            else:
+                selected_ferret_talker_hitrate = selected_ferret_talker[selected_ferret_talker['response'] != 5]
 
             selected_ferret_catch_talker = selected_ferret_catch[selected_ferret_catch['talker'] == talker]
 
@@ -1305,6 +1307,36 @@ def run_repeated_anova(stats_dict_inter, stats_dict_intra, stats_dict_control):
         print(anovaresults)
     return
 
+def compare_real_with_null(df, df_null):
+    '''compare the real data with a shuffled null distribution'''
+    pitch_type_list = ['control_trial', 'inter_trial_roving', 'intra_trial_roving']
+    stats_dict_all_combined = {}
+    stats_dict_combined = {}
+    stats_dict_all_combined[1] = {}
+    stats_dict_all_combined[2] = {}
+    stats_dict_combined[1] = {}
+    stats_dict_combined[2] = {}
+
+    stats_dict_all_combined_null = {}
+    stats_dict_combined_null = {}
+    stats_dict_all_combined_null[1] = {}
+    stats_dict_all_combined_null[2] = {}
+    stats_dict_combined_null[1] = {}
+    stats_dict_combined_null[2] = {}
+
+    for pitch in pitch_type_list:
+        stats_dict_all, stats_dict = run_stats_calc(df, ferrets, pitch_param=pitch)
+        stats_dict_all_combined[1][pitch] = stats_dict_all[1][pitch]
+        stats_dict_all_combined[2][pitch] = stats_dict_all[2][pitch]
+        stats_dict_combined[1][pitch] = stats_dict[1][pitch]
+        stats_dict_combined[2][pitch] = stats_dict[2][pitch]
+
+        stats_dict_all_null, stats_dict_null = run_stats_calc(df_null, ferrets, pitch_param=pitch, null_distribution=True)
+        stats_dict_all_combined_null[1][pitch] = stats_dict_all_null[1][pitch]
+        stats_dict_all_combined_null[2][pitch] = stats_dict_all_null[2][pitch]
+        stats_dict_combined_null[1][pitch] = stats_dict_null[1][pitch]
+        stats_dict_combined_null[2][pitch] = stats_dict_null[2][pitch]
+    return
 
 
 if __name__ == '__main__':
@@ -1314,6 +1346,7 @@ if __name__ == '__main__':
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
     df = behaviouralhelperscg.get_stats_df(ferrets=ferrets, startdate='04-01-2016', finishdate='01-03-2023', path='D:/Data/L27andL28/')
     df_null =behaviouralhelperscg.get_stats_df_null_distribution(ferrets=ferrets, startdate='04-01-2016', finishdate='01-03-2023', path='D:/Data/L27andL28/')
+    compare_real_with_null(df, df_null)
     kw_dict =  kw_test(df)
     stats_dict_all_inter, stats_dict_inter = run_stats_calc_by_pitch_mf(df, ferrets, stats_dict_empty, pitch_param='inter_trial_roving')
     stats_dict_all_intermf, stats_dict_intermf = run_stats_calc(df, ferrets, pitch_param='inter_trial_roving')
