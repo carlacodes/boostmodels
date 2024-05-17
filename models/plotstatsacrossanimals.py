@@ -1250,6 +1250,7 @@ if __name__ == '__main__':
     df = behaviouralhelperscg.get_stats_df(ferrets=ferrets, startdate='04-01-2016', finishdate='01-03-2023', path='D:/Data/L27andL28/')
     # kw_dict =  kw_test(df)
     #bin df by target presentation time
+    ##TODO: put in separate function
     bin_edges = np.arange(0, 5.1, 0.5)
     df['targtimes_bins'] = pd.cut(df['targTimes'], bins=bin_edges)
 
