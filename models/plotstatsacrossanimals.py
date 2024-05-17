@@ -1247,8 +1247,57 @@ if __name__ == '__main__':
     stats_dict_empty = {}
     # run_barplot_pipeline()
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    df = behaviouralhelperscg.get_stats_df(ferrets=ferrets, startdate='04-01-2016', finishdate='01-03-2023')
-    kw_dict =  kw_test(df)
+    df = behaviouralhelperscg.get_stats_df(ferrets=ferrets, startdate='04-01-2016', finishdate='01-03-2023', path='D:/Data/L27andL28/')
+    # kw_dict =  kw_test(df)
+    #bin df by target presentation time
+    bin_edges = np.arange(0, 5.1, 0.5)
+    df['targtimes_bins'] = pd.cut(df['targTimes'], bins=bin_edges)
+
+    dprime_results = pd.DataFrame()
+    for bin in df['targtimes_bins'].unique():
+        #filter the df
+        df_bin = df[df['targtimes_bins'] == bin]
+        #calculate the dprime
+        dprime_for_bin = CalculateStats.dprime(np.mean(df_bin['hit']), np.mean(df_bin['falsealarm']))
+        #append to a different dataframe
+        dprime_results = pd.concat([dprime_results, pd.DataFrame({'dprime': [dprime_for_bin], 'bin': [bin]})])
+
+    fig, ax = plt.subplots()
+    for pitchtype in ['control_trial', 'inter_trial_roving', 'intra_trial_roving']:
+        df_pitch = df[df[pitchtype] == 1]
+        dprime_results = pd.DataFrame()
+        df_pitch = df_pitch.dropna(subset=['targtimes_bins'])
+
+        for bin in df_pitch['targtimes_bins'].unique():
+            # filter the df
+            df_bin = df_pitch[df_pitch['targtimes_bins'] == bin]
+            # calculate the dprime
+            dprime_for_bin = CalculateStats.dprime(np.mean(df_bin['hit']), np.mean(df_bin['falsealarm']))
+            #get the standard error
+            # std_dev = np.sqrt((np.mean(df_bin['hit']) * (1 - np.mean(df_bin['hit'])) + np.mean(df_bin['falsealarm']) * (1 - np.mean(df_bin['falsealarm']))) / len(df_bin))
+            # append to a different dataframe
+            dprime_results = pd.concat([dprime_results, pd.DataFrame(
+                {'dprime': [dprime_for_bin], 'bin': [bin.mid]})])  # Use the midpoint of the interval
+        # plot the dprime
+        # plt.scatter(dprime_results['bin'], dprime_results['dprime'], label=pitchtype)
+        #add error bars
+        std_dev = np.std(dprime_results['dprime'])
+        standard_error = std_dev / np.sqrt(len(dprime_results['dprime']))
+        #make a y err column
+        dprime_results['std_error'] = standard_error
+
+        plt.errorbar(dprime_results['bin'], dprime_results['dprime'], yerr=dprime_results['std_error'], fmt='o', label = pitchtype)
+    plt.legend()
+    plt.xlabel('Target presentation time (s)')
+    plt.ylabel('dprime')
+    plt.title('dprime by target presentation time')
+    plt.savefig('figs/dprime_by_targetpresentationtime_17052024.png', dpi=500, bbox_inches='tight')
+    plt.show()
+
+
+
+    
+
     stats_dict_all_inter, stats_dict_inter = run_stats_calc_by_pitch_mf(df, ferrets, stats_dict_empty, pitch_param='inter_trial_roving')
     stats_dict_all_intermf, stats_dict_intermf = run_stats_calc(df, ferrets, pitch_param='inter_trial_roving')
     stats_dict_all_intra, stats_dict_intra = run_stats_calc(df, ferrets, pitch_param='intra_trial_roving')
