@@ -722,7 +722,7 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
     ax4.set_xticks([0.25, 1.25], ['Female', 'Male'])
     ax4.set_ylabel('d\'')
     ax4.set_title('d\'')
-    plt.savefig('figs/proportion_hits_falsealarms_correctresp_dprime_bytalker_2706.png', dpi = 500, bbox_inches='tight')
+    plt.savefig('figs/proportion_hits_falsealarms_correctresp_dprime_bytalker_2005.png', dpi = 500, bbox_inches='tight')
     plt.show()
     fig, ax = plt.subplots()
     multiplier = 0
@@ -763,7 +763,7 @@ def plot_stats(stats_dict_all_combined, stats_dict_combined):
     ax.set_ylabel('bias', fontsize = 15)
     ax.set_title('Bias across talkers', fontsize = 18)
     plt.legend(fontsize=8, loc = 'lower right')
-    plt.savefig('figs/bias_bytalker_2706.png', dpi=500, bbox_inches='tight')
+    plt.savefig('figs/bias_bytalker_2005.png', dpi=500, bbox_inches='tight')
     plt.show()
     return
 
@@ -1065,7 +1065,7 @@ def run_barplot_pipeline():
     :return: None'''
 
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
-    df = behaviouralhelperscg.get_stats_df(ferrets=ferrets, startdate='04-01-2016', finishdate='01-03-2023')
+    df = behaviouralhelperscg.get_stats_df(ferrets=ferrets, startdate='04-01-2016', finishdate='01-03-2023',  path='D:/Data/L27andL28/')
     pitch_type_list = ['control_trial', 'inter_trial_roving', 'intra_trial_roving']
     stats_dict_all_combined = {}
     stats_dict_combined = {}
@@ -1245,55 +1245,55 @@ def run_repeated_anova(stats_dict_inter, stats_dict_intra, stats_dict_control):
 if __name__ == '__main__':
     run_simulated_releasetimes()
     stats_dict_empty = {}
-    # run_barplot_pipeline()
+    run_barplot_pipeline()
     ferrets = ['F1702_Zola', 'F1815_Cruella', 'F1803_Tina', 'F2002_Macaroni', 'F2105_Clove']
     df = behaviouralhelperscg.get_stats_df(ferrets=ferrets, startdate='04-01-2016', finishdate='01-03-2023', path='D:/Data/L27andL28/')
     # kw_dict =  kw_test(df)
     #bin df by target presentation time
     ##TODO: put in separate function
-    bin_edges = np.arange(0, 5.1, 0.5)
-    df['targtimes_bins'] = pd.cut(df['targTimes'], bins=bin_edges)
-
-    dprime_results = pd.DataFrame()
-    for bin in df['targtimes_bins'].unique():
-        #filter the df
-        df_bin = df[df['targtimes_bins'] == bin]
-        #calculate the dprime
-        dprime_for_bin = CalculateStats.dprime(np.mean(df_bin['hit']), np.mean(df_bin['falsealarm']))
-        #append to a different dataframe
-        dprime_results = pd.concat([dprime_results, pd.DataFrame({'dprime': [dprime_for_bin], 'bin': [bin]})])
-
-    fig, ax = plt.subplots()
-    for pitchtype in ['control_trial', 'inter_trial_roving', 'intra_trial_roving']:
-        df_pitch = df[df[pitchtype] == 1]
-        dprime_results = pd.DataFrame()
-        df_pitch = df_pitch.dropna(subset=['targtimes_bins'])
-
-        for bin in df_pitch['targtimes_bins'].unique():
-            # filter the df
-            df_bin = df_pitch[df_pitch['targtimes_bins'] == bin]
-            # calculate the dprime
-            dprime_for_bin = CalculateStats.dprime(np.mean(df_bin['hit']), np.mean(df_bin['falsealarm']))
-            #get the standard error
-            # std_dev = np.sqrt((np.mean(df_bin['hit']) * (1 - np.mean(df_bin['hit'])) + np.mean(df_bin['falsealarm']) * (1 - np.mean(df_bin['falsealarm']))) / len(df_bin))
-            # append to a different dataframe
-            dprime_results = pd.concat([dprime_results, pd.DataFrame(
-                {'dprime': [dprime_for_bin], 'bin': [bin.mid]})])  # Use the midpoint of the interval
-        # plot the dprime
-        # plt.scatter(dprime_results['bin'], dprime_results['dprime'], label=pitchtype)
-        #add error bars
-        std_dev = np.std(dprime_results['dprime'])
-        standard_error = std_dev / np.sqrt(len(dprime_results['dprime']))
-        #make a y err column
-        dprime_results['std_error'] = standard_error
-
-        plt.errorbar(dprime_results['bin'], dprime_results['dprime'], yerr=dprime_results['std_error'], fmt='o', label = pitchtype)
-    plt.legend()
-    plt.xlabel('Target presentation time (s)')
-    plt.ylabel('dprime')
-    plt.title('dprime by target presentation time')
-    plt.savefig('figs/dprime_by_targetpresentationtime_17052024.png', dpi=500, bbox_inches='tight')
-    plt.show()
+    # bin_edges = np.arange(0, 5.1, 0.5)
+    # df['targtimes_bins'] = pd.cut(df['targTimes'], bins=bin_edges)
+    #
+    # dprime_results = pd.DataFrame()
+    # for bin in df['targtimes_bins'].unique():
+    #     #filter the df
+    #     df_bin = df[df['targtimes_bins'] == bin]
+    #     #calculate the dprime
+    #     dprime_for_bin = CalculateStats.dprime(np.mean(df_bin['hit']), np.mean(df_bin['falsealarm']))
+    #     #append to a different dataframe
+    #     dprime_results = pd.concat([dprime_results, pd.DataFrame({'dprime': [dprime_for_bin], 'bin': [bin]})])
+    #
+    # fig, ax = plt.subplots()
+    # for pitchtype in ['control_trial', 'inter_trial_roving', 'intra_trial_roving']:
+    #     df_pitch = df[df[pitchtype] == 1]
+    #     dprime_results = pd.DataFrame()
+    #     df_pitch = df_pitch.dropna(subset=['targtimes_bins'])
+    #
+    #     for bin in df_pitch['targtimes_bins'].unique():
+    #         # filter the df
+    #         df_bin = df_pitch[df_pitch['targtimes_bins'] == bin]
+    #         # calculate the dprime
+    #         dprime_for_bin = CalculateStats.dprime(np.mean(df_bin['hit']), np.mean(df_bin['falsealarm']))
+    #         #get the standard error
+    #         # std_dev = np.sqrt((np.mean(df_bin['hit']) * (1 - np.mean(df_bin['hit'])) + np.mean(df_bin['falsealarm']) * (1 - np.mean(df_bin['falsealarm']))) / len(df_bin))
+    #         # append to a different dataframe
+    #         dprime_results = pd.concat([dprime_results, pd.DataFrame(
+    #             {'dprime': [dprime_for_bin], 'bin': [bin.mid]})])  # Use the midpoint of the interval
+    #     # plot the dprime
+    #     # plt.scatter(dprime_results['bin'], dprime_results['dprime'], label=pitchtype)
+    #     #add error bars
+    #     std_dev = np.std(dprime_results['dprime'])
+    #     standard_error = std_dev / np.sqrt(len(dprime_results['dprime']))
+    #     #make a y err column
+    #     dprime_results['std_error'] = standard_error
+    #
+    #     plt.errorbar(dprime_results['bin'], dprime_results['dprime'], yerr=dprime_results['std_error'], fmt='o', label = pitchtype)
+    # plt.legend()
+    # plt.xlabel('Target presentation time (s)')
+    # plt.ylabel('dprime')
+    # plt.title('dprime by target presentation time')
+    # plt.savefig('figs/dprime_by_targetpresentationtime_17052024.png', dpi=500, bbox_inches='tight')
+    # plt.show()
 
 
 
