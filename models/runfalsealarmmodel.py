@@ -331,7 +331,7 @@ def run_mixed_effects_model_falsealarm(df):
         summary = base.summary(model)
         # Extract the fixed effects coefficients, p-values, and standard errors
         coefficients_fold = np.array(robjects.r['coef'](summary))
-        p_values_fold = np.array(robjects.r['pvalues'](summary))
+        p_values_fold =summary.rx2('coefficients')[:, 4]
         std_error_fold = np.array(robjects.r['std.error'](summary))
 
         coefficients.append(coefficients_fold)
