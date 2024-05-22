@@ -383,7 +383,7 @@ def run_glmme_correctresp(df):
 
         # Get the variance-covariance matrix of the random effects
         var_random_effect_object = robjects.r['VarCorr'](model)
-        var_random_effect = var_random_effect_object.rx2('ferret_ID')[0][0]
+        var_random_effect = var_random_effect_object.rx2('ferret')[0][0]
 
         # Calculate the variance of the fixed effects
         fitted_values = robjects.r['fitted'](model)
