@@ -281,8 +281,7 @@ def run_mixed_effects_model_falsealarm(df):
         #scale trial number and time since trial start
         train['trial_number'] = (train['trial_number'] - train['trial_number'].mean()) / train['trial_number'].std()
         train['time_since_trial_start'] = (train['time_since_trial_start'] - train['time_since_trial_start'].mean()) / train['time_since_trial_start'].std()
-        test['trial_number'] = (test['trial_number'] - test['trial_number'].mean()) / test['trial_number'].std()
-        test['time_since_trial_start'] = (test['time_since_trial_start'] - test['time_since_trial_start'].mean()) / test['time_since_trial_start'].std()
+
 
 
 

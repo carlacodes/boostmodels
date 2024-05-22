@@ -306,9 +306,7 @@ def run_glmme_correctresp(df):
         train['trialNum'] = (train['trialNum'] - train['trialNum'].mean()) / train['trialNum'].std()
         train['targTimes'] = (train['targTimes'] - train['targTimes'].mean()) / \
                                           train['targTimes'].std()
-        test['trial_number'] = (test['trial_number'] - test['trial_number'].mean()) / test['trial_number'].std()
-        test['targTimes'] = (test['targTimes'] - test['targTimes'].mean()) / \
-                                         test['targTimes'].std()
+
 
         # Convert pandas DataFrame to R DataFrame
         rdf = pandas2ri.py2rpy(train)
