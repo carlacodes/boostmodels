@@ -303,7 +303,7 @@ def run_glmme_correctresp(df):
     for train_index, test_index in kf.split(df):
         train, test = df.iloc[train_index], df.iloc[test_index]
         # scale trial number and time since trial start
-        train['trial_number'] = (train['trial_number'] - train['trial_number'].mean()) / train['trial_number'].std()
+        train['trialNum'] = (train['trialNum'] - train['trialNum'].mean()) / train['trialNum'].std()
         train['targTimes'] = (train['targTimes'] - train['targTimes'].mean()) / \
                                           train['targTimes'].std()
         test['trial_number'] = (test['trial_number'] - test['trial_number'].mean()) / test['trial_number'].std()
@@ -989,7 +989,7 @@ def run_correct_responsepipeline(ferrets):
     :param ferrets: which ferret(s) to run the model on
     :return: xg_reg2, ypred2, y_test2, results2, shap_values, X_train, y_train, bal_accuracy, shap_values2'''
     resultingcr_df = behaviouralhelperscg.get_df_behav(ferrets=ferrets, includefaandmiss=False, includemissonly=True, startdate='04-01-2020',
-                                  finishdate='03-01-2023')
+                                  finishdate='03-01-2023', path = 'D:/Data/L27andL28/')
     resultingcr_df['talker'] = resultingcr_df['talker'].replace({1: 2, 2: 1})
     filepath = Path('D:/dfformixedmodels/correctresponsemodel_dfuse.csv')
     filepath.parent.mkdir(parents=True, exist_ok=True)
