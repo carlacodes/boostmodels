@@ -1272,6 +1272,10 @@ if __name__ == '__main__':
         for bin in df_pitch['targtimes_bins'].unique():
             # filter the df
             df_bin = df_pitch[df_pitch['targtimes_bins'] == bin]
+
+            # make sure it is non catch non correction trials
+            df_bin = df_bin[df_bin['catchTrial'] == 0]
+            df_bin = df_bin[df_bin['correctionTrial'] == 0]
             df_bin_hit = df_bin[df_bin['response'] != 5]            # calculate the dprime
             dprime_for_bin = CalculateStats.dprime(np.mean(df_bin_hit['hit']), np.mean(df_bin['falsealarm']))
             #get the standard error
