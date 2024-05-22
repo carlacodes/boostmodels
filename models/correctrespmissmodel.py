@@ -327,7 +327,7 @@ def run_glmme_correctresp(df):
 
 
         rdf = pandas2ri.py2rpy(train)
-        formula = 'misslist ~ talker + side + precur_and_targ_same + targTimes + pastcorrectresp + pastcatchtrial + pitchoftarg + (1|ferret_ID)'
+        formula = 'misslist ~ talker + side + precur_and_targ_same + targTimes + pastcorrectresp + pastcatchtrial + pitchoftarg + (1|ferret)'
 
         # Fit the GLMM
         # Replace 'binomial' with the appropriate family for your data
