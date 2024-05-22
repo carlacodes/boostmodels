@@ -338,11 +338,12 @@ def run_mixed_effects_model_falsealarm(df):
         random_effects_df = pd.concat([random_effects_df, random_effects_2])
         p_values.append(p_values_fold)
         std_error.append(std_error_fold)
+        lme4 = importr('lme4')
 
-        var_corr = lme4.VarCorr(model)
-
-        # Calculate the standard deviation of the random effects
-        std_error_re.append(np.sqrt(np.diag(var_corr)))
+        # Get the variance-covariance matrix of the random effects
+        # var_corr = robjects.r['lme4::VarCorr'](model)
+        # # Calculate the standard deviation of the random effects
+        # std_error_re.append(np.sqrt(np.diag(var_corr)))
 
         # Generate confusion matrix for train set
         stats = importr('stats')
