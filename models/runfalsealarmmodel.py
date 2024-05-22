@@ -312,7 +312,7 @@ def run_mixed_effects_model_falsealarm(df):
         #
         #flatten the random_effects
         print(random_effects_np)
-        var_resid = base.sigma(model) ** 2
+        var_resid = robjects.r['sigma'](model) ** 2
 
         # Get the variance-covariance matrix of the random effects
         var_random_effect = lme4.VarCorr(model)
@@ -424,7 +424,7 @@ def run_mixed_effects_model_falsealarm(df):
     print(mean_coefficients)    #export
     np.savetxt(f"D:/mixedeffects_csvs/falsealarm_balac_train_mean.csv", [np.mean(train_acc)], delimiter=",")
     np.savetxt(f"D:/mixedeffects_csvs/falsealarmbalac_test_mean.csv", [np.mean(test_acc)], delimiter=",")
-    return result
+    return coefficients
 
 
 def runlgbfaornotwithoptuna(dataframe, paramsinput, ferret_as_feature=False, one_ferret = False, ferrets = None):
