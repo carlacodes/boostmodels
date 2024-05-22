@@ -418,7 +418,7 @@ def run_glmme_correctresp(df):
         y_pred_train_prob = 1 / (1 + np.exp(-y_pred_train))
         y_pred_train_class = [1 if prob >= 0.5 else 0 for prob in y_pred_train]
 
-        y_true_train = train['falsealarm'].to_numpy()
+        y_true_train = train['misslist'].to_numpy()
 
         # Calculate balanced accuracy for train set
         balanced_accuracy_train = balanced_accuracy_score(y_true_train, y_pred_train_class)
@@ -430,7 +430,7 @@ def run_glmme_correctresp(df):
         y_pred = stats.predict(model, newdata=rdf_test)
         y_pred_prob = 1 / (1 + np.exp(-y_pred))
         y_pred_class = [1 if prob >= 0.5 else 0 for prob in y_pred]
-        y_true = test['falsealarm'].to_numpy()
+        y_true = test['misslist'].to_numpy()
 
         # Calculate balanced accuracy for test set
         balanced_accuracy_test = balanced_accuracy_score(y_true, y_pred_class)
@@ -452,7 +452,7 @@ def run_glmme_correctresp(df):
     p_values_df = pd.DataFrame(p_values).mean()
     std_error_df = pd.DataFrame(std_error).mean()
     std_error_re_df = pd.DataFrame(std_error_re).mean()
-    labels_mixed_effects_df = pd.DataFrame(labels_mixed_effects)
+    # labels_mixed_effects_df = pd.DataFrame(labels_mixed_effects)
     # combine into one dataframe
 
     result_coefficients = pd.concat([coefficients_df, p_values_df, std_error_df], axis=1,
@@ -478,7 +478,7 @@ def run_glmme_correctresp(df):
     ax.set_ylabel('Mean Coefficient')
     plt.xticks(rotation=45, ha='right')
     ax.set_title('Mean Coefficient for Each Feature, False Alarm Model')
-    plt.savefig('D:/mixedeffects_csvs//fa_or_not_model_mean_coefficients.png', dpi=500, bbox_inches='tight')
+    plt.savefig('D:/mixedeffects_csvs//correctresp_or_not_model_mean_coefficients.png', dpi=500, bbox_inches='tight')
     plt.show()
 
     # plot the mean coefficients as a bar plot
@@ -489,16 +489,16 @@ def run_glmme_correctresp(df):
     mean_coefficients = pd.concat([mean_coefficients, p_values_df, std_error_df], axis=1,
                                   keys=['coefficients', 'p_values', 'std_error'])
     print(mean_coefficients)
-    mean_coefficients.to_csv('D:/mixedeffects_csvs/falsealarm_mean_coefficients.csv')
+    mean_coefficients.to_csv('D:/mixedeffects_csvs/correctresp_mean_coefficients.csv')
 
     mean_random_effects = random_effects_df.mean(axis=0)
     print(mean_random_effects)
     big_df = pd.concat([mean_coefficients, mean_random_effects], axis=0)
-    mean_random_effects.to_csv('D:/mixedeffects_csvs/false_alarm_random_effects.csv')
+    mean_random_effects.to_csv('D:/mixedeffects_csvs/correctresp_random_effects.csv')
 
     print(mean_coefficients)  # export
-    np.savetxt(f"D:/mixedeffects_csvs/falsealarm_balac_train_mean.csv", [np.mean(train_acc)], delimiter=",")
-    np.savetxt(f"D:/mixedeffects_csvs/falsealarmbalac_test_mean.csv", [np.mean(test_acc)], delimiter=",")
+    np.savetxt(f"D:/mixedeffects_csvs/correctresp_balac_train_mean.csv", [np.mean(train_acc)], delimiter=",")
+    np.savetxt(f"D:/mixedeffects_csvs/correctresp_balac_test_mean.csv", [np.mean(test_acc)], delimiter=",")
     return coefficients
 
 
