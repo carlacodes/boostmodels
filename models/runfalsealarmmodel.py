@@ -296,7 +296,7 @@ def run_mixed_effects_model_falsealarm(df):
         base = importr('base')
 
         print(base.summary(model))
-        random_effects = lme4.ranef(model)
+        random_effects = robjects.r['ranef'](model)
 
         random_effects_np = np.array([list(df) for df in random_effects])
 
@@ -312,15 +312,19 @@ def run_mixed_effects_model_falsealarm(df):
         #
         #flatten the random_effects
         print(random_effects_np)
+        var_resid = base.sigma(model) ** 2
 
-        var_resid = result.scale
-        var_random_effect = float(result.cov_re.iloc[0])
-        var_fixed_effect = result.predict(df).var()
+        # Get the variance-covariance matrix of the random effects
+        var_random_effect = lme4.VarCorr(model)
+
+        # Calculate the variance of the fixed effects
+        fitted_values = base.fitted(model)
+        var_fixed_effect = base.var(fitted_values)
 
         total_var = var_fixed_effect + var_random_effect + var_resid
         marginal_r2 = var_fixed_effect / total_var
         conditional_r2 = (var_fixed_effect + var_random_effect) / total_var
-        params = result.params
+
         #combiune params and random effects into one series
         # params = pd.concat([params, random_effects_2.mean(axis=0)], axis=0)
         summary = base.summary(model)
@@ -340,29 +344,21 @@ def run_mixed_effects_model_falsealarm(df):
         std_error_re.append(np.sqrt(np.diag(var_corr)))
 
         # Generate confusion matrix for train set
-        y_pred_train = result.predict(train)
-        y_pred_train = (y_pred_train > 0.5).astype(int)
+        stats = importr('stats')
+
+        y_pred_train = stats.predict(model, newdata=rdf)
         y_true_train = train['falsealarm'].to_numpy()
-        confusion_matrix_train = confusion_matrix(y_true_train, y_pred_train)
-        print(confusion_matrix_train)
 
         # Calculate balanced accuracy for train set
         balanced_accuracy_train = balanced_accuracy_score(y_true_train, y_pred_train)
         print(balanced_accuracy_train)
         train_acc.append(balanced_accuracy_train)
 
-        # Export confusion matrix and balanced accuracy for train set
-        np.savetxt(f"D:/mixedeffects_csvs/falsealarm_confusionmatrix_train_fold{fold_index}.csv", confusion_matrix_train,
-                   delimiter=",")
-        np.savetxt(f"D:/mixedeffects_csvs/falsealarm_balac_train_fold{fold_index}.csv", [balanced_accuracy_train],
-                   delimiter=",")
-
         # Generate confusion matrix for test set
-        y_pred = result.predict(test)
-        y_pred = (y_pred > 0.5).astype(int)
+        rdf_test = pandas2ri.py2rpy(test)
+        y_pred =  stats.predict(model, newdata=rdf_test)
         y_true = test['falsealarm'].to_numpy()
-        confusion_matrix_test = confusion_matrix(y_true, y_pred)
-        print(confusion_matrix_test)
+
 
 
         # Calculate balanced accuracy for test set
@@ -370,11 +366,11 @@ def run_mixed_effects_model_falsealarm(df):
         print(balanced_accuracy_test)
         test_acc.append(balanced_accuracy_test)
 
-        # Export confusion matrix and balanced accuracy for test set
-        np.savetxt(f"D:/mixedeffects_csvs/falsealarmp_confusionmatrix_test_fold{fold_index}.csv", confusion_matrix_test,
-                   delimiter=",")
-        np.savetxt(f"D:/mixedeffects_csvs/falsealarm_balac_test_fold{fold_index}.csv", [balanced_accuracy_test],
-                   delimiter=",")
+        # # Export confusion matrix and balanced accuracy for test set
+        # np.savetxt(f"D:/mixedeffects_csvs/falsealarmp_confusionmatrix_test_fold{fold_index}.csv", confusion_matrix_test,
+        #            delimiter=",")
+        # np.savetxt(f"D:/mixedeffects_csvs/falsealarm_balac_test_fold{fold_index}.csv", [balanced_accuracy_test],
+        #            delimiter=",")
 
         fold_index += 1  # Increment fold index
     #calculate the mean accuracy
