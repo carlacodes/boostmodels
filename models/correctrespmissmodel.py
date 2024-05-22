@@ -30,7 +30,7 @@ def shap_summary_plot(
         shap_values2,
         feature_labels,
         ax=None,
-        cmap = "viridis",
+        cmap = "viridis", show = False
     ):
     '''plot the shap summary plot
     :param shap_values2: shap values
@@ -813,7 +813,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
     ax_dict['A'].set_xticklabels(feature_labels, rotation=20, ha='right', fontfamily='sans-serif')  # rotate x-axis labels for better readability
 
     axmini = ax_dict['B']
-    shap_summary_plot(shap_values2, feature_labels, show_plots=False, ax=axmini, cmap=cmapcustom)
+    shap_summary_plot(shap_values2, feature_labels, ax=axmini, cmap=cmapcustom, show = False)
     ax_dict['B'].set_yticklabels(np.flip(feature_labels), fontsize=12, rotation=45, fontfamily='sans-serif')
     ax_dict['B'].set_xlabel('Log(odds) miss', fontsize=12)
     ax_dict['B'].set_xticks([-1, -0.5, 0, 0.5, 1])
