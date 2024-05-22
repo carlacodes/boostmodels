@@ -282,8 +282,7 @@ def run_mixed_effects_model_falsealarm(df):
         test['trial_number'] = (test['trial_number'] - test['trial_number'].mean()) / test['trial_number'].std()
         test['time_since_trial_start'] = (test['time_since_trial_start'] - test['time_since_trial_start'].mean()) / test['time_since_trial_start'].std()
 
-        model = smf.mixedlm(equation, train, groups=train["ferret_ID"])
-        result = model.fit()
+
 
         # Convert pandas DataFrame to R DataFrame
         rdf = pandas2ri.py2rpy(train)
@@ -297,22 +296,22 @@ def run_mixed_effects_model_falsealarm(df):
         base = importr('base')
 
         print(base.summary(model))
+        random_effects = lme4.ranef(model)
 
-        random_effects = result.random_effects
+        random_effects_np = np.array([list(df) for df in random_effects])
+
         #commbine all into one series
         # random_effects = pd.DataFrame(random_effects)
         random_effects_2 = pd.DataFrame()
         for i, ferret in enumerate(ferrets):
             try:
-                random_effects_2[ferret] = random_effects[i].values
+                random_effects_2[ferret] = random_effects_np[i].values
             except:
                 continue
 
         #
         #flatten the random_effects
-        print(random_effects)
-
-        print(result.summary())
+        print(random_effects_np)
 
         var_resid = result.scale
         var_random_effect = float(result.cov_re.iloc[0])
@@ -324,12 +323,21 @@ def run_mixed_effects_model_falsealarm(df):
         params = result.params
         #combiune params and random effects into one series
         # params = pd.concat([params, random_effects_2.mean(axis=0)], axis=0)
+        summary = base.summary(model)
+        # Extract the fixed effects coefficients, p-values, and standard errors
+        coefficients_fold = np.array(robjects.r['coef'](summary))
+        p_values_fold = np.array(robjects.r['pvalues'](summary))
+        std_error_fold = np.array(robjects.r['std.error'](summary))
 
-        coefficients.append(params)
+        coefficients.append(coefficients_fold)
         random_effects_df = pd.concat([random_effects_df, random_effects_2])
-        p_values.append(result.pvalues)
-        std_error.append(result.bse)
-        std_error_re.append(result.bse_re)
+        p_values.append(p_values_fold)
+        std_error.append(std_error_fold)
+
+        var_corr = lme4.VarCorr(model)
+
+        # Calculate the standard deviation of the random effects
+        std_error_re.append(np.sqrt(np.diag(var_corr)))
 
         # Generate confusion matrix for train set
         y_pred_train = result.predict(train)
