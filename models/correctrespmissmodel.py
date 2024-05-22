@@ -17,7 +17,15 @@ from helpers.behaviouralhelpersformodels import *
 import sklearn.metrics as metrics
 import rpy2.robjects as robjects
 from rpy2.robjects import pandas2ri
+# from rpy2.robjects import pandas2ri
+
 from rpy2.robjects.packages import importr
+
+# Enable automatic conversion from pandas to R
+pandas2ri.activate()
+
+# Import R packages
+lme4 = importr('lme4')
 def shap_summary_plot(
         shap_values2,
         feature_labels,
@@ -275,7 +283,8 @@ def run_glmme_correctresp(df):
     df = df.dropna()
     #calculate the probability of a miss when the targtimes >=5.5
     df['misslist'] = df['misslist'].astype(int)
-    df['targTimes'] = df['targTimes'].astype(float)
+    df['targTimes'] = df['targTimes']
+    df['trialNum'] = df['trialNum'].astype(int)
     df['pastcorrectresp'] = df['pastcorrectresp'].astype('category')
     df['precur_and_targ_same'] = df['precur_and_targ_same'].astype('category')
     df['side'] = df['side'].astype('category')
@@ -299,16 +308,24 @@ def run_glmme_correctresp(df):
     std_error_re = []
     random_effects_df = pd.DataFrame()
     lme4 = importr('lme4')
-
+    for col in df.columns:
+        if isinstance(df[col], pd.Series):
+            print('series detected')
+            df[col] = df[col].to_numpy()
     for train_index, test_index in kf.split(df):
         train, test = df.iloc[train_index], df.iloc[test_index]
         # scale trial number and time since trial start
         train['trialNum'] = (train['trialNum'] - train['trialNum'].mean()) / train['trialNum'].std()
         train['targTimes'] = (train['targTimes'] - train['targTimes'].mean()) / \
                                           train['targTimes'].std()
-
-
+        #
+        # for col in df.columns:
+        #     if isinstance(df[col], pd.Series):
+        #         df[col] = df[col].to_numpy()
         # Convert pandas DataFrame to R DataFrame
+
+
+
         rdf = pandas2ri.py2rpy(train)
 
         formula = 'falsealarm ~ talker + time_since_trial_start + trial_number + audio_side + intra_trial_F0_roving + past_response_correct + past_trial_was_catch + F0 + (1|ferret_ID)'
