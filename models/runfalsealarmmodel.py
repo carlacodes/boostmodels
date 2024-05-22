@@ -296,8 +296,38 @@ def run_mixed_effects_model_falsealarm(df):
         # Replace 'binomial' with the appropriate family for your data
         model = lme4.glmer(formula, data=rdf, family='binomial')
         base = importr('base')
+        from rpy2.robjects import r
 
+        # Assuming 'model' is your model
+        # Convert the model to an R object
+        r_model = pandas2ri.py2rpy(model)
+        r.assign("model", r_model)
+
+        r('summary_model <- summary(model)')
+
+        # Extract the coefficients
+        r('coefficients <- summary_model$coefficients')
+
+        # Get the labels of the coefficients
+        r('coefficient_labels <- rownames(coefficients)')
+
+        # Print the labels
+        print(r('coefficient_labels'))
+        #extract the coefficients
+        coeff_labels = r('coefficient_labels')
+
+
+        # Get the labels of the coefficients
         print(base.summary(model))
+
+        # coefficient_labels = robjects.r['rownames'](coefficients)
+        #
+        # # Convert R labels to Python list
+        # coefficient_labels_list = list(coefficient_labels)
+        #
+        # print(coefficient_labels_list)
+
+
         random_effects = robjects.r['ranef'](model)
 
         random_effects_np = np.array([list(df) for df in random_effects])
@@ -394,7 +424,9 @@ def run_mixed_effects_model_falsealarm(df):
 
     result_coefficients = pd.concat([coefficients_df, p_values_df, std_error_df], axis=1, keys=['coefficients', 'p_values', 'std_error'])
     fig, ax = plt.subplots()
-    result_coefficients.index = result_coefficients.index.str.replace('Group Var', 'Ferret')
+    #extract the coefficient labels
+    result_coefficients.index = coeff_labels
+    result_coefficients.index = result_coefficients.index.str.replace('(Intercept)', 'Ferret')
 
     #sort the coefficients by their mean value
 
