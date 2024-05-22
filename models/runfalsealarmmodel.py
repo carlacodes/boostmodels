@@ -25,7 +25,15 @@ import matplotlib.pyplot as plt
 import statsmodels.formula.api as smf
 from sklearn.model_selection import KFold
 from sklearn.metrics import confusion_matrix, balanced_accuracy_score
+import rpy2.robjects as robjects
+from rpy2.robjects import pandas2ri
+from rpy2.robjects.packages import importr
 
+# Enable automatic conversion from pandas to R
+pandas2ri.activate()
+
+# Import R packages
+lme4 = importr('lme4')
 
 def shap_summary_plot(
         shap_values2,
@@ -234,7 +242,7 @@ def run_mixed_effects_model_falsealarm(df):
     :param df: dataframe
     :return: mixed effects model'
     '''
-    equation = 'falsealarm ~ talker +time_since_trial_start+ trial_number + audio_side + intra_trial_F0_roving + past_response_correct + past_trial_was_catch + F0'
+    equation = 'falsealarm ~ talker +time_since_trial_start+ trial_number + (audio_side *ferret_ID) + intra_trial_F0_roving + past_response_correct + past_trial_was_catch + F0'
 
     #drop the rows with missing values
     labels_mixed_effects = ["time_since_trial_start", "ferret_ID", "trial_number", "talker", "audio_side",
@@ -268,9 +276,27 @@ def run_mixed_effects_model_falsealarm(df):
     random_effects_df = pd.DataFrame()
     for train_index, test_index in kf.split(df):
         train, test = df.iloc[train_index], df.iloc[test_index]
+        #scale trial number and time since trial start
+        train['trial_number'] = (train['trial_number'] - train['trial_number'].mean()) / train['trial_number'].std()
+        train['time_since_trial_start'] = (train['time_since_trial_start'] - train['time_since_trial_start'].mean()) / train['time_since_trial_start'].std()
+        test['trial_number'] = (test['trial_number'] - test['trial_number'].mean()) / test['trial_number'].std()
+        test['time_since_trial_start'] = (test['time_since_trial_start'] - test['time_since_trial_start'].mean()) / test['time_since_trial_start'].std()
 
         model = smf.mixedlm(equation, train, groups=train["ferret_ID"])
         result = model.fit()
+
+        # Convert pandas DataFrame to R DataFrame
+        rdf = pandas2ri.py2rpy(train)
+
+
+        formula = 'falsealarm ~ talker + time_since_trial_start + trial_number + audio_side + intra_trial_F0_roving + past_response_correct + past_trial_was_catch + F0 + (1|ferret_ID)'
+
+        # Fit the GLMM
+        # Replace 'binomial' with the appropriate family for your data
+        model = lme4.glmer(formula, data=rdf, family='binomial')
+        base = importr('base')
+
+        print(base.summary(model))
 
         random_effects = result.random_effects
         #commbine all into one series
@@ -318,9 +344,9 @@ def run_mixed_effects_model_falsealarm(df):
         train_acc.append(balanced_accuracy_train)
 
         # Export confusion matrix and balanced accuracy for train set
-        np.savetxt(f"mixedeffects_csvs/falsealarm_confusionmatrix_train_fold{fold_index}.csv", confusion_matrix_train,
+        np.savetxt(f"D:/mixedeffects_csvs/falsealarm_confusionmatrix_train_fold{fold_index}.csv", confusion_matrix_train,
                    delimiter=",")
-        np.savetxt(f"mixedeffects_csvs/falsealarm_balac_train_fold{fold_index}.csv", [balanced_accuracy_train],
+        np.savetxt(f"D:/mixedeffects_csvs/falsealarm_balac_train_fold{fold_index}.csv", [balanced_accuracy_train],
                    delimiter=",")
 
         # Generate confusion matrix for test set
@@ -337,9 +363,9 @@ def run_mixed_effects_model_falsealarm(df):
         test_acc.append(balanced_accuracy_test)
 
         # Export confusion matrix and balanced accuracy for test set
-        np.savetxt(f"mixedeffects_csvs/falsealarmp_confusionmatrix_test_fold{fold_index}.csv", confusion_matrix_test,
+        np.savetxt(f"D:/mixedeffects_csvs/falsealarmp_confusionmatrix_test_fold{fold_index}.csv", confusion_matrix_test,
                    delimiter=",")
-        np.savetxt(f"mixedeffects_csvs/falsealarm_balac_test_fold{fold_index}.csv", [balanced_accuracy_test],
+        np.savetxt(f"D:/mixedeffects_csvs/falsealarm_balac_test_fold{fold_index}.csv", [balanced_accuracy_test],
                    delimiter=",")
 
         fold_index += 1  # Increment fold index
@@ -374,7 +400,7 @@ def run_mixed_effects_model_falsealarm(df):
     ax.set_ylabel('Mean Coefficient')
     plt.xticks(rotation=45, ha='right')
     ax.set_title('Mean Coefficient for Each Feature, False Alarm Model')
-    plt.savefig('mixedeffects_csvs//fa_or_not_model_mean_coefficients.png', dpi=500, bbox_inches='tight')
+    plt.savefig('D:/mixedeffects_csvs//fa_or_not_model_mean_coefficients.png', dpi=500, bbox_inches='tight')
     plt.show()
 
     #plot the mean coefficients as a bar plot
@@ -384,16 +410,16 @@ def run_mixed_effects_model_falsealarm(df):
     mean_coefficients = pd.DataFrame(coefficients).mean()
     mean_coefficients = pd.concat([mean_coefficients, p_values_df, std_error_df], axis=1, keys=['coefficients', 'p_values', 'std_error'])
     print(mean_coefficients)
-    mean_coefficients.to_csv('mixedeffects_csvs/falsealarm_mean_coefficients.csv')
+    mean_coefficients.to_csv('D:/mixedeffects_csvs/falsealarm_mean_coefficients.csv')
 
     mean_random_effects = random_effects_df.mean(axis=0)
     print(mean_random_effects)
     big_df = pd.concat([mean_coefficients, mean_random_effects], axis=0)
-    mean_random_effects.to_csv('mixedeffects_csvs/false_alarm_random_effects.csv')
+    mean_random_effects.to_csv('D:/mixedeffects_csvs/false_alarm_random_effects.csv')
 
     print(mean_coefficients)    #export
-    np.savetxt(f"mixedeffects_csvs/falsealarm_balac_train_mean.csv", [np.mean(train_acc)], delimiter=",")
-    np.savetxt(f"mixedeffects_csvs/falsealarmbalac_test_mean.csv", [np.mean(test_acc)], delimiter=",")
+    np.savetxt(f"D:/mixedeffects_csvs/falsealarm_balac_train_mean.csv", [np.mean(train_acc)], delimiter=",")
+    np.savetxt(f"D:/mixedeffects_csvs/falsealarmbalac_test_mean.csv", [np.mean(test_acc)], delimiter=",")
     return result
 
 
@@ -1185,7 +1211,7 @@ def runfalsealarmpipeline(ferrets, optimization=False, ferret_as_feature=False):
     :param ferret_as_feature: whether to use ferret as a feature or not
     :return: xg_reg, ypred, y_test, results, shap_values1, X_train, y_train, bal_accuracy, shap_values2'''
     resultingfa_df = behaviouralhelperscg.get_false_alarm_behavdata(ferrets=ferrets, startdate='04-01-2020',
-                                                              finishdate='01-03-2023')
+                                                              finishdate='01-03-2023', path  = 'D:/Data/L27andL28/')
     len_of_data_male = {}
     len_of_data_female = {}
     len_of_data_female_intra = {}

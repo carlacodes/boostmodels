@@ -189,9 +189,9 @@ def run_mixed_effects_model_correctresp(df):
         train_acc.append(balanced_accuracy_train)
 
         # Export confusion matrix and balanced accuracy for train set
-        np.savetxt(f"mixedeffects_csvs/correctresp_confusionmatrix_train_fold{fold_index}.csv", confusion_matrix_train,
+        np.savetxt(f"D:/mixedeffects_csvs/correctresp_confusionmatrix_train_fold{fold_index}.csv", confusion_matrix_train,
                    delimiter=",")
-        np.savetxt(f"mixedeffects_csvs/correctresp_balac_train_fold{fold_index}.csv", [balanced_accuracy_train],
+        np.savetxt(f"D:/mixedeffects_csvs/correctresp_balac_train_fold{fold_index}.csv", [balanced_accuracy_train],
                    delimiter=",")
 
         # Generate confusion matrix for test set
@@ -207,9 +207,9 @@ def run_mixed_effects_model_correctresp(df):
         test_acc.append(balanced_accuracy_test)
 
         # Export confusion matrix and balanced accuracy for test set
-        np.savetxt(f"mixedeffects_csvs/correctresp_confusionmatrix_test_fold{fold_index}.csv", confusion_matrix_test,
+        np.savetxt(f"D:/mixedeffects_csvs/correctresp_confusionmatrix_test_fold{fold_index}.csv", confusion_matrix_test,
                    delimiter=",")
-        np.savetxt(f"mixedeffects_csvs/correctresp_balac_test_fold{fold_index}.csv", [balanced_accuracy_test],
+        np.savetxt(f"D:/mixedeffects_csvs/correctresp_balac_test_fold{fold_index}.csv", [balanced_accuracy_test],
                    delimiter=",")
 
         fold_index += 1  # Increment fold index
@@ -243,7 +243,7 @@ def run_mixed_effects_model_correctresp(df):
     plt.xticks(rotation=45, ha='right')
     ax.set_title('Mean Coefficient for Each Feature, Miss Model')
 
-    plt.savefig('mixedeffects_csvs/mean_coefficients_correct_response.png', dpi=500, bbox_inches='tight')
+    plt.savefig('D:/mixedeffects_csvs/mean_coefficients_correct_response.png', dpi=500, bbox_inches='tight')
     plt.show()
 
     print(np.mean(train_acc))
@@ -251,16 +251,16 @@ def run_mixed_effects_model_correctresp(df):
     mean_coefficients = pd.DataFrame(coefficients).mean()
     mean_coefficients = pd.concat([mean_coefficients, p_values_df, std_error_df], axis=1, keys=['coefficients', 'p_values', 'std_error'])
     print(mean_coefficients)
-    mean_coefficients.to_csv('mixedeffects_csvs/correctresp_mean_coefficients.csv')
+    mean_coefficients.to_csv('D:/mixedeffects_csvs/correctresp_mean_coefficients.csv')
 
     mean_random_effects = random_effects_df.mean(axis=0)
     print(mean_random_effects)
     big_df = pd.concat([mean_coefficients, mean_random_effects], axis=0)
-    mean_random_effects.to_csv('mixedeffects_csvs/random_effects.csv')
+    mean_random_effects.to_csv('D:/mixedeffects_csvs/random_effects.csv')
 
     #export to dataframe
-    np.savetxt(f"mixedeffects_csvs/correctresp_balac_train_mean.csv", [np.mean(train_acc)], delimiter=",")
-    np.savetxt(f"mixedeffects_csvs/correctresp_balac_test_mean.csv", [np.mean(test_acc)], delimiter=",")
+    np.savetxt(f"D:/mixedeffects_csvs/correctresp_balac_train_mean.csv", [np.mean(train_acc)], delimiter=",")
+    np.savetxt(f"D:/mixedeffects_csvs/correctresp_balac_test_mean.csv", [np.mean(test_acc)], delimiter=",")
     return result
 
 def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization = False, ferret_as_feature=False, one_ferret = False, ferrets = None):
