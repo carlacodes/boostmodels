@@ -15,7 +15,9 @@ import matplotlib.colors as mcolors
 from sklearn.model_selection import train_test_split
 from helpers.behaviouralhelpersformodels import *
 import sklearn.metrics as metrics
-
+import rpy2.robjects as robjects
+from rpy2.robjects import pandas2ri
+from rpy2.robjects.packages import importr
 def shap_summary_plot(
         shap_values2,
         feature_labels,
@@ -263,6 +265,229 @@ def run_mixed_effects_model_correctresp(df):
     np.savetxt(f"D:/mixedeffects_csvs/correctresp_balac_test_mean.csv", [np.mean(test_acc)], delimiter=",")
     return result
 
+
+def run_glmme_correctresp(df):
+
+    ferrets= ['F1702', 'F1815', 'F1803', 'F2002', 'F2105']
+    equation = 'misslist ~ talker + side + precur_and_targ_same + targTimes + pastcorrectresp + pastcatchtrial + pitchoftarg'
+    #split the data into training and test set
+    #drop the rows with missing values
+    df = df.dropna()
+    #calculate the probability of a miss when the targtimes >=5.5
+    df['misslist'] = df['misslist'].astype(int)
+    df['targTimes'] = df['targTimes'].astype(float)
+    df['pastcorrectresp'] = df['pastcorrectresp'].astype('category')
+    df['precur_and_targ_same'] = df['precur_and_targ_same'].astype('category')
+    df['side'] = df['side'].astype('category')
+    df['side'] = df['side'].replace({0: 'Left', 1: 'Right'})
+
+    df['talker'] = df['talker'].astype('category')
+    df['precur_and_targ_same'] = df['precur_and_targ_same'].astype('category')
+    df['pastcatchtrial'] = df['pastcatchtrial'].astype('category')
+    df['pitchoftarg'] = df['pitchoftarg'].astype('category')
+    df['talker'] = df['talker'].replace({1: 'Male', 2: 'Female'})
+    df['pitchoftarg'] = df['pitchoftarg'].replace({1: '109 Hz', 2: '124 Hz', 3: '144 Hz', 4: '191 Hz', 5: '251 Hz'})
+    df['ferret'] = df['ferret'].astype('category')
+
+    kf = KFold(n_splits=5, shuffle=True, random_state=123)
+    fold_index = 1
+    train_acc = []
+    test_acc = []
+    coefficients = []
+    p_values = []
+    std_error = []
+    std_error_re = []
+    random_effects_df = pd.DataFrame()
+    lme4 = importr('lme4')
+
+    for train_index, test_index in kf.split(df):
+        train, test = df.iloc[train_index], df.iloc[test_index]
+        # scale trial number and time since trial start
+        train['trial_number'] = (train['trial_number'] - train['trial_number'].mean()) / train['trial_number'].std()
+        train['targTimes'] = (train['targTimes'] - train['targTimes'].mean()) / \
+                                          train['targTimes'].std()
+        test['trial_number'] = (test['trial_number'] - test['trial_number'].mean()) / test['trial_number'].std()
+        test['targTimes'] = (test['targTimes'] - test['targTimes'].mean()) / \
+                                         test['targTimes'].std()
+
+        # Convert pandas DataFrame to R DataFrame
+        rdf = pandas2ri.py2rpy(train)
+
+        formula = 'falsealarm ~ talker + time_since_trial_start + trial_number + audio_side + intra_trial_F0_roving + past_response_correct + past_trial_was_catch + F0 + (1|ferret_ID)'
+
+        # Fit the GLMM
+        # Replace 'binomial' with the appropriate family for your data
+        model = lme4.glmer(formula, data=rdf, family='binomial')
+        base = importr('base')
+        from rpy2.robjects import r
+
+        # Assuming 'model' is your model
+        # Convert the model to an R object
+        r_model = pandas2ri.py2rpy(model)
+        r.assign("model", r_model)
+
+        r('summary_model <- summary(model)')
+
+        # Extract the coefficients
+        r('coefficients <- summary_model$coefficients')
+
+        # Get the labels of the coefficients
+        r('coefficient_labels <- rownames(coefficients)')
+
+        # Print the labels
+        print(r('coefficient_labels'))
+        # extract the coefficients
+        coeff_labels = r('coefficient_labels')
+
+        # Get the labels of the coefficients
+        print(base.summary(model))
+
+        # coefficient_labels = robjects.r['rownames'](coefficients)
+        #
+        # # Convert R labels to Python list
+        # coefficient_labels_list = list(coefficient_labels)
+        #
+        # print(coefficient_labels_list)
+
+        random_effects = robjects.r['ranef'](model)
+
+        random_effects_np = np.array([list(df) for df in random_effects])
+
+        # commbine all into one series
+        # random_effects = pd.DataFrame(random_effects)
+        random_effects_2 = pd.DataFrame()
+        for i, ferret in enumerate(ferrets):
+            try:
+                random_effects_2[ferret] = random_effects_np[i].values
+            except:
+                continue
+
+        #
+        # flatten the random_effects
+        print(random_effects_np)
+        var_resid = robjects.r['sigma'](model) ** 2
+
+        # Get the variance-covariance matrix of the random effects
+        var_random_effect_object = robjects.r['VarCorr'](model)
+        var_random_effect = var_random_effect_object.rx2('ferret_ID')[0][0]
+
+        # Calculate the variance of the fixed effects
+        fitted_values = robjects.r['fitted'](model)
+        var_fixed_effect = robjects.r['var'](fitted_values)
+
+        total_var = var_fixed_effect + var_random_effect + var_resid
+        marginal_r2 = var_fixed_effect / total_var
+        conditional_r2 = (var_fixed_effect + var_random_effect) / total_var
+
+        # combiune params and random effects into one series
+        # params = pd.concat([params, random_effects_2.mean(axis=0)], axis=0)
+        summary = base.summary(model)
+        # Extract the fixed effects coefficients, p-values, and standard errors
+        coefficients_fold = np.array(robjects.r['coef'](summary))[:, 0]
+        p_values_fold = summary.rx2('coefficients')[:, 3]
+        std_error_fold = summary.rx2('coefficients')[:, 1]
+
+        coefficients.append(coefficients_fold)
+        random_effects_df = pd.concat([random_effects_df, random_effects_2])
+        p_values.append(p_values_fold)
+        std_error.append(std_error_fold)
+
+        # Get the variance-covariance matrix of the random effects
+        # var_corr = robjects.r['lme4::VarCorr'](model)
+        # # Calculate the standard deviation of the random effects
+        # std_error_re.append(np.sqrt(np.diag(var_corr)))
+
+        # Generate confusion matrix for train set
+        stats = importr('stats')
+
+        y_pred_train = stats.predict(model, newdata=rdf)
+        y_pred_train_prob = 1 / (1 + np.exp(-y_pred_train))
+        y_pred_train_class = [1 if prob >= 0.5 else 0 for prob in y_pred_train]
+
+        y_true_train = train['falsealarm'].to_numpy()
+
+        # Calculate balanced accuracy for train set
+        balanced_accuracy_train = balanced_accuracy_score(y_true_train, y_pred_train_class)
+        print(balanced_accuracy_train)
+        train_acc.append(balanced_accuracy_train)
+
+        # Generate confusion matrix for test set
+        rdf_test = pandas2ri.py2rpy(test)
+        y_pred = stats.predict(model, newdata=rdf_test)
+        y_pred_prob = 1 / (1 + np.exp(-y_pred))
+        y_pred_class = [1 if prob >= 0.5 else 0 for prob in y_pred]
+        y_true = test['falsealarm'].to_numpy()
+
+        # Calculate balanced accuracy for test set
+        balanced_accuracy_test = balanced_accuracy_score(y_true, y_pred_class)
+        print(balanced_accuracy_test)
+        test_acc.append(balanced_accuracy_test)
+
+        # # Export confusion matrix and balanced accuracy for test set
+        # np.savetxt(f"D:/mixedeffects_csvs/falsealarmp_confusionmatrix_test_fold{fold_index}.csv", confusion_matrix_test,
+        #            delimiter=",")
+        # np.savetxt(f"D:/mixedeffects_csvs/falsealarm_balac_test_fold{fold_index}.csv", [balanced_accuracy_test],
+        #            delimiter=",")
+
+        fold_index += 1  # Increment fold index
+    # calculate the mean accuracy
+    # plot the mean coefficients as a bar plot
+    # make a dataframe of the coefficients, p-values, and features
+    coefficients_df = pd.DataFrame(coefficients).mean()
+    index = coefficients_df.index
+    p_values_df = pd.DataFrame(p_values).mean()
+    std_error_df = pd.DataFrame(std_error).mean()
+    std_error_re_df = pd.DataFrame(std_error_re).mean()
+    labels_mixed_effects_df = pd.DataFrame(labels_mixed_effects)
+    # combine into one dataframe
+
+    result_coefficients = pd.concat([coefficients_df, p_values_df, std_error_df], axis=1,
+                                    keys=['coefficients', 'p_values', 'std_error'])
+    fig, ax = plt.subplots()
+    # extract the coefficient labels
+    result_coefficients.index = coeff_labels
+    result_coefficients.index = result_coefficients.index.str.replace('(Intercept)', 'Ferret')
+
+    # sort the coefficients by their mean value
+
+    result_coefficients = result_coefficients.sort_values(by='coefficients', ascending=False)
+    ax.bar(result_coefficients.index, result_coefficients['coefficients'])
+    ax.errorbar(result_coefficients.index, result_coefficients['coefficients'], yerr=result_coefficients['std_error'],
+                fmt='none', ecolor='black', elinewidth=1, capsize=2)
+
+    # ax.set_xticklabels(result_coefficients['features'], rotation=45, ha='right')
+    # if the mean p value is less than 0.05, then add a star to the bar plot
+    for i in range(len(result_coefficients)):
+        if result_coefficients['p_values'][i] < 0.05:
+            ax.text(i, 0.00, '*', fontsize=20)
+    ax.set_xlabel('Features')
+    ax.set_ylabel('Mean Coefficient')
+    plt.xticks(rotation=45, ha='right')
+    ax.set_title('Mean Coefficient for Each Feature, False Alarm Model')
+    plt.savefig('D:/mixedeffects_csvs//fa_or_not_model_mean_coefficients.png', dpi=500, bbox_inches='tight')
+    plt.show()
+
+    # plot the mean coefficients as a bar plot
+
+    print(np.mean(train_acc))
+    print(np.mean(test_acc))
+    mean_coefficients = pd.DataFrame(coefficients).mean()
+    mean_coefficients = pd.concat([mean_coefficients, p_values_df, std_error_df], axis=1,
+                                  keys=['coefficients', 'p_values', 'std_error'])
+    print(mean_coefficients)
+    mean_coefficients.to_csv('D:/mixedeffects_csvs/falsealarm_mean_coefficients.csv')
+
+    mean_random_effects = random_effects_df.mean(axis=0)
+    print(mean_random_effects)
+    big_df = pd.concat([mean_coefficients, mean_random_effects], axis=0)
+    mean_random_effects.to_csv('D:/mixedeffects_csvs/false_alarm_random_effects.csv')
+
+    print(mean_coefficients)  # export
+    np.savetxt(f"D:/mixedeffects_csvs/falsealarm_balac_train_mean.csv", [np.mean(train_acc)], delimiter=",")
+    np.savetxt(f"D:/mixedeffects_csvs/falsealarmbalac_test_mean.csv", [np.mean(test_acc)], delimiter=",")
+    return coefficients
+
+
 def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization = False, ferret_as_feature=False, one_ferret = False, ferrets = None):
     '''run the lightgbm model for the correct response model
     :param dataframe: dataframe
@@ -279,7 +504,7 @@ def runlgbcorrectrespornotwithoptuna(dataframe, paramsinput=None, optimization =
                                "pastcatchtrial", "pitchoftarg", "ferret"]]
         labels = ['trial no.','misslist', 'talker', 'audio side', 'precur. = targ. F0','target time', 'past resp. correct', 'past trial catch',"target F0", 'ferret ID']
 
-        run_mixed_effects_model_correctresp(df_to_use)
+        run_glmme_correctresp(df_to_use)
         df_to_use = df_to_use.rename(columns=dict(zip(df_to_use.columns, labels)))
 
         fig_dir = Path('D:/behavmodelfigs/correctresp_or_miss/ferret_as_feature')
