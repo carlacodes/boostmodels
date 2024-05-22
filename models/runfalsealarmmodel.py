@@ -315,7 +315,8 @@ def run_mixed_effects_model_falsealarm(df):
         var_resid = robjects.r['sigma'](model) ** 2
 
         # Get the variance-covariance matrix of the random effects
-        var_random_effect = lme4.VarCorr(model)
+        var_random_effect_object = robjects.r['VarCorr'](model)
+        var_random_effect = var_random_effect_object.rx2('ferret_ID')[0][0]
 
         # Calculate the variance of the fixed effects
         fitted_values = base.fitted(model)
