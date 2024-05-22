@@ -319,8 +319,8 @@ def run_mixed_effects_model_falsealarm(df):
         var_random_effect = var_random_effect_object.rx2('ferret_ID')[0][0]
 
         # Calculate the variance of the fixed effects
-        fitted_values = base.fitted(model)
-        var_fixed_effect = base.var(fitted_values)
+        fitted_values = robjects.r['fitted'](model)
+        var_fixed_effect = robjects.r['var'](fitted_values)
 
         total_var = var_fixed_effect + var_random_effect + var_resid
         marginal_r2 = var_fixed_effect / total_var
