@@ -274,6 +274,8 @@ def run_mixed_effects_model_falsealarm(df):
     std_error = []
     std_error_re = []
     random_effects_df = pd.DataFrame()
+    lme4 = importr('lme4')
+
     for train_index, test_index in kf.split(df):
         train, test = df.iloc[train_index], df.iloc[test_index]
         #scale trial number and time since trial start
@@ -330,7 +332,7 @@ def run_mixed_effects_model_falsealarm(df):
         # params = pd.concat([params, random_effects_2.mean(axis=0)], axis=0)
         summary = base.summary(model)
         # Extract the fixed effects coefficients, p-values, and standard errors
-        coefficients_fold = np.array(robjects.r['coef'](summary))
+        coefficients_fold = np.array(robjects.r['coef'](summary))[:,0]
         p_values_fold =summary.rx2('coefficients')[:,3]
         std_error_fold = summary.rx2('coefficients')[:,1]
 
@@ -338,7 +340,6 @@ def run_mixed_effects_model_falsealarm(df):
         random_effects_df = pd.concat([random_effects_df, random_effects_2])
         p_values.append(p_values_fold)
         std_error.append(std_error_fold)
-        lme4 = importr('lme4')
 
         # Get the variance-covariance matrix of the random effects
         # var_corr = robjects.r['lme4::VarCorr'](model)
@@ -349,22 +350,27 @@ def run_mixed_effects_model_falsealarm(df):
         stats = importr('stats')
 
         y_pred_train = stats.predict(model, newdata=rdf)
+        y_pred_train_prob = 1 / (1 + np.exp(-y_pred_train))
+        y_pred_train_class = [1 if prob >= 0.5 else 0 for prob in y_pred_train]
+
         y_true_train = train['falsealarm'].to_numpy()
 
         # Calculate balanced accuracy for train set
-        balanced_accuracy_train = balanced_accuracy_score(y_true_train, y_pred_train)
+        balanced_accuracy_train = balanced_accuracy_score(y_true_train, y_pred_train_class)
         print(balanced_accuracy_train)
         train_acc.append(balanced_accuracy_train)
 
         # Generate confusion matrix for test set
         rdf_test = pandas2ri.py2rpy(test)
         y_pred =  stats.predict(model, newdata=rdf_test)
+        y_pred_prob = 1 / (1 + np.exp(-y_pred))
+        y_pred_class = [1 if prob >= 0.5 else 0 for prob in y_pred]
         y_true = test['falsealarm'].to_numpy()
 
 
 
         # Calculate balanced accuracy for test set
-        balanced_accuracy_test = balanced_accuracy_score(y_true, y_pred)
+        balanced_accuracy_test = balanced_accuracy_score(y_true, y_pred_class)
         print(balanced_accuracy_test)
         test_acc.append(balanced_accuracy_test)
 
